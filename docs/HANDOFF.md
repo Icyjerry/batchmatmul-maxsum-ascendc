@@ -4,11 +4,16 @@
 
 ## 当前最重要的结论
 
-- `kernel.asc` 已基于队友版本实现实验 v1；不是最初的 Vector fallback。
-- 当前候选开启 `BMMMS_DEFERRED_MAX=1`，只影响默认 dual=1/2 的合适形状。
-- **尚无本轮 NPU 编译成功、正式 15 case 通过或性能提升证据。**
+- `kernel.asc` 已基于队友版本实现实验 v1 + wave-balance 调度优化；不是最初的 Vector fallback。
+- **本轮已完成真实 NPU 编译与精度**：T0/T1/T2 三组在 910B3 / CANN 9.0.0 上均 21/21 通过
+  （自建多 case harness，含 FP16/BF16、FF/FT/TF/TT、全负、K 跨 tile、多 batch）。
+- **deferred Max（T1 vs T2）实测收益约 ±7% 以内、多数为噪声，未观察到预期加速。**
+  真正瓶颈是 cube wave 未填满和 64 行 tile 的 B 重载。
+- 当前候选为 `experiment/wave-balance`：只改 host plan，实测 1.16–1.58x（多个 shape），
+  大 dual==2 与转置布局中性。详见 PERF_LOG。
+- **正式 15 个 case 与官方评测器仍未运行**（本地只有自建 harness，不是官方判分）。
 - CANN 9.0.0，A2/A3 均可能；不要把任一设备的最佳参数未经验证推广到另一种。
-- 用户当前要求把项目放到 GitHub 并用 Git 保留交接信息。GitHub 仓库私有，接手环境需要相应权限。
+- 用户当前要求把项目放到 GitHub 并用 Git 保留交接信息。仓库现已公开。
 
 ## 已完成
 
@@ -18,12 +23,21 @@
 4. 保留 `BMMMS_DEFERRED_MAX=0` 对照，0/1 两组的 UB 预留与 host tiling 逻辑相同。最多新增 16 KiB/AIV。
 5. 修复 FinalizeRows 中把 AIC worker 数误用为 AIV 遍历步长的问题。
 6. CPU C++ helper 模型 2,304 个分片、54,828 个有效行最大值逐位一致。Python 补充模型、任务覆盖与 UB 预算结果见 PERF_LOG。没有 NPU 结果。
+7. **[wave-balance, 2026-09-20]** 910B3 实测：T0/T1/T2 各 21/21 精度通过；msprof 证明
+   `(1,513,511,2048)` 只跑 5/20 block、cube util 24%。三项 host-plan 修复：dual==1
+   wave 填充、shape family `tuneM` 64→128、小 K 走 dual==2 避开全 C fixpipe；加
+   `BMMMS_DUMP_PLAN`。实测 1.16–1.58x（见 PERF_LOG），转置与已调优的多 split 形状经
+   gate 后保持中性。
 
 ## 下一条具体动作
 
-**有 NPU 环境：**按 `docs/VALIDATION_REQUEST_v1.md` 编译 T0/T1/T2，并回传逐 case 精度、耗时和 msprof。T0 从 `teammate-opt4` tag 获取；T1/T2 使用当前代码但分别定义宏为 0/1。
+**有 NPU 环境：**把 `experiment/wave-balance` 与 T0/T1/T2 在同一 harness 上跑
+`BMMMS_DEFERRED_MAX=0/1` 完整 A/B，并对有收益/退化的代表 case 采 median/p95 与 msprof；
+重点确认 `(1,513,511,2048)`、`(1,1023,513,512)`、`(1,1024,512,256)` 的收益可复现，
+以及 `BMMMS_TUNING` 分支（env：`BMMMS_BM/BN/NS/DUAL/WINDOW/WORKERS`）覆盖更多 shape。
 
-**只有本地开发环境：**运行 `python3 tools/validate_cpu_model.py`，检查当前 Git 状态和验证资料，准备交接；不要凭 CPU 计时修改性能分块策略。
+**只有本地开发环境：**运行 `python3 tools/validate_cpu_model.py`，检查 Git 状态和验证资料；
+不要凭 CPU 计时修改分块策略。
 
 T0/T1/T2 差异：
 
