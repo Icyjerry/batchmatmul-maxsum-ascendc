@@ -1,0 +1,15 @@
+/build*/
+/input/
+/output/
+/artifacts/
+/profiling/
+/profiler/
+__pycache__/
+*.py[cod]
+*.bin
+.DS_Store
+.env
+.env.*
+!.env.example
+/.codex/
+/.agents/

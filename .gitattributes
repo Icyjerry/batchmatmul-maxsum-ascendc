@@ -1,0 +1,2 @@
+# Preserve kernel snapshots byte-for-byte for SHA256 comparisons.
+kernel.asc -text
