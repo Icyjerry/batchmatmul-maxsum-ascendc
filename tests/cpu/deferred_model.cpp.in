@@ -1,0 +1,110 @@
+
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <iostream>
+#include <stdexcept>
+#include <vector>
+#define __aicore__
+constexpr int PIPE_V=0;
+namespace AscendC {
+enum class TPosition {VECCALC};
+enum class ReduceOrder {ORDER_ONLY_VALUE};
+template<class T> struct LocalTensor {
+    std::vector<T>* data=nullptr;
+    size_t offset=0;
+    LocalTensor operator[](size_t n) const {return {data,offset+n};}
+    T& at(size_t n) const {return data->at(offset+n);}
+};
+template<TPosition P> struct TBuf {
+    std::vector<float> storage;
+    template<class T> LocalTensor<T> Get(){return {&storage,0};}
+};
+struct TPipe {
+    template<TPosition P> void InitBuffer(TBuf<P>& b,uint32_t bytes) {
+        assert(bytes%32==0); b.storage.assign(bytes/4,1.0e30f);
+    }
+};
+struct BinaryRepeatParams {uint8_t db,s0b,s1b,dr,s0r,s1r;};
+template<int P> void PipeBarrier(){}
+void Duplicate(const LocalTensor<float>& a,float v,uint32_t count) {
+    for(uint32_t i=0;i<count;++i)a.at(i)=v;
+}
+void Max(const LocalTensor<float>& dst,const LocalTensor<float>& a,
+         const LocalTensor<float>& b,uint64_t mask,uint8_t reps,const BinaryRepeatParams& p) {
+    assert(mask>0&&mask<=64&&reps>0);
+    assert(dst.offset%8==0&&a.offset%8==0&&b.offset%8==0);
+    for(uint32_t r=0;r<reps;++r)for(uint32_t j=0;j<mask;++j) {
+        const uint32_t block=j/8,lane=j%8;
+        dst.at(r*p.dr*8+block*p.db*8+lane)=std::max(
+            a.at(r*p.s0r*8+block*p.s0b*8+lane),b.at(r*p.s1r*8+block*p.s1b*8+lane));
+    }
+}
+void WholeReduceMax(const LocalTensor<float>& dst,const LocalTensor<float>& src,
+    uint64_t mask,uint8_t reps,uint8_t ds,uint8_t ss,uint8_t rs,ReduceOrder) {
+    assert(mask>0&&mask<=64&&reps>0);
+    for(uint32_t r=0;r<reps;++r) {
+        float result=-INFINITY;
+        for(uint32_t j=0;j<mask;++j)result=std::max(result,src.at(r*rs*8+(j/8)*ss*8+j%8));
+        dst.at(r*ds)=result;
+    }
+}
+}
+
+// BMMMS_INSERT_LIVE_HELPER
+
+float sample(uint32_t row,uint32_t col,uint32_t mode) {
+    uint32_t h=(row+11)*2654435761u^(col+17)*2246822519u;
+    if(mode==0)return -float(1+h%10000)/128.0f;
+    if(mode==1)return float(int(h%20001)-10000)/128.0f;
+    if(mode==2)return col%19==0?3.25f:-2.0f;
+    return col%97==0?1.0e-38f:-1.0e-38f;
+}
+
+int main() {
+    std::cout<<"CPU address/mask model started"<<std::endl;
+    uint64_t shards=0,checkedRows=0;
+    const std::vector<uint32_t> nsizes={1,7,8,15,16,31,32,63,64,65,127,128,129,255,256,257,511,512,513,1023,1025,2048,4097,8192};
+    const std::vector<uint32_t> rowCounts={64,1,63,0,32,7,31,8,16,15};
+    uint32_t seed=0x12345678;
+    auto next=[&](){seed=seed*1664525u+1013904223u;return seed;};
+    for(uint32_t stride:{64u,128u,256u}) {
+        AscendC::TPipe pipe; DeferredRowMax reducer; reducer.Init(pipe,64);
+        std::vector<float> tile(64*stride),out(128);
+        AscendC::LocalTensor<float> c{&tile,0},maxima{&out,0};
+        for(uint32_t trial=0;trial<768;++trial) {
+            const uint32_t n=nsizes[trial%nsizes.size()];
+            const uint32_t nt=(n+stride-1)/stride;
+            const uint32_t splits[]={1,2,3,4,7,8,16,32};
+            const uint32_t split=std::min(nt,splits[(trial/24)%8]);
+            const uint32_t part=trial%2?split-1:next()%split;
+            const uint32_t rows=rowCounts[(trial/3)%rowCounts.size()];
+            const uint32_t mode=(trial/24)%4;
+            const uint32_t begin=part*nt/split,end=(part+1)*nt/split;
+            std::vector<float> ref(rows,-INFINITY);
+            std::fill(out.begin(),out.end(),-INFINITY);
+            reducer.Reset(rows);
+            for(uint32_t t=begin;t<end;++t) {
+                const uint32_t cols=std::min(stride,n-t*stride);
+                std::fill(tile.begin(),tile.end(),1.0e30f);
+                for(uint32_t r=0;r<rows;++r)for(uint32_t j=0;j<cols;++j) {
+                    const float v=sample(r,t*stride+j,mode);
+                    tile[r*stride+j]=v;ref[r]=std::max(ref[r],v);
+                }
+                if(rows)reducer.Update(c,rows,cols,stride);
+            }
+            reducer.Finish(maxima,rows);
+            for(uint32_t r=0;r<rows;++r) {
+                if(std::memcmp(&ref[r],&out[r],sizeof(float)))throw std::runtime_error("row mismatch");
+                ++checkedRows;
+            }
+            for(uint32_t r=rows;r<out.size();++r)assert(out[r]==-INFINITY);
+            ++shards;
+        }
+        std::cout<<"stride "<<stride<<" passed"<<std::endl;
+    }
+    std::cout<<"actual DeferredRowMax helper: "<<shards<<" shard cases, "<<checkedRows
+             <<" valid row maxima bitwise equal; poisoned tails and repeated Reset passed\n";
+}
