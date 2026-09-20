@@ -82,6 +82,18 @@ T2 → 本分支（同机实测，单次 msprof）：
 原始材料：本机 `/tmp/opencode/`（非 Git）。plan dump 可用
 `BMMMS_DUMP_PLAN=1 ./batch_matmul_max_sum_custom B M N K 1 tx1 tx2` 复现。
 
+## 2026-09-20 · 覆盖度检查与死代码瘦身
+
+Kernel SHA256（CRLF）：`95e8c24446daf7dd4b670adea393f1f7f5344229bc54257783efc5f7e8bf2fcc`
+
+- 静态 + 51-shape 实测确认：默认构建 `dual ∈ {0,1,2}`，8 个策略 kernel 不可达
+  （见 [COVERAGE.md](COVERAGE.md)），合计 888,216 B。
+- 把这些 kernel/类与其 `Launch` 分支用 `#ifdef BMMMS_TUNING` 包住：
+  设备 ELF `1,689,520 -> 714,736` B（−58%）；`-DBMMMS_TUNING` 构建仍含全部候选。
+- 精度：36/36 通过（新增 dual==2 与 kSplit>1 覆盖 case）。
+- 性能：5 个代表 shape A/B 为噪声级中性（±6%），本项不是速度优化。
+- 仍未覆盖/未验证：官方 15 case、A3、median/p95、`BMMMS_TUNING` 候选的性能。
+
 ## 后续实机记录模板
 
 ```text

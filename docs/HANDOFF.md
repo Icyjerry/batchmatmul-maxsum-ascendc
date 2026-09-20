@@ -11,6 +11,9 @@
   真正瓶颈是 cube wave 未填满和 64 行 tile 的 B 重载。
 - 当前候选为 `experiment/wave-balance`：只改 host plan，实测 1.16–1.58x（多个 shape），
   大 dual==2 与转置布局中性。详见 PERF_LOG。
+- 覆盖度检查发现默认构建有 8 个策略 kernel 不可达（占设备码 59%）；已用
+  `#ifdef BMMMS_TUNING` 包住，设备 ELF 1.69MB→0.71MB（−58%），性能中性；
+  并为 dual==2 / kSplit>1 补了覆盖 case（36/36）。详见 COVERAGE.md。
 - **正式 15 个 case 与官方评测器仍未运行**（本地只有自建 harness，不是官方判分）。
 - CANN 9.0.0，A2/A3 均可能；不要把任一设备的最佳参数未经验证推广到另一种。
 - 用户当前要求把项目放到 GitHub 并用 Git 保留交接信息。仓库现已公开。
