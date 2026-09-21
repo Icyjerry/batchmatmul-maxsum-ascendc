@@ -1,6 +1,6 @@
 # BatchMatmulMaxSum · Ascend C
 
-> **最新实验（2026-09-21）：**`experiment/coverage-splitk`，提交 `71a288a`，从用户最佳 tag 独立派生。包含存活 UB 预算修复（`b0a2fc0`）、小核数末级输出覆盖修复（`c4e536a`），以及参考 Stream-K/CUTLASS 的 1/2/4 份自适应拆分。CPU 模型通过；CANN/NPU 仍 PENDING。检出该分支阅读 `docs/HANDOFF.md` 和 `docs/VALIDATION_REQUEST_coverage_splitk.md`。此前流水实验仍保存在 `experiment/dual-consumer-pipeline`（`7c44793`），未混入当前对照；用户最优 tag 不变。
+> **最新实验（2026-09-21）：**`experiment/n-split-critical-work`，提交 `677d882`，父提交 `8fb1e72`。新增一项对齐大矩阵 dual=1 的 N 拆分候选，按真实 cyclic worker 工作选择 ns；宏 `BMMMS_BALANCED_NSPLIT=0/1` 做对照。CPU 38,880 调度配置通过，CANN/NPU/正式性能仍 PENDING。检出该分支阅读 `docs/HANDOFF.md` 与 `docs/VALIDATION_REQUEST_nsplit_work.md`。该分支也保存了队友探针资料审计和覆盖修复；消费流水实验未混入。main 内核仍为历史v1，用户最佳tag不变；本次仅更新接手入口。
 
 > **2026-09-21 最新入口：**用户提供了新的当前最优版本。后续开发请先执行 `git fetch origin`、`git switch --track origin/experiment/user-best-20260921`（已有本地分支则直接 switch），并阅读该分支的 HANDOFF。固定 tag 为 `user-best-20260921`，导入提交 `23e3e5a`，kernel SHA256 为 `e512c0d5d21ff4f065cabcd16278e097a2678f327334b85156939b35fc8f4cdc`。旧 N 拆分实验保存在 `experiment/v2-dual1-nsplit`（`7426712`）。main 的 kernel 仍为历史 v1；以下 v1 内容不是当前最佳版本说明。新版本的本轮 CANN/NPU 复测仍待完成。
 
