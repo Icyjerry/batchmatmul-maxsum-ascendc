@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reproduce CPU-only v1 checks; this does not compile or run an NPU kernel."""
+"""Reproduce CPU-only experiment checks; this does not run an NPU kernel."""
 
 from collections import Counter
 from pathlib import Path
@@ -82,9 +82,22 @@ def main():
         cpp.write_text(template.replace(marker, helper))
         subprocess.run([compiler, "-std=c++14", "-O2", str(cpp), "-o", str(exe)], check=True, timeout=60)
         subprocess.run([str(exe)], check=True, timeout=60)
+        if "inline uint32_t SelectDual1NSplit(" in source:
+            # Compile the actual host policy against an independent task oracle.
+            ceil_start = source.index("inline int64_t Ceil(")
+            ceil_end = source.index("\n", ceil_start)
+            policy_start = source.index("struct NSplitCost {")
+            policy_end = source.index("inline const TensorInfo &OnlyTensor", policy_start)
+            policy = source[ceil_start:ceil_end] + "\n" + source[policy_start:policy_end]
+            model = (ROOT / "tests/cpu/nsplit_model.cpp.in").read_text()
+            marker = "// BMMMS_INSERT_LIVE_NSPLIT"
+            assert model.count(marker) == 1
+            cpp.write_text(model.replace(marker, policy))
+            subprocess.run([compiler, "-std=c++14", "-O2", str(cpp), "-o", str(exe)], check=True, timeout=60)
+            subprocess.run([str(exe)], check=True, timeout=60)
     check_schedules(source)
     check_budget(source)
-    print("PASS: CPU helper, schedule, and budget models. NPU validation remains pending.")
+    print("PASS: CPU models. NPU validation remains pending.")
 
 
 if __name__ == "__main__":

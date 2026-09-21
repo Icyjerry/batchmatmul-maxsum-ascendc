@@ -1,5 +1,11 @@
 # 接手状态
 
+## 2026-09-21 分支归档更新
+
+此分支为 `experiment/v2-dual1-nsplit`，在下述 v1 上增加 N 拆分代理成本选择器；详见 `EXPERIMENT_v2.md`。CPU 模型通过，CANN/NPU 均 PENDING。用户已提供新的当前最优 `kernel(2).asc`，后续以 `experiment/user-best-20260921` 和 `user-best-20260921` tag 为起点；不要把本分支当作用户当前最优。
+
+以下是 v1 历史接手记录。
+
 更新日期：2026-09-20。此文件与 Git 中的代码、验证单一起足以独立接手。
 
 ## 当前最重要的结论

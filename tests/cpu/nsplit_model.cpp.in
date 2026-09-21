@@ -1,0 +1,97 @@
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <iostream>
+#include <vector>
+
+// BMMMS_INSERT_LIVE_NSPLIT
+
+// Independent enumeration: assign each (M task, N shard) to task % workers.
+NSplitCost oracle(int64_t base, uint32_t tiles, uint32_t splits,
+                  uint32_t workers, uint32_t window)
+{
+    std::vector<int64_t> work(workers), windows(workers);
+    for (int64_t m = 0; m < base; ++m) {
+        uint32_t previous = 0;
+        for (uint32_t ns = 0; ns < splits; ++ns) {
+            const uint32_t begin = uint64_t(ns) * tiles / splits;
+            const uint32_t end = uint64_t(ns + 1) * tiles / splits;
+            assert(begin == previous && end > begin && end <= tiles);
+            const uint32_t owner = (m * splits + ns) % workers;
+            work[owner] += end - begin;
+            for (uint32_t start = begin; start < end; start += window)
+                ++windows[owner];
+            previous = end;
+        }
+        assert(previous == tiles);
+    }
+    return {*std::max_element(work.begin(), work.end()),
+            *std::max_element(windows.begin(), windows.end())};
+}
+
+int main()
+{
+    uint64_t checked = 0, changed = 0;
+    for (uint32_t workers : {1u, 2u, 3u, 4u, 5u, 8u, 16u, 20u, 24u, 32u, 64u}) {
+        for (int64_t base : {1, 2, 3, 5, 8, 9, 12, 16, 19, 20, 21, 31, 32, 33, 64, 65, 128}) {
+            for (uint32_t tiles : {1u, 2u, 3u, 4u, 5u, 7u, 8u, 9u, 16u, 31u, 32u, 33u, 64u, 128u, 512u}) {
+                for (uint32_t current : {1u, 2u, 3u}) {
+                    if (current > tiles) continue;
+                    for (uint32_t window : {1u, 2u, 4u, 8u}) {
+                        const auto selected = SelectDual1NSplit(base, tiles, current, workers, window);
+                        assert(selected >= current && selected <= tiles);
+                        const auto before = oracle(base, tiles, current, workers, window);
+                        const auto after = oracle(base, tiles, selected, workers, window);
+                        const auto proxy = EstimateNSplitCost(base, tiles, selected, workers, window);
+                        assert(after.maxTiles == proxy.maxTiles && after.maxWindows == proxy.maxWindows);
+                        if (base * current >= workers || current == tiles) assert(selected == current);
+                        if (selected != current) {
+                            assert(after.maxTiles < before.maxTiles);
+                            assert(selected <= (2LL * workers + base - 1) / base);
+                            ++changed;
+                        }
+                        ++checked;
+                    }
+                }
+            }
+        }
+    }
+
+    // Screenshot case, assuming actual baseM/baseN = 128/128 and 20 cores.
+    assert(SelectDual1NSplit(5, 4, 1, 20, 4) == 4);
+    assert(oracle(5, 4, 1, 20, 4).maxTiles == 4);
+    assert(oracle(5, 4, 4, 20, 4).maxTiles == 1);
+    // A naive ceil(workers/base) choice of 2 would make the critical load worse.
+    assert(oracle(9, 3, 2, 16, 2).maxTiles == 4);
+    assert(SelectDual1NSplit(9, 3, 1, 16, 2) == 3);
+    assert(oracle(9, 3, 3, 16, 2).maxTiles == 2);
+    // More active cores alone is insufficient if critical work does not fall.
+    assert(SelectDual1NSplit(12, 2, 1, 20, 4) == 1);
+    assert(SelectDual1NSplit(16, 3, 1, 16, 2) == 1);
+
+    // Check Max over the selected, uneven N partitions with poisoned tails.
+    uint64_t reductions = 0;
+    for (uint32_t n : {65u, 127u, 129u, 255u, 257u, 511u, 513u, 8191u, 8192u}) {
+        for (uint32_t bn : {64u, 128u, 256u}) {
+            const uint32_t tiles = (n + bn - 1) / bn;
+            const auto splits = SelectDual1NSplit(5, tiles, 1, 20, 4);
+            for (int mode = 0; mode < 2; ++mode) {
+                std::vector<float> values(tiles * bn, 1.0e30f);
+                for (uint32_t i = 0; i < n; ++i)
+                    values[i] = mode ? float(int((i * 7919u) % 4093) - 2046) : -float(1 + i % 97);
+                float result = -__builtin_inff();
+                for (uint32_t ns = 0; ns < splits; ++ns) {
+                    const uint32_t begin = uint64_t(ns) * tiles / splits * bn;
+                    const uint32_t end = std::min(n, uint32_t(uint64_t(ns + 1) * tiles / splits * bn));
+                    assert(begin < end);
+                    result = std::max(result, *std::max_element(values.begin() + begin, values.begin() + end));
+                }
+                assert(result == *std::max_element(values.begin(), values.begin() + n));
+                ++reductions;
+            }
+        }
+    }
+    std::cout << "N-split scheduler: " << checked << " configurations passed, " << changed
+              << " changed with strictly less critical tile work; " << reductions
+              << " negative/mixed/tail reductions passed. No latency claim.\n";
+}
