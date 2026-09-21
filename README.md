@@ -4,7 +4,15 @@
 
 **当前开发起点为用户确认的最优 kernel(2).asc，已原样导入；本 Agent 尚未完成该版本的设备复测。**
 
-## 当前覆盖实验
+## 最新性能候选
+
+分支 `experiment/n-split-critical-work`：在父分支覆盖修复基础上增加单项 N 拆分实验，缓解已占满核心时的任务尾波不均衡。宏 `BMMMS_BALANCED_NSPLIT=0/1` 可对照。
+
+- [假设、证据与CPU验证](docs/EXPERIMENT_nsplit_work.md)
+- [设备验证单](docs/VALIDATION_REQUEST_nsplit_work.md)
+- 当前候选 kernel SHA256：`e2bd32e9bdf9d13b2974b565aecb3f55f2519c102bb376ebe54f4cabfc982858`；CANN/NPU/正式性能 PENDING。
+
+## 父分支覆盖实验
 
 分支 `experiment/coverage-splitk`：修复 Split-K UB 预算及小核数输出遍历，再对 long-K 类比较 1/2/4 份拆分。独立于 `experiment/dual-consumer-pipeline`，当前未完成 NPU 验证。
 
@@ -15,7 +23,7 @@
 
 ## 接手
 
-1. 当前工作检出 `experiment/coverage-splitk`；原样用户最优检出 `experiment/user-best-20260921`，阅读 [HANDOFF](docs/HANDOFF.md) 和 [AGENTS](AGENTS.md)。
+1. 当前工作检出 `experiment/n-split-critical-work`；原样用户最优检出 `experiment/user-best-20260921`，阅读 [HANDOFF](docs/HANDOFF.md) 和 [AGENTS](AGENTS.md)。
 2. 阅读 [题目约束](docs/PROBLEM.md)、[当前版本验证单](docs/VALIDATION_REQUEST_user_best.md) 和 [性能记录](docs/PERF_LOG.md)。
 3. 后续优化从当前版本另建实验分支，保留逐 case 的真实对照。
 
@@ -31,7 +39,7 @@
 | `teammate-opt4` | 最初 2,809 行队友原件 |
 | `vector-v0.2` | 早期 Vector 版本 |
 
-当前 kernel SHA256：`e512c0d5d21ff4f065cabcd16278e097a2678f327334b85156939b35fc8f4cdc`。
+原样用户最佳 kernel SHA256：`e512c0d5d21ff4f065cabcd16278e097a2678f327334b85156939b35fc8f4cdc`。
 
 ## 验证范围
 

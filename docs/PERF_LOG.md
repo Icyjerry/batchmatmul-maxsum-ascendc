@@ -97,3 +97,13 @@ Split-K host 模型两档宏均编译运行，统计是各档相同模型空间�
 - `python3 tools/audit_teammate_probe.py`：保存转录哈希一致；75 个粗维度/属性读数最大整数残差 0.144667；section 15 总时间复算 626.96µs。其构建归属来自队友材料，未独立验证。
 - 旧 45 代理发现 14 个 K 非 8 倍数、第 14 点两个 M 超出后续推断范围，第 10 点属性存在冲突；生成 50 个合法本地验证配置，设备结果 PENDING。
 - 来源、当前路径对应、旧报告矛盾与下一轮优先级见 `TEAM_PROBE_REVIEW.md`。不将历史 F12 耗时、旧路径表或单个 big08 profile 计为当前性能证据。
+
+## 2026-09-21 · n-split-critical-work
+
+父提交8fb1e72；kernel SHA256 `e2bd32e9bdf9d13b2974b565aecb3f55f2519c102bb376ebe54f4cabfc982858`。新增65行kernel host调度代码；不改设备算术和事件代码。
+
+- `python3 tools/validate_nsplit_work.py`：38,880调度配置与独立逐tile oracle一致，8,893个配置满足工作量准入；1,836行全负数据分片归约一致；宏0/1/1+TUNING及接入条件通过。数字按单套参数空间计，不将三档相加。
+- 20 Cube 示例 B1/M1536/N1536/K1536：ns2→3，最忙worker tiles12→8、最大windows2→2；M3072：ns1→3、tiles24→16、windows4→4。均为CPU代理计数，非NPU时间。
+- 继承回归：UB86,784、finalizer28,672、Ksplit361,152及classifier864配置通过。
+- 24shape×2dtype×4layout设备清单已列；CANN编译、完整精度、正式15点、稳定态latency及msprof **PENDING**。
+- 对照入口：`VALIDATION_REQUEST_nsplit_work.md`；不将这次计数改善计入性能成绩。

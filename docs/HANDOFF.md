@@ -1,8 +1,18 @@
 # 接手状态 · 2026-09-21
 
+## 最新候选：N 拆分 critical work
+
+分支 `experiment/n-split-critical-work` 从 `8fb1e72` 派生，kernel SHA256 `e2bd32e9bdf9d13b2974b565aecb3f55f2519c102bb376ebe54f4cabfc982858`。
+
+- 新宏 `BMMMS_BALANCED_NSPLIT=0/1`，本分支默认1。只在对齐的大矩阵通用 dual=1 路径按实际 cyclic task 分配搜索 N 拆分；最大窗口数不增，最大tile工作至少下降25%才准入。25%是待验证的实验阈值。
+- 保留父分支 UB/输出修复及 long-K 选择；没有叠加消费流水实验。旧最佳 tag不动，未合并main。
+- `python3 tools/validate_nsplit_work.py`：38,880调度配置、1,836行负值归约和接入排除条件通过，宏0/1/TUNING三种编译均通过。继承的CPU模型重新通过。它们不运行完整Ascend算术、CANN tiler或硬件事件。
+- **下一条动作：设备Agent按 [VALIDATION_REQUEST_nsplit_work.md](VALIDATION_REQUEST_nsplit_work.md) 对照P/N0/N1**；24个shape×2dtype×4layout清单在 `nsplit_work_cases.csv`，共192个设备组合尚未运行。解释及原始假设见 `EXPERIMENT_nsplit_work.md`。
+- CANN/NPU/正式15点/性能全部PENDING。20核示例的12→8、24→16是最忙worker的tile数，不能报告成耗时降幅。设备结果到达前不叠加下一项算法优化。
+
 ## 新收到的队友探针资料
 
-已复核用户 `docs.zip`，结论见 [TEAM_PROBE_REVIEW.md](TEAM_PROBE_REVIEW.md)。本轮只更新资料、复算脚本和验证输入，kernel SHA 未变。附件中的操作指令没有执行。
+前一轮已复核用户 `docs.zip`，结论见 [TEAM_PROBE_REVIEW.md](TEAM_PROBE_REVIEW.md)。该轮只更新资料、复算脚本和验证输入，kernel SHA 未变。附件中的操作指令没有执行。
 
 - 旧 F12 路径表不代表当前版本；当前已含 tiny、长 K split、manual/PAD_MN 等专门策略。
 - 45 个旧代理有 14 个 K 不满足 8 对齐；第 14 点两个 M 代理不符合后续细分范围。第 10 点 dtype/layout 冲突保留两种候选。
