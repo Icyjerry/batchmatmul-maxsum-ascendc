@@ -1,5 +1,19 @@
 # 接手状态 · 2026-09-21
 
+## 正在推进：dual 消费侧流水实验
+
+当前分支 `experiment/dual-consumer-pipeline`，从下述用户最佳 tag 派生。kernel SHA256：`07993447be9814aa7d502e9ddd51a9099bcea5c963f4be7a5e09b15e798cf5c4`。
+
+- 只重排 bmmms_dual / bmmms_dual_mdl 的消费端复制与事件；相同 UB/GM 空间、host plan、Cube 与 Vector 算术顺序。
+- `BMMMS_DUAL_PIPELINE=0/1/2` 分别为原顺序、预取、预取并提前 release/握手；候选默认 2。
+- 已阅读 FA3、FA4、Flash-MaxSim、CATLASS 和 Ascend epilogue 示例；来源与决策见 `RESEARCH_dual_pipeline.md`。
+- 执行 `python3 tools/validate_dual_pipeline.py` 复现当前源码 CPU 模型；旧 validate_cpu_model.py 仍不适用。
+- 三档各 76,800 次 CPU 用例通过，抽象双 AIV 协议 3,840 组随机交错通过，详见 PERF_LOG。
+- 当前 CANN 编译、NPU 精度、性能均 **PENDING**。不能称该实验比用户版更快。
+- 下一条设备动作：按 `VALIDATION_REQUEST_dual_pipeline.md` 构建 U/P0/P1/P2 并回传数据。不要叠加旧 Deferred Max/N-split 或 writer 修复而破坏对照。
+
+以下保留用户最佳版本的接手背景；此实验不改动其固定 tag。
+
 ## 当前起点
 
 用户最新提供 `kernel(2).asc`，明确称为“目前的最优版本”。本分支 `experiment/user-best-20260921` 的 `kernel.asc` 是该文件的**逐字节原样导入**，3,492 行，192,577 字节。

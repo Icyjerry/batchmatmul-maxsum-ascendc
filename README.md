@@ -4,9 +4,17 @@
 
 **当前开发起点为用户确认的最优 kernel(2).asc，已原样导入；本 Agent 尚未完成该版本的设备复测。**
 
+## 当前实验
+
+分支 `experiment/dual-consumer-pipeline`：基于用户最佳版本重排 dual=1/2 的 UB 搬运与槽位释放。提供 `BMMMS_DUAL_PIPELINE=0/1/2` 三档独立对照，尚无设备提速结论。
+
+- [研究依据](docs/RESEARCH_dual_pipeline.md)
+- [设备验证单](docs/VALIDATION_REQUEST_dual_pipeline.md)
+- 当前 CPU 模型：`python3 tools/validate_dual_pipeline.py`
+
 ## 接手
 
-1. 检出 `experiment/user-best-20260921`，阅读 [HANDOFF](docs/HANDOFF.md) 和 [AGENTS](AGENTS.md)。
+1. 原样最优检出 `experiment/user-best-20260921`，继续当前实验检出 `experiment/dual-consumer-pipeline`，阅读 [HANDOFF](docs/HANDOFF.md) 和 [AGENTS](AGENTS.md)。
 2. 阅读 [题目约束](docs/PROBLEM.md)、[当前版本验证单](docs/VALIDATION_REQUEST_user_best.md) 和 [性能记录](docs/PERF_LOG.md)。
 3. 后续优化从当前版本另建实验分支，保留逐 case 的真实对照。
 

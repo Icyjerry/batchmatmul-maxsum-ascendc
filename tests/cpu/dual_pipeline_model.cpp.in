@@ -1,0 +1,170 @@
+// CPU model for the actual extracted consumer helpers, not a CANN emulator.
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <deque>
+#include <functional>
+#include <iostream>
+#include <limits>
+#include <vector>
+#define __aicore__
+constexpr int PIPE_V=1, PIPE_MTE2=2;
+struct Schedule { int64_t n; uint32_t baseM,baseN,window; };
+struct State {
+    std::vector<std::function<void()>> pending;
+    std::vector<uint64_t> trace, reads, arithmetic;
+    std::vector<float>* ring=nullptr;
+    uint32_t slot=0, releases=0, handshakes=0, waits=0, allocations=0, peak=0;
+    bool released=false;
+    void Flush() { for(auto& f:pending) f(); pending.clear(); }
+} state;
+namespace AscendC {
+enum class TPosition { VECIN };
+enum class ReduceOrder { ORDER_ONLY_VALUE };
+struct BinaryRepeatParams { uint32_t db,a,b,dr,ar,br; };
+struct DataCopyExtParams { uint16_t rows; uint32_t bytes,srcStride,dstStride,reserved; };
+template<class T> struct DataCopyPadExtParams { bool enabled; uint8_t left,right; T value; };
+template<class T> struct LocalTensor {
+    std::vector<T>* data; size_t offset=0;
+    LocalTensor operator[](size_t i) const { assert(offset+i<data->size()); return {data,offset+i}; }
+    T& At(size_t i) const { assert(offset+i<data->size()); return (*data)[offset+i]; }
+};
+template<class T> struct GlobalTensor {
+    std::vector<T>* data; size_t offset=0;
+    GlobalTensor operator[](size_t i) const { assert(offset+i<data->size()); return {data,offset+i}; }
+    T At(size_t i) const { assert(offset+i<data->size()); return (*data)[offset+i]; }
+};
+template<TPosition P,int Depth> struct TQue {
+    std::vector<float> buffers[Depth]; bool used[Depth]={};
+    std::deque<LocalTensor<float>> ready;
+    explicit TQue(size_t count) { for(auto& b:buffers) b.assign(count,1e30f); }
+    template<class T> LocalTensor<T> AllocTensor() {
+        for(int i=0;i<Depth;++i) if(!used[i]) {
+            used[i]=true; ++state.allocations; state.peak=std::max(state.peak,state.allocations);
+            state.trace.push_back(100+i); return {&buffers[i],0};
+        }
+        assert(false && "more than two live UB buffers"); return {};
+    }
+    void EnQue(LocalTensor<float> x) { assert(ready.size()<Depth); ready.push_back(x); state.trace.push_back(200); }
+    template<class T> LocalTensor<T> DeQue() {
+        assert(!ready.empty()); state.Flush(); auto x=ready.front(); ready.pop_front();
+        state.trace.push_back(300); return x;
+    }
+    void FreeTensor(LocalTensor<float> x) {
+        for(int i=0;i<Depth;++i) if(x.data==&buffers[i]) {
+            assert(used[i]); used[i]=false; --state.allocations; state.trace.push_back(400+i); return;
+        }
+        assert(false);
+    }
+};
+inline void DataCopyPad(LocalTensor<float> dst,GlobalTensor<float> src,
+                        DataCopyExtParams p,DataCopyPadExtParams<float> pad) {
+    assert(!state.released); assert(p.bytes%4==0 && p.srcStride%4==0 && pad.left==0);
+    state.trace.push_back(500); const uint32_t count=p.bytes/4;
+    const uint32_t pitch=(count+pad.right)+p.dstStride*8;
+    for(uint32_t r=0;r<p.rows;++r) for(uint32_t j=0;j<count;++j)
+        state.reads.push_back(src.offset+r*(count+p.srcStride/4)+j);
+    state.pending.push_back([=] {
+        for(uint32_t r=0;r<p.rows;++r) {
+            for(uint32_t j=0;j<count;++j) dst.At(r*pitch+j)=src.At(r*(count+p.srcStride/4)+j);
+            if(pad.enabled) for(uint32_t j=0;j<pad.right;++j) dst.At(r*pitch+count+j)=pad.value;
+        }
+    });
+}
+template<int Mode> void CrossCoreWaitFlag(uint32_t flag) {
+    assert(Mode==2 && flag==state.slot && state.waits++==0);
+    state.trace.push_back(600+flag);
+}
+template<int Mode,int Pipe> void CrossCoreSetFlag(uint32_t flag) {
+    assert(Mode==2 && Pipe==PIPE_MTE2 && flag==2+state.slot && state.releases++==0);
+    // Model the PIPE_MTE2 completion dependency, then immediate producer reuse.
+    state.Flush(); state.released=true; state.trace.push_back(700+flag);
+    std::fill(state.ring->begin(),state.ring->end(),1e30f);
+}
+template<int Pipe> void PipeBarrier() { assert(Pipe==PIPE_V); state.trace.push_back(800); }
+inline void WholeReduceMax(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,
+        uint32_t reps,uint32_t dstStride,uint32_t srcBlock,uint32_t srcRepeat,ReduceOrder) {
+    assert(mask>0 && mask<=64 && reps>0 && reps<=255 && dstStride==1 && srcBlock==1);
+    state.trace.push_back(900); state.arithmetic.insert(state.arithmetic.end(),{900,mask,reps,srcRepeat});
+    for(uint32_t r=0;r<reps;++r) {
+        float v=-std::numeric_limits<float>::infinity();
+        for(uint32_t j=0;j<mask;++j) v=std::max(v,src.At(r*srcRepeat*8+j));
+        dst.At(r)=v;
+    }
+}
+inline void Max(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,
+                uint64_t mask,uint32_t reps,BinaryRepeatParams p) {
+    assert(mask>0 && mask<=64 && reps>0 && reps<=255);
+    state.trace.push_back(1000); state.arithmetic.insert(state.arithmetic.end(),{1000,mask,reps});
+    for(uint32_t r=0;r<reps;++r) for(uint32_t j=0;j<mask;++j)
+        dst.At(r*p.dr*8+j)=std::max(a.At(r*p.ar*8+j),b.At(r*p.br*8+j));
+}
+} // namespace AscendC
+struct MatmulStub {
+    template<bool Sync> void IterateAll(const AscendC::GlobalTensor<float>&) {
+        assert(!Sync && state.released); ++state.handshakes; state.trace.push_back(1100);
+    }
+};
+// BMMMS_INSERT_HELPERS
+// BMMMS_INSERT_REFERENCE
+struct Result { std::vector<float> maxima; std::vector<uint64_t> trace,reads,arithmetic; uint32_t peak; };
+Result Run(bool reference,const Schedule& s,uint32_t rowStart,uint32_t rows,
+           uint32_t nt,uint32_t end,uint32_t sequence,uint32_t total,int pattern) {
+    state=State{}; state.slot=sequence&1;
+    const size_t width=s.baseN*s.window, slotSize=s.baseM*width;
+    const uint32_t tiles=std::min(end-nt,s.window);
+    std::vector<float> ring(2*slotSize,1e30f),maximum(s.baseM,-INFINITY),row(s.baseM,1e30f);
+    std::vector<float> expected=maximum;
+    for(uint32_t r=0;r<rows;++r) {
+        // Existing maxima model earlier windows of this N shard.
+        maximum[r]=expected[r]=sequence==0?-INFINITY:-17.25f;
+        for(uint32_t j=0;j<tiles*s.baseN && int64_t(nt)*s.baseN+j<s.n;++j) {
+            const int v=int((r*131+j*17+sequence*29)%257);
+            const float value=pattern==0?-float(v+1)/8:pattern==1?float(v-128)/8:3.25f;
+            ring[state.slot*slotSize+(rowStart+r)*width+j]=value;
+            expected[r]=std::max(expected[r],value);
+        }
+    }
+    state.ring=&ring;
+    AscendC::GlobalTensor<float> gm{&ring};
+    AscendC::LocalTensor<float> maxima{&maximum},temp{&row};
+    AscendC::TQue<AscendC::TPosition::VECIN,2> queue((s.baseM/2)*s.baseN);
+    MatmulStub mm;
+    if(reference) ReferenceConsume(mm,queue,gm,s,maxima,temp,rowStart,rows,nt,end,sequence,total);
+    else ConsumeDualWindow(mm,queue,gm,s,maxima,temp,rowStart,rows,nt,end,sequence,total);
+    assert(state.waits==1 && state.releases==1 && state.handshakes==(sequence+2<total));
+    assert(state.pending.empty() && queue.ready.empty() && state.allocations==0 && state.peak<=2);
+    assert(maximum==expected); // poisoned GM / UB tails must never become maxima
+    return {maximum,state.trace,state.reads,state.arithmetic,state.peak};
+}
+int main() {
+    uint64_t cases=0,prefetched=0;
+    for(uint32_t bm:{16u,32u,64u,128u}) for(uint32_t bn:{16u,32u,64u,128u,256u})
+    for(uint32_t window:{1u,2u,3u,4u,8u}) for(uint32_t tiles:{1u,window})
+    for(uint32_t tail:{1u,7u,bn-1,bn}) for(uint32_t sub:{0u,1u})
+    for(uint32_t rows:{0u,1u,bm/2-1,bm/2}) for(uint32_t seq:{0u,1u,2u,5u})
+    for(int pattern:{0,1,2}) {
+        const uint32_t nt=window; // exercise nonzero N origin and a short last window
+        Schedule s{int64_t(nt+tiles-1)*bn+tail,bm,bn,window};
+        const uint32_t total=(seq%2==0)?seq+3:seq+1;
+        auto old=Run(true,s,sub*(bm/2),rows,nt,nt+tiles,seq,total,pattern);
+        auto cur=Run(false,s,sub*(bm/2),rows,nt,nt+tiles,seq,total,pattern);
+        assert(cur.maxima==old.maxima && cur.reads==old.reads && cur.arithmetic==old.arithmetic);
+#if BMMMS_DUAL_PIPELINE == 0
+        assert(cur.trace==old.trace);
+#else
+        if(rows && tiles>1) { assert(cur.peak==2); ++prefetched; }
+#endif
+#if BMMMS_DUAL_PIPELINE == 2
+        if(rows) {
+            auto release=std::find(cur.trace.begin(),cur.trace.end(),702+(seq&1));
+            assert(std::find(release,cur.trace.end(),900)!=cur.trace.end());
+        }
+#endif
+        ++cases;
+    }
+    std::cout<<"mode="<<BMMMS_DUAL_PIPELINE<<": "<<cases<<" cases; prefetch cases="<<prefetched
+             <<"; exact maxima/read addresses/vector order; two UB slots; release/handshake counts PASS\n";
+}

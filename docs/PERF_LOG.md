@@ -68,3 +68,24 @@ Interpretation / next hypothesis:
 - 源码注释记录的性能属于提供者数据，未在本轮复现。
 - 旧 CPU helper 模型对该源码不适用；脚本明确非零退出，不能误报 PASS。
 - 当前版本 CANN 编译 / NPU 精度 / NPU 性能：PENDING。
+
+## 2026-09-21 · dual-consumer-pipeline
+
+- 分支：`experiment/dual-consumer-pipeline`，基于 `user-best-20260921`。
+- Kernel SHA256：`07993447be9814aa7d502e9ddd51a9099bcea5c963f4be7a5e09b15e798cf5c4`。
+- 假设：现有双 UB 缓冲用于预取，并在 MTE2 完成后提前归还双槽 ring，可减少消费侧串行等待。默认实验宏 BMMMS_DUAL_PIPELINE=2，0/1 为消融对照。
+- 命令：`python3 tools/validate_dual_pipeline.py`；macOS、系统 clang++ C++14 -O2；退出码 0。
+
+| 检查 | 结果 | 边界 |
+|---|---|---|
+| 模式 0 | 76,800 次用例执行通过；完整模型 trace 与从用户原件抽取的循环一致 | CPU 模型，不是编译后的 NPU 指令 |
+| 模式 1 | 76,800 次通过；23,040 次实际占用两个 UB 槽 | 原版相同的地址、Max 结果及 Vector 调用顺序 |
+| 模式 2 | 76,800 次通过；23,040 次占用两个 UB 槽；release 后立即污染 GM 仍结果一致 | 假定 PIPE_MTE2 完成语义成立 |
+| 抽象跨核协议 | 3,840 组随机交错通过；0–9 个窗口、双槽终态信用配对 | 不模拟 Matmul 内部 wrapper / CANN 硬件 |
+| 改动范围 | 恢复两处旧消费循环并剔除新 helper/宏后，源码与用户 tag 全文一致 | host plan、分配、Cube、finalizer 均未混改 |
+| CANN 9.0.0 编译 | PENDING | 本机无 SDK |
+| NPU 正式精度 / latency / msprof | PENDING | 不能宣称比用户最优更快 |
+
+初轮 mode 2 检查脚本将 release trace ID 写为 700/701，实际模型编码为 702/703，导致测试断言失败。修正测试编号后重跑全套通过，kernel 未因该断言修改；此前失败不是设备错误。
+
+研究来源：`RESEARCH_dual_pipeline.md`。下一步：设备 Agent 按 `VALIDATION_REQUEST_dual_pipeline.md` 构建 U/P0/P1/P2；若 P0 对 U 退化，先定位 helper 提取对编译的影响；若仅 P2 失败/退化，用 P1 隔离提前 wrapper 握手的影响。
