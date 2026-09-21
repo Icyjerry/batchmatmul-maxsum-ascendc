@@ -32,6 +32,7 @@ def main():
 #include <cassert>
 #include <cstdint>
 #include <iostream>
+#include <vector>
 inline int64_t Ceil(int64_t v,int64_t d){return (v+d-1)/d;}
 ''' + shape + '\nnamespace old {\n' + original + '\n}\nnamespace now {\n' + current + '''
 }
@@ -48,6 +49,7 @@ uint64_t Actual(Schedule s) {
 ''' + '\n'.join(zero + allocations) + '''
     return pipe.bytes;
 }
+// INSERT_POLICY_CHECK
 int main() {
     uint64_t checked=0,unsafe=0;
     for(uint64_t ub:{128ULL*1024,192ULL*1024,256ULL*1024})
@@ -57,19 +59,21 @@ int main() {
         auto actual=Actual(s);
         assert(now::SplitKNDLiveBytes(s.baseM,s.baseN,n)==actual);
         auto before=old::ClassifyCase(x,ub);
-        auto corrected=now::ClassifyCase(x,ub);
+        auto corrected=now::ClassifyCase(x,ub,20);
         if(before.ks>1 && actual>=ub) {++unsafe; assert(corrected.ks==0);}
         if(corrected.ks>1) assert(actual<ub);
         ++checked;
     }
+    CheckPolicy();
     Schedule bad{}; bad.baseM=112;bad.baseN=192;bad.n=192;
     assert(Actual(bad)==217120);
     Shape x{1,112,192,8192,1,0,0};
-    assert(old::ClassifyCase(x,192*1024).ks==4 && now::ClassifyCase(x,192*1024).ks==0);
+    assert(old::ClassifyCase(x,192*1024).ks==4 && now::ClassifyCase(x,192*1024,20).ks==0);
     std::cout<<"UB/classifier: "<<checked<<" boundary configurations; "<<unsafe
              <<" formerly accepted over-budget selections rejected. (112,192): live=217120 bytes PASS\\n";
 }
 '''
+    code = code.replace('// INSERT_POLICY_CHECK', (ROOT / 'tests/cpu/splitk_policy.cpp.in').read_text())
     print('CPU host/allocation model only; actual CANN tiling and NPU correctness PENDING.', flush=True)
     print('kernel SHA256:', hashlib.sha256(raw).hexdigest(), flush=True)
     compiler = shutil.which('clang++') or shutil.which('c++')
@@ -77,8 +81,10 @@ int main() {
     with tempfile.TemporaryDirectory(prefix='bmmms-coverage-') as tmp:
         cpp = Path(tmp) / 'model.cpp'; exe = Path(tmp) / 'model'
         cpp.write_text(code)
-        subprocess.run([compiler, '-std=c++14', '-O2', str(cpp), '-o', str(exe)], check=True, timeout=60)
-        subprocess.run([str(exe)], check=True, timeout=60)
+        for mode in (0, 1):
+            print(f'BMMMS_ADAPTIVE_SPLITK={mode}', flush=True)
+            subprocess.run([compiler, '-std=c++14', '-O2', f'-DBMMMS_ADAPTIVE_SPLITK={mode}', str(cpp), '-o', str(exe)], check=True, timeout=60)
+            subprocess.run([str(exe)], check=True, timeout=60)
 
 
 if __name__ == '__main__':

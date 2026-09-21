@@ -4,9 +4,18 @@
 
 **当前开发起点为用户确认的最优 kernel(2).asc，已原样导入；本 Agent 尚未完成该版本的设备复测。**
 
+## 当前覆盖实验
+
+分支 `experiment/coverage-splitk`：修复 Split-K UB 预算及小核数输出遍历，再对 long-K 类比较 1/2/4 份拆分。独立于 `experiment/dual-consumer-pipeline`，当前未完成 NPU 验证。
+
+- [缺口与论文依据](docs/RESEARCH_coverage_splitk.md)
+- [设备对照请求](docs/VALIDATION_REQUEST_coverage_splitk.md)
+- [边界 shape 清单](docs/coverage_cases.csv)
+- 本地模型：`python3 tools/validate_splitk_coverage.py` 和 `python3 tools/validate_finalizer_coverage.py`
+
 ## 接手
 
-1. 检出 `experiment/user-best-20260921`，阅读 [HANDOFF](docs/HANDOFF.md) 和 [AGENTS](AGENTS.md)。
+1. 当前工作检出 `experiment/coverage-splitk`；原样用户最优检出 `experiment/user-best-20260921`，阅读 [HANDOFF](docs/HANDOFF.md) 和 [AGENTS](AGENTS.md)。
 2. 阅读 [题目约束](docs/PROBLEM.md)、[当前版本验证单](docs/VALIDATION_REQUEST_user_best.md) 和 [性能记录](docs/PERF_LOG.md)。
 3. 后续优化从当前版本另建实验分支，保留逐 case 的真实对照。
 

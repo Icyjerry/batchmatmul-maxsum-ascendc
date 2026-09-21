@@ -1,0 +1,54 @@
+// Included into the host model after the real classifier/helpers.
+int64_t WorkOracle(int64_t batches,int64_t k,int64_t workers,int64_t request) {
+    int64_t chunk=((k+request-1)/request+31)/32*32;
+    int64_t parts=(k+chunk-1)/chunk;
+    std::vector<int64_t> loads(workers,0);
+    int64_t cursor=0;
+    for(int64_t b=0;b<batches;++b) {
+        int64_t covered=0;
+        for(int64_t p=0;p<parts;++p) {
+            int64_t first=p*chunk,last=std::min(k,first+chunk);
+            assert(first==covered && last>first); covered=last;
+            loads[cursor++%workers]+=(last-first+31)/32;
+        }
+        assert(covered==k);
+    }
+    return *std::max_element(loads.begin(),loads.end());
+}
+void CheckPolicy() {
+    uint64_t checked=0,changed=0,choose[5]={};
+    for(int b=1;b<=64;++b)for(int k=4096;k<=8192;k+=8)
+    for(int w:{1,2,4,8,16,20,24,32,40,48,64}) {
+        uint32_t selected=now::SelectLongKSplit(b,k,w);
+        auto current=WorkOracle(b,k,w,selected),original=WorkOracle(b,k,w,4);
+        assert(current<=original);
+        for(uint32_t q:{1u,2u,4u}) {
+            auto cost=WorkOracle(b,k,w,q);
+            assert(current<=cost);
+            if(cost==current)assert(selected<=q); // least merge traffic on ties
+        }
+        ++checked; ++choose[selected]; changed+=(selected!=4);
+    }
+    // Full waves: splitting only adds partials. A ragged wave can still benefit.
+    assert(now::SelectLongKSplit(20,8192,20)==1);
+    assert(now::SelectLongKSplit(8,8192,20)==2);
+    assert(now::SelectLongKSplit(12,8192,20)==4);
+    assert(now::SelectLongKSplit(1,8192,1)==1);
+    uint64_t routes=0;
+    for(int b:{1,8,12,20,32,64})for(int k:{4096,4104,8192})for(int w:{1,2,16,20,32,48})
+    for(int dtype:{1,2})for(int tx1:{0,1})for(int tx2:{0,1}) {
+        Shape s{b,64,96,k,dtype,tx1,tx2};
+        auto plan=now::ClassifyCase(s,192*1024,w);
+#if BMMMS_ADAPTIVE_SPLITK
+        assert(plan.ks==now::SelectLongKSplit(b,k,w));
+        assert(plan.bm==64 && plan.bn==96 && plan.ns==1 && plan.window==1);
+#else
+        assert(plan.ks==4);
+#endif
+        assert(plan.dual==1);
+        ++routes;
+    }
+    std::cout<<"Split-K proxy: "<<checked<<" schedules; "<<changed<<" choose fewer partials; selected 1/2/4="
+             <<choose[1]<<"/"<<choose[2]<<"/"<<choose[4]<<"; "<<routes
+             <<" classifier dtype/layout/core cases PASS. No latency claim.\n";
+}
