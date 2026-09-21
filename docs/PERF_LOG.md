@@ -90,3 +90,10 @@ Interpretation / next hypothesis:
 Split-K host 模型两档宏均编译运行，统计是各档相同模型空间，不将两档相加声称独立覆盖率。输出模型按实际 for-loop 头部计数，但没有执行完整设备算术或同步。代理工作量非增不等于真实耗时非增。
 
 验证资料：`RESEARCH_coverage_splitk.md`、`VALIDATION_REQUEST_coverage_splitk.md`。下一步先验证 UB 回退能被真实 CANN tiler 接受，再验证低核数的输出覆盖与 A1 的 FP32 精度/latency。
+
+## 2026-09-21 · 队友 docs.zip 资料复核
+
+- 仅资料算术/来源检查，无新 NPU 测量，无 kernel 改动。
+- `python3 tools/audit_teammate_probe.py`：保存转录哈希一致；75 个粗维度/属性读数最大整数残差 0.144667；section 15 总时间复算 626.96µs。其构建归属来自队友材料，未独立验证。
+- 旧 45 代理发现 14 个 K 非 8 倍数、第 14 点两个 M 超出后续推断范围，第 10 点属性存在冲突；生成 50 个合法本地验证配置，设备结果 PENDING。
+- 来源、当前路径对应、旧报告矛盾与下一轮优先级见 `TEAM_PROBE_REVIEW.md`。不将历史 F12 耗时、旧路径表或单个 big08 profile 计为当前性能证据。

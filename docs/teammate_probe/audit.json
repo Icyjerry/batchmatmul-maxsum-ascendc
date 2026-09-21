@@ -1,0 +1,108 @@
+{
+  "archive_sha256": "cc2f55947439b14aab5423a896fc725370503ab2b718b334469d9fbe08695b0a",
+  "evidence": "arithmetic on teammate transcription; original submission/build ledger absent",
+  "max_rung_residual_BMNK_and_attributes": 0.144667,
+  "section15_sum_us": 626.96,
+  "attribute_conflicts": [
+    {
+      "case": 10,
+      "decoded": [
+        "bf16",
+        0,
+        0
+      ],
+      "old_paths": [
+        [
+          "fp16",
+          1,
+          1
+        ]
+      ]
+    }
+  ],
+  "old_proxy_K_not_multiple_of_8": [
+    [
+      1,
+      "hi",
+      63
+    ],
+    [
+      2,
+      "hi",
+      63
+    ],
+    [
+      3,
+      "hi",
+      63
+    ],
+    [
+      4,
+      "hi",
+      255
+    ],
+    [
+      5,
+      "hi",
+      255
+    ],
+    [
+      6,
+      "hi",
+      255
+    ],
+    [
+      7,
+      "hi",
+      511
+    ],
+    [
+      8,
+      "hi",
+      2047
+    ],
+    [
+      9,
+      "hi",
+      2047
+    ],
+    [
+      10,
+      "hi",
+      2047
+    ],
+    [
+      11,
+      "hi",
+      4095
+    ],
+    [
+      12,
+      "hi",
+      2047
+    ],
+    [
+      13,
+      "hi",
+      255
+    ],
+    [
+      14,
+      "hi",
+      255
+    ]
+  ],
+  "old_proxy_M_outside_refined_range": [
+    [
+      14,
+      "mid",
+      96
+    ],
+    [
+      14,
+      "hi",
+      127
+    ]
+  ],
+  "legal_local_validation_inputs": 50
+}
