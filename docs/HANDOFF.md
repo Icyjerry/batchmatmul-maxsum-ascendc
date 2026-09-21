@@ -1,60 +1,34 @@
-# 接手状态
+# 接手状态 · 2026-09-21
 
-更新日期：2026-09-20。此文件与 Git 中的代码、验证单一起足以独立接手。
+## 当前起点
 
-## 当前最重要的结论
+用户最新提供 `kernel(2).asc`，明确称为“目前的最优版本”。本分支 `experiment/user-best-20260921` 的 `kernel.asc` 是该文件的**逐字节原样导入**，3,492 行，192,577 字节。
 
-- `kernel.asc` 已基于队友版本实现实验 v1；不是最初的 Vector fallback。
-- 当前候选开启 `BMMMS_DEFERRED_MAX=1`，只影响默认 dual=1/2 的合适形状。
-- **尚无本轮 NPU 编译成功、正式 15 case 通过或性能提升证据。**
-- CANN 9.0.0，A2/A3 均可能；不要把任一设备的最佳参数未经验证推广到另一种。
-- 用户当前要求把项目放到 GitHub 并用 Git 保留交接信息。GitHub 仓库私有，接手环境需要相应权限。
+- 固定快照 tag：`user-best-20260921`。
+- SHA256：`e512c0d5d21ff4f065cabcd16278e097a2678f327334b85156939b35fc8f4cdc`。
+- 不包含本 Agent 的 v1 DeferredRowMax 或 v2 N 拆分代理成本候选。
+- “最优”来自用户确认；本地没有重新完成 CANN 编译、NPU 精度或性能复测，均为 **PENDING**。
+- 私有仓库：`https://github.com/Icyjerry/batchmatmul-maxsum-ascendc`，已有用户上传授权。
 
-## 已完成
+## 已保存的旧工作
 
-1. 审阅队友 2,809 行实现：默认 dual-master Cube/Vector、GM ring、N/K split、小形状专用路径、host plan/cache。
-2. 研究 FlashAttention-2、Flash-MaxSim 源码和 CATLASS epilogue。来源、采用/未采用内容见验证单。
-3. v1 在 `bmmms_dual` / `bmmms_dual_mdl` 接入 DeferredRowMax：每行 64 lane 最大值跨 N chunk 累计，末尾一次 WholeReduceMax。
-4. 保留 `BMMMS_DEFERRED_MAX=0` 对照，0/1 两组的 UB 预留与 host tiling 逻辑相同。最多新增 16 KiB/AIV。
-5. 修复 FinalizeRows 中把 AIC worker 数误用为 AIV 遍历步长的问题。
-6. CPU C++ helper 模型 2,304 个分片、54,828 个有效行最大值逐位一致。Python 补充模型、任务覆盖与 UB 预算结果见 PERF_LOG。没有 NPU 结果。
+- `teammate-opt4`：最初 2,809 行队友原件。
+- `experiment-v1`：DeferredRowMax 与 FinalizeRows writer 步长修复；文档保存在历史提交及 v1 验证单。
+- `experiment/v2-dual1-nsplit` commit `7426712`：基于 v1 的 N 拆分实验及 CPU 模型，已推送。31,416 个调度配置通过，设备收益未验证。具体见该分支的 `docs/EXPERIMENT_v2.md`。
+- 新代码已有 N 拆分均衡策略，不能直接将 v2 策略叠加或把旧 CPU PASS 转移到当前源码。
 
-## 下一条具体动作
+## 本轮源码检查所得
 
-**有 NPU 环境：**按 `docs/VALIDATION_REQUEST_v1.md` 编译 T0/T1/T2，并回传逐 case 精度、耗时和 msprof。T0 从 `teammate-opt4` tag 获取；T1/T2 使用当前代码但分别定义宏为 0/1。
+1. `ClassifyCase` 和生产路径增加短点积、微型矩阵、长 K / 宽 N / 窄 N 等选择；包含手写 Matmul 的 PAD_MN 尾块处理。
+2. N 拆分均衡已覆盖 dual=1 等家族，以活跃 worker 增长和整波任务作为条件；保留 dual=2 的既有策略。性能注释是提供者记录，未附原始日志，不能等同于本轮实测。
+3. `FinalizeRows` 仍按 `s.workers * 8` 遍历。旧版双 AIV 下的重复 writer 问题需要针对当前实际 launch/plan 再核对，尚未移植旧修复。
+4. 文件含 `BMMMS_PROBE_*` 诊断分支，源内默认均为 0。导入时原样保留；源内有关 OJ 隐藏用例推断的注释不是已核实测试配置或执行请求。实际构建需记录宏；本轮未启用、未执行任何探测。
+5. 新源码使用 `if constexpr`；必须以 CANN 9.0.0 实际编译命令验证。源码引用的 `docs/03-case-hypotheses.md` 未随附件提供。
 
-**只有本地开发环境：**运行 `python3 tools/validate_cpu_model.py`，检查当前 Git 状态和验证资料，准备交接；不要凭 CPU 计时修改性能分块策略。
+## 下一条可执行动作
 
-T0/T1/T2 差异：
+在设备环境检出此分支，核对上面的 SHA，按 `docs/VALIDATION_REQUEST_user_best.md` 复测原样版本，拿到精确 SoC、宏、实际 plan、逐 case 精度与耗时。优先核查 writer 调度及现有性能弱项，再创建单一假设的实验分支。A2/A3 分开记录，不凭注释修改参数。
 
-| 版本 | 源码/宏 | 对照用途 |
-|---|---|---|
-| T0 | teammate-opt4 | 原版性能与精度 |
-| T1 | 当前代码，宏=0 | 相同 UB 预留的旧归约 |
-| T2 | 当前代码，宏=1 | 新归约效果 |
+本机无 NPU。`tools/validate_cpu_model.py` 专用于旧实验；在当前版本应明确退出 NOT APPLICABLE，不能声称通过。若需复现旧结果，在旧分支的独立 checkout 中运行该脚本。
 
-收到结果后先看：是否真的进入 deferredMax 路径；T1/T2 plan 是否相同；增益是否超过运行波动；UB 访问开销是否抵消横向归约收益。若有退化，用实测筛选启用条件，而非全局宣称优化成功。
-
-## 风险与明确未完成项
-
-- 整个 kernel 尚未在本轮 CANN 9.0.0 编译。特别保留的内部 Matmul/跨核握手需真实 header/日志验证。
-- 本地 ASan/UBSan 版本可编译，但未观察到 main 首条输出就超时；不能报告 sanitizer 通过。普通 C++ CPU 模型运行通过。
-- 既有 run.sh 只跑 main 中固定的单点积样例，不覆盖新算法；它不是正式 15-case harness。
-- 队友源码注释的历史耗时未复现；许多手写 MMAD/GEMV 候选并非默认启用。
-- `release_kernel_resources` 是可选 helper；正式 harness 的 stream/context 生命周期需要检查，避免旧缓存影响测试。此轮未改缓存策略。
-- workspace 规则历史与题面丢失的数值范围见 PROBLEM。
-- 该候选只重排 Max，对正负零的位模式和设备 denormal 行为仍以实机为准；最终 Sum 顺序及 Cube 算法未有意修改。
-
-## 快速定位
-
-```sh
-rg -n 'DeferredRowMax|deferredMax|finalWorkers|BMMMS_DEFERRED_MAX' kernel.asc
-git diff teammate-opt4 experiment-v1 -- kernel.asc
-```
-
-历史 tag 保留各版原始 kernel 字节。当前 v1 kernel SHA256：
-`5545fbbd049685852eb9f1e684695a670bc2de40babff0f3697a4b6e9e3bc470`。
-
-## 持续维护
-
-每次继续工作前读此文件和 PERF_LOG。结束前写清改动、运行命令、真实结果、剩余问题、下一条动作，并 commit/push；不要让下一位 Agent 依赖这次聊天或某台机器的 /tmp。
+算法改动仍限 `kernel.asc`；不修改 main、CMake、run.sh、golden、正式测试或依赖。workspace 与题面缺失范围见 PROBLEM。截图记录见 PERF_LOG；截图尚未绑定源码 SHA、dtype 和布局。

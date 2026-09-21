@@ -1,59 +1,33 @@
 # BatchMatmulMaxSum · Ascend C
 
-目标：在 CANN **9.0.0**、**A2 / A3** 上优化 `BatchMatMul → Max(N) → Sum(M)`，支持 FP16/BF16 输入、四种存储布局和 FP32 输出。
+目标：CANN 9.0.0、A2/A3 上的 BatchMatMul → Max(N) → Sum(M) 融合性能。
 
-**当前状态：实验候选，尚未完成本轮 NPU 编译、15 个正式 case 验证或性能测量。** CPU 模型通过不代表设备测试通过。
+**当前开发起点为用户确认的最优 kernel(2).asc，已原样导入；本 Agent 尚未完成该版本的设备复测。**
 
-## 新 Agent 从这里接手
+## 接手
 
-1. 阅读 [AGENTS.md](AGENTS.md) 和 [HANDOFF.md](docs/HANDOFF.md)。
-2. 阅读 [算子约束](docs/PROBLEM.md) 和 [v1 研究与验证单](docs/VALIDATION_REQUEST_v1.md)。
-3. 使用 [CPU 检查](#cpu-检查) 复现本地模型；上板执行验证单中的 T0/T1/T2 对照。
-4. 将实际结果和下一步写入 [PERF_LOG.md](docs/PERF_LOG.md)、更新 HANDOFF，然后 commit / push。
+1. 检出 `experiment/user-best-20260921`，阅读 [HANDOFF](docs/HANDOFF.md) 和 [AGENTS](AGENTS.md)。
+2. 阅读 [题目约束](docs/PROBLEM.md)、[当前版本验证单](docs/VALIDATION_REQUEST_user_best.md) 和 [性能记录](docs/PERF_LOG.md)。
+3. 后续优化从当前版本另建实验分支，保留逐 case 的真实对照。
 
-## Git 中保存的版本
+私有仓库：[Icyjerry/batchmatmul-maxsum-ascendc](https://github.com/Icyjerry/batchmatmul-maxsum-ascendc)。接手环境需要对应访问权限。
 
-| Tag | 内容 |
+## 保存的版本
+
+| Git 引用 | 内容 |
 |---|---|
-| `vector-v0.2` | 早期 Vector 版本，保留用于追溯 |
-| `teammate-opt4` | 用户提供的 2,809 行队友原版，字节级保留 |
-| `experiment-v1` | 当前延后 Max 归约候选，以及最终归约 writer 步长修复 |
+| `user-best-20260921` | 当前用户最优，3,492 行，逐字节保留 |
+| `experiment/v2-dual1-nsplit` | 旧基准上的 N 拆分 CPU 实验，设备未验证 |
+| `experiment-v1` | 旧 Deferred Max 候选及 writer 步长修复 |
+| `teammate-opt4` | 最初 2,809 行队友原件 |
+| `vector-v0.2` | 早期 Vector 版本 |
 
-`main` 包含当前候选及完整交接资料。只需克隆此仓库，不依赖原对话、微信路径或本机 `/tmp`。
+当前 kernel SHA256：`e512c0d5d21ff4f065cabcd16278e097a2678f327334b85156939b35fc8f4cdc`。
 
-```sh
-git clone https://github.com/Icyjerry/batchmatmul-maxsum-ascendc.git
-cd batchmatmul-maxsum-ascendc
-git status --short --branch
-git log --oneline --decorate -6
-git diff teammate-opt4 experiment-v1 -- kernel.asc
-```
+## 验证范围
 
-仓库为私有；其他 Agent 的执行环境需要使用有该仓库权限的 GitHub 身份。
+`tools/validate_cpu_model.py` 只适用于旧 v1/v2 实验，在当前源码上应提示 NOT APPLICABLE 并非零退出。旧实验的 CPU PASS 不证明新版本正确。
 
-## CPU 检查
+原有 run.sh/main.asc 仅跑固定小样例。使用服务器已有 harness 按当前验证单复测，记录精确 SoC、编译宏、实际 plan、正式精度和稳定态性能。A2/A3 分开记录。
 
-需要 Python 3 标准库及支持 C++14 的 `clang++` 或 `c++`，不需要 NPU 或新增 Python 依赖。
-
-```sh
-python3 tools/validate_cpu_model.py
-```
-
-脚本从当前 `kernel.asc` 提取 `DeferredRowMax`，编译 CPU 指令语义模型，在临时目录执行，并检查输出任务覆盖与 UB 预算。**它不编译整个 Ascend kernel、不模拟硬件同步，也不测 NPU 性能。**
-
-## 上板
-
-原有 `run.sh` / `main.asc` 仅提供一个固定小样例，不能代表 15 个正式用例通过，而且该小样例不进入本轮优化路径。
-
-先设置服务器的 CANN 环境，再按 [VALIDATION_REQUEST_v1.md](docs/VALIDATION_REQUEST_v1.md) 用已有评测 harness 编译和测试。A2/A3 分开记录结果。
-
-- `BMMMS_DEFERRED_MAX=1`：当前默认候选。
-- `BMMMS_DEFERRED_MAX=0`：相同 UB 预留和分块策略下的旧归约对照。
-- 不默认开启 `BMMMS_TUNING` 或额外手写 MMAD 候选。
-
-## 目录
-
-- `kernel.asc`：算子实现，比赛代码改动集中于此。
-- 原有 `main.asc`、`CMakeLists.txt`、`run.sh`、`data_utils.h`、`scripts/`：保持原模板。
-- `docs/`：任务约束、研究、验证请求、结果记录和接手状态。
-- `tests/cpu/`、`tools/`：独立本地模型验证，不修改正式 golden 或评测器。
+算法只修改 kernel.asc；原 main、CMake、run.sh、golden、正式测试保持原样。研究与历史验证仍可从 docs/VALIDATION_REQUEST_v1.md 和 Git 历史追溯。

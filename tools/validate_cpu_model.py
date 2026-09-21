@@ -67,6 +67,8 @@ def main():
     source = raw.decode().replace("\r\n", "\n")
     print("CPU models only; no CANN compilation, synchronization check, or NPU benchmark.", flush=True)
     print("kernel SHA256:", hashlib.sha256(raw).hexdigest(), flush=True)
+    if "class DeferredRowMax {" not in source:
+        raise SystemExit("NOT APPLICABLE: this CPU model targets experiment-v1 / experiment/v2-dual1-nsplit; current user-best kernel is not validated by it.")
     start = source.index("class DeferredRowMax {")
     end = source.index("\n};", start) + 3
     helper = source[start:end]
