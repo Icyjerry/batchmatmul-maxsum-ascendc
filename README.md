@@ -1,5 +1,7 @@
 # BatchMatmulMaxSum · Ascend C
 
+> **2026-09-21 最新入口：**用户提供了新的当前最优版本。后续开发请先执行 `git fetch origin`、`git switch --track origin/experiment/user-best-20260921`（已有本地分支则直接 switch），并阅读该分支的 HANDOFF。固定 tag 为 `user-best-20260921`，导入提交 `23e3e5a`，kernel SHA256 为 `e512c0d5d21ff4f065cabcd16278e097a2678f327334b85156939b35fc8f4cdc`。旧 N 拆分实验保存在 `experiment/v2-dual1-nsplit`（`7426712`）。main 的 kernel 仍为历史 v1；以下 v1 内容不是当前最佳版本说明。新版本的本轮 CANN/NPU 复测仍待完成。
+
 目标：在 CANN **9.0.0**、**A2 / A3** 上优化 `BatchMatMul → Max(N) → Sum(M)`，支持 FP16/BF16 输入、四种存储布局和 FP32 输出。
 
 **当前状态：实验候选，尚未完成本轮 NPU 编译、15 个正式 case 验证或性能测量。** CPU 模型通过不代表设备测试通过。
