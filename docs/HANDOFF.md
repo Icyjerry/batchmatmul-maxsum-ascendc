@@ -1,6 +1,6 @@
 # 接手状态
 
-> **最新实验（2026-09-21）：**`experiment/n-split-critical-work`，提交 `677d882`，父提交 `8fb1e72`。新增一项对齐大矩阵 dual=1 的 N 拆分候选，按真实 cyclic worker 工作选择 ns；宏 `BMMMS_BALANCED_NSPLIT=0/1` 做对照。CPU 38,880 调度配置通过，CANN/NPU/正式性能仍 PENDING。检出该分支阅读 `docs/HANDOFF.md` 与 `docs/VALIDATION_REQUEST_nsplit_work.md`。该分支也保存了队友探针资料审计和覆盖修复；消费流水实验未混入。main 内核仍为历史v1，用户最佳tag不变；本次仅更新接手入口。
+> **最新工作（2026-09-22）：**`experiment/known-issue-closure`，提交 `35a86eb`。已集中修复earlySum输出、调参缓存、manual冗余库workspace、低核dot split除零，以及scratch转换回Matmul的初始化保护。76,424个host计划模型和49,152个finalizer配置通过；不是CANN/NPU PASS。用户明确云端执行暂缓。检出该分支阅读 `docs/HANDOFF.md`、`docs/KNOWN_ISSUES.md` 和统一验证单。main内核仍为历史v1，用户最佳tag不动；此处仅更新接手入口。
 
 > **2026-09-21 最新入口：**用户提供了新的当前最优版本。后续开发请先执行 `git fetch origin`、`git switch --track origin/experiment/user-best-20260921`（已有本地分支则直接 switch），并阅读该分支的 HANDOFF。固定 tag 为 `user-best-20260921`，导入提交 `23e3e5a`，kernel SHA256 为 `e512c0d5d21ff4f065cabcd16278e097a2678f327334b85156939b35fc8f4cdc`。旧 N 拆分实验保存在 `experiment/v2-dual1-nsplit`（`7426712`）。main 的 kernel 仍为历史 v1；以下 v1 内容不是当前最佳版本说明。新版本的本轮 CANN/NPU 复测仍待完成。
 
