@@ -16,7 +16,7 @@ def main():
     shapes = source[source.index('struct Shape {'):source.index('template <AscendC::HardEvent')]
     host = source[source.index('struct Plan {'):source.index('using CacheKey =')]
     code = (ROOT / 'tests/cpu/planner_stub.hpp').read_text() + shapes + host + r'''
-uint64_t panelPlans=0,residentPlans=0;
+uint64_t panelPlans=0,residentPlans=0,widePlans=0;
 void Check(Shape s,int cores){
     Plan p=MakePlan(s,cores);const auto& d=p.schedule;
     assert(p.finalBlocks>0 && p.finalBlocks<=40);
@@ -41,6 +41,14 @@ void Check(Shape s,int cores){
         assert(4ULL*(d.baseM+d.baseN)*d.panelK+1024<=hw->l1);
         assert(8ULL*d.baseM*d.baseN<=hw->l0);
         assert(d.panelResident==(BMMMS_CUBE_PANEL>=3 && 2ULL*d.baseM*Ceil(s.k,16)*16+4ULL*d.baseN*d.panelK+1024<=hw->l1));
+        if(d.panelL1K){
+            ++widePlans;
+            assert(BMMMS_L1_K_PANELS && d.panelGroup==2 && s.k>d.panelK);
+            assert(d.panelL1K==2*d.panelK || d.panelL1K==4*d.panelK);
+            assert(d.panelL1K<=512 && d.panelL1K<=Ceil(s.k,d.panelK)*d.panelK);
+            const uint64_t aBytes=d.panelResident?2ULL*d.baseM*Ceil(s.k,16)*16:4ULL*d.baseM*d.panelL1K;
+            assert(aBytes+8ULL*d.baseN*d.panelL1K+1024<=hw->l1);
+        }
     }
     uint64_t partial;
     if(d.kSplit>1){
@@ -83,7 +91,11 @@ int main(){
         Check({1,1536,1536,1536,1,1,1},20);
     }
     platform->l0a=platform->l0b=65536;
-    std::cout<<"panel="<<BMMMS_CUBE_PANEL<<", selected="<<panelPlans<<", resident="<<residentPlans<<"\n";
+    for(uint64_t bytes:{65536ULL,131072ULL,262144ULL,524288ULL}){
+        platform->l1=bytes;Check({1,1536,1536,1536,1,1,1},20);
+    }
+    platform->l1=524288;
+    std::cout<<"panel="<<BMMMS_CUBE_PANEL<<", wide="<<BMMMS_L1_K_PANELS<<", selected="<<panelPlans<<", resident="<<residentPlans<<", widePlans="<<widePlans<<"\n";
 #ifdef BMMMS_TUNING
     platform->system=16*1024*1024;
     Tune().dual=10;
@@ -107,11 +119,12 @@ int main(){
     with tempfile.TemporaryDirectory(prefix='bmmms-hostplan-') as tmp:
         cpp, exe = Path(tmp) / 'model.cpp', Path(tmp) / 'model'
         cpp.write_text(code)
-        for mode in (0, 1, 2, 3):
+        for mode, hierarchy in ((0,1),(1,1),(2,0),(2,1),(3,0),(3,1)):
             for flags in [[], ['-DBMMMS_TUNING']]:
                 print('TUNING' if flags else 'production planner', flush=True)
                 subprocess.run([compiler, '-std=c++14', '-O2', '-DBMMMS_ADAPTIVE_SPLITK=1',
                                 '-DBMMMS_BALANCED_NSPLIT=1', f'-DBMMMS_CUBE_PANEL={mode}',
+                                f'-DBMMMS_L1_K_PANELS={hierarchy}',
                                 *flags, str(cpp), '-o', str(exe)], check=True, timeout=60)
                 subprocess.run([str(exe)], check=True, timeout=60)
 

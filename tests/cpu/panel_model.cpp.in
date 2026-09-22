@@ -14,12 +14,12 @@ constexpr int PIPE_MTE2=1,PIPE_M=2,PIPE_FIX=3;
 struct Schedule {
     int64_t b,m,n,k;
     uint32_t baseM,baseN,mTiles,nTiles,nSplit,workers,panelK,panelGroup;
-    uint32_t panelResident=0;
+    uint32_t panelResident=0,panelL1K=0;
 };
 struct Expected {int64_t b,m,n;uint32_t rows,cols;};
 struct State {
     Schedule s;bool tx1,tx2;
-    uint64_t aReads=0,bReads=0,aL0=0,bL0=0,mmads=0;
+    uint64_t aReads=0,bReads=0,aL0=0,bL0=0,mmads=0,aCopies=0,bCopies=0;
     std::map<std::pair<int,int>,int> events;
     int cross[2]={1,1};
     std::vector<Expected> expected;size_t fixes=0;
@@ -80,6 +80,7 @@ template<class T>void DataCopy(LocalTensor<T> dst,GlobalTensor<T> src,Nd2NzParam
         dst.at((c/16)*p.dstNzC0Stride*16+r*16+c%16)=c<p.dValue?src.at(r*p.srcDValue+c):0;
     }
     (src.isA?st.aReads:st.bReads)+=p.nValue*p.dValue;
+    ++(src.isA?st.aCopies:st.bCopies);
 }
 struct LoadData2DParams {uint32_t repeatTimes=1,srcStride=1,dstGap=0;bool ifTranspose=false;};
 template<class T>void LoadData(LocalTensor<T> dst,LocalTensor<T> src,LoadData2DParams p){
@@ -116,7 +117,7 @@ void Fixpipe(GlobalTensor<float> dst,LocalTensor<float> src,FixpipeParamsV220 p)
 }
 template<AscendC::HardEvent E>void Fence(){}
 // INSERT_HELPERS
-struct Counts{uint64_t a,b,al0,bl0,mmads;};
+struct Counts{uint64_t a,b,al0,bl0,mmads,ac,bc;};
 template<bool TX1,bool TX2>Counts Run(Schedule s){
     Counts counts{};
     std::vector<int16_t> a(s.b*s.m*s.k),b(s.b*s.n*s.k);
@@ -134,13 +135,16 @@ template<bool TX1,bool TX2>Counts Run(Schedule s){
         }
         std::vector<float> ring(2*s.baseM*s.baseN,1e30f);
         AscendC::TPipe pipe;
-        RunPanelCube<int16_t,TX1,TX2>(pipe,{&a,0,true},{&b,0,false},{&ring},s,worker);
+        if(s.panelL1K)RunPanelCube<int16_t,TX1,TX2,true>(pipe,{&a,0,true},{&b,0,false},{&ring},s,worker);
+        else RunPanelCube<int16_t,TX1,TX2>(pipe,{&a,0,true},{&b,0,false},{&ring},s,worker);
         assert(st.fixes==st.expected.size() && !st.cross[0] && !st.cross[1]);
         for(auto e:st.events)assert(e.second==0);
         counts.a+=st.aReads;counts.b+=st.bReads;counts.al0+=st.aL0;counts.bl0+=st.bL0;counts.mmads+=st.mmads;
+        counts.ac+=st.aCopies;counts.bc+=st.bCopies;
     }
     return counts;
 }
+uint32_t wideCases=0;
 template<bool X,bool Y>void Check(Schedule s){
     s.mTiles=(s.m+s.baseM-1)/s.baseM;s.nTiles=(s.n+s.baseN-1)/s.baseN;
     s.panelGroup=1;const auto one=Run<X,Y>(s);
@@ -150,6 +154,16 @@ template<bool X,bool Y>void Check(Schedule s){
     s.panelResident=1;const auto resident=Run<X,Y>(s);
     assert(resident.a==uint64_t(s.b*s.m*s.k)*s.nSplit);
     assert(resident.a<=two.a && resident.al0==two.al0 && resident.b==two.b && resident.bl0==two.bl0 && resident.mmads==two.mmads);
+    for(uint32_t residency:{0u,1u})for(uint32_t factor:{2u,4u}) {
+        s.panelResident=residency;s.panelL1K=s.panelK*factor;
+        const uint64_t abytes=residency?2ULL*s.baseM*((s.k+15)/16*16):4ULL*s.baseM*s.panelL1K;
+        if(s.panelL1K>512 || abytes+8ULL*s.baseN*s.panelL1K+1024>512*1024)continue;
+        const auto wide=Run<X,Y>(s),base=residency?resident:two;
+        assert(wide.a==base.a && wide.b==base.b && wide.al0==base.al0 && wide.bl0==base.bl0 && wide.mmads==base.mmads);
+        assert(wide.ac<=base.ac && wide.bc<=base.bc);
+        if(s.k>s.panelK)assert(wide.bc<base.bc);
+        ++wideCases;
+    }
 }
 int main(){
     uint32_t cases=0;
@@ -166,8 +180,10 @@ int main(){
         Check<false,false>(s);Check<false,true>(s);Check<true,false>(s);Check<true,true>(s);cases+=12;
     }
     for(auto s:std::vector<Schedule>{{1,129,257,136,128,128,0,0,1,2,128,1},
+                                    {1,33,97,344,32,32,0,0,1,2,112,1},
                                     {1,17,33,8192,16,16,0,0,1,1,256,1}}){
         Check<false,false>(s);Check<false,true>(s);Check<true,false>(s);Check<true,true>(s);cases+=12;
     }
     std::cout<<cases<<" producer executions (all layouts, streamed single/paired and resident), physical block/padding/C values/events/A reuse PASS\n";
+    std::cout<<wideCases<<" hierarchical K executions: exact C/byte counts/L0 work, fewer DMA calls PASS\n";
 }
