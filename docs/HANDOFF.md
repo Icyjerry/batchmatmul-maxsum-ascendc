@@ -1,5 +1,9 @@
 # 接手状态 · 2026-09-22
 
+## 最新审查：性能结构与实验堆叠
+
+用户要求检查代码是否出现屎山倾向；已审查当前4044行kernel，未修改算法。见 [PERFORMANCE_STRUCTURE_REVIEW.md](PERFORMANCE_STRUCTURE_REVIEW.md)。实际planner CPU复现了自动producer覆盖旧窗口、单N组无收益常驻导致TX1 LoadData 1→8次，以及显式bn/ns/window被case profile回写。另确认两个C累加器跨组的Fixpipe→MMAD依赖；净性能影响仍PENDING。复现：`python3 tools/audit_plan_precedence.py`。下一步优先修连续A切片和pin优先级，再处理C释放等待及统一路径选择，先收敛已有代码。当前实现分支和SHA如下。
+
 ## 最新：L1/L0 两级 K 分块
 
 分支 **`experiment/hierarchical-k`**，实现 `d64d0c1`，父版本 `73ed463`（Cube 面板复用）。本次 kernel 新增103行、删除18行，将L1传输粒度与L0计算粒度分开。
