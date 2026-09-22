@@ -1,6 +1,6 @@
 # 接手状态
 
-> **最新工作（2026-09-22）：**检出 `experiment/dual-consumer-fold`，提交 `48e37c7`。两条dual设备路径已接入UB双缓冲预取、GM读取完成后提前归还槽位、tile内树形Max；继承known-issue-closure的修复。256列tile横向归约调用4→1，屏障8→4，不代表实测加速。六组开关的CPU语义/地址模型通过；CANN/NPU精度和性能PENDING，用户暂缓云端执行。检出后阅读 `docs/HANDOFF.md` 与 `docs/DUAL_CONSUMER_OPTIMIZATION.md`。main kernel仍为历史v1，此处仅更新接手指针。
+> **最新工作（2026-09-22）：**检出 `experiment/hierarchical-k`，提交 `76d6c28`（核心实现 `d64d0c1`，父版 `73ed463`）。Cube已新增成对N tile共享A、可选L1常驻，并进一步将L1大K面板与L0小K计算分离，B四缓冲预取。实际容量不足时回退，保留独立对照开关。456次父producer执行和584次两级K CPU模型执行通过；读取字节/MMAD数不变、DMA调用减少，不代表实测加速。CANN/NPU精度、正式15点、性能PENDING；用户暂缓云端执行。检出后阅读 `docs/HANDOFF.md`、`docs/HIERARCHICAL_K.md` 与父版 `docs/CUBE_PANEL_REUSE.md`。main kernel仍为历史v1，此处仅更新接手指针。
 
 > **历史起点：**用户确认的最佳原件保存在 `user-best-20260921` tag（`23e3e5a`），当前设备端候选建立在它的后续修复版本上。以下v1内容是main的历史记录，后续开发以顶部新分支接手单为准。
 
