@@ -1,6 +1,18 @@
 # 接手状态 · 2026-09-22
 
-## 最新：设备端 dual 消费流水与 tile 归约
+## 最新：Cube 面板复用与 L1 常驻
+
+用户要求更大幅度核心改造；当前分支 **`experiment/cube-panel-reuse`**，实现 `bc3f7cf`，父版本 `48e37c7`。新增255行kernel，重组K/N循环和片上缓冲生命周期。
+
+- 新生产者 `RunPanelCube`：两个N tile共享A的GM→L1及L1→L0A搬运、两个C在L0C完成K累加；可容纳时整个A面板常驻L1跨N组复用；B保持双缓冲。共享已有GM环形通路及Vector最终归约。
+- `BMMMS_CUBE_PANEL=0/1/2/3`：父路径 / 单tile新内核 / 双tile复用 / 可选L1常驻，默认3。查询实际L1/L0A/L0B/L0C；容量不符、只有一个N tile/shard或显式TUNING pins保留旧路径。自动替换不是已测最优策略。
+- kernel SHA256：`e440e1b3d915ba61f696059cd3af0efdee6b8d087aee04ef7a49ba40ef2a637b`。
+- `python3 tools/validate_cube_panel.py`：444配置物理块/完整C值/事件计数/读取量模型通过；`python3 tools/validate_host_plan.py`四档production/TUNING主网格76,424配置通过。宽松fake tiler与同步CPU指令模型，不能冒充CANN或NPU精度。
+- 新内核1→2对成对tile的A读取和L0A加载减半，resident时A每个任务从GM读取一次；**不代表相对旧Matmul库的流量降幅或速度收益**。
+- CANN编译、正式15点、FP16/BF16设备精度和性能 **PENDING**。云端仍按用户要求暂缓；下一条执行单：[CUBE_PANEL_REUSE.md](CUBE_PANEL_REUSE.md)，直接构建P0/P1/P2/P3，记录实际plan和SoC；重点确认事件池、双L0C和resident重用。
+- 旧dual消费候选仍继承；满足准入的形状现在走新manual生产者及Fold Max。main仅更新接手指针，未合并未测kernel。
+
+## 父版本：设备端 dual 消费流水与 tile 归约
 
 用户要求继续推进核心优化，云服务器测试仍按用户要求暂缓。当前分支 **`experiment/dual-consumer-fold`**，父版本 `35a86eb`；代码提交 `324a6a0`（预取/提前归还槽位）、`00a91b4`（tile 内树形 Max）。不是仅修改 host 参数。
 

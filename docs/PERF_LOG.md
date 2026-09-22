@@ -129,3 +129,12 @@ Split-K host 模型两档宏均编译运行，统计是各档相同模型空间�
 - 源码逆替换验证：host planner、Cube侧、缓冲分配、末级输出、其它算子路径与父版本逐字一致。无需用host stub的重复大网格充当本次设备验证。
 - CANN/NPU/正式15点/latency/msprof **PENDING**。现场依赖待确认：CANN9队列事件、Matmul flag9握手、VECIN原地Max、A2/A3分别运行。
 - 执行单：`DUAL_CONSUMER_OPTIMIZATION.md`。本机未新增任何NPU耗时或速度结论。
+
+## 2026-09-22 · cube-panel-reuse
+
+- 实现 `bc3f7cf`，父 `48e37c7`，SHA `e440e1b3d915ba61f696059cd3af0efdee6b8d087aee04ef7a49ba40ef2a637b`；kernel新增255行。
+- 新Cube生产者按N组/K面板重排，双L0C累加，A跨两个N tile复用，可选全K A常驻L1；接入既有manual AIV与Fold Max。查询实际片上容量，保留旧路径与四档对照。
+- 444个物理块模型执行通过；四布局、三种新模式、K8非16对齐、M/N尾、长K、多task、奇数N组；逐元素C、补零、队列/事件计数与读取量检查。小整数输入不是FP16/BF16设备编码/舍入模拟。
+- host四档production/TUNING各76,424主网格配置与额外资源检查；模式1/2/3选择11,989次，模式3中9,963次resident。fake tiler不能证明CANN可用。
+- 前版消费模型与finalizer模型通过；没有新增NPU性能数字。模式1→2的A读取及L0A搬入量在成对tile上减半；resident进一步减少A GM重复读取。**不能据此报告对父版Matmul库的流量降幅/提速**。
+- CANN9/A2/A3/正式15点/latency/msprof全部PENDING；四档同机执行单在 `CUBE_PANEL_REUSE.md`。用户仍暂缓云端执行。

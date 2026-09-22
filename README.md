@@ -4,7 +4,15 @@
 
 **当前开发起点为用户确认的最优 kernel(2).asc，已原样导入；本 Agent 尚未完成该版本的设备复测。**
 
-## 最新设备端优化候选
+## 最新：Cube 主循环改造
+
+检出 **`experiment/cube-panel-reuse`**：新增成对N tile共享A、K双缓冲流水和可选query整块L1常驻。硬件容量不足时回退；四档宏可独立对照。
+
+- [核心实现、研究依据与P0/P1/P2/P3执行单](docs/CUBE_PANEL_REUSE.md)
+- 抽取实际生产者检查：`python3 tools/validate_cube_panel.py`；444配置通过。
+- **CANN/NPU/正式性能PENDING**。搬运量模型改善不等于相对旧库提速。
+
+## 父版本：dual消费优化
 
 检出 **`experiment/dual-consumer-fold`**。两条dual路径采用UB双缓冲预取、按DMA完成提前归还GM槽位，以及tile内树形Max合并。保留独立开关做同机对照。
 
@@ -40,7 +48,7 @@
 
 ## 接手
 
-1. 当前工作检出 `experiment/dual-consumer-fold`；原样用户最优检出 `experiment/user-best-20260921`，阅读 [HANDOFF](docs/HANDOFF.md) 和 [AGENTS](AGENTS.md)。
+1. 当前工作检出 `experiment/cube-panel-reuse`；原样用户最优检出 `experiment/user-best-20260921`，阅读 [HANDOFF](docs/HANDOFF.md) 和 [AGENTS](AGENTS.md)。
 2. 阅读 [题目约束](docs/PROBLEM.md)、[当前版本验证单](docs/VALIDATION_REQUEST_user_best.md) 和 [性能记录](docs/PERF_LOG.md)。
 3. 后续优化从当前版本另建实验分支，保留逐 case 的真实对照。
 
