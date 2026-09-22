@@ -107,3 +107,15 @@ Split-K host 模型两档宏均编译运行，统计是各档相同模型空间�
 - 继承回归：UB86,784、finalizer28,672、Ksplit361,152及classifier864配置通过。
 - 24shape×2dtype×4layout设备清单已列；CANN编译、完整精度、正式15点、稳定态latency及msprof **PENDING**。
 - 对照入口：`VALIDATION_REQUEST_nsplit_work.md`；不将这次计数改善计入性能成绩。
+
+## 2026-09-22 · 已知问题集中修复（云端按用户指示暂缓）
+
+分支 `experiment/known-issue-closure`；kernel SHA256 `d218864289599e2b39ef09d83cfdde68988908bf9400fa42b5bc9b03031783bb`。
+
+- `31a5715`：earlySum多batch完整输出。finalizer模型扩展至49,152配置，全部唯一且完整；对照旧循环在该空间有928组遗漏、896组重复。
+- `e579d8c`：manual不再申请未使用的库workspace，低核dot split的parts下限为1。
+- `0d6fae8`：缓存包含全部11个Tune字段。同shape改参数不再复用旧计划。
+- 追加保护：offset-zero scratch使用后标记库前缀脏；重新进入Matmul时同步并清零前缀；保留跨无workspace计划的脏状态。首次新分配不等待旧scratch使用者，因为不存在旧分配；实际resize与用途转换仍同步。
+- 完整host控制流模型76,424配置通过，production和TUNING分别运行。fake tiler不构成CANN资源可行性证明。
+- 真实run_kernel/cache/release代码的CPU替身检查通过：同shape调参、context隔离、复用/幂等释放、malloc/memset/sync/free失败、generic/manual/dot/GEMV之间用途转换及重试。
+- 统一计划覆盖151shape×2dtype×4layout；设备未运行。CANN/NPU/正式15点/latency/msprof依然PENDING。本记录没有新增任何NPU性能数字。

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Run real host planning branches with an explicitly permissive fake tiler."""
 import hashlib
+import csv
 from pathlib import Path
 import shutil
 import subprocess
@@ -49,11 +50,12 @@ int main(){
     for(int b:{1,2,8,64})for(int m:{1,2,8,16,32,64,65,68,80,112,128,129,513,1024,1536,8192})
     for(int n:{1,2,8,16,32,64,96,127,128,192,256,513,1024,1536,4096,8192})
     for(int k:{32,40,64,128,248,512,1032,2048,4104,8192})
-    for(int layout=0;layout<4;++layout){
+    for(int layout=0;layout<4;++layout)for(int dtype:{1,2}){
         if(std::max(int64_t(b)*m*k,int64_t(b)*n*k)>(1LL<<26))continue;
-        Shape s{b,m,n,k,1+(count%2),layout/2,layout%2};
+        Shape s{b,m,n,k,dtype,layout/2,layout%2};
         Check(s,count%3==0?1:count%3==1?8:20);++count;
     }
+    // INSERT_UNIFIED_CASES
     // Reject first candidate: generic plans must continue the host fallback loop.
     matmul_tiling::MatmulApiTiling::rejectFirst=true;
     Check({1,1536,1536,1536,1,1,1},20);
@@ -74,6 +76,12 @@ int main(){
     std::cout<<count<<" real-host plans checked with permissive tiler; CANN tiling PENDING\n";
 }
 '''
+    unified = list(csv.DictReader((ROOT / 'docs/known_issues_cases.csv').open()))
+    literals = ','.join('{' + ','.join(r[d] for d in 'BMNK') + ',1,0,0}' for r in unified)
+    code = code.replace('// INSERT_UNIFIED_CASES',
+                        'Shape unified[]={' + literals + '};\n'
+                        'for(auto s:unified)for(int dtype:{1,2})for(int layout=0;layout<4;++layout){'
+                        's.dtype=dtype;s.tx1=layout/2;s.tx2=layout%2;Check(s,20);++count;}')
     print('Host control-flow model only; fake tiler accepts requested tiles.', flush=True)
     print('kernel SHA256:', hashlib.sha256(raw).hexdigest(), flush=True)
     compiler = shutil.which('clang++') or shutil.which('c++')

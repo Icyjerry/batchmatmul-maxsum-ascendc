@@ -4,7 +4,16 @@
 
 **当前开发起点为用户确认的最优 kernel(2).asc，已原样导入；本 Agent 尚未完成该版本的设备复测。**
 
-## 最新性能候选
+## 当前集中修复版本
+
+检出 `experiment/known-issue-closure`。已修复末级输出、UB、调参缓存和workspace用途转换问题，并保留可对照的分块候选。
+
+- [全部已知问题状态](docs/KNOWN_ISSUES.md)
+- [统一设备验证入口](docs/VALIDATION_REQUEST_known_issues.md)（用户当前暂缓云端执行）
+- [接手状态](docs/HANDOFF.md)
+- 当前kernel SHA256：`d218864289599e2b39ef09d83cfdde68988908bf9400fa42b5bc9b03031783bb`。CPU控制流/资源模型通过，CANN/NPU精度和性能未验证。
+
+## 已包含的性能候选
 
 分支 `experiment/n-split-critical-work`：在父分支覆盖修复基础上增加单项 N 拆分实验，缓解已占满核心时的任务尾波不均衡。宏 `BMMMS_BALANCED_NSPLIT=0/1` 可对照。
 
@@ -23,7 +32,7 @@
 
 ## 接手
 
-1. 当前工作检出 `experiment/n-split-critical-work`；原样用户最优检出 `experiment/user-best-20260921`，阅读 [HANDOFF](docs/HANDOFF.md) 和 [AGENTS](AGENTS.md)。
+1. 当前工作检出 `experiment/known-issue-closure`；原样用户最优检出 `experiment/user-best-20260921`，阅读 [HANDOFF](docs/HANDOFF.md) 和 [AGENTS](AGENTS.md)。
 2. 阅读 [题目约束](docs/PROBLEM.md)、[当前版本验证单](docs/VALIDATION_REQUEST_user_best.md) 和 [性能记录](docs/PERF_LOG.md)。
 3. 后续优化从当前版本另建实验分支，保留逐 case 的真实对照。
 

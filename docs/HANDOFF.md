@@ -1,4 +1,19 @@
-# 接手状态 · 2026-09-21
+# 接手状态 · 2026-09-22
+
+## 当前工作：已知问题集中修复
+
+用户最新指示是“直接把已知的问题全部解决”，并明确云服务器执行“先不用管”。当前分支 `experiment/known-issue-closure`，从 `677d882` 派生；不要继续按独立轮次割裂本地缺陷收敛，也不要为此编造设备结论。
+
+Kernel SHA256：`d218864289599e2b39ef09d83cfdde68988908bf9400fa42b5bc9b03031783bb`。
+
+- 本地已修复earlySum漏写、Tune缓存陈旧、manual冗余系统workspace、低核dot split除零；增加scratch用途变更时的库前缀重置，去掉首次分配前无必要的stream同步。继承先前UB、输出及分块修复。
+- 全部R1–R18审计和生命周期/异常/题面边界的明确结论见 [KNOWN_ISSUES.md](KNOWN_ISSUES.md)。其中无实测依据的性能规则仍标待判定，不能说全部性能问题已解决。
+- CPU：76,424个host plan配置（真实控制流、stub tiler）、49,152个finalizer遍历配置；缓存11字段、context隔离、scratch换用途及4类失败通过。既有N/K拆分和UB模型通过。**不等于CANN编译/设备精度通过。**
+- 统一清单 `known_issues_cases.csv` 共151shape/1,208组合。云端恢复时按 [VALIDATION_REQUEST_known_issues.md](VALIDATION_REQUEST_known_issues.md) 执行，不要求对方重做算法设计；目前按用户指示暂缓。
+- 本地复现：`python3 tools/validate_host_plan.py`、`python3 tools/validate_host_cache.py`、`python3 tools/validate_finalizer_coverage.py`；继承模型命令见下文。
+- 资源释放仍要求调用者在stream/context销毁前调用现有release入口；正式main未修改。不要在未知ACL退出顺序的静态析构里自动调用ACL。
+
+以下保留父版本背景；其中“等待设备后才继续”的旧工作节奏已由用户上述指示取代，本地缺陷已继续处理。
 
 ## 最新候选：N 拆分 critical work
 
