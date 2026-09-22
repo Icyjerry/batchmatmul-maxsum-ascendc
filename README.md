@@ -4,7 +4,15 @@
 
 **当前开发起点为用户确认的最优 kernel(2).asc，已原样导入；本 Agent 尚未完成该版本的设备复测。**
 
-## 最新：L1/L0 两级 K 分块
+## 最新：性能结构集中修复
+
+检出 **`experiment/performance-structure-fixes`**，实现 `a3c1f7d`。修复冗余A加载、调参覆盖、过早等待C，并合并重复K主循环。
+
+- 新producer默认自动替换已取消：`BMMMS_CUBE_PANEL=0`，显式1/2/3仍可测试。
+- [四项处理结果、本地验证及设备执行单](docs/PERFORMANCE_STRUCTURE_FIXES.md)
+- CPU模型通过，**CANN/NPU精度与性能PENDING**。以下默认3的说明属于父版本历史。
+
+## 父版本：L1/L0 两级 K 分块
 
 检出 **`experiment/hierarchical-k`**：在成对N tile共享A和L1常驻基础上，L1使用较大的K面板，L0按小块计算；B四缓冲预取下一对面板。按实际容量选择，保留独立开关。
 
@@ -56,7 +64,7 @@
 
 ## 接手
 
-1. 当前工作检出 `experiment/hierarchical-k`；原样用户最优检出 `experiment/user-best-20260921`，阅读 [HANDOFF](docs/HANDOFF.md) 和 [AGENTS](AGENTS.md)。
+1. 当前工作检出 `experiment/performance-structure-fixes`；原样用户最优检出 `experiment/user-best-20260921`，阅读 [HANDOFF](docs/HANDOFF.md) 和 [AGENTS](AGENTS.md)。
 2. 阅读 [题目约束](docs/PROBLEM.md)、[当前版本验证单](docs/VALIDATION_REQUEST_user_best.md) 和 [性能记录](docs/PERF_LOG.md)。
 3. 后续优化从当前版本另建实验分支，保留逐 case 的真实对照。
 

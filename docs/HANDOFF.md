@@ -1,6 +1,16 @@
 # 接手状态 · 2026-09-22
 
-## 最新审查：性能结构与实验堆叠
+## 最新：性能结构四项集中修复
+
+当前分支 **`experiment/performance-structure-fixes`**，代码 `a3c1f7d`，父 `3ca0d7c`。四项均已落到kernel：完整连续A切片合并LoadData、显式tile/window/ns优先且不静默回退、取消新producer的默认自动替换、C事件延至各自首次覆写前获取。合并单级/两级K重复主循环，单N组不再启用无收益常驻。
+
+- 默认 `BMMMS_CUBE_PANEL=0`；显式1/2/3仍可测试修复后的新内核。默认AIC/AIV预处理移除panel调用分支。此前文档“默认3”现为历史记录。
+- SHA256：`1e92ea2c6a15db6869df08429f3f468fb74b7fb0ed09d6a7cc02f1ff71bbc6a3`。
+- CPU物理块456+584配置及完整切片反例、严格pins/预处理、host planner、缓存、N/K拆分和UB模型通过。原反例LoadData从8次降到1次；不代表耗时8倍改善。
+- CANN9/NPU/正式15点/latency/msprof仍 **PENDING**，云端按用户指示暂缓；源码修复完成不等于设备性能问题已实测闭环。
+- 交接与下一条设备执行动作：[PERFORMANCE_STRUCTURE_FIXES.md](PERFORMANCE_STRUCTURE_FIXES.md)。历史规则未被臆造的成本模型替换，main只更新接手指针。
+
+## 历史审查：性能结构与实验堆叠
 
 用户要求检查代码是否出现屎山倾向；已审查当前4044行kernel，未修改算法。见 [PERFORMANCE_STRUCTURE_REVIEW.md](PERFORMANCE_STRUCTURE_REVIEW.md)。实际planner CPU复现了自动producer覆盖旧窗口、单N组无收益常驻导致TX1 LoadData 1→8次，以及显式bn/ns/window被case profile回写。另确认两个C累加器跨组的Fixpipe→MMAD依赖；净性能影响仍PENDING。复现：`python3 tools/audit_plan_precedence.py`。下一步优先修连续A切片和pin优先级，再处理C释放等待及统一路径选择，先收敛已有代码。当前实现分支和SHA如下。
 

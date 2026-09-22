@@ -148,3 +148,13 @@ Split-K host 模型两档宏均编译运行，统计是各档相同模型空间�
 - `validate_host_plan.py`：六种宏组合×production/TUNING，各76,424主网格与额外内存边界通过。模式2/H1选中两级K 9,403次，模式3/H1 7,714次。计数包含额外检查，不是正式case覆盖率。
 - 同步CPU模型和fake tiler；CANN编译、真实队列/事件、NPU精度/正式15点/latency/msprof全部PENDING。较少DMA调用可能被TX1切片LoadData及队列开销抵消，没有新增NPU性能数据。
 - 设备执行入口 `HIERARCHICAL_K.md`；按用户指示云端暂缓。main kernel未合并。
+
+
+## 2026-09-22 · performance-structure-fixes
+
+- 代码 `a3c1f7d`，父 `3ca0d7c`；SHA `1e92ea2c6a15db6869df08429f3f468fb74b7fb0ed09d6a7cc02f1ff71bbc6a3`。
+- 完整连续TX1切片LoadData 8→1；单N组无收益驻留取消；各C首次MMAD前才获取自己的释放事件；两份K主循环合一。
+- 显式tile/window/ns最后应用且拒绝静默覆盖；split-K完整M/N保护。默认P0及预处理隔离保留原家族，显式P2/P3提供修复后候选。
+- CPU：456常规+584两级K+2针对性执行通过；逐元素C/补零/地址/事件收支/操作量检查。六种host宏组合production/TUNING各76,424主网格及容量边界通过；pin与预处理、缓存、N/K/UB回归通过。旧nsplit模型抽取误包含PanelL1Capacity导致的CPU编译错误已修正。
+- P3（显式）驻留选择6,026次、P3/H1两级K 8,410次；包含额外边界，不是正式case命中率。kernel净减少15行，不能作为速度证据。
+- CANN编译、真实异步事件、FP16/BF16设备精度、正式15点与性能全部PENDING；没有新增NPU耗时。设备入口 `PERFORMANCE_STRUCTURE_FIXES.md`。
