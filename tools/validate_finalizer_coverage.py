@@ -12,7 +12,7 @@ ROOT=Path(__file__).resolve().parents[1]
 def main():
     source=(ROOT/'kernel.asc').read_text()
     functions=[]
-    for name in ('FinalizeRows','FinalizeSplitKND','bmmms_gemv_vector'):
+    for name in ('FinalizeRows','FinalizeSplitKND','bmmms_gemv_vector','FinalizeEarly'):
         # Skip forward declarations (only FinalizeRows has one).
         match=re.search(r'void '+name+r'\([^;{]+\)\s*\{', source)
         start=match.start(); end=source.index('\n}\n',start)
@@ -26,7 +26,7 @@ def main():
             stop+=1
         loop=block[loop_start:stop]
         decl=''
-        if name=='FinalizeRows': decl=re.search(r'    const int64_t finalWorkers[^;]+;',block).group(0)
+        if name in ('FinalizeRows','FinalizeEarly'): decl=re.search(r'    const int64_t finalWorkers[^;]+;',block).group(0)
         if name=='FinalizeSplitKND': decl=re.search(r'    const int64_t firstBatch[^;]+;',block).group(0)
         functions.append('void Check'+name+'(Schedule s,int worker,std::vector<int>& counts){\n'+decl+'\n'+loop+'''
 {for(int64_t b=b0;b<std::min<int64_t>(s.b,b0+8);++b) ++counts.at(b);}}
@@ -42,9 +42,9 @@ namespace AscendC{int GetBlockIdx(){return currentBlock;}}
 '''+''.join(functions)+'''
 int main(){
  uint64_t cases=0,oldMissing=0,oldDuplicate=0;
- for(int b=1;b<=64;++b)for(int workers=1;workers<=64;++workers)for(int kind=0;kind<3;++kind)
+ for(int b=1;b<=64;++b)for(int workers=1;workers<=64;++workers)for(int kind=0;kind<4;++kind)
  for(int dual:{0,1,2,3,14}){
-  if(kind!=0 && dual!=1)continue;
+  if((kind==1 || kind==2) && dual!=1)continue;
   Schedule s{b,uint32_t(workers),uint32_t(dual)};
   int aivs=kind==2?workers:(kind==1 || dual)?2*workers:workers;
   std::vector<int> now(b),old(b);
@@ -53,6 +53,7 @@ int main(){
    if(kind==0)CheckFinalizeRows(s,v,now);
    if(kind==1)CheckFinalizeSplitKND(s,v,now);
    if(kind==2)Checkbmmms_gemv_vector(s,v,now);
+   if(kind==3)CheckFinalizeEarly(s,v,now);
    if(kind==0) {for(int start=v*8;start<b;start+=workers*8)
        for(int j=start;j<std::min(b,start+8);++j)++old[j];}
    else if(v*8<b)for(int j=v*8;j<std::min(b,v*8+8);++j)++old[j];
