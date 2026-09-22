@@ -4,7 +4,15 @@
 
 **当前开发起点为用户确认的最优 kernel(2).asc，已原样导入；本 Agent 尚未完成该版本的设备复测。**
 
-## 当前集中修复版本
+## 最新设备端优化候选
+
+检出 **`experiment/dual-consumer-fold`**。两条dual路径采用UB双缓冲预取、按DMA完成提前归还GM槽位，以及tile内树形Max合并。保留独立开关做同机对照。
+
+- [实现、论文/API依据及设备执行单](docs/DUAL_CONSUMER_OPTIMIZATION.md)
+- 本地抽取源码模型：`python3 tools/validate_dual_pipeline.py`，六种开关组合通过。
+- CANN编译、NPU精度和性能：**PENDING**；云端暂缓。不把减少调用数换算成加速比。
+
+## 父版本集中修复
 
 检出 `experiment/known-issue-closure`。已修复末级输出、UB、调参缓存和workspace用途转换问题，并保留可对照的分块候选。
 
@@ -32,7 +40,7 @@
 
 ## 接手
 
-1. 当前工作检出 `experiment/known-issue-closure`；原样用户最优检出 `experiment/user-best-20260921`，阅读 [HANDOFF](docs/HANDOFF.md) 和 [AGENTS](AGENTS.md)。
+1. 当前工作检出 `experiment/dual-consumer-fold`；原样用户最优检出 `experiment/user-best-20260921`，阅读 [HANDOFF](docs/HANDOFF.md) 和 [AGENTS](AGENTS.md)。
 2. 阅读 [题目约束](docs/PROBLEM.md)、[当前版本验证单](docs/VALIDATION_REQUEST_user_best.md) 和 [性能记录](docs/PERF_LOG.md)。
 3. 后续优化从当前版本另建实验分支，保留逐 case 的真实对照。
 

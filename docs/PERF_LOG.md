@@ -119,3 +119,13 @@ Split-K host 模型两档宏均编译运行，统计是各档相同模型空间�
 - 完整host控制流模型76,424配置通过，production和TUNING分别运行。fake tiler不构成CANN资源可行性证明。
 - 真实run_kernel/cache/release代码的CPU替身检查通过：同shape调参、context隔离、复用/幂等释放、malloc/memset/sync/free失败、generic/manual/dot/GEMV之间用途转换及重试。
 - 统一计划覆盖151shape×2dtype×4layout；设备未运行。CANN/NPU/正式15点/latency/msprof依然PENDING。本记录没有新增任何NPU性能数字。
+
+## 2026-09-22 · dual-consumer-fold 设备端优化
+
+- 分支 `experiment/dual-consumer-fold`，父版本 `35a86eb`；kernel SHA256 `8f848c4869d90f0da7a955b14b457a47ecc9a09c41e515c95efa17562916d29e`。
+- `324a6a0` 将历史消费流水候选移植到当前修复版；`00a91b4` 新增原地树形tile Max，复用已有UB双缓冲。
+- 默认 pipeline=2/fold=1；两条完整K dual路径接入。256列tile的WholeReduceMax调用4→1，Vector屏障8→4；无新增workspace。这是操作计数，非性能结果。
+- 六种开关组合各76,800窗口配置与34,816全部列尾/行跨度配置通过；3,840抽象协议调度通过。0/0与父循环CPU轨迹一致，其余模式结果及GM读取地址一致。
+- 源码逆替换验证：host planner、Cube侧、缓冲分配、末级输出、其它算子路径与父版本逐字一致。无需用host stub的重复大网格充当本次设备验证。
+- CANN/NPU/正式15点/latency/msprof **PENDING**。现场依赖待确认：CANN9队列事件、Matmul flag9握手、VECIN原地Max、A2/A3分别运行。
+- 执行单：`DUAL_CONSUMER_OPTIMIZATION.md`。本机未新增任何NPU耗时或速度结论。

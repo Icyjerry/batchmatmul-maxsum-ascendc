@@ -1,5 +1,21 @@
 # 接手状态 · 2026-09-22
 
+## 最新：设备端 dual 消费流水与 tile 归约
+
+用户要求继续推进核心优化，云服务器测试仍按用户要求暂缓。当前分支 **`experiment/dual-consumer-fold`**，父版本 `35a86eb`；代码提交 `324a6a0`（预取/提前归还槽位）、`00a91b4`（tile 内树形 Max）。不是仅修改 host 参数。
+
+Kernel SHA256：`8f848c4869d90f0da7a955b14b457a47ecc9a09c41e515c95efa17562916d29e`。
+
+- `bmmms_dual` / `bmmms_dual_mdl` 两条完整 K 路径接入同一设备消费 helper。既有两个 UB tile 预取下一块；最后一次 GM 读取发出后，以 PIPE_MTE2 完成依赖提前归还槽位并发下一窗口握手。无有效行的 AIV 仍参加同步。
+- 在当前私有 UB tile 内按 64 lane 分组树形 Max，最后一次 WholeReduceMax 更新行最大值。256 列时横向归约 4→1、Vector 屏障 8→4；属于源码调用数，**不是实测加速比**。不额外分配 UB/GM；host plan、Cube 算术、partial/finalizer 保持父版本。
+- `BMMMS_DUAL_PIPELINE=0/1/2`（默认2）；`BMMMS_DUAL_FOLD_MAX=0/1`（默认1）。前者从历史独立流水实验移植，后者是新实现；六组组合可分别归因。
+- `python3 tools/validate_dual_pipeline.py` 已通过：每组76,800窗口配置、34,816归约边界配置，另3,840抽象双AIV协议调度。0/0的CPU指令轨迹与父循环一致；源码逆替换确认其它kernel/host/缓冲预算未改动。这些不是SDK或设备模拟。
+- **CANN 9.0.0 编译、A2/A3 精度、正式15点、msprof/性能全部 PENDING。** Matmul内部flag 9、真实队列同步和在VECIN上原地Max必须设备确认。
+- 下一条执行入口：[DUAL_CONSUMER_OPTIMIZATION.md](DUAL_CONSUMER_OPTIMIZATION.md)。云端恢复后按六档固定plan对照执行；检查实际dual路径，split-K/tiny/manual不进入本次helper。
+- 已知问题修复全部继承。原样用户最优tag、main kernel及其它历史分支未替换；不要把当前候选称为设备最优。
+
+以下为历史记录，旧的“等待设备才继续”节奏已由用户继续本地优化的指示取代。
+
 ## 当前工作：已知问题集中修复
 
 用户最新指示是“直接把已知的问题全部解决”，并明确云服务器执行“先不用管”。当前分支 `experiment/known-issue-closure`，从 `677d882` 派生；不要继续按独立轮次割裂本地缺陷收敛，也不要为此编造设备结论。
