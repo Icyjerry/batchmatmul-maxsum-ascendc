@@ -16,7 +16,7 @@ def main():
     baseline = subprocess.check_output(['git', 'show', f'{BASELINE}:kernel.asc'], cwd=ROOT).decode()
     print('CPU model only; CANN compile, hardware ordering and latency remain PENDING.', flush=True)
     print('kernel SHA256:', hashlib.sha256(raw).hexdigest(), flush=True)
-    start = source.index('__aicore__ inline void CopyDualTile(')
+    start = source.index('__aicore__ inline void ReduceDualTile(')
     end = source.index('template <typename T, bool TX1, bool TX2>\n__schedmode__(1)', start)
     helpers = source[start:end]
     start = baseline.index('            const uint32_t slot=sequence&1;', baseline.index(
@@ -34,7 +34,7 @@ def main():
     assert source.count(call) == 2
     # Host plan, allocation, Cube code and all unrelated kernels must be identical.
     stripped = source.replace(source[source.index('// Consumer pipeline experiment:'):source.index('// Experimental aligned dual=1 scheduling.')], '')
-    stripped = stripped.replace('// The queue already owns two UB tiles. Prefetching does not change its budget.\n'+helpers, '')
+    stripped = stripped.replace(helpers, '')
     stripped = stripped.replace('            '+call, old_body)
     assert stripped == baseline, 'Changes beyond the two consumers require a new validation plan'
     compiler = shutil.which('clang++') or shutil.which('c++')
@@ -45,9 +45,11 @@ def main():
         cpp = Path(directory) / 'model.cpp'
         cpp.write_text(code)
         for mode in (0, 1, 2):
-            exe = Path(directory) / f'model-{mode}'
-            subprocess.run([compiler, '-std=c++14', '-O2', f'-DBMMMS_DUAL_PIPELINE={mode}', str(cpp), '-o', str(exe)], check=True, timeout=60)
-            subprocess.run([str(exe)], check=True, timeout=60)
+            for fold in (0, 1):
+                exe = Path(directory) / f'model-{mode}-{fold}'
+                subprocess.run([compiler, '-std=c++14', '-O2', f'-DBMMMS_DUAL_PIPELINE={mode}',
+                                f'-DBMMMS_DUAL_FOLD_MAX={fold}', str(cpp), '-o', str(exe)], check=True, timeout=60)
+                subprocess.run([str(exe)], check=True, timeout=60)
     subprocess.run([shutil.which('python3'), str(ROOT / 'tests/cpu/dual_pipeline_protocol.py')], check=True, timeout=60)
     print('PASS: CPU model and surgical source comparison; no device-performance claim.')
 

@@ -97,6 +97,16 @@ inline void WholeReduceMax(LocalTensor<float> dst,LocalTensor<float> src,uint64_
 inline void Max(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,
                 uint64_t mask,uint32_t reps,BinaryRepeatParams p) {
     assert(mask>0 && mask<=64 && reps>0 && reps<=255);
+    assert(p.db==1 && p.a==1 && p.b==1 && p.dr<=255 && p.ar<=255 && p.br<=255);
+    assert(dst.offset%8==0 && a.offset%8==0 && b.offset%8==0);
+    // In-place src0 must match dst exactly. Fold src1 groups are disjoint
+    // within each row, and never depend on a previous repeat's write.
+    if(dst.data==a.data) assert(dst.offset==a.offset && p.dr==p.ar);
+    if(dst.data==b.data) {
+        assert(p.dr==p.br && p.dr*8>=mask);
+        const auto gap=b.offset-dst.offset;
+        assert(gap>=mask && gap+mask<=p.dr*8);
+    }
     state.trace.push_back(1000); state.arithmetic.insert(state.arithmetic.end(),{1000,mask,reps});
     for(uint32_t r=0;r<reps;++r) for(uint32_t j=0;j<mask;++j)
         dst.At(r*p.dr*8+j)=std::max(a.At(r*p.ar*8+j),b.At(r*p.br*8+j));
@@ -139,7 +149,44 @@ Result Run(bool reference,const Schedule& s,uint32_t rowStart,uint32_t rows,
     assert(maximum==expected); // poisoned GM / UB tails must never become maxima
     return {maximum,state.trace,state.reads,state.arithmetic,state.peak};
 }
+void ValidateFoldTails() {
+    uint64_t cases=0;
+    for(uint32_t bn=16;bn<=256;bn+=16) for(uint32_t cols=1;cols<=bn;++cols)
+    for(uint32_t rows:{1u,7u,32u,64u}) for(int pattern=0;pattern<4;++pattern) {
+        state=State{};
+        // Huge positive poison in invalid columns and inactive rows.
+        std::vector<float> c(64*bn,1e30f),maximum(128,-INFINITY),row(128,1e30f);
+        std::vector<float> expected=maximum;
+        for(uint32_t r=0;r<rows;++r) {
+            maximum[r]=expected[r]=pattern==3?3.5f:-INFINITY;
+            for(uint32_t j=0;j<cols;++j) {
+                float value=-float(1+(r*31+j*17)%997)/8;
+                if(pattern==1) value=j==cols-1?17.0f:value; // last valid column wins
+                if(pattern==2) value=-std::numeric_limits<float>::min()*float(1+j%17);
+                c[r*bn+j]=value;
+                expected[r]=std::max(expected[r],value);
+            }
+        }
+        ReduceDualTile({&c},{&maximum},{&row},rows,cols,bn);
+        assert(maximum==expected);
+        for(uint32_t r=0;r<64;++r) for(uint32_t j=(r<rows?cols:0);j<bn;++j)
+            assert(c[r*bn+j]==1e30f);
+        const auto reductions=std::count(state.trace.begin(),state.trace.end(),900);
+        const auto barriers=std::count(state.trace.begin(),state.trace.end(),800);
+#if BMMMS_DUAL_FOLD_MAX
+        uint32_t levels=0;
+        for(uint32_t step=64;step<cols;step*=2) ++levels;
+        assert(reductions==1 && barriers==2+levels);
+#else
+        assert(reductions==(cols+63)/64 && barriers==2*reductions);
+#endif
+        ++cases;
+    }
+    std::cout<<"fold="<<BMMMS_DUAL_FOLD_MAX<<": "<<cases
+             <<" all-column tails/16-element row strides/negative values/poison/operation counts PASS\n";
+}
 int main() {
+    ValidateFoldTails();
     uint64_t cases=0,prefetched=0;
     for(uint32_t bm:{16u,32u,64u,128u}) for(uint32_t bn:{16u,32u,64u,128u,256u})
     for(uint32_t window:{1u,2u,3u,4u,8u}) for(uint32_t tiles:{1u,window})
@@ -151,10 +198,14 @@ int main() {
         const uint32_t total=(seq%2==0)?seq+3:seq+1;
         auto old=Run(true,s,sub*(bm/2),rows,nt,nt+tiles,seq,total,pattern);
         auto cur=Run(false,s,sub*(bm/2),rows,nt,nt+tiles,seq,total,pattern);
-        assert(cur.maxima==old.maxima && cur.reads==old.reads && cur.arithmetic==old.arithmetic);
-#if BMMMS_DUAL_PIPELINE == 0
+        assert(cur.maxima==old.maxima && cur.reads==old.reads);
+#if !BMMMS_DUAL_FOLD_MAX
+        assert(cur.arithmetic==old.arithmetic);
+#endif
+#if BMMMS_DUAL_PIPELINE == 0 && !BMMMS_DUAL_FOLD_MAX
         assert(cur.trace==old.trace);
-#else
+#endif
+#if BMMMS_DUAL_PIPELINE >= 1
         if(rows && tiles>1) { assert(cur.peak==2); ++prefetched; }
 #endif
 #if BMMMS_DUAL_PIPELINE == 2
@@ -165,6 +216,6 @@ int main() {
 #endif
         ++cases;
     }
-    std::cout<<"mode="<<BMMMS_DUAL_PIPELINE<<": "<<cases<<" cases; prefetch cases="<<prefetched
-             <<"; exact maxima/read addresses/vector order; two UB slots; release/handshake counts PASS\n";
+    std::cout<<"mode="<<BMMMS_DUAL_PIPELINE<<", fold="<<BMMMS_DUAL_FOLD_MAX<<": "<<cases<<" cases; prefetch cases="<<prefetched
+             <<"; exact maxima/read addresses; two UB slots; release/handshake counts PASS\n";
 }
