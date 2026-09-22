@@ -1,6 +1,18 @@
 # 接手状态 · 2026-09-22
 
-## 最新：Cube 面板复用与 L1 常驻
+## 最新：L1/L0 两级 K 分块
+
+分支 **`experiment/hierarchical-k`**，实现 `d64d0c1`，父版本 `73ed463`（Cube 面板复用）。本次 kernel 新增103行、删除18行，将L1传输粒度与L0计算粒度分开。
+
+- `panelL1K` 按真实L1容量选 `2*panelK` 或 `4*panelK`，最多512；B1四缓冲保存当前/下一对面板，A继续双缓冲或整块常驻。L0双缓冲和两个C累加器沿用父版，K累加顺序不变，无新增GM通路。
+- `BMMMS_L1_K_PANELS=0/1`，默认1；不满足容量时自动保留父版。固定 `BMMMS_CUBE_PANEL=2` 或3再比较H0/H1，避免把不同优化混作收益。
+- SHA256：`771b0cf9b1472ed8c0efee350275413a89aedb79000325b64d78353aa6a27d59`。
+- CPU物理块模型：456次父producer执行、584次两级K执行通过；实际C、读取字节数、L0搬运量及MMAD次数一致，DMA调用减少。额外覆盖112的非2次幂K块及344尾块。
+- host模型六种宏组合各production/TUNING通过76,424主网格及额外容量边界；默认模式选中11,992次，resident 9,964次，两级K 7,714次（含额外检查）。宽松tiler及同步事件模型不构成CANN/设备验证。
+- **CANN9编译、FP16/BF16设备精度、正式15点、性能 PENDING**。四B队列实际事件分配、异步生命周期、TX1切片增加的LoadData指令成本须上板确认；减少DMA调用不是减少读取字节，更不是实测速率。
+- 下一条执行动作：[HIERARCHICAL_K.md](HIERARCHICAL_K.md)。按用户指示云端暂缓；GitHub保存当前候选，main仅更新接手指针。
+
+## 父版本：Cube 面板复用与 L1 常驻
 
 用户要求更大幅度核心改造；当前分支 **`experiment/cube-panel-reuse`**，实现 `bc3f7cf`，父版本 `48e37c7`。新增255行kernel，重组K/N循环和片上缓冲生命周期。
 

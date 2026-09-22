@@ -138,3 +138,13 @@ Split-K host 模型两档宏均编译运行，统计是各档相同模型空间�
 - host四档production/TUNING各76,424主网格配置与额外资源检查；模式1/2/3选择11,989次，模式3中9,963次resident。fake tiler不能证明CANN可用。
 - 前版消费模型与finalizer模型通过；没有新增NPU性能数字。模式1→2的A读取及L0A搬入量在成对tile上减半；resident进一步减少A GM重复读取。**不能据此报告对父版Matmul库的流量降幅/提速**。
 - CANN9/A2/A3/正式15点/latency/msprof全部PENDING；四档同机执行单在 `CUBE_PANEL_REUSE.md`。用户仍暂缓云端执行。
+
+
+## 2026-09-22 · hierarchical-k
+
+- 分支 `experiment/hierarchical-k`，实现 `d64d0c1`，父 `73ed463`；kernel SHA256 `771b0cf9b1472ed8c0efee350275413a89aedb79000325b64d78353aa6a27d59`。
+- L1面板K为L0 K的2/4倍（最多512），B1四缓冲、A1双缓冲或常驻；容量不符保留父路径。`BMMMS_L1_K_PANELS=0/1`默认1。
+- `validate_cube_panel.py`：456父producer执行及584两级K执行通过；逐元素C/补零一致、读字节/L0搬运/MMAD计数不变、ND2NZ调用减少；含四布局、尾块、BK112、K8192。
+- `validate_host_plan.py`：六种宏组合×production/TUNING，各76,424主网格与额外内存边界通过。模式2/H1选中两级K 9,403次，模式3/H1 7,714次。计数包含额外检查，不是正式case覆盖率。
+- 同步CPU模型和fake tiler；CANN编译、真实队列/事件、NPU精度/正式15点/latency/msprof全部PENDING。较少DMA调用可能被TX1切片LoadData及队列开销抵消，没有新增NPU性能数据。
+- 设备执行入口 `HIERARCHICAL_K.md`；按用户指示云端暂缓。main kernel未合并。
