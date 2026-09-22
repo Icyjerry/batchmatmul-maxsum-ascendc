@@ -13,12 +13,13 @@ namespace AscendC { namespace tiling {
 struct TCubeTiling {uint32_t baseM=0,baseN=0,baseK=0,stepM=0,stepN=0,usedCoreNum=0;};
 }}
 namespace platform_ascendc {
-enum class CoreMemType {UB,L1,L0_C};
+enum class CoreMemType {UB,L1,L0_A,L0_B,L0_C};
 struct PlatformAscendCManager {
     int aic=20,aiv=40;uint64_t ub=192*1024,l1=512*1024,l0=128*1024,system=16*1024*1024;
+    uint64_t l0a=64*1024,l0b=64*1024;
     static PlatformAscendCManager* GetInstance(){static PlatformAscendCManager p;return &p;}
     int GetCoreNumAic(){return aic;} int GetCoreNumAiv(){return aiv;}
-    void GetCoreMemSize(CoreMemType kind,uint64_t& value){value=kind==CoreMemType::UB?ub:kind==CoreMemType::L1?l1:l0;}
+    void GetCoreMemSize(CoreMemType kind,uint64_t& value){value=kind==CoreMemType::UB?ub:kind==CoreMemType::L1?l1:kind==CoreMemType::L0_A?l0a:kind==CoreMemType::L0_B?l0b:l0;}
     uint64_t GetLibApiWorkSpaceSize(){return system;}
 };
 }

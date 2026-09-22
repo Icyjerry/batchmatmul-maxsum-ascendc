@@ -32,11 +32,17 @@ def main():
 ''' + old_body + '\n}\n'
     call = 'ConsumeDualWindow(mm,cq,ring,s,maxima,row,rowStart,rows,nt,end,sequence,totalWindows);'
     assert source.count(call) == 2
-    # Host plan, allocation, Cube code and all unrelated kernels must be identical.
+    # This branch also changes a separate producer. The two library dual
+    # kernels themselves must still differ from the parent only by consumers.
     stripped = source.replace(source[source.index('// Consumer pipeline experiment:'):source.index('// Experimental aligned dual=1 scheduling.')], '')
     stripped = stripped.replace(helpers, '')
     stripped = stripped.replace('            '+call, old_body)
-    assert stripped == baseline, 'Changes beyond the two consumers require a new validation plan'
+    for name in ('bmmms_dual', 'bmmms_dual_mdl'):
+        def body(text):
+            start = text.index(f'__schedmode__(1) __global__ __mix__(1, 2) void {name}(')
+            end = text.index('\n#endif\n}', start) + len('\n#endif\n}')
+            return text[start:end]
+        assert body(stripped) == body(baseline), f'{name}: unrelated changes'
     compiler = shutil.which('clang++') or shutil.which('c++')
     assert compiler, 'C++14 compiler required'
     template = (ROOT / 'tests/cpu/dual_pipeline_model.cpp.in').read_text()

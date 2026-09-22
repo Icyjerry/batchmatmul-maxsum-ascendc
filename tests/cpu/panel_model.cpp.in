@@ -1,0 +1,173 @@
+// Executes extracted producer with physical NZ/ZZ/ZN blocks. Not a CANN emulator.
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <deque>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <vector>
+#define __aicore__
+using event_t=int;
+constexpr int PIPE_MTE2=1,PIPE_M=2,PIPE_FIX=3;
+struct Schedule {
+    int64_t b,m,n,k;
+    uint32_t baseM,baseN,mTiles,nTiles,nSplit,workers,panelK,panelGroup;
+    uint32_t panelResident=0;
+};
+struct Expected {int64_t b,m,n;uint32_t rows,cols;};
+struct State {
+    Schedule s;bool tx1,tx2;
+    uint64_t aReads=0,bReads=0,aL0=0,bL0=0,mmads=0;
+    std::map<std::pair<int,int>,int> events;
+    int cross[2]={1,1};
+    std::vector<Expected> expected;size_t fixes=0;
+} st;
+int16_t A(int64_t b,int64_t m,int64_t k){return int((b*13+m*7+k*3)%7)-3;}
+int16_t B(int64_t b,int64_t k,int64_t n){return -int16_t(1+(b*11+k*5+n*3)%3);}
+namespace AscendC {
+enum class TPosition {A1,B1,A2,B2,CO1};
+enum class HardEvent {M_MTE1,MTE1_M,FIX_M,M_FIX,MTE2_MTE1};
+struct Storage {std::vector<uint8_t> bytes;TPosition pos;Storage(size_t n,TPosition p):bytes(n,0x77),pos(p){}};
+template<class T>struct LocalTensor {
+    std::shared_ptr<Storage> mem;size_t offset=0;
+    LocalTensor operator[](size_t i)const{assert(offset+i*sizeof(T)<mem->bytes.size());return {mem,offset+i*sizeof(T)};}
+    T& at(size_t i)const{assert(offset+(i+1)*sizeof(T)<=mem->bytes.size());return *reinterpret_cast<T*>(&mem->bytes[offset+i*sizeof(T)]);}
+    template<class U>LocalTensor<U> ReinterpretCast()const{return {mem,offset};}
+};
+template<class T>struct GlobalTensor {
+    std::vector<T>* data;size_t offset=0;bool isA=false;
+    GlobalTensor operator[](size_t i)const{assert(offset+i<data->size());return {data,offset+i,isA};}
+    T& at(size_t i)const{assert(offset+i<data->size());return data->at(offset+i);}
+};
+template<TPosition P,int N>struct TQue {
+    std::shared_ptr<Storage> mem[N];bool used[N]={};std::deque<int> fifo;
+    template<class T>LocalTensor<T> AllocTensor(){for(int i=0;i<N;++i)if(!used[i]){used[i]=true;return {mem[i],0};}assert(false);return {};}
+    template<class T>void EnQue(LocalTensor<T> t){for(int i=0;i<N;++i)if(mem[i]==t.mem){assert(used[i]);fifo.push_back(i);return;}assert(false);}
+    template<class T>LocalTensor<T> DeQue(){assert(!fifo.empty());int i=fifo.front();fifo.pop_front();return {mem[i],0};}
+    template<class T>void FreeTensor(LocalTensor<T> t){for(int i=0;i<N;++i)if(mem[i]==t.mem){assert(used[i]);used[i]=false;return;}assert(false);}
+    ~TQue(){assert(fifo.empty());for(bool u:used)assert(!u);}
+};
+template<TPosition P>struct TBuf{std::shared_ptr<Storage> mem;template<class T>LocalTensor<T> Get(){return {mem,0};}};
+struct TPipe {
+    int next[5]={3,0,0,0,0};uint64_t l1=0,l0a=0,l0b=0,l0c=0;
+    void Count(TPosition p,uint64_t n){
+        if(p==TPosition::A1||p==TPosition::B1){l1+=n;assert(l1<=512*1024);}
+        if(p==TPosition::A2){l0a+=n;assert(l0a<=65536);}
+        if(p==TPosition::B2){l0b+=n;assert(l0b<=65536);}
+        if(p==TPosition::CO1){l0c+=n;assert(l0c<=131072);}
+    }
+    template<TPosition P,int N>void InitBuffer(TQue<P,N>& q,int depth,uint32_t n){assert(depth==N);Count(P,depth*n);for(auto& m:q.mem)m=std::make_shared<Storage>(n,P);}
+    template<TPosition P>void InitBuffer(TBuf<P>& b,uint32_t n){Count(P,n);b.mem=std::make_shared<Storage>(n,P);}
+    template<HardEvent E>int AllocEventID(){int i=next[int(E)]++;assert(i<8);return i;}
+    template<HardEvent E>void ReleaseEventID(int i){assert(st.events[std::make_pair(int(E),i)]==0);}
+};
+template<HardEvent E>void SetFlag(int i){assert(st.events[std::make_pair(int(E),i)]++==0);}
+template<HardEvent E>void WaitFlag(int i){assert(st.events[std::make_pair(int(E),i)]--==1);}
+template<int P>void PipeBarrier(){}
+template<int Mode>void CrossCoreWaitFlag(int id){assert(Mode==2 && id>=4 && id<6);assert(st.cross[id-4]--==1);}
+template<int Mode,int P>void CrossCoreSetFlag(int id){assert(Mode==2 && P==PIPE_FIX && id<2);assert(st.cross[id]++==0);}
+struct Nd2NzParams {uint32_t ndNum,nValue,dValue,srcDValue,dstNzC0Stride,dstNzNStride;};
+template<class T>struct InitConstValueParams {uint16_t repeats,blocks,gap;T value;};
+template<class T>void InitConstValue(LocalTensor<T> dst,InitConstValueParams<T> p){
+    for(uint32_t r=0;r<p.repeats;++r)for(uint32_t j=0;j<p.blocks*16;++j)
+        dst.at(r*(p.blocks+p.gap)*16+j)=p.value;
+}
+template<class T>void DataCopy(LocalTensor<T> dst,GlobalTensor<T> src,Nd2NzParams p){
+    assert(p.ndNum==1 && p.dstNzNStride==1 && p.dstNzC0Stride%16==0);
+    for(uint32_t r=0;r<p.nValue;++r)for(uint32_t c=0;c<(p.dValue+15)/16*16;++c){
+        dst.at((c/16)*p.dstNzC0Stride*16+r*16+c%16)=c<p.dValue?src.at(r*p.srcDValue+c):0;
+    }
+    (src.isA?st.aReads:st.bReads)+=p.nValue*p.dValue;
+}
+struct LoadData2DParams {uint32_t repeatTimes=1,srcStride=1,dstGap=0;bool ifTranspose=false;};
+template<class T>void LoadData(LocalTensor<T> dst,LocalTensor<T> src,LoadData2DParams p){
+    assert(p.repeatTimes>0 && p.repeatTimes<=255 && dst.offset%512==0 && src.offset%512==0);
+    for(uint32_t r=0;r<p.repeatTimes;++r)for(uint32_t i=0;i<16;++i)for(uint32_t j=0;j<16;++j)
+        dst.at(r*(p.dstGap+1)*256+i*16+j)=src.at(r*p.srcStride*256+(p.ifTranspose?j*16+i:i*16+j));
+    (dst.mem->pos==TPosition::A2?st.aL0:st.bL0)+=p.repeatTimes*256;
+}
+struct MmadParams {uint32_t m,n,k;bool cmatrixInitVal;};
+template<class T>void Mmad(LocalTensor<float> c,LocalTensor<T> a,LocalTensor<T> b,MmadParams p){
+    assert(p.m%16==0 && p.n%16==0 && p.k%16==0);++st.mmads;
+    for(uint32_t m=0;m<p.m;++m)for(uint32_t n=0;n<p.n;++n){
+        const size_t ci=(n/16)*p.m*16+m*16+n%16;
+        float v=p.cmatrixInitVal?0:c.at(ci);
+        for(uint32_t k=0;k<p.k;++k){
+            auto ai=((m/16)*(p.k/16)+k/16)*256+(m%16)*16+k%16;
+            auto bi=((k/16)*(p.n/16)+n/16)*256+(n%16)*16+k%16;
+            v+=float(a.at(ai))*float(b.at(bi));
+        }
+        c.at(ci)=v;
+    }
+}
+struct FixpipeParamsV220 {uint32_t nSize,mSize,srcStride,dstStride;};
+void Fixpipe(GlobalTensor<float> dst,LocalTensor<float> src,FixpipeParamsV220 p){
+    assert(st.fixes<st.expected.size());const auto e=st.expected[st.fixes++];
+    assert(p.srcStride==p.mSize && p.dstStride==st.s.baseN);
+    for(uint32_t m=0;m<p.mSize;++m)for(uint32_t n=0;n<p.nSize;++n){
+        float v=src.at((n/16)*p.srcStride*16+m*16+n%16),gold=0;
+        if(m<e.rows && n<e.cols)for(uint32_t k=0;k<st.s.k;++k)gold+=float(A(e.b,e.m+m,k))*float(B(e.b,k,e.n+n));
+        assert(v==gold); // checks every output C element, including padded rows/cols
+        dst.at(m*p.dstStride+n)=v;
+    }
+}
+}
+template<AscendC::HardEvent E>void Fence(){}
+// INSERT_HELPERS
+struct Counts{uint64_t a,b,al0,bl0,mmads;};
+template<bool TX1,bool TX2>Counts Run(Schedule s){
+    Counts counts{};
+    std::vector<int16_t> a(s.b*s.m*s.k),b(s.b*s.n*s.k);
+    for(int64_t z=0;z<s.b;++z)for(int64_t m=0;m<s.m;++m)for(int64_t k=0;k<s.k;++k)
+        a[z*s.m*s.k+(TX1?k*s.m+m:m*s.k+k)]=A(z,m,k);
+    for(int64_t z=0;z<s.b;++z)for(int64_t k=0;k<s.k;++k)for(int64_t n=0;n<s.n;++n)
+        b[z*s.n*s.k+(TX2?n*s.k+k:k*s.n+n)]=B(z,k,n);
+    for(uint32_t worker=0;worker<s.workers;++worker){
+        st=State{};st.s=s;st.tx1=TX1;st.tx2=TX2;
+        for(int64_t t=worker;t<s.b*s.mTiles*s.nSplit;t+=s.workers){
+            auto ns=t%s.nSplit,mt=(t/s.nSplit)%s.mTiles,z=t/(s.nSplit*s.mTiles);
+            for(int64_t nt=ns*s.nTiles/s.nSplit;nt<(ns+1)*s.nTiles/s.nSplit;++nt)
+                st.expected.push_back({z,mt*s.baseM,nt*s.baseN,
+                    uint32_t(std::min<int64_t>(s.baseM,s.m-mt*s.baseM)),uint32_t(std::min<int64_t>(s.baseN,s.n-nt*s.baseN))});
+        }
+        std::vector<float> ring(2*s.baseM*s.baseN,1e30f);
+        AscendC::TPipe pipe;
+        RunPanelCube<int16_t,TX1,TX2>(pipe,{&a,0,true},{&b,0,false},{&ring},s,worker);
+        assert(st.fixes==st.expected.size() && !st.cross[0] && !st.cross[1]);
+        for(auto e:st.events)assert(e.second==0);
+        counts.a+=st.aReads;counts.b+=st.bReads;counts.al0+=st.aL0;counts.bl0+=st.bL0;counts.mmads+=st.mmads;
+    }
+    return counts;
+}
+template<bool X,bool Y>void Check(Schedule s){
+    s.mTiles=(s.m+s.baseM-1)/s.baseM;s.nTiles=(s.n+s.baseN-1)/s.baseN;
+    s.panelGroup=1;const auto one=Run<X,Y>(s);
+    s.panelGroup=2;const auto two=Run<X,Y>(s);
+    assert(two.a<=one.a && two.al0<=one.al0 && two.b==one.b && two.bl0==one.bl0 && two.mmads==one.mmads);
+    if(s.nTiles%s.nSplit==0 && (s.nTiles/s.nSplit)%2==0){assert(two.a*2==one.a && two.al0*2==one.al0);}
+    s.panelResident=1;const auto resident=Run<X,Y>(s);
+    assert(resident.a==uint64_t(s.b*s.m*s.k)*s.nSplit);
+    assert(resident.a<=two.a && resident.al0==two.al0 && resident.b==two.b && resident.bl0==two.bl0 && resident.mmads==two.mmads);
+}
+int main(){
+    uint32_t cases=0;
+    // Enough arithmetic to expose wrong transposes, loop origins and padding;
+    // capacity and wide shapes are covered separately by host/schedule models.
+    for(uint32_t k:{40u,128u,136u,264u})for(uint32_t n:{33u,65u,97u,129u}){
+        Schedule s{2,33,n,k,32,32,0,0,1,3,64,1};
+        Check<false,false>(s);Check<false,true>(s);Check<true,false>(s);Check<true,true>(s);cases+=12;
+        s.nSplit=2;s.workers=5;
+        Check<false,false>(s);Check<false,true>(s);Check<true,false>(s);Check<true,true>(s);cases+=12;
+    }
+    for(uint32_t bn:{80u,128u,256u}){
+        Schedule s{1,17,2*bn+1,248,32,bn,0,0,1,2,64,1};
+        Check<false,false>(s);Check<false,true>(s);Check<true,false>(s);Check<true,true>(s);cases+=12;
+    }
+    for(auto s:std::vector<Schedule>{{1,129,257,136,128,128,0,0,1,2,128,1},
+                                    {1,17,33,8192,16,16,0,0,1,1,256,1}}){
+        Check<false,false>(s);Check<false,true>(s);Check<true,false>(s);Check<true,true>(s);cases+=12;
+    }
+    std::cout<<cases<<" producer executions (all layouts, streamed single/paired and resident), physical block/padding/C values/events/A reuse PASS\n";
+}

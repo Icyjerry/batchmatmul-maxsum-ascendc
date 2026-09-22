@@ -16,6 +16,7 @@ def main():
     shapes = source[source.index('struct Shape {'):source.index('template <AscendC::HardEvent')]
     host = source[source.index('struct Plan {'):source.index('using CacheKey =')]
     code = (ROOT / 'tests/cpu/planner_stub.hpp').read_text() + shapes + host + r'''
+uint64_t panelPlans=0,residentPlans=0;
 void Check(Shape s,int cores){
     Plan p=MakePlan(s,cores);const auto& d=p.schedule;
     assert(p.finalBlocks>0 && p.finalBlocks<=40);
@@ -31,6 +32,16 @@ void Check(Shape s,int cores){
     assert(d.baseM%16==0 && d.baseN%16==0);
     assert(d.mTiles==Ceil(s.m,d.baseM) && d.nTiles==Ceil(s.n,d.baseN));
     assert(d.nSplit>0 && d.nSplit<=d.nTiles && d.window>0);
+    if(d.panelK){
+        ++panelPlans;residentPlans+=d.panelResident;
+        auto* hw=platform_ascendc::PlatformAscendCManager::GetInstance();
+        assert(d.dual==14 && d.kSplit==1 && d.window==1 && d.panelGroup==std::min(2,BMMMS_CUBE_PANEL));
+        assert(d.panelK>=64 && d.panelK%16==0 && d.nTiles>=2*d.nSplit);
+        assert(4ULL*d.baseM*d.panelK<=hw->l0a && 4ULL*d.baseN*d.panelK<=hw->l0b);
+        assert(4ULL*(d.baseM+d.baseN)*d.panelK+1024<=hw->l1);
+        assert(8ULL*d.baseM*d.baseN<=hw->l0);
+        assert(d.panelResident==(BMMMS_CUBE_PANEL>=3 && 2ULL*d.baseM*Ceil(s.k,16)*16+4ULL*d.baseN*d.panelK+1024<=hw->l1));
+    }
     uint64_t partial;
     if(d.kSplit>1){
         assert(d.baseM>=s.m && d.baseN>=s.n);
@@ -61,11 +72,18 @@ int main(){
     Check({1,1536,1536,1536,1,1,1},20);
     assert(!matmul_tiling::MatmulApiTiling::rejectFirst);
     auto* platform=platform_ascendc::PlatformAscendCManager::GetInstance();
+    bool needsSystem=MakePlan({1,1536,1536,1536,1,1,1},20).systemBytes!=0;
     platform->system=0;
     Check({1,8192,127,248,1,0,0},20); // manual does not require library scratch
     bool rejected=false;
     try{MakePlan({1,1536,1536,1536,1,1,1},20);}catch(const std::runtime_error&){rejected=true;}
-    assert(rejected);
+    assert(rejected==needsSystem);
+    for(uint64_t bytes:{0ULL,8192ULL,16384ULL,32768ULL,65536ULL}){
+        platform->l0a=bytes;platform->l0b=bytes;platform->system=16*1024*1024;
+        Check({1,1536,1536,1536,1,1,1},20);
+    }
+    platform->l0a=platform->l0b=65536;
+    std::cout<<"panel="<<BMMMS_CUBE_PANEL<<", selected="<<panelPlans<<", resident="<<residentPlans<<"\n";
 #ifdef BMMMS_TUNING
     platform->system=16*1024*1024;
     Tune().dual=10;
@@ -89,11 +107,13 @@ int main(){
     with tempfile.TemporaryDirectory(prefix='bmmms-hostplan-') as tmp:
         cpp, exe = Path(tmp) / 'model.cpp', Path(tmp) / 'model'
         cpp.write_text(code)
-        for flags in [[], ['-DBMMMS_TUNING']]:
-            print('TUNING' if flags else 'production planner', flush=True)
-            subprocess.run([compiler, '-std=c++14', '-O2', '-DBMMMS_ADAPTIVE_SPLITK=1',
-                            '-DBMMMS_BALANCED_NSPLIT=1', *flags, str(cpp), '-o', str(exe)], check=True, timeout=60)
-            subprocess.run([str(exe)], check=True, timeout=60)
+        for mode in (0, 1, 2, 3):
+            for flags in [[], ['-DBMMMS_TUNING']]:
+                print('TUNING' if flags else 'production planner', flush=True)
+                subprocess.run([compiler, '-std=c++14', '-O2', '-DBMMMS_ADAPTIVE_SPLITK=1',
+                                '-DBMMMS_BALANCED_NSPLIT=1', f'-DBMMMS_CUBE_PANEL={mode}',
+                                *flags, str(cpp), '-o', str(exe)], check=True, timeout=60)
+                subprocess.run([str(exe)], check=True, timeout=60)
 
 
 if __name__ == '__main__':
