@@ -1,8 +1,8 @@
 # 接手状态
 
-> **最新工作（2026-09-22）：**`experiment/known-issue-closure`，提交 `35a86eb`。已集中修复earlySum输出、调参缓存、manual冗余库workspace、低核dot split除零，以及scratch转换回Matmul的初始化保护。76,424个host计划模型和49,152个finalizer配置通过；不是CANN/NPU PASS。用户明确云端执行暂缓。检出该分支阅读 `docs/HANDOFF.md`、`docs/KNOWN_ISSUES.md` 和统一验证单。main内核仍为历史v1，用户最佳tag不动；此处仅更新接手入口。
+> **最新工作（2026-09-22）：**检出 `experiment/dual-consumer-fold`，提交 `48e37c7`。两条dual设备路径已接入UB双缓冲预取、GM读取完成后提前归还槽位、tile内树形Max；继承known-issue-closure的修复。256列tile横向归约调用4→1，屏障8→4，不代表实测加速。六组开关的CPU语义/地址模型通过；CANN/NPU精度和性能PENDING，用户暂缓云端执行。检出后阅读 `docs/HANDOFF.md` 与 `docs/DUAL_CONSUMER_OPTIMIZATION.md`。main kernel仍为历史v1，此处仅更新接手指针。
 
-> **2026-09-21 最新入口：**用户提供了新的当前最优版本。后续开发请先执行 `git fetch origin`、`git switch --track origin/experiment/user-best-20260921`（已有本地分支则直接 switch），并阅读该分支的 HANDOFF。固定 tag 为 `user-best-20260921`，导入提交 `23e3e5a`，kernel SHA256 为 `e512c0d5d21ff4f065cabcd16278e097a2678f327334b85156939b35fc8f4cdc`。旧 N 拆分实验保存在 `experiment/v2-dual1-nsplit`（`7426712`）。main 的 kernel 仍为历史 v1；以下 v1 内容不是当前最佳版本说明。新版本的本轮 CANN/NPU 复测仍待完成。
+> **历史起点：**用户确认的最佳原件保存在 `user-best-20260921` tag（`23e3e5a`），当前设备端候选建立在它的后续修复版本上。以下v1内容是main的历史记录，后续开发以顶部新分支接手单为准。
 
 更新日期：2026-09-20。此文件与 Git 中的代码、验证单一起足以独立接手。
 
