@@ -59,18 +59,18 @@ int main(){
     auto s=reinterpret_cast<void*>(2);
     Tune().ns=3;Run(s);assert(launched.schedule.nSplit==3);
     assert(synchronizations==0); // first allocation has no previous scratch user
-    Run(s,{1,8192,96,192,1,0,0}); // manual reuses, and overwrites, the library prefix
+    Tune().ns=1;Run(s,{1,8192,96,192,1,0,0}); // manual reuses, and overwrites, the library prefix
     assert(launched.systemBytes==0 && Cache().at(CurrentKey(s)).systemDirty);
-    Run(s,{1,1,1,32,1,0,0}); // a workspace-free shape must not lose the dirty state
+    Tune().ns=0;Run(s,{1,1,1,32,1,0,0}); // a workspace-free shape must not lose the dirty state
     assert(Cache().at(CurrentKey(s)).systemDirty);
-    fail=2;bool resetFailed=false;
+    Tune().ns=3;fail=2;bool resetFailed=false;
     try{Run(s);}catch(const std::runtime_error&){resetFailed=true;}
     assert(resetFailed && Cache().at(CurrentKey(s)).systemDirty);
     fail=0;Run(s);assert(!Cache().at(CurrentKey(s)).systemDirty);
     int stableSync=synchronizations;Run(s);assert(synchronizations==stableSync);
-    Run(s,{1,1,8192,512,1,0,1}); // vector GEMV also uses offset-zero scratch
+    Tune().ns=0;Run(s,{1,1,8192,512,1,0,1}); // vector GEMV also uses offset-zero scratch
     assert(Cache().at(CurrentKey(s)).systemDirty);
-    Run(s);assert(!Cache().at(CurrentKey(s)).systemDirty);
+    Tune().ns=3;Run(s);assert(!Cache().at(CurrentKey(s)).systemDirty);
     int once=allocations,sync=synchronizations;
     Run(s);assert(allocations==once && synchronizations==sync);
     Tune().ns=1;Run(s);assert(launched.schedule.nSplit==1);

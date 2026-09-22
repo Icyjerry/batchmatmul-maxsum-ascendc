@@ -40,7 +40,7 @@ void Check(Shape s,int cores){
         assert(4ULL*d.baseM*d.panelK<=hw->l0a && 4ULL*d.baseN*d.panelK<=hw->l0b);
         assert(4ULL*(d.baseM+d.baseN)*d.panelK+1024<=hw->l1);
         assert(8ULL*d.baseM*d.baseN<=hw->l0);
-        assert(d.panelResident==(BMMMS_CUBE_PANEL>=3 && 2ULL*d.baseM*Ceil(s.k,16)*16+4ULL*d.baseN*d.panelK+1024<=hw->l1));
+        assert(d.panelResident==(BMMMS_CUBE_PANEL>=3 && d.nTiles/d.nSplit>d.panelGroup && 2ULL*d.baseM*Ceil(s.k,16)*16+4ULL*d.baseN*d.panelK+1024<=hw->l1));
         if(d.panelL1K){
             ++widePlans;
             assert(BMMMS_L1_K_PANELS && d.panelGroup==2 && s.k>d.panelK);

@@ -19,7 +19,8 @@ struct Schedule {
 struct Expected {int64_t b,m,n;uint32_t rows,cols;};
 struct State {
     Schedule s;bool tx1,tx2;
-    uint64_t aReads=0,bReads=0,aL0=0,bL0=0,mmads=0,aCopies=0,bCopies=0;
+    uint64_t aReads=0,bReads=0,aL0=0,bL0=0,mmads=0,aCopies=0,bCopies=0,aLoads=0,bLoads=0;
+    int lastCWait=-1;
     std::map<std::pair<int,int>,int> events;
     int cross[2]={1,1};
     std::vector<Expected> expected;size_t fixes=0;
@@ -64,7 +65,10 @@ struct TPipe {
     template<HardEvent E>void ReleaseEventID(int i){assert(st.events[std::make_pair(int(E),i)]==0);}
 };
 template<HardEvent E>void SetFlag(int i){assert(st.events[std::make_pair(int(E),i)]++==0);}
-template<HardEvent E>void WaitFlag(int i){assert(st.events[std::make_pair(int(E),i)]--==1);}
+template<HardEvent E>void WaitFlag(int i){
+    assert(st.events[std::make_pair(int(E),i)]--==1);
+    if(E==HardEvent::FIX_M)st.lastCWait=i;
+}
 template<int P>void PipeBarrier(){}
 template<int Mode>void CrossCoreWaitFlag(int id){assert(Mode==2 && id>=4 && id<6);assert(st.cross[id-4]--==1);}
 template<int Mode,int P>void CrossCoreSetFlag(int id){assert(Mode==2 && P==PIPE_FIX && id<2);assert(st.cross[id]++==0);}
@@ -88,10 +92,18 @@ template<class T>void LoadData(LocalTensor<T> dst,LocalTensor<T> src,LoadData2DP
     for(uint32_t r=0;r<p.repeatTimes;++r)for(uint32_t i=0;i<16;++i)for(uint32_t j=0;j<16;++j)
         dst.at(r*(p.dstGap+1)*256+i*16+j)=src.at(r*p.srcStride*256+(p.ifTranspose?j*16+i:i*16+j));
     (dst.mem->pos==TPosition::A2?st.aL0:st.bL0)+=p.repeatTimes*256;
+    ++(dst.mem->pos==TPosition::A2?st.aLoads:st.bLoads);
 }
 struct MmadParams {uint32_t m,n,k;bool cmatrixInitVal;};
 template<class T>void Mmad(LocalTensor<float> c,LocalTensor<T> a,LocalTensor<T> b,MmadParams p){
     assert(p.m%16==0 && p.n%16==0 && p.k%16==0);++st.mmads;
+    const int slot=c.offset/(st.s.baseM*st.s.baseN*sizeof(float));
+    assert(st.events[std::make_pair(int(HardEvent::FIX_M),slot)]==0);
+    if(p.cmatrixInitVal) {
+        assert(st.lastCWait==slot);st.lastCWait=-1;
+        // First C can start while the second tile's FIX_M credit is still pending.
+        if(slot==0)assert(st.events[std::make_pair(int(HardEvent::FIX_M),1)]==1);
+    }
     for(uint32_t m=0;m<p.m;++m)for(uint32_t n=0;n<p.n;++n){
         const size_t ci=(n/16)*p.m*16+m*16+n%16;
         float v=p.cmatrixInitVal?0:c.at(ci);
@@ -117,7 +129,7 @@ void Fixpipe(GlobalTensor<float> dst,LocalTensor<float> src,FixpipeParamsV220 p)
 }
 template<AscendC::HardEvent E>void Fence(){}
 // INSERT_HELPERS
-struct Counts{uint64_t a,b,al0,bl0,mmads,ac,bc;};
+struct Counts{uint64_t a,b,al0,bl0,mmads,ac,bc,aloads,bloads;};
 template<bool TX1,bool TX2>Counts Run(Schedule s){
     Counts counts{};
     std::vector<int16_t> a(s.b*s.m*s.k),b(s.b*s.n*s.k);
@@ -141,6 +153,7 @@ template<bool TX1,bool TX2>Counts Run(Schedule s){
         for(auto e:st.events)assert(e.second==0);
         counts.a+=st.aReads;counts.b+=st.bReads;counts.al0+=st.aL0;counts.bl0+=st.bL0;counts.mmads+=st.mmads;
         counts.ac+=st.aCopies;counts.bc+=st.bCopies;
+        counts.aloads+=st.aLoads;counts.bloads+=st.bLoads;
     }
     return counts;
 }
@@ -167,6 +180,12 @@ template<bool X,bool Y>void Check(Schedule s){
 }
 int main(){
     uint32_t cases=0;
+    // Audit regression: a complete transposed A slice is contiguous even in resident L1.
+    Schedule full{1,128,256,128,128,128,1,2,1,1,128,2};
+    const auto streamed=Run<true,false>(full);
+    full.panelResident=1;const auto resident=Run<true,false>(full);
+    assert(streamed.aloads==1 && resident.aloads==1 && streamed.a==resident.a);
+    std::cout<<"complete resident A: 1 LoadData; independent per-C acquisition PASS\n";
     // Enough arithmetic to expose wrong transposes, loop origins and padding;
     // capacity and wide shapes are covered separately by host/schedule models.
     for(uint32_t k:{40u,128u,136u,264u})for(uint32_t n:{33u,65u,97u,129u}){

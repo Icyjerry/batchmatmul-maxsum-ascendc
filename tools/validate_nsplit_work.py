@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     raw = (ROOT / 'kernel.asc').read_bytes()
     source = raw.decode()
-    helpers = source[source.index('struct NPartitionCost'):source.index('inline Plan MakePlan(')]
+    helpers = source[source.index('struct NPartitionCost'):source.index('inline uint32_t PanelKCapacity(')]
     start = source.index('#if BMMMS_BALANCED_NSPLIT\n')
     end = source.index('    d.window = std::min<uint32_t>', start)
     integration = source[start:end]

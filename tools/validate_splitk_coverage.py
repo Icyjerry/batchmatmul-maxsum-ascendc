@@ -20,7 +20,7 @@ def main():
     raw = (ROOT / 'kernel.asc').read_bytes()
     source = raw.decode()
     baseline = subprocess.check_output(['git', 'show', 'user-best-20260921:kernel.asc'], cwd=ROOT).decode()
-    current = source[source.index('inline uint64_t SplitKNDLiveBytes('):source.index('inline Plan MakePlan(')]
+    current = source[source.index('inline uint64_t SplitKNDLiveBytes('):source.index('struct NPartitionCost')]
     original = baseline[baseline.index('enum ForcedKind'):baseline.index('inline Plan MakePlan(')]
     shape = source[source.index('struct Shape {'):source.index('template <AscendC::HardEvent')]
     final = function(source, 'FinalizeSplitKND')
