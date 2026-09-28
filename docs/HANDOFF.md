@@ -1,4 +1,11 @@
-# 接手状态 · 2026-09-22
+# 接手状态 · 2026-09-28
+
+## 正式 CANNJudge 验证（最新）
+
+- 当前分支 `experiment/performance-structure-fixes` 的 `kernel.asc` 已提交到 [BatchMatmulMaxSum 正式评测](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6aba3abb694b590c3cd6cbe3)：提交 ID **498385**，2026-09-28 18:00:27 CST，最终状态 **Pass，15/15**，每点输出错误占比均为 0.00%。
+- 提交页面保存的 `kernel.asc` 经复制回本地逐字节比对，216575 字节、SHA256 `1e92ea2c6a15db6869df08429f3f468fb74b7fb0ed09d6a7cc02f1ff71bbc6a3`，与本分支文件一致；提交对应代码提交 `a3c1f7d`。逐点耗时和平台显示的最优用时见 [PERF_LOG.md](PERF_LOG.md)。
+- 平台标注 CANN 9.0.0，但该页面未给出精确 SoC、15 点 shape/layout/dtype、实际 plan、msprof 或编译日志。这些仍待单独采集。旧段落中的“正式15点 PENDING”是提交前历史状态。
+- 下一步先定位耗时比最高的第 5、8、4 点及第 13–15 点对应的 shape/layout/dtype 和实际路径，再按单一假设开实验分支做同机对照；不要根据隐藏 case 的编号猜形状。
 
 ## 最新：性能结构四项集中修复
 
