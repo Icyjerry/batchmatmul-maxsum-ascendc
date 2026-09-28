@@ -1,8 +1,16 @@
 # 接手状态 · 2026-09-28
 
-## 正式 CANNJudge 验证（最新）
+## 当前候选：队友 C6/C10/C12 合并 v3
 
-- 当前分支 `experiment/performance-structure-fixes` 的 `kernel.asc` 已提交到 [BatchMatmulMaxSum 正式评测](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6aba3abb694b590c3cd6cbe3)：提交 ID **498385**，2026-09-28 18:00:27 CST，最终状态 **Pass，15/15**，每点输出错误占比均为 0.00%。
+- 工作分支 `experiment/teammate-c6-c10-c12-v3`，导入提交 `d9d74eb`。用户提供的 `kernel_c6_c10_c12_merged_v3.asc` 已逐字节原样导入 `kernel.asc` 并推送；244979 字节，SHA256 `ce2e12e425883fc207d0dd5d08a7a72b485c439b65fbbb8db33165905aecce52`。不要把附件中的性能注释当成本轮测量。
+- [正式提交 498576](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6aba3dbb694b590c3cd8f427)，2026-09-28 18:13:15 CST：**Pass，15/15**，每点输出错误占比 0.00%。平台保存的 `kernel.asc` 再次复制回本地并与原件逐字节比对，SHA 一致。
+- 相比上个已通过的提交 498385，页面两位小数耗时有 13 点降低、2 点升高；15 点合计 599.65→519.71 μs。按页面展示的最优用时和题面公式估算均分约 34.80→40.39，仅用于同页对照，不是平台公布分数。完整逐点数据见 [PERF_LOG.md](PERF_LOG.md)。
+- 旧 CPU host 检查脚本依赖上一版 `Schedule`、`TuneConfig` 结构，对新原件不适用；执行时因字段缺失而编译失败，不能记为候选精度失败或 CPU PASS。正式评测已给出 15 点正确性结果。精确 SoC、case shape/layout/dtype、实际 plan、编译命令、msprof 和重复测量仍未取得。
+- 下一动作：保留此实验分支为目前正式评测较快的候选。优先识别第 1/2 点的小幅退化和第 8 点剩余较大最优差距，再针对一个可复现的形状及设备路径提出单一优化假设；设备记录须绑定本 SHA。未经额外验证不把新候选合并进 `main`。
+
+## 上一个通过版本：CANNJudge 498385
+
+- 分支 `experiment/performance-structure-fixes` 的 `kernel.asc` 已提交到 [BatchMatmulMaxSum 正式评测](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6aba3abb694b590c3cd6cbe3)：提交 ID **498385**，2026-09-28 18:00:27 CST，最终状态 **Pass，15/15**，每点输出错误占比均为 0.00%。
 - 提交页面保存的 `kernel.asc` 经复制回本地逐字节比对，216575 字节、SHA256 `1e92ea2c6a15db6869df08429f3f468fb74b7fb0ed09d6a7cc02f1ff71bbc6a3`，与本分支文件一致；提交对应代码提交 `a3c1f7d`。逐点耗时和平台显示的最优用时见 [PERF_LOG.md](PERF_LOG.md)。
 - 平台标注 CANN 9.0.0，但该页面未给出精确 SoC、15 点 shape/layout/dtype、实际 plan、msprof 或编译日志。这些仍待单独采集。旧段落中的“正式15点 PENDING”是提交前历史状态。
 - 下一步先定位耗时比最高的第 5、8、4 点及第 13–15 点对应的 shape/layout/dtype 和实际路径，再按单一假设开实验分支做同机对照；不要根据隐藏 case 的编号猜形状。
