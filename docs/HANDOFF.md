@@ -1,6 +1,6 @@
 # 接手状态
 
-> **最新工作（2026-09-22）：**检出 `experiment/hierarchical-k`，提交 `76d6c28`（核心实现 `d64d0c1`，父版 `73ed463`）。Cube已新增成对N tile共享A、可选L1常驻，并进一步将L1大K面板与L0小K计算分离，B四缓冲预取。实际容量不足时回退，保留独立对照开关。456次父producer执行和584次两级K CPU模型执行通过；读取字节/MMAD数不变、DMA调用减少，不代表实测加速。CANN/NPU精度、正式15点、性能PENDING；用户暂缓云端执行。检出后阅读 `docs/HANDOFF.md`、`docs/HIERARCHICAL_K.md` 与父版 `docs/CUBE_PANEL_REUSE.md`。main kernel仍为历史v1，此处仅更新接手指针。
+> **最新工作（2026-09-28）：**检出 `experiment/performance-structure-fixes`，文档提交 `2fcac68`（内核实现 `a3c1f7d`，SHA256 `1e92ea2c6a15db6869df08429f3f468fb74b7fb0ed09d6a7cc02f1ff71bbc6a3`）。[CANNJudge 正式提交 498385](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6aba3abb694b590c3cd6cbe3) 已 **Pass，15/15**；平台保存的 `kernel.asc` 与该分支逐字节一致。逐点耗时见该分支的 `docs/PERF_LOG.md`，下一步先定位第 5、8、4、13–15 点的实际 shape/layout/dtype 与运行路径。main kernel仍是历史v1；此处仅更新接手指针。
 
 > **历史起点：**用户确认的最佳原件保存在 `user-best-20260921` tag（`23e3e5a`），当前设备端候选建立在它的后续修复版本上。以下v1内容是main的历史记录，后续开发以顶部新分支接手单为准。
 
