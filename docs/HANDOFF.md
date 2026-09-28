@@ -1,5 +1,9 @@
 # 接手状态 · 2026-09-28
 
+## 大 TT 手写 Cube 实验结果
+
+`experiment/large-tt-manual` 的首次实验已提交 [498813](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6aba421c694b590c3cdbb884)，15/15 通过，但第 8 点比队友原件慢 2.32 μs，估算均分低约 0.65。详见 [PERF_LOG.md](PERF_LOG.md)。该分支保留作失败对照；当前已证实较快的候选仍是 `experiment/teammate-c6-c10-c12-v3` / 498576。下一实验从该候选新建独立分支，优先处理历史探针指向的小 batch 第 4/5/7 点的跨核收尾开销。
+
 ## 当前候选：队友 C6/C10/C12 合并 v3
 
 - 工作分支 `experiment/teammate-c6-c10-c12-v3`，导入提交 `d9d74eb`。用户提供的 `kernel_c6_c10_c12_merged_v3.asc` 已逐字节原样导入 `kernel.asc` 并推送；244979 字节，SHA256 `ce2e12e425883fc207d0dd5d08a7a72b485c439b65fbbb8db33165905aecce52`。不要把附件中的性能注释当成本轮测量。

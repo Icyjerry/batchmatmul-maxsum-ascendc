@@ -2,6 +2,12 @@
 
 每条新记录必须带代码 commit/SHA、设备、CANN、case、命令和实际结果。空白数据不得补成零或推测值。
 
+## 2026-09-28 · 手写 Cube 常驻 A 的大 TT 实验（未胜出）
+
+- 分支 `experiment/large-tt-manual`，提交 `472200c`，kernel SHA256 `05ab944da658956b531754f9e146860e10117b809b7863834addbb731dff73d9`。假设：BF16/TT、B=1、M/N/K 在 1024–2047 且 16 对齐、L1 可容纳整块 A 时，已有 `dual=6` 手写 Cube 的 L1 A 复用可胜过 Matmul API；固定 128×128、N 分片 3。
+- 官方 CLI 预检只包含 `kernel.asc`（245677 字节），提交 [498813](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6aba421c694b590c3cdbb884)。API 读取的保存源码 SHA 与本地一致。结果 **Pass 15/15**，每点 `precision_ratio=1`。
+- 与 498576 同页时间相比，第 8 点 **67.21→69.53 μs**；15 点耗时合计 519.71→529.66 μs。按页面最优值估算均分 **40.39→39.74**。其余点也有波动，不能仅凭这次结果判断该分支是否命中了第 8 点的真实 shape；精确 shape/plan 和 profiler 仍未取得。该实验不作为性能升级合并。
+
 ## 2026-09-28 · CANNJudge 正式提交 498576 · 队友合并 v3
 
 - 提交：[BatchMatmulMaxSum / 498576](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6aba3dbb694b590c3cd8f427)，2026-09-28 18:13:15 CST；分支 `experiment/teammate-c6-c10-c12-v3`，导入提交 `d9d74eb`。
