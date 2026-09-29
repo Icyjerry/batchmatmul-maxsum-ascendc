@@ -1,5 +1,11 @@
 # 接手状态 · 2026-09-29
 
+## 双缓冲消费者实验结果
+
+`experiment/dual-consumer-overlap` 从直接 batch 归约版派生，代码 `bea6de0`，kernel SHA256 `d55ac07aa939ffa856a7f786fade29b6179d6dd226c77842d9e6868aaa560e3f`。[正式提交 6abb2eeb694b590c3c6db357](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb2eeb694b590c3c6db357) 15/15 Pass。双 VECIN 预取、MTE2 完成后提前归还 GM ring、UB 树形 Max 的组合只将第 8 点 69.69→68.53 μs、估算均分 40.774→40.794；其它点有波动。该方案未达到用户的重大突破要求，不合并 main，也无需重复提交类似微调。完整验证在 [PERF_LOG.md](PERF_LOG.md)。
+
+下一可执行动作：检查短 M/宽 N 路径的 `nSplit=10` 是否使 20 Cube 核仅使用一半；若结构性空闲确实存在，从当前版新建分支，以固定 geometry 和逐核任务模型评估更高 N 分片后再决定正式提交。不要根据历史探针推断 hidden exact shape；提交前核对真实 plan 与可用核数。官方 CANN 9 [SetOrgShape](https://www.hiascend.com/doc_center/source/en/CANNCommunityEdition/900/API/ascendcopapi/atlasascendc_api_07_0651.html) 文档支持同一 Matmul 对象复用，[WaitIterateAll](https://www.hiascend.com/doc_center/source/en/CANNCommunityEdition/900/API/ascendcopapi/atlasascendc_api_07_0641.html) 文档要求显式等待异步完成，因此尚未删除 `bmmms_dual` 每窗口的 `End`。
+
 ## 当前直接 batch 归约实验
 
 `experiment/direct-batch-reduce` 从 15/15 通过的队友版 `21dfc40` 独立派生；代码 `45efd1f`，kernel SHA256 `e06ce50abb27dc9315d1b64437c2086473ffe53295c843c39aa61aa3feadefc2`。用户已授权官方 CLI 提交，但要求只有较大突破才继续提交。
