@@ -1,5 +1,11 @@
 # 接手状态 · 2026-09-29
 
+## 最新：小 TT 长 K 手写 Cube Split-K 正式通过
+
+`experiment/manual-splitk-tiny` 代码 `568f4eb`，kernel SHA256 `6e264a6b1979210a58744b2f33ac3aaa5c18ab46a975690d83c7338ab7f2aef5`，已推送私有 GitHub。[正式提交 6abbcdc5694b590c3cc4cac3](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abbcdc5694b590c3cc4cac3) **15/15 Pass**，每点 `precision_ratio=1`。第 15 点相对直接 batch 父版 **13.10→9.20 µs（1.42×）**，15 点合计 522.78→517.73 µs；按页面最优时间估算均分 40.774→40.967，仅是估算而非平台公布分数。第 8 点 69.69→67.80 µs，但其它点也有单次波动，不能归因于新路径。候选只为 B=1、FP16、双转置、M/N≤128、K≥4096 且满足片上内存条件的现有 Split-K 计划启用 8 路手写 Cube，现有 finalizer 先合并 K 再执行 Max(N)→Sum(M)。
+
+`python3 tools/validate_manual_splitk.py` 的 host 路由/资源回退与 48 组独立 TT 数值模型通过；正式 CANN 编译和 15 点精度通过。精确 SoC、隐藏 shape、实际 plan、msprof、重复测量仍 **PENDING**。最初代码 `654347a` 的[提交 6abbccee694b590c3cc43d25](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abbccee694b590c3cc43d25) 因混合类型同一条 `auto` 声明而 Compile Error；`568f4eb` 只修正该声明后重新评测。下一条动作是取得第 15 点实际 shape/plan 与同设备重复 A/B，判断这条新路径的稳定得分，再决定是否并入 main；目前保留独立分支。逐点结果见 [PERF_LOG.md](PERF_LOG.md)。
+
 ## 大 TT 双 N tile 共用 A 面板的正式结果
 
 `experiment/tt-panel-pair` / `7b4d477`，kernel SHA256 `802026fd4949d0aa1c5622576080964a8a3734267181a7ed4019303a979084e0`。[正式提交 6abbc9e9694b590c3cc258f3](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abbc9e9694b590c3cc258f3) **15/15 Pass**，但第 8 点 69.69→69.65 μs、第 11 点 87.63→88.86 μs，没有明显收益。该实验恢复并接入历史经 CPU 物理块模型检查的 `RunPanelCube`：两个相邻 N tile 的 L0C 独立累加器共享 A 的每个 K 面板；`validate_cube_panel.py` 456+584 个模型执行、`validate_tt_panel_plan.py` 代理形状/资源回退通过。正式平台未暴露隐藏 shape、实际 plan 或 msprof，不能证明第 8/11 点实际命中该分支，也不能归因瓶颈。保留为对照，**不替换较快分支**。详见 [PERF_LOG.md](PERF_LOG.md)。

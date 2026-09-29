@@ -2,6 +2,14 @@
 
 每条新记录必须带代码 commit/SHA、设备、CANN、case、命令和实际结果。空白数据不得补成零或推测值。
 
+## 2026-09-29 · CANNJudge CLI · 小 TT 长 K 手写 Cube Split-K
+
+- 分支 `experiment/manual-splitk-tiny`，代码 `568f4eb`，kernel SHA256 `6e264a6b1979210a58744b2f33ac3aaa5c18ab46a975690d83c7338ab7f2aef5`，252985 字节。dry-run 确认只上传 `kernel.asc`。[正式提交 6abbcdc5694b590c3cc4cac3](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abbcdc5694b590c3cc4cac3)。命令：`python3 /tmp/cann-learning-hub/skills/cannjudge-submit/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /tmp/bmmms-judge-manual-tt/project --no-wait`，随后 `query --submission-id 6abbcdc5694b590c3cc4cac3`。
+- 假设：小 M/N、长 K、TT、FP16 的现有 Matmul Split-K 会话开销较高。为 B=1、M/N 16–128、K 4096–8192 且 K 为 1024 倍数、片上内存满足预算的现有 Split-K 计划，改成 8 个 Cube worker 各自计算完整 FP32 C 的一段 K，再由原 finalizer 合并 K、沿 N 取 Max、沿 M 求和。`python3 tools/validate_manual_splitk.py`：host 路由及资源回退通过，48 组独立 TT 数值/尾块/任务模型通过；`git diff --check` 通过。这些本地模型不是设备精度证据。
+- 首次代码 `654347a`、SHA `6c198f0b38315efdb85c876c6520ffd22a3819a0e8bbad146b2408c986f893ab` 的[提交 6abbccee694b590c3cc43d25](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abbccee694b590c3cc43d25) 为 **Compile Error**：同一 `auto` 声明将 `LocalTensor<T>` 和 `LocalTensor<float>` 混用。`568f4eb` 拆为两条声明后重新提交；不要把首次提交计为精度或性能结果。
+- 修正版正式结果 **Pass，15/15**，每点 `precision_ratio=1`。15 点时间依次为 `[2.14,3.96,4.56,8.08,5.31,10.58,10.15,67.80,83.95,97.84,88.16,96.97,15.83,13.20,9.20]` µs。相对直接 batch 父版，第 15 点 13.10→9.20 µs，1.42×；第 8 点 69.69→67.80 µs。15 点时间合计 522.78→517.73 µs，按同页最优值估算均分 40.774→40.967（+0.193），不是平台公布的分数。第 8 点及非目标点的单次波动不能归因于新路径。
+- 平台标注 CANN 9.0.0；精确 SoC、隐藏 shape/layout/dtype、实际 plan、msprof 与重复 A/B 未取得。候选保留在独立分支，待确认第 15 点路径和稳定收益后决定是否并入 main。
+
 ## 2026-09-29 · CANNJudge CLI · 大 TT 双 N tile A 面板复用
 
 - 分支 `experiment/tt-panel-pair`，代码 `7b4d477`，kernel SHA256 `802026fd4949d0aa1c5622576080964a8a3734267181a7ed4019303a979084e0`，259564 字节。官方 dry-run 确认仅上传 `kernel.asc`；[提交 6abbc9e9694b590c3cc258f3](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abbc9e9694b590c3cc258f3)。命令：`python3 /tmp/cann-learning-hub/skills/cannjudge-submit/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /tmp/bmmms-judge-manual-tt/project --no-wait`，随后 `query --submission-id 6abbc9e9694b590c3cc258f3`。
