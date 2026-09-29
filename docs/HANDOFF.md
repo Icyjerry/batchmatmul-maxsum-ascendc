@@ -1,5 +1,9 @@
 # 接手状态 · 2026-09-29
 
+## 宽 N 尾块 A 常驻实验：正式通过但退化
+
+`experiment/ragged-wide-resident-a` 代码 `3c54597`，kernel SHA256 `60b86f28e0c98731f7c54f944dd3095d1af31e1c8a02de2dd090b8a92b67828a`。[正式提交 6abbd297694b590c3cc7d861](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abbd297694b590c3cc7d861) **15/15 Pass**，但第 14 点相对其手写 Split-K 父版 13.20→13.70 µs；15 点合计 517.73→526.30 µs，按页面最优时间估算均分 40.967→40.209。该实验扩展 BF16、短 M、宽 N、短 K 的 A 常驻手写 Cube 路径，使 M/N/K 非对齐尾块可走该路径；host 路由/资源回退和 10 组独立 CPU 尾块数值模型通过。正式平台未给出隐藏 shape、实际 plan、msprof，因此不能证明第 14 点命中新增分支，也不能判断退化原因。**保留失败对照，不替换较快的 `experiment/manual-splitk-tiny`。** 完整结果见 [PERF_LOG.md](PERF_LOG.md)。
+
 ## 最新：小 TT 长 K 手写 Cube Split-K 正式通过
 
 `experiment/manual-splitk-tiny` 代码 `568f4eb`，kernel SHA256 `6e264a6b1979210a58744b2f33ac3aaa5c18ab46a975690d83c7338ab7f2aef5`，已推送私有 GitHub。[正式提交 6abbcdc5694b590c3cc4cac3](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abbcdc5694b590c3cc4cac3) **15/15 Pass**，每点 `precision_ratio=1`。第 15 点相对直接 batch 父版 **13.10→9.20 µs（1.42×）**，15 点合计 522.78→517.73 µs；按页面最优时间估算均分 40.774→40.967，仅是估算而非平台公布分数。第 8 点 69.69→67.80 µs，但其它点也有单次波动，不能归因于新路径。候选只为 B=1、FP16、双转置、M/N≤128、K≥4096 且满足片上内存条件的现有 Split-K 计划启用 8 路手写 Cube，现有 finalizer 先合并 K 再执行 Max(N)→Sum(M)。

@@ -2,6 +2,13 @@
 
 每条新记录必须带代码 commit/SHA、设备、CANN、case、命令和实际结果。空白数据不得补成零或推测值。
 
+## 2026-09-29 · CANNJudge CLI · 宽 N 尾块 A 常驻失败对照
+
+- 分支 `experiment/ragged-wide-resident-a`，代码 `3c54597`，kernel SHA256 `60b86f28e0c98731f7c54f944dd3095d1af31e1c8a02de2dd090b8a92b67828a`，253301 字节；dry-run 仅上传 `kernel.asc`。[提交 6abbd297694b590c3cc7d861](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abbd297694b590c3cc7d861)。命令：`python3 /tmp/cann-learning-hub/skills/cannjudge-submit/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /tmp/bmmms-judge-manual-tt/project --no-wait`，随后 `query --submission-id 6abbd297694b590c3cc7d861`。
+- 假设：历史第 14 点的 BF16、短 M、宽 N、短 K 可能因 M/N/K 非对齐而回退通用 Matmul。把已有完整 A 常驻 L1/L0A、两个 N tile 共用 A 的手写 Cube 路径扩展到尾块；K 上取整分配 L1/L0，M/N/K padding 后只归约有效列和行。实际路由要求 TX1=false、TX2=true、M≤128、N≥4096、K≤256、片上容量满足预算；不限制 B。`python3 tools/validate_ragged_wide.py`：host 路由/资源回退和 10 组独立数值/全负/尾块模型通过；`validate_manual_splitk.py`、`validate_direct_batch.py` 回归通过。CPU 模型不能证明设备路径和性能。
+- 正式 **Pass，15/15**，每点 `precision_ratio=1`。时间依次为 `[2.18,3.93,4.28,8.40,5.78,11.06,10.54,69.64,84.20,99.10,89.50,97.71,16.94,13.70,9.34]` µs。第 14 点相对手写 Split-K 父版 13.20→13.70 µs；15 点合计 517.73→526.30 µs，按页面最优时间估算均分 40.967→40.209（非平台公布分数）。没有目标收益，不替换父版。
+- 平台标注 CANN 9.0.0；精确 SoC、隐藏 shape/layout/dtype、实际 plan、msprof 和重复 A/B 未取得。第 14 点是否命中新增路径未知，不能把退化直接归因于手写路径本身。
+
 ## 2026-09-29 · CANNJudge CLI · 小 TT 长 K 手写 Cube Split-K
 
 - 分支 `experiment/manual-splitk-tiny`，代码 `568f4eb`，kernel SHA256 `6e264a6b1979210a58744b2f33ac3aaa5c18ab46a975690d83c7338ab7f2aef5`，252985 字节。dry-run 确认只上传 `kernel.asc`。[正式提交 6abbcdc5694b590c3cc4cac3](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abbcdc5694b590c3cc4cac3)。命令：`python3 /tmp/cann-learning-hub/skills/cannjudge-submit/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /tmp/bmmms-judge-manual-tt/project --no-wait`，随后 `query --submission-id 6abbcdc5694b590c3cc4cac3`。
