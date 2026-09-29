@@ -1,10 +1,14 @@
 # 接手状态 · 2026-09-29
 
+## 交换 TT 计算方向的正式反例
+
+`experiment/swapped-tt-column-max` / `345e335`，kernel SHA256 `40c5bed863c6ab9411783479c0b6921268815449434728a523b5d2a4e9fff5a0`。[正式提交 6abbc6d9694b590c3cc08c48](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abbc6d9694b590c3cc08c48) **15/15 Pass**，但第 11 点相对当前较快版 **87.63→152.24 μs**，第 8 点 69.69→70.47 μs。新核把 TT 物理输入交换为 FF Matmul、在 AIV 沿原 N 做列 Max、最后 Sum(M)；独立 CPU 模型 228 组通过。实际隐藏 shape/plan/profile 未提供，不能确定每点具体路径或退化来源。此架构保留为反例，**不替换较快分支**；不要通过同一路径的小参数微调继续提交。详见 [PERF_LOG.md](PERF_LOG.md)。
+
 ## Matmul 会话复用实验结果
 
 `experiment/norm-session-reuse` / `56ea172`，kernel SHA256 `a1c60ea079ca3c75656dc271b806d2e66268ddfc19df8f3cb70e641565cd7bb3`。[正式提交 6abb3973694b590c3c72900c](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb3973694b590c3c72900c) **15/15 Pass**。改动把 dual AIC 的 `mm.End()` 从每个 C window 移到 worker 循环结束，以尝试跨 window 复用 Matmul 内部 A/B 缓冲。相对当前较快的直接 batch 归约版，第 8–12 点耗时从 `[69.69,84.83,98.04,87.63,96.02]` 到 `[70.32,84.16,97.85,88.12,96.80]` μs，有升有降，未形成大幅收益。该分支保留为失败对照，不替换较快分支。精确 SoC、实际 plan、msprof 和重复测量未取得。完整结果见 [PERF_LOG.md](PERF_LOG.md)。历史段落中“尚未删除每窗口 End”只描述当时状态，本实验已验证该改动。
 
-当前下一条研究方向：针对双转置存储的较大矩阵，评估交换物理输入后按 FF 计算转置的相似度矩阵，是否可降低 GM→L1 搬运/格式转换。该变换需要实现沿输出列的 Max(N)，不能直接把现有行归约用于互换后的结果。未经设备验证前不替换正式通过版。
+上述 TT 交换方向现已实测且退化。下一条动作是优先定位第 8/11 点的实际 shape、Matmul 计划和 Cube/Vector/MTE profile，再设计另一项能减少完整计算路径成本的架构候选；没有这些指标时不得把本次反例归因于某个硬件单元。
 
 ## ragged B 常驻实验结果
 

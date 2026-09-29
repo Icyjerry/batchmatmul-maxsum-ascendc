@@ -2,6 +2,12 @@
 
 每条新记录必须带代码 commit/SHA、设备、CANN、case、命令和实际结果。空白数据不得补成零或推测值。
 
+## 2026-09-29 · CANNJudge CLI · TT 交换方向失败对照
+
+- 分支 `experiment/swapped-tt-column-max`，代码 `345e335`，kernel SHA256 `40c5bed863c6ab9411783479c0b6921268815449434728a523b5d2a4e9fff5a0`，256083 字节。官方 dry-run 确认仅上传 `kernel.asc`，SHA 与 Git 工作区一致；[提交 6abbc6d9694b590c3cc08c48](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abbc6d9694b590c3cc08c48)。命令：`python3 /tmp/cann-learning-hub/skills/cannjudge-submit/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /tmp/bmmms-judge-manual-tt/project --no-wait`，随后 `query --submission-id 6abbc6d9694b590c3cc08c48`。
+- 假设：两个 TT storage 输入物理上为 `X2[N,K]` 和 `X1[K,M]`，交换操作数后用 FF Matmul 得到 `Cᵀ[N,M]`，可能降低输入转置搬运；AIV 以二叉树对原 N 做列 Max，随后沿原 M 求和。专用计划只考虑大矩阵、B=1、两个属性为 true、M/N/K 16 对齐、完整 K；资源或 tiler 不接受时保留父路径。`python3 tools/validate_swapped_tt.py` 的 228 组独立 CPU 数学/任务覆盖模型通过，`git diff --check` 通过。旧 `validate_host_plan.py` 因其断言仍引用已删除的 `panelK/panelResident` 字段而编译失败，不能作为本次候选精度证据。
+- 官方结果 **Pass，15/15**，每点 `precision_ratio=1`。全部时间依次为 `[2.33,4.22,4.09,8.04,5.52,10.47,10.57,70.47,84.10,99.21,152.24,97.40,16.45,13.70,13.70]` μs。相对直接 batch 归约父版，第 11 点 87.63→152.24 μs，第 8 点 69.69→70.47 μs；没有整体收益。页面标注 CANN 9.0.0；精确 SoC、实际 plan、隐藏 shape、msprof、重复测量均未取得，因此无法将第 11 点退化精确归因于某一环节。该实验不并入较快分支。
+
 ## 2026-09-29 · CANNJudge CLI · Matmul 会话复用失败对照
 
 - 分支 `experiment/norm-session-reuse`，代码 `56ea172`，kernel SHA256 `a1c60ea079ca3c75656dc271b806d2e66268ddfc19df8f3cb70e641565cd7bb3`，246845 字节。官方 CLI dry-run 仅上传 `kernel.asc`；[提交 6abb3973694b590c3c72900c](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb3973694b590c3c72900c)。命令：`python3 /tmp/cann-learning-hub/skills/cannjudge-submit/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /tmp/bmmms-judge-manual-tt/project --no-wait`，随后以同 CLI `query --submission-id 6abb3973694b590c3c72900c` 读取结果。
