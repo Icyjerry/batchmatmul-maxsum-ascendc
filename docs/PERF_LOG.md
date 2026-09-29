@@ -2,6 +2,12 @@
 
 每条新记录必须带代码 commit/SHA、设备、CANN、case、命令和实际结果。空白数据不得补成零或推测值。
 
+## 2026-09-29 · CANNJudge CLI · Matmul 会话复用失败对照
+
+- 分支 `experiment/norm-session-reuse`，代码 `56ea172`，kernel SHA256 `a1c60ea079ca3c75656dc271b806d2e66268ddfc19df8f3cb70e641565cd7bb3`，246845 字节。官方 CLI dry-run 仅上传 `kernel.asc`；[提交 6abb3973694b590c3c72900c](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb3973694b590c3c72900c)。命令：`python3 /tmp/cann-learning-hub/skills/cannjudge-submit/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /tmp/bmmms-judge-manual-tt/project --no-wait`，随后以同 CLI `query --submission-id 6abb3973694b590c3c72900c` 读取结果。
+- 假设：`bmmms_dual` 中每个 C window 的 `mm.End()` 可能破坏 Matmul 内部 A/B 缓冲复用；把 End 移到 worker 循环末尾，保留原 ring 和 flag 同步。官方 CANN 9 Matmul 文档允许复用对象；具体内部销毁行为参考官方开源 `ascendc-api-adv` 源码，但本机副本并非 CANN 9.0.0 精确版本，不能据此推断设备收益。
+- 结果 **Pass，15/15**，每点 `precision_ratio=1`。全部时间依次为 `[2.03,3.79,4.29,8.19,5.29,10.78,10.12,70.32,84.16,97.85,88.12,96.80,15.86,13.15,13.30]` μs。相对直接 batch 归约父版，第 8–12 点分别变化 `+0.63,-0.67,-0.19,+0.49,+0.78` μs；没有稳定的大幅收益。页面 CANN 9.0.0，精确 SoC、隐藏 shape/plan、msprof、重复测量未取得。该分支保留失败对照，不替换较快版。
+
 ## 2026-09-29 · CANNJudge CLI · ragged B 常驻失败对照
 
 - 分支 `experiment/tall-ragged-resident-b`，代码 `a6c5a29`，kernel SHA256 `92a92db0c01b93223056fc70b0cc062ebbf0eefc39b8020954e498bde370b62c`。官方 CLI dry-run 确认只上传 `kernel.asc`，248519 字节；[提交 6abb3724694b590c3c71cfe4](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb3724694b590c3c71cfe4)。命令：`python3 /tmp/cann-learning-hub/skills/cannjudge-submit/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /tmp/bmmms-judge-manual-tt/project --no-wait`，随后以同 CLI `query --submission-id 6abb3724694b590c3c71cfe4` 读取结果。
