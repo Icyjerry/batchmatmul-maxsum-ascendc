@@ -13,7 +13,7 @@ def main():
     raw = (ROOT / 'kernel.asc').read_bytes()
     source = raw.decode()
     zero = source[source.index('template<typename T>\n__aicore__ inline void ManualZeroNZTail'):
-                  source.index('template<typename T,bool TX1,bool TX2,bool PAD_MN=false>')]
+                  source.index('// One Cube owns one complete small batch')]
     panel = source[source.index('// Copy one physical ND rectangle'):
                    source.index('// The basic-API path owns all local events')]
     code = (ROOT / 'tests/cpu/panel_model.cpp.in').read_text().replace('// INSERT_HELPERS', zero + panel)
