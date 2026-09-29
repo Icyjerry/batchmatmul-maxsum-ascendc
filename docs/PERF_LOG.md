@@ -2,6 +2,33 @@
 
 每条新记录必须带代码 commit/SHA、设备、CANN、case、命令和实际结果。空白数据不得补成零或推测值。
 
+## 2026-09-29 · CANNJudge CLI · 直接 batch 归约
+
+- 分支 `experiment/direct-batch-reduce`，代码提交 `45efd1f`，`kernel.asc` SHA256 `e06ce50abb27dc9315d1b64437c2086473ffe53295c843c39aa61aa3feadefc2`。正式[提交 6abb2b8d694b590c3c6b89a2](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb2b8d694b590c3c6b89a2)由官方 CLI 发起；dry-run 确认仅上传 `kernel.asc`，246853 字节，SHA 一致。
+- 假设：历史探针第 4/5/7 点的单 M/N tile 可由一个 AIV 完成全 batch Max(N)→Sum(M) 并直接写 y，省掉 partial 写回、全核 `SyncAll` 和末级读回。第 4/5 点复用第 6 点已通过的 direct kernel；第 7 点对手写 Cube 路径增加 full-row direct specialization。其它分支仍用原逻辑。
+- `python3 tools/validate_direct_batch.py`：探针范围的 1,458 组 batch/shape/core 边界排程和 192 KiB UB 显式分配模型通过；`git diff --check` 通过。模型不验证 Ascend 指令和性能。
+- 正式结果：**Pass，15/15**，每点 `precision_ratio=1`。平台标注 CANN 9.0.0；精确 SoC、hidden shape/layout/dtype、实际 plan、编译命令和 msprof 未取得。平台时间单位按页面为 μs。
+
+| 点 | 队友 498576 | direct | 差值 direct−队友 |
+|---:|---:|---:|---:|
+| 1 | 2.22 | 2.10 | -0.12 |
+| 2 | 4.10 | 3.92 | -0.18 |
+| 3 | 4.26 | 4.28 | +0.02 |
+| 4 | 8.48 | 8.33 | -0.15 |
+| 5 | 6.53 | 5.26 | -1.27 |
+| 6 | 10.60 | 10.60 | 0.00 |
+| 7 | 11.69 | 10.12 | -1.57 |
+| 8 | 67.21 | 69.69 | +2.48 |
+| 9 | 84.65 | 84.83 | +0.18 |
+| 10 | 95.37 | 98.04 | +2.67 |
+| 11 | 87.36 | 87.63 | +0.27 |
+| 12 | 95.95 | 96.02 | +0.07 |
+| 13 | 14.93 | 15.74 | +0.81 |
+| 14 | 13.02 | 13.12 | +0.10 |
+| 15 | 13.34 | 13.10 | -0.24 |
+
+按页面两位小数时间与相同页面最优值估算均分 40.39→40.77（+0.38）；15 点时间合计 519.71→522.78 μs。单次运行的非目标点存在波动，不能把估算分差当已复现实测收益。第 5/7 点局部改善明确，但整体未达到用户要求的重大突破；暂不并入 main，也不再为小改动重复提交。
+
 ## 2026-09-28 · CANNJudge 正式提交 498576 · 队友合并 v3
 
 - 提交：[BatchMatmulMaxSum / 498576](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6aba3dbb694b590c3cd8f427)，2026-09-28 18:13:15 CST；分支 `experiment/teammate-c6-c10-c12-v3`，导入提交 `d9d74eb`。

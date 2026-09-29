@@ -1,4 +1,12 @@
-# 接手状态 · 2026-09-28
+# 接手状态 · 2026-09-29
+
+## 当前直接 batch 归约实验
+
+`experiment/direct-batch-reduce` 从 15/15 通过的队友版 `21dfc40` 独立派生；代码 `45efd1f`，kernel SHA256 `e06ce50abb27dc9315d1b64437c2086473ffe53295c843c39aa61aa3feadefc2`。用户已授权官方 CLI 提交，但要求只有较大突破才继续提交。
+
+- [正式提交 6abb2b8d694b590c3c6b89a2](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb2b8d694b590c3c6b89a2)：15/15 Pass；第 5/7 点 6.53→5.26、11.69→10.12 μs，第 4 点 8.48→8.33 μs。按页面最优时间估算均分 40.39→40.77，仅 +0.38；第 8/10 点单次用时上升，合计时间反而 519.71→522.78 μs。完整逐点数据见 [PERF_LOG.md](PERF_LOG.md)。
+- 本地 1,458 组历史探针范围排程/缓冲模型通过；正式评测证明当前源码在 15 点精度通过。精确 SoC、隐藏 shape、实际路径、msprof 和重复测量未取得。该实验保留为小幅有效候选，不并入 main。
+- 下一条动作：从本分支或队友版继续研究能明显降低 Cube/GM 主耗时的结构性方案；只有形成重大收益候选再调用 CLI。保留失败的 `experiment/large-tt-manual` 作为反例；不要把其中的 TT 强制路由合入本分支。
 
 ## 当前候选：队友 C6/C10/C12 合并 v3
 
