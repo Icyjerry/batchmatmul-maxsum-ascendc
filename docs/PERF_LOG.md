@@ -2,6 +2,14 @@
 
 每条新记录必须带代码 commit/SHA、设备、CANN、case、命令和实际结果。空白数据不得补成零或推测值。
 
+## 2026-09-29 · CANNJudge CLI · ragged B 常驻失败对照
+
+- 分支 `experiment/tall-ragged-resident-b`，代码 `a6c5a29`，kernel SHA256 `92a92db0c01b93223056fc70b0cc062ebbf0eefc39b8020954e498bde370b62c`。官方 CLI dry-run 确认只上传 `kernel.asc`，248519 字节；[提交 6abb3724694b590c3c71cfe4](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb3724694b590c3c71cfe4)。命令：`python3 /tmp/cann-learning-hub/skills/cannjudge-submit/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /tmp/bmmms-judge-manual-tt/project --no-wait`，随后以同 CLI `query --submission-id 6abb3724694b590c3c71cfe4` 读取结果。
+- 假设：历史第 13 点的非对齐 FP16 FF 长 M/窄 N 路径，完整 B 可放入每 worker 的 L1/L0B；把 B 的 GM 加载由每 M tile 一次改为每 worker 一次，并把 worker 的行最大值在 AIV 内合并。按 64 个 M tile、20 个 worker 的模型，B GM 加载次数 64→20；这不是性能预测。实际选择仍受 tiler 与设备容量检查控制。
+- `python3 tools/validate_ragged_resident_b.py` 的 384 个采样行覆盖 N=64/65/96/127、K=128/136/192/248、16/20/32 worker、全负相似度和 K/N padding，CPU 数值与逻辑点积相等；`git diff --check` 通过。该模型不验证 Ascend DMA、事件和真实 plan。
+- 结果 **Pass，15/15**，每点 `precision_ratio=1`。目标第 13 点从直接 batch 父版 15.74 到 15.93 μs，未见收益。全部时间依次为 `[2.10,3.74,4.36,8.38,5.38,10.71,10.25,68.92,83.70,99.10,88.71,96.86,15.93,13.25,13.45]` μs。第 13 点是否满足此分支的非对齐条件未知，因此不能归因于 B 常驻的实际性能。
+- 平台标注 CANN 9.0.0；精确 SoC、隐藏 shape、实际 plan、msprof、重复测量均未取得。该版本不合并较快分支；保留 Git 分支供定位，后续以实际 plan/profile 为准。
+
 ## 2026-09-29 · CANNJudge CLI · 256 行 tall/manual tile 失败对照
 
 - 独立分支 `experiment/tall-m256` 从直接 batch 归约 `fa3eaed` 派生，代码 `eae79e4`，kernel SHA256 `60f31c815eb2dca302ad8c2c11b586c1b57c43727ba22a14b036053195b45c93`，248426 字节。[提交 6abb3203694b590c3c6fc554](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb3203694b590c3c6fc554)，官方 CLI dry-run 确认只上传该 `kernel.asc`。
