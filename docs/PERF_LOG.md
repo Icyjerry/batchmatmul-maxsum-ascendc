@@ -2,6 +2,12 @@
 
 每条新记录必须带代码 commit/SHA、设备、CANN、case、命令和实际结果。空白数据不得补成零或推测值。
 
+## 2026-09-29 · CANNJudge CLI · 大 TT 双 N tile A 面板复用
+
+- 分支 `experiment/tt-panel-pair`，代码 `7b4d477`，kernel SHA256 `802026fd4949d0aa1c5622576080964a8a3734267181a7ed4019303a979084e0`，259564 字节。官方 dry-run 确认仅上传 `kernel.asc`；[提交 6abbc9e9694b590c3cc258f3](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abbc9e9694b590c3cc258f3)。命令：`python3 /tmp/cann-learning-hub/skills/cannjudge-submit/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /tmp/bmmms-judge-manual-tt/project --no-wait`，随后 `query --submission-id 6abbc9e9694b590c3cc258f3`。
+- 假设：大 TT 的相邻两个 N tile 可共用 A 的每个 K 面板，以两个 L0C 累加器完成完整 K 后沿用现有 Max(N)→Sum(M) 消费路径。只有平台 L1/L0/UB 容量充足、B=1、两个转置属性 true、M/N/K 大且 16 对齐、bm=bn=128、每 N 分区至少两 tile 时才尝试。`python3 tools/validate_cube_panel.py`：456 个生产者及 584 个分层 K CPU 物理块执行通过；`python3 tools/validate_tt_panel_plan.py`：两个历史目标代理形状命中、非 TT/资源不足回退通过。旧通用 `validate_host_plan.py` 仍因与当前源码不符的 `SplitKNDLiveBytes` 断言无法编译，不能作为本实验失败证据。
+- 正式结果 **Pass，15/15**，每点 `precision_ratio=1`。全部时间依次为 `[2.19,3.92,4.32,8.34,5.45,10.54,10.18,69.65,83.52,97.61,88.86,97.11,15.86,13.46,13.06]` μs。相对直接 batch 父版，第 8 点 69.69→69.65 μs，第 11 点 87.63→88.86 μs，无目标收益。页面标注 CANN 9.0.0；精确 SoC、隐藏 shape、实际 plan、msprof、重复测量未取得。不能断定目标点实际走了双 tile 路径；该分支不并入较快版。
+
 ## 2026-09-29 · CANNJudge CLI · TT 交换方向失败对照
 
 - 分支 `experiment/swapped-tt-column-max`，代码 `345e335`，kernel SHA256 `40c5bed863c6ab9411783479c0b6921268815449434728a523b5d2a4e9fff5a0`，256083 字节。官方 dry-run 确认仅上传 `kernel.asc`，SHA 与 Git 工作区一致；[提交 6abbc6d9694b590c3cc08c48](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abbc6d9694b590c3cc08c48)。命令：`python3 /tmp/cann-learning-hub/skills/cannjudge-submit/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /tmp/bmmms-judge-manual-tt/project --no-wait`，随后 `query --submission-id 6abbc6d9694b590c3cc08c48`。
