@@ -2,6 +2,14 @@
 
 每条新记录必须带代码 commit/SHA、设备、CANN、case、命令和实际结果。空白数据不得补成零或推测值。
 
+## 2026-09-29 · CANNJudge CLI · 双缓冲消费流水
+
+- 分支 `experiment/dual-consumer-overlap`，代码 `bea6de0`，kernel SHA256 `d55ac07aa939ffa856a7f786fade29b6179d6dd226c77842d9e6868aaa560e3f`，248362 字节。官方 CLI dry-run 仅含 `kernel.asc`；[正式提交 6abb2eeb694b590c3c6db357](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb2eeb694b590c3c6db357)。父版是通过 15 点的直接 batch 归约 `fa3eaed`。
+- 假设：双 VECIN 缓冲预取下一 C tile；当前 GM ring 槽的所有 MTE2 读取发出后以 `PIPE_MTE2` 归还，使 Cube 写下一窗口与 Vector 的私有 UB 归约重叠；每 tile 先在 UB 做 64-lane 树形 Max，减少横向归约调用。只改完整 K 的 dual/dual_mdl AIV 消费侧，不改 Cube/tiling/partial 布局。
+- CPU：`python3 tools/validate_dual_consumer_current.py` 六种流水/归约组合分别通过 76,800 个窗口配置，34,816 组列尾/全负/污染检查与 3,840 组抽象握手交错；且源码除这两条消费者外与父版一致。CANN 编译/真实事件耗时无法由模型证明。
+- 正式 **Pass，15/15**，`precision_ratio=1`。平台标注 CANN 9.0.0；精确 SoC、hidden shape、实际 plan、msprof 未取得。相对父版，第 8 点 69.69→68.53 μs、第 9 点 84.83→82.81 μs、第 11 点 87.63→86.98 μs；第 10/12 点 98.04→98.38、96.02→96.74 μs。全部时间依次为 `[2.10,3.82,4.38,8.42,5.23,10.57,10.22,68.53,82.81,98.38,86.98,96.74,15.69,13.23,13.05]` μs。
+- 页面两位小数合计 522.78→520.15 μs；按同一页面最优时间估算均分 40.774→40.794，差值 +0.020。单次波动足以覆盖该差异；**不是重大突破**，不并入 main。下一实验应优先改变已知空闲核或重复读输入的结构，而不是继续调整消费者微流水。
+
 ## 2026-09-29 · CANNJudge CLI · 直接 batch 归约
 
 - 分支 `experiment/direct-batch-reduce`，代码提交 `45efd1f`，`kernel.asc` SHA256 `e06ce50abb27dc9315d1b64437c2086473ffe53295c843c39aa61aa3feadefc2`。正式[提交 6abb2b8d694b590c3c6b89a2](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb2b8d694b590c3c6b89a2)由官方 CLI 发起；dry-run 确认仅上传 `kernel.asc`，246853 字节，SHA 一致。
