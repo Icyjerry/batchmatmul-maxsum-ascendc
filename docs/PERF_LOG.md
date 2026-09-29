@@ -2,6 +2,12 @@
 
 每条新记录必须带代码 commit/SHA、设备、CANN、case、命令和实际结果。空白数据不得补成零或推测值。
 
+## 2026-09-29 · CANNJudge CLI · 256 行 tall/manual tile 失败对照
+
+- 独立分支 `experiment/tall-m256` 从直接 batch 归约 `fa3eaed` 派生，代码 `eae79e4`，kernel SHA256 `60f31c815eb2dca302ad8c2c11b586c1b57c43727ba22a14b036053195b45c93`，248426 字节。[提交 6abb3203694b590c3c6fc554](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb3203694b590c3c6fc554)，官方 CLI dry-run 确认只上传该 `kernel.asc`。
+- 假设：历史探针第 13 点 M=8192、N∈[64,127]、K∈[128,248] 的 FP16 FF 路径，用 256 行 manual tile 把 64 个 M 任务降至 32 个，并减少 B 重复搬运。仅该形状类别进入显式 L1/L0/UB 预算分支；资源不足时保留 128 行候选。`python3 tools/validate_tall_m256.py` 144 组排程/输出槽/缓冲模型通过；这不是设备 tiling 证据。
+- 正式结果 **Pass，15/15**，`precision_ratio=1`。第 13 点反而从直接 batch 父版 15.74 升至 16.98 μs；15 点合计 522.78→523.82 μs，按同页最优值估算均分 40.774→40.660。其它点的变化落在单次结果波动范围，未见结构性收益。正式耗时依次为 `[2.08,3.95,4.22,7.90,5.49,10.61,10.09,69.34,82.98,99.73,87.63,96.52,16.98,13.30,13.00]` μs。
+- 平台不提供实际 plan、精确 SoC、msprof，故不能证明第 13 点确实选到了 256 行 tile，也不能判定退化来自 L0C 单缓冲或 Cube 负载；此分支保留失败对照，**不合并 main**。
 ## 2026-09-29 · CANNJudge CLI · 双缓冲消费流水
 
 - 分支 `experiment/dual-consumer-overlap`，代码 `bea6de0`，kernel SHA256 `d55ac07aa939ffa856a7f786fade29b6179d6dd226c77842d9e6868aaa560e3f`，248362 字节。官方 CLI dry-run 仅含 `kernel.asc`；[正式提交 6abb2eeb694b590c3c6db357](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb2eeb694b590c3c6db357)。父版是通过 15 点的直接 batch 归约 `fa3eaed`。

@@ -1,10 +1,15 @@
 # 接手状态 · 2026-09-29
 
+## 256 行 tall/manual tile 结果
+
+`experiment/tall-m256` / `eae79e4` 的 [正式提交 6abb3203694b590c3c6fc554](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb3203694b590c3c6fc554) 15/15 Pass，但目标第 13 点 15.74→16.98 μs、估算均分 40.774→40.660，未见收益。kernel SHA256 `60f31c815eb2dca302ad8c2c11b586c1b57c43727ba22a14b036053195b45c93`。独立排程/缓冲模型144组通过，但无实际 plan/msprof，因此不能确定其退化原因或真实 tile 命中。保留此分支作失败对照，不合并 main。见 [PERF_LOG.md](PERF_LOG.md)。
+
+当前三个新正式实验均未达到重大突破：直接 batch 归约约 +0.38 估算均分；其上的消费者流水相对父版仅约 +0.02；256 行 tile 退化。后续停止以相近小变体频繁调用正式评测，优先取得精确 SoC/plan/msprof 或建立可在设备侧 A/B 的独立验证入口。保持通过版 `experiment/direct-batch-reduce` 与队友原版 `experiment/teammate-c6-c10-c12-v3` 可随时检出。
 ## 双缓冲消费者实验结果
 
 `experiment/dual-consumer-overlap` 从直接 batch 归约版派生，代码 `bea6de0`，kernel SHA256 `d55ac07aa939ffa856a7f786fade29b6179d6dd226c77842d9e6868aaa560e3f`。[正式提交 6abb2eeb694b590c3c6db357](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb2eeb694b590c3c6db357) 15/15 Pass。双 VECIN 预取、MTE2 完成后提前归还 GM ring、UB 树形 Max 的组合只将第 8 点 69.69→68.53 μs、估算均分 40.774→40.794；其它点有波动。该方案未达到用户的重大突破要求，不合并 main，也无需重复提交类似微调。完整验证在 [PERF_LOG.md](PERF_LOG.md)。
 
-下一可执行动作：检查短 M/宽 N 路径的 `nSplit=10` 是否使 20 Cube 核仅使用一半；若结构性空闲确实存在，从当前版新建分支，以固定 geometry 和逐核任务模型评估更高 N 分片后再决定正式提交。不要根据历史探针推断 hidden exact shape；提交前核对真实 plan 与可用核数。官方 CANN 9 [SetOrgShape](https://www.hiascend.com/doc_center/source/en/CANNCommunityEdition/900/API/ascendcopapi/atlasascendc_api_07_0651.html) 文档支持同一 Matmul 对象复用，[WaitIterateAll](https://www.hiascend.com/doc_center/source/en/CANNCommunityEdition/900/API/ascendcopapi/atlasascendc_api_07_0641.html) 文档要求显式等待异步完成，因此尚未删除 `bmmms_dual` 每窗口的 `End`。
+短 M/宽 N 路径已核查：专用计划把 64 个 N tile 分给约 16–20 核，增加分片不能降低每核最多 4 tile 的任务量。官方 CANN 9 [SetOrgShape](https://www.hiascend.com/doc_center/source/en/CANNCommunityEdition/900/API/ascendcopapi/atlasascendc_api_07_0651.html) 文档支持同一 Matmul 对象复用，[WaitIterateAll](https://www.hiascend.com/doc_center/source/en/CANNCommunityEdition/900/API/ascendcopapi/atlasascendc_api_07_0641.html) 文档要求显式等待异步完成，因此尚未删除 `bmmms_dual` 每窗口的 `End`。
 
 ## 当前直接 batch 归约实验
 
