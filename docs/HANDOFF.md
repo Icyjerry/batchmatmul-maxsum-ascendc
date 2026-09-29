@@ -1,5 +1,11 @@
 # 接手状态 · 2026-09-29
 
+## 256 行 tall/manual tile 结果
+
+`experiment/tall-m256` / `eae79e4` 的 [正式提交 6abb3203694b590c3c6fc554](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb3203694b590c3c6fc554) 15/15 Pass，但目标第 13 点 15.74→16.98 μs、估算均分 40.774→40.660，未见收益。kernel SHA256 `60f31c815eb2dca302ad8c2c11b586c1b57c43727ba22a14b036053195b45c93`。独立排程/缓冲模型144组通过，但无实际 plan/msprof，因此不能确定其退化原因或真实 tile 命中。保留此分支作失败对照，不合并 main。见 [PERF_LOG.md](PERF_LOG.md)。
+
+当前三个新正式实验均未达到重大突破：直接 batch 归约约 +0.38 估算均分；其上的消费者流水相对父版仅约 +0.02；256 行 tile 退化。后续停止以相近小变体频繁调用正式评测，优先取得精确 SoC/plan/msprof 或建立可在设备侧 A/B 的独立验证入口。保持通过版 `experiment/direct-batch-reduce` 与队友原版 `experiment/teammate-c6-c10-c12-v3` 可随时检出。
+
 ## 当前直接 batch 归约实验
 
 `experiment/direct-batch-reduce` 从 15/15 通过的队友版 `21dfc40` 独立派生；代码 `45efd1f`，kernel SHA256 `e06ce50abb27dc9315d1b64437c2086473ffe53295c843c39aa61aa3feadefc2`。用户已授权官方 CLI 提交，但要求只有较大突破才继续提交。
