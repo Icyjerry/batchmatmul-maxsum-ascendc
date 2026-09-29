@@ -1,5 +1,11 @@
 # 接手状态 · 2026-09-29
 
+## Matmul 会话复用实验结果
+
+`experiment/norm-session-reuse` / `56ea172`，kernel SHA256 `a1c60ea079ca3c75656dc271b806d2e66268ddfc19df8f3cb70e641565cd7bb3`。[正式提交 6abb3973694b590c3c72900c](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb3973694b590c3c72900c) **15/15 Pass**。改动把 dual AIC 的 `mm.End()` 从每个 C window 移到 worker 循环结束，以尝试跨 window 复用 Matmul 内部 A/B 缓冲。相对当前较快的直接 batch 归约版，第 8–12 点耗时从 `[69.69,84.83,98.04,87.63,96.02]` 到 `[70.32,84.16,97.85,88.12,96.80]` μs，有升有降，未形成大幅收益。该分支保留为失败对照，不替换较快分支。精确 SoC、实际 plan、msprof 和重复测量未取得。完整结果见 [PERF_LOG.md](PERF_LOG.md)。历史段落中“尚未删除每窗口 End”只描述当时状态，本实验已验证该改动。
+
+当前下一条研究方向：针对双转置存储的较大矩阵，评估交换物理输入后按 FF 计算转置的相似度矩阵，是否可降低 GM→L1 搬运/格式转换。该变换需要实现沿输出列的 Max(N)，不能直接把现有行归约用于互换后的结果。未经设备验证前不替换正式通过版。
+
 ## ragged B 常驻实验结果
 
 `experiment/tall-ragged-resident-b` / `a6c5a29`，kernel SHA256 `92a92db0c01b93223056fc70b0cc062ebbf0eefc39b8020954e498bde370b62c`。[正式提交 6abb3724694b590c3c71cfe4](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb3724694b590c3c71cfe4) 15/15 Pass，但第 13 点相对直接 batch 父版 15.74→15.93 μs，没有提速。该路径只针对历史探针推断的 B=1、M=8192、N=64–127、K=128–248、FP16 FF 非对齐类，尝试将完整 B 在每个 worker 的 L1/L0B 中复用；CPU padding/任务归属模型 384 行通过。平台未暴露实际 shape/plan/msprof，无法判断该分支是否命中或为何未见收益。保留为失败对照，不合入当前较快分支，不再提交同类微调。详细逐点结果见 [PERF_LOG.md](PERF_LOG.md)。
