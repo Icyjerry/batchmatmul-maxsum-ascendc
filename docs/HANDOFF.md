@@ -1,5 +1,9 @@
 # 接手状态 · 2026-09-29
 
+## ragged B 常驻实验结果
+
+`experiment/tall-ragged-resident-b` / `a6c5a29`，kernel SHA256 `92a92db0c01b93223056fc70b0cc062ebbf0eefc39b8020954e498bde370b62c`。[正式提交 6abb3724694b590c3c71cfe4](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb3724694b590c3c71cfe4) 15/15 Pass，但第 13 点相对直接 batch 父版 15.74→15.93 μs，没有提速。该路径只针对历史探针推断的 B=1、M=8192、N=64–127、K=128–248、FP16 FF 非对齐类，尝试将完整 B 在每个 worker 的 L1/L0B 中复用；CPU padding/任务归属模型 384 行通过。平台未暴露实际 shape/plan/msprof，无法判断该分支是否命中或为何未见收益。保留为失败对照，不合入当前较快分支，不再提交同类微调。详细逐点结果见 [PERF_LOG.md](PERF_LOG.md)。
+
 ## 256 行 tall/manual tile 结果
 
 `experiment/tall-m256` / `eae79e4` 的 [正式提交 6abb3203694b590c3c6fc554](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abb3203694b590c3c6fc554) 15/15 Pass，但目标第 13 点 15.74→16.98 μs、估算均分 40.774→40.660，未见收益。kernel SHA256 `60f31c815eb2dca302ad8c2c11b586c1b57c43727ba22a14b036053195b45c93`。独立排程/缓冲模型144组通过，但无实际 plan/msprof，因此不能确定其退化原因或真实 tile 命中。保留此分支作失败对照，不合并 main。见 [PERF_LOG.md](PERF_LOG.md)。
