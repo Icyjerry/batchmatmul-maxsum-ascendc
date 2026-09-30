@@ -38,7 +38,12 @@ GM ND2NZ从许多短K拷贝改为一块完整K的拷贝，并跨一个worker的�
 - production/TUNING各480个host配置，分别384个选择；真实容量不足、dtype/layout/batch不符合及显式pins回退。
 - int16小整数、同步指令模型，不模拟BF16舍入、异步调度或缓存性能；不可当CANN/NPU精度结果。
 
-CANN编译、正式15点精度、NPU性能、精确SoC/plan/profile：提交前PENDING。
+[正式提交 6abd3e5d694b590c3c7d644c](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd3e5d694b590c3c7d644c)：CANN编译通过，15/15精度通过，各precision_ratio=1。代码 `c9bfb58`，SHA `280ab900d186365fb999d4bc83fc04109aa89baeaf54cfaa0b06d9b5f9e96e2d`。
+
+耗时 `[2.1, 4.35, 4.27, 5.53, 5.54, 10.59, 10.1, 68.03, 85.04, 99.18, 88.75, 96.85, 16.24, 13.34, 9.21]` μs，合计519.12 μs；父版511.66 μs。第8点69.03→68.03μs，未见明显整体收益。
+缺少实际shape/plan/SoC/profile和同设备重复A/B，单次约1.5%的差异不是稳定提速证明。
+其它kernel未修改，不归因其它点变化。保留本分支，后续恢复父通过版，不提交相近分组变体。
+精确SoC、实际plan/profile及完整支持范围设备覆盖仍PENDING。整体重大提升未达成。
 
 ## 下一条验证动作
 

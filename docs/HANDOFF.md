@@ -1,12 +1,15 @@
 # 接手状态 · 2026-10-01
 
-## 2026-10-01 · 完整 K 的 B 驻留候选（设备PENDING）
+## 2026-10-01 · 完整 B 驻留正式通过，无明显整体收益
 
-当前分支 `experiment/resident-b-column`，父 `18a93f3`。新增dual29，完整B N块驻留L1，按N外M内复用；AIV保存多个M块的UB行最大值，沿用partial/ring/FinalizeRows，不新增输入GM预处理。
-CPU296真实producer+两名consumer执行通过，production/TUNING各480host配置（各384选择）通过，含尾块、负值、K非16对齐、容量/pins回退。
-这是以完整B驻留替换A缓存取向的结构候选，可能增加A重读；不能据B读取次数声称总流量下降或加速。
-CANN/NPU/正式15点/性能PENDING。下一动作独立正式模板dry-run后CLI提交并观察同一ID到终态；若无收益恢复父版，不继续相近分组参数提交。
-来源、资源预算和对照见 [COLUMN_B_RESIDENCE.md](COLUMN_B_RESIDENCE.md)。整体重大提升仍未达成。
+代码 `c9bfb58`，kernel SHA `280ab900d186365fb999d4bc83fc04109aa89baeaf54cfaa0b06d9b5f9e96e2d`，[正式提交 6abd3e5d694b590c3c7d644c](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd3e5d694b590c3c7d644c) **CANN编译通过，15/15 Pass，precision_ratio均为1**。
+
+耗时 `[2.1, 4.35, 4.27, 5.53, 5.54, 10.59, 10.1, 68.03, 85.04, 99.18, 88.75, 96.85, 16.24, 13.34, 9.21]` μs，合计519.12 μs，父通过版511.66 μs。
+第8点69.03→68.03μs，单次约1.5%差异不证明稳定收益；其余路径未修改，变化不能归因。
+没有实际shape/plan/SoC/profile或重复A/B，也不能证明新路由命中；本结果只证明此kernel通过15点。
+完整B N块驻留L1、N外M内、多个M块UB Max状态及按列核心分组已实现；296个抽取producer和两名consumer模型、production/TUNING各480host配置（各384选择）通过。
+保留 `experiment/resident-b-column` 为结构对照，恢复 `experiment/tiny-tt-query-block` 的代码 `55225cc`；不继续相近分组参数提交。
+原始JSON本机Git忽略 `artifacts/column-b-residence/`，详见 [COLUMN_B_RESIDENCE.md](COLUMN_B_RESIDENCE.md)。整体重大提升尚未达成。
 
 ## 当前工作起点：恢复 query-block 通过版
 
