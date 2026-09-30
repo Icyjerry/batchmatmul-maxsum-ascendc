@@ -37,7 +37,12 @@ Cube等待既有全局完成屏障/flag12；预处理耗时进入整条路径启
 - 去掉新增helper并选择宏0后，kernel与父版本逐字节一致：host、Cube、归约、flag、资源和其它路径未改。
 
 这是带延迟DMA的CPU语义模型，不是CANN模拟器；不模拟硬件真实queue事件分配、乱序流水、缓存或BF16计算。
-CANN9编译、正式15点精度和性能：提交前PENDING。
+[正式提交 6abd423a694b590c3c7ee13d](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd423a694b590c3c7ee13d)：CANN编译通过，15/15精度通过，各precision_ratio=1。代码 `c763281`，SHA `119f145b81270e2994cd686bb4c621f58c48367be8629b921e6f8705b69813b4`。
+
+耗时 `[2.34, 3.89, 4.14, 5.54, 5.29, 10.64, 10.16, 68.97, 83.48, 99.95, 88.57, 97.14, 16.18, 13.58, 9.78]` μs，合计519.65 μs；父版511.66 μs，第12点95.91→97.14μs，无收益。
+缺少实际shape/plan/SoC/profile和同设备重复A/B，不证明命中或具体瓶颈；其它路径未改，不归因其时长变化。
+保留此分支作反例，后续恢复父通过版，不继续预取深度或pack矩形相近变体。
+完整支持范围的异步设备覆盖及精确profile仍PENDING。整体重大突破未达成。
 
 ## 下一条动作
 
