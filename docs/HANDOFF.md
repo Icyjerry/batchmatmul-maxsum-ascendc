@@ -1,5 +1,14 @@
 # 接手状态 · 2026-10-01
 
+## 2026-10-01 · 手写 Cube 矩形加载候选（尚未正式验证）
+
+当前分支 `experiment/rectangular-load3d`，从最新15/15通过的query-block版本 `909294b` 派生。
+六个非转置A/B加载点改用typed Load3Dv2完整矩形加载，保留原Load2D宏0对照；没有新GM通路、host调度或缓冲/事件修改。
+API依据、代码范围与对照见 [RECTANGULAR_LOAD3D.md](RECTANGULAR_LOAD3D.md)。
+CPU宏0/1各2888真实加载块布局/边界/尾块/常驻K切片检查通过；未改tiny TT路径700执行与30量化数值检查通过。
+CANN/NPU精度/性能PENDING；下一条动作是独立正式模板dry-run后CLI提交一次候选，并观察该提交直至终态。
+没有本次性能结论，整体重大提升仍未达成。
+
 ## 2026-09-30 · 一次 A 整理与双 query 正式结果
 
 代码 `55225cc`，kernel SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`，[正式提交 6abd3263694b590c3c776446](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd3263694b590c3c776446) **CANN编译通过，15/15 Pass，precision_ratio均为1**。

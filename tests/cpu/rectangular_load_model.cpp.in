@@ -1,0 +1,92 @@
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <iostream>
+#include <memory>
+#include <vector>
+#define __aicore__
+namespace AscendC {
+enum class TPosition {A1,B1,A2,B2};
+template<class T>struct LocalTensor {
+    std::shared_ptr<std::vector<T>> data;
+    TPosition pos;size_t offset=0;
+    LocalTensor operator[](size_t i) const {return {data,pos,offset+i};}
+    T& at(size_t i) const {return data->at(offset+i);}
+};
+struct LoadData2DParams {uint32_t repeatTimes=1,srcStride=1,dstGap=0;bool ifTranspose=false;};
+unsigned calls=0;
+template<class T>void LoadData(LocalTensor<T> dst,LocalTensor<T> src,LoadData2DParams p){
+    ++calls;
+    for(unsigned b=0;b<p.repeatTimes;++b)for(unsigned r=0;r<16;++r)for(unsigned c=0;c<16;++c)
+        dst.at(b*(1+p.dstGap)*256+r*16+c)=src.at(b*p.srcStride*256+(p.ifTranspose?c*16+r:r*16+c));
+}
+template<class T>struct LoadData3DParamsV2 {
+    uint32_t l1H=0,l1W=0,channelSize=0,mStartPt=0,kStartPt=0,mExtension=0,kExtension=0;
+    uint32_t strideH=1,strideW=1,filterH=1,filterW=1,dilationFilterH=1,dilationFilterW=1;
+};
+template<class T>void LoadData(LocalTensor<T> dst,LocalTensor<T> src,LoadData3DParamsV2<T> p){
+    ++calls;assert(p.l1H==1 && p.filterH==1 && p.filterW==1);
+    assert(p.strideH==1 && p.strideW==1 && p.dilationFilterH==1 && p.dilationFilterW==1);
+    assert(p.mStartPt+p.mExtension<=p.l1W && p.kStartPt+p.kExtension<=p.channelSize);
+    for(unsigned r=0;r<p.mExtension;++r)for(unsigned c=0;c<p.kExtension;++c){
+        unsigned rr=r+p.mStartPt,cc=c+p.kStartPt;
+        size_t in=(cc/16*p.l1W+rr)*16+cc%16;
+        size_t out=(r/16*(p.kExtension/16)+c/16)*256;
+        out+=dst.pos==TPosition::A2?(r%16)*16+c%16:(c%16)*16+r%16;
+        dst.at(out)=src.at(in);
+    }
+}
+}
+// @HELPER@
+// @BLOCKS@
+using Tensor=AscendC::LocalTensor<int16_t>;
+using Position=AscendC::TPosition;
+Tensor allocate(unsigned n,Position pos){return {std::make_shared<std::vector<int16_t>>(n,-30000),pos,0};}
+int16_t value(unsigned r,unsigned c,unsigned vr,unsigned vc){
+    return r<vr && c<vc?int16_t(-1-int((r*17+c*7)%101)):0;
+}
+using Loader=void(*)(Tensor,Tensor,uint32_t,uint32_t,uint32_t,uint32_t,bool,unsigned);
+unsigned cases=0;
+void check(Loader loader,bool isB,unsigned sr,unsigned sc,unsigned rows,unsigned cols,
+           unsigned colOffset,bool resident,unsigned tree,unsigned trim){
+    if(sr*sc>262144 || rows*cols>32768)return; // inherited L1/L0 upper bounds
+    auto src=allocate(sr*sc,Position::A1),dst=allocate(rows*cols+256,isB?Position::B2:Position::A2);
+    const unsigned vr=sr-trim,vc=sc-trim;
+    for(unsigned r=0;r<sr;++r)for(unsigned c=0;c<sc;++c)
+        src.at((c/16*sr+r)*16+c%16)=value(r,c,vr,vc);
+    auto before=*src.data;AscendC::calls=0;
+    if(isB)loader(dst,src,rows,rows,cols,0,false,tree);
+    else loader(dst,src,rows,cols,sc,colOffset,resident,tree);
+    for(unsigned r=0;r<rows;++r)for(unsigned c=0;c<cols;++c){
+        size_t at=(r/16*(cols/16)+c/16)*256+(isB?c%16*16+r%16:r%16*16+c%16);
+        assert(dst.at(at)==value(r,c+colOffset,vr,vc));
+    }
+    for(unsigned i=rows*cols;i<rows*cols+256;++i)assert(dst.at(i)==-30000);
+    assert(before==*src.data);
+#if BMMMS_RECT_LOAD3D
+    assert(AscendC::calls==1);
+#else
+    assert(AscendC::calls>0);
+#endif
+    ++cases;
+}
+int main(){
+    for(unsigned r:{16u,32u,48u,64u,96u,128u,192u,256u})
+    for(unsigned c:{16u,32u,48u,64u,96u,128u,192u,256u})for(unsigned trim:{0u,1u,7u}){
+        for(unsigned tree:{0u,2u}){
+            check(manualA,false,r,c,r,c,0,false,tree,trim);
+            check(packedA,false,r,c,r,c,0,false,tree,trim);
+            check(manualB,true,r,c,r,c,0,false,tree,trim);
+            check(packedB,true,r,c,r,c,0,false,tree,trim);
+        }
+        check(directA,false,r,c,r,c,0,false,0,trim);
+        check(directB,true,r,c,r,c,0,false,0,trim);
+    }
+    for(unsigned r:{16u,48u,64u,128u})for(unsigned k:{128u,256u,512u,2048u,8192u})
+    for(unsigned count:{16u,48u,64u,128u})if(count<=k)
+    for(unsigned k0:{0u,(k-count)/16*16})for(unsigned tree:{0u,2u})for(unsigned trim:{0u,7u}){
+        check(manualA,false,r,k,r,count,k0,true,tree,trim);
+        check(packedA,false,r,k,r,count,k0,true,tree,trim);
+    }
+    std::cout<<"Load mode "<<BMMMS_RECT_LOAD3D<<": "<<cases<<" actual blocks, padded tails, resident K slices PASS\n";
+}
