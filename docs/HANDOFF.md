@@ -1,5 +1,26 @@
 # 接手状态 · 2026-10-01
 
+## 当前：恢复 query-block，通过版未并入新 B 驻留实验
+
+当前分支 `experiment/tiny-tt-query-block`，通过kernel代码 `55225cc` / SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`。
+完整B驻留实验已结束，15/15通过但没有明显整体收益；代码及296实际producer/consumer模型保留在 `experiment/resident-b-column`。
+当前仅同步实验结果文档，kernel恢复原样；没有活动的正式任务。
+
+下一条明确动作：审查case12既有packed-B预处理的双缓冲。当前 `bmmms_manual_case12_packed` 的AIV pack循环在每个矩形的MTE3后立即Fence，再FreeTensor，然后才读取下一矩形；cq已经有两个buffer但没有pack输入预取。
+先按实际队列/事件生命周期实现前后矩形的MTE2/MTE3重叠，仍只用已有packed-B区和cq；保留全局完成屏障/flag12及原Cube计算。不得增加新的输入GM通路或据DMA调用数声明收益。
+这项预处理流水尚未实现，不是已验证提速；整体重大突破仍未达成。
+
+## 2026-10-01 · 完整 B 驻留正式通过，无明显整体收益
+
+代码 `c9bfb58`，kernel SHA `280ab900d186365fb999d4bc83fc04109aa89baeaf54cfaa0b06d9b5f9e96e2d`，[正式提交 6abd3e5d694b590c3c7d644c](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd3e5d694b590c3c7d644c) **CANN编译通过，15/15 Pass，precision_ratio均为1**。
+
+耗时 `[2.1, 4.35, 4.27, 5.53, 5.54, 10.59, 10.1, 68.03, 85.04, 99.18, 88.75, 96.85, 16.24, 13.34, 9.21]` μs，合计519.12 μs，父通过版511.66 μs。
+第8点69.03→68.03μs，单次约1.5%差异不证明稳定收益；其余路径未修改，变化不能归因。
+没有实际shape/plan/SoC/profile或重复A/B，也不能证明新路由命中；本结果只证明此kernel通过15点。
+完整B N块驻留L1、N外M内、多个M块UB Max状态及按列核心分组已实现；296个抽取producer和两名consumer模型、production/TUNING各480host配置（各384选择）通过。
+保留 `experiment/resident-b-column` 为结构对照，恢复 `experiment/tiny-tt-query-block` 的代码 `55225cc`；不继续相近分组参数提交。
+原始JSON本机Git忽略 `artifacts/column-b-residence/`，详见 [COLUMN_B_RESIDENCE.md](COLUMN_B_RESIDENCE.md)。整体重大提升尚未达成。
+
 ## 当前工作起点：恢复 query-block 通过版
 
 当前分支 `experiment/tiny-tt-query-block`，kernel仍为代码 `55225cc` / SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`，正式15/15通过，第4点5.66μs。
