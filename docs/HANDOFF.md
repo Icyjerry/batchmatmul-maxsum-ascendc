@@ -1,5 +1,25 @@
 # 接手状态 · 2026-10-01
 
+## 当前：恢复 query-block，通过版未并入 packed-B 流水
+
+当前分支 `experiment/tiny-tt-query-block`，通过kernel代码 `55225cc` / SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`。
+packed-B双缓冲实验正式15/15通过但无收益，保留 `experiment/packed-b-pipeline` 的源码、宏0/1各650延迟DMA模型执行与正式结果；这里仅同步结果文档，kernel恢复原样，没有活动的正式任务。
+
+下一条明确动作：[MTE2_PRELOAD_REVIEW.md](MTE2_PRELOAD_REVIEW.md)。已核对CANN9的GetSpecialMDLConfig支持A2/A3 M方向完整K预载及DoubleBuffer条件；先查询公开真实tiler和preload源码，区分库baseM64与现有GM窗口128行，检查完整K、depth/step/DB/L1/L0C所有条件。
+这不是此前普通MDL或单M块N-session方案；不能只开配置而没有下一M块，也不能硬改depth字段不核对总容量。尚未实现或取得此方向设备结果。
+整体重大提升仍未达成，不继续packed-B或resident-B相近变体提交。
+
+## 2026-10-01 · packed-B 双缓冲正式通过，无收益
+
+代码 `c763281`，kernel SHA `119f145b81270e2994cd686bb4c621f58c48367be8629b921e6f8705b69813b4`，[正式提交 6abd423a694b590c3c7ee13d](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd423a694b590c3c7ee13d) **CANN编译通过，15/15 Pass，precision_ratio均为1**。
+
+耗时 `[2.34, 3.89, 4.14, 5.54, 5.29, 10.64, 10.16, 68.97, 83.48, 99.95, 88.57, 97.14, 16.18, 13.58, 9.78]` μs，合计519.65 μs，父通过版511.66 μs。
+第12点95.91→97.14μs，没有收益。只改已有case12 pack阶段，其余kernel未改，不归因其它点变化。
+没有实际shape/plan/SoC/profile或重复A/B，不能证明此正式case命中新流水或判定具体退化原因。
+宏0/1各650实际源码延迟DMA模型执行通过；完成真实CPU发起顺序重叠、晚释放UB源保护，但不构成硬件加速证明。
+保留 `experiment/packed-b-pipeline` 的源码/模型/结果，恢复 `experiment/tiny-tt-query-block` 通过kernel；不提交预取深度或pack矩形相近变体。
+原始JSON本机Git忽略 `artifacts/packed-b-pipeline/`；详见 [PACKED_B_PIPELINE.md](PACKED_B_PIPELINE.md)。整体重大提升尚未达成。
+
 ## 当前：恢复 query-block，通过版未并入新 B 驻留实验
 
 当前分支 `experiment/tiny-tt-query-block`，通过kernel代码 `55225cc` / SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`。
