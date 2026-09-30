@@ -59,3 +59,7 @@
 | 15 | 9.20 | 9.70 |
 
 15点合计 517.73→527.49 μs。第8点67.80→70.86、第11点88.16→89.29，没有收益。未获得实际shape/plan/kernel/profile，不能断言命中MDL路由或归因退化；其它点也有单次波动。保留分支对照，不替换最快通过版、不继续相近MDL参数提交。原始JSON在Git忽略 `artifacts/mdl-shard-pipeline/`。下一条研究动作：核对A2/A3 Fixpipe直接到UB能力与Matmul输出交接实现，再判断能否削减现有GM ring通路。整体大幅提升仍未达成。
+
+## 后续源码证据
+
+公开真实tiler驱动80组查询均stepM/N=1，修正原先对手动step1的怀疑；不能称其为已确认缺陷。A2/A3直接L0C到UB方案缺少硬件支持，暂不实现。下一项是大K TT两个M块共享B的K面板，设计仍未实现。见 [INPUT_PIPELINE_REVIEW.md](INPUT_PIPELINE_REVIEW.md)。

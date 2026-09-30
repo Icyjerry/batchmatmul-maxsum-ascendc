@@ -4,7 +4,7 @@
 
 `experiment/mdl-shard-pipeline` / `df0e049`，kernel SHA `9cf72c174b5ef077db5e8c06826df39718fe926d10efc86391f88e6a5359751e`，[正式提交 6abcbaf3694b590c3c353072](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcbaf3694b590c3c353072) **CANN编译通过、15/15 Pass**。独立MatmulImpl从Norm改MDL，host显式匹配并保留K面板分组step/depth/DB；96个host和384个抽取producer/consumer配置通过。第8点67.80→70.86、第11点88.16→89.29 µs，合计517.73→527.49，无收益，不替换最快保留版。详情 [MDL_SHARD_PIPELINE.md](MDL_SHARD_PIPELINE.md)，原始JSON在Git忽略 `artifacts/mdl-shard-pipeline/`。实际shape/plan/profile未取得，不声称路由命中或确切瓶颈。
 
-下一条研究动作：核对A2/A3 Fixpipe直接到UB能力及库交接源码，判断能否削减现有GM ring搬运；不继续相近MDL/session/output参数提交。后续起点恢复 `experiment/manual-splitk-tiny`。整体大幅提升仍未达成。
+后续审查已执行：80组公开真实tiler查询的stepM/N均为1，不能把强制step1称为已确认缺陷。A2/A3 CO2映射GM且V220无直接L0C→UB能力，不套用C310路径。见 [INPUT_PIPELINE_REVIEW.md](INPUT_PIPELINE_REVIEW.md)。下一条明确动作：从最快通过版实现大K TT配对M producer，使两个独立C共享每个B K面板，复用现有manual AIV/ring/finalizer；该设计待实现，不是已测优化。CPU工具 `inspect_public_matmul_tiling.py` 可重建80查询，源码固定公开8.3版本，不是installed9.0。后续起点恢复 `experiment/manual-splitk-tiny`；不继续相近MDL/session/output参数提交。整体大幅提升仍未达成。
 
 ## 最新：库内建 NZ 流水正式通过，无整体收益
 
