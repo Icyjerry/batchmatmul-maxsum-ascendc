@@ -4,6 +4,8 @@
 
 ## 2026-09-30 · CANNJudge CLI · 紧凑 NZ ring 首版 Runtime Error
 
+编译期 callback baseN 版 `21dae0d`，kernel SHA `34faa07f6d898386f0dec10da0a68fc0f013a67152529b650e9fd1d6e3644912`，257417 字节；[提交 6abca4d0694b590c3c26d435](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abca4d0694b590c3c26d435) **编译通过，第 8 点 Runtime Error 507015，7/15 Pass**。前 7 点 `[2.12,3.98,4.27,8.32,5.12,10.83,10.14]` µs，后 7 点 Skipped。日志 device 0，目标核 `bmmms_dual<bf16,true,true,true,128>`；目标点无有效时长。取消运行时 user info 传递未解决故障，不能归因为用户标量传递。三版均不合并通过版，暂不提交相近变体。原始失败日志及 JSON 已保存至本机 Git 忽略 `artifacts/nz-ring-max/`；精确 SoC、实际 shape/plan、底层异常地址未提供。
+
 ND 库调度隔离版 `5de5952`，kernel SHA `9e6717adbcfa291b6899e48ebd79e1b7b8f2768ab1df8ff19f96195ab300d481`，257173 字节；[提交 6abca32b694b590c3c25d63d](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abca32b694b590c3c25d63d) 编译通过，仍是第 8 点 Runtime Error 507015，前 7 点 Pass，后 7 点 Skipped。前 7 点耗时 `[2.14,4.00,4.28,7.85,5.50,10.56,9.53]` µs。device 0 同步失败；目标点无有效时长，不能估算分数。原始 JSON `/private/tmp/bmmms-6abca32b694b590c3c25d63d.json`。恢复库 C/tiler ND 未解决故障；下一修正版使用编译期 baseN 消除回调用户标量传递，仅为待验证隔离，未证明根因。
 
 - 分支 `experiment/nz-ring-max`，代码 `9c7a006`，kernel SHA256 `4d1fa214d1fc56d97be612ce0969277b317ec6e617ab07903be03698c09b9832`，257091 字节。dry-run 只上传 kernel.asc。[提交 6abca137694b590c3c249f19](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abca137694b590c3c249f19)。CLI 恢复于 `/private/tmp/cannjudge_cli.py`；`submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /private/tmp/bmmms-judge-nz-ring/project --no-wait`，随后 query。

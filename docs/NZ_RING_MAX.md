@@ -24,3 +24,7 @@
 ND 调度修正版 `5de5952`、SHA `9e6717adbcfa291b6899e48ebd79e1b7b8f2768ab1df8ff19f96195ab300d481`，[提交 6abca32b694b590c3c25d63d](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abca32b694b590c3c25d63d) 仍在第 8 点 Runtime Error 507015，前 7 点通过、后 7 点跳过；底层原因未提供。因此恢复 ND 库调度未解决故障。原始 JSON 在 `/private/tmp/bmmms-6abca32b694b590c3c25d63d.json`。
 
 当前实现把 callback baseN 改为模板常量，128/256 两种 host 计划分别实例化，取消 `SetUserDefInfo` 传递标量；其它 baseN 回退旧 ND producer/consumer。此措施去掉未观测的回调运行时信息依赖，不代表已证明用户信息传递有错。[CANN9 Fixpipe 文档](https://www.hiascend.com/doc_center/source/en/CANNCommunityEdition/900/API/ascendcopapi/atlasascendc_api_07_0251.html) 的 NZ srcStride/dstStride 单位已核对，与目前模型一致。当前修正版正式验证 PENDING。
+
+编译期 baseN 版 `21dae0d`、SHA `34faa07f6d898386f0dec10da0a68fc0f013a67152529b650e9fd1d6e3644912`，[提交 6abca4d0694b590c3c26d435](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abca4d0694b590c3c26d435) 仍在第 8 点 507015 Runtime Error，前 7 点 Pass、后 7 点 Skipped。因此编译期偏移未解决故障；没有目标点耗时，不能计分或声称提速。最新 kernel 保留在本实验分支，不合并通过版。
+
+三个版本编译均通过，但设备完整精度/性能均失败。后续须获取 CANN9 实际 header、AiCore 异常 PC/GM 地址并分开验证 NZ producer 与 consumer，避免继续以相近变体调用正式评测。原始日志/JSON 已从临时目录复制到本机 Git 忽略的 `artifacts/nz-ring-max/`；公共 CLI helper 保存于 `artifacts/tooling/cannjudge-submit/`，未复制会话凭据。

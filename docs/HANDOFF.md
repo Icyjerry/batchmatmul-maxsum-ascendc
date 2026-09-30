@@ -2,7 +2,11 @@
 
 ## 当前：紧凑 NZ ring 与直接 NZ MaxSim
 
-工作分支 `experiment/nz-ring-max` 从较快的手写 Split-K 父版派生。大 TT 完整 K 的 dual=1 路径接入 Matmul 输出回调：L0C 以 NZ 写到原 GM ring，AIV 直接按 NZ 做 Max，保留窗口/分片/slot 容量和 finalizer。库 `enSequentialWrite=true` 会把所有 tile 写到同一起点，因此回调显式按 curN 定位。抽取回调的 90 组单位/窗口检查、1,344 组尾块/负值地址模型及父版模型通过。首版 `9c7a006`，[正式提交 6abca137694b590c3c249f19](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abca137694b590c3c249f19) **CANN 编译通过，但第 8 点 Runtime Error 507015**；前 7 点通过，后续跳过。日志确认第 8 点命中新 BF16 TT kernel，未给底层异常地址。当前修正版把库 C 类型和 tiler 恢复 ND，只由回调写 NZ，排除库 NZ 调度及原始 M/N 对齐限制；错误原因仍未证实，正式精度/性能 **PENDING**。见 [NZ_RING_MAX.md](NZ_RING_MAX.md)。下一条动作：提交当前修正版，查询同一 submission；日志 `/private/tmp/nz-ring-query.log`。
+`experiment/nz-ring-max` 保留失败对照；最新代码 `21dae0d`，kernel SHA `34faa07f6d898386f0dec10da0a68fc0f013a67152529b650e9fd1d6e3644912`。大 TT 完整 K 的 dual=1 路径接入 Matmul 输出回调，L0C 以 NZ 写到原 GM ring，AIV 直接 NZ Max，保留窗口/分片/slot 容量和 finalizer。库 `enSequentialWrite=true` 写同一起点，因此回调显式按 curN 定位。抽取回调的 90 组单位/窗口检查、1,344 组尾块/负值地址模型通过，但三个正式版本均 **CANN 编译通过、第 8 点 Runtime Error 507015**：首版 `9c7a006`、恢复 ND 库调度的 `5de5952`、编译期 baseN 的 `21dae0d`。[最新提交 6abca4d0694b590c3c26d435](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abca4d0694b590c3c26d435) 前 7 点 Pass，后 7 点 Skipped。已证明第 8 点命中新 BF16 TT kernel，未得到底层异常地址；两项隔离未解决故障，不能归因于库 C 格式或用户标量传递。详情 [NZ_RING_MAX.md](NZ_RING_MAX.md)、[PERF_LOG.md](PERF_LOG.md)。
+
+恢复通过版 `experiment/manual-splitk-tiny` 作为后续优化起点，kernel SHA 仍为 `6e264a6b1979210a58744b2f33ac3aaa5c18ab46a975690d83c7338ab7f2aef5`。NZ 方案没有可计分结果，不合并最快版，暂不提交相近变体。下一条动作：取得 CANN9 实际 callback/Fixpipe header 与 `slog`/AiCore 异常 PC/GM 地址；使用独立设备 harness 分别验证 producer NZ 输出和 AIV 消费，再决定是否继续该路径。也可从通过版继续研究另一项减少 Cube/GM 主成本的结构方案；大幅整体提升仍未达成。
+
+本机原始失败日志已保存到 Git 忽略的 `artifacts/nz-ring-max/`，避免 `/tmp` 被清理后丢失。CLI 及公共 helper 副本在 Git 忽略的 `artifacts/tooling/cannjudge-submit/`；会话仍使用用户原有 `~/.cannjudge/session.json`，未复制凭据。新提交前使用此 CLI 下载独立正式模板并 dry-run。这些本机 artifact 不随 GitHub 分支交接，接手者可按提交链接读取结果。
 
 ## 宽 N 尾块 A 常驻实验：正式通过但退化
 
