@@ -17,11 +17,19 @@ host 查询实际 L1、L0A/B/C、UB 和 AIC/AIV 数量；优先 M tile=128，容
 `python3 tools/validate_ragged_tt_resident.py`：
 
 - production/TUNING 各 465 个选中计划配置：真实 host 控制流、逐 (M,N tile) 唯一覆盖、实际核数和 workspace 大小；检查 dtype/layout/B/K 排除、低资源回退和显式 pins。
-- 125 组 NZ→ZZ/ZN 物理块模型，抽取实际 A copy、zero-tail、resident loader、B copy；验证零填充、重复复用、有效元素、合法块地址。小形状执行物理 dot→Max→Sum 与独立 oracle 比较，含全负相似度。
+- 231 组 NZ→ZZ/ZN 物理块模型，抽取实际 A copy、zero-tail、resident loader、B copy；验证完整内部 tile、零填充、重复复用、有效元素、合法块地址。小形状执行物理 dot→Max→Sum 与独立 oracle 比较，含全负相似度。
 - 模型里的 A `DataCopy` 每次任务恰好一次，读取 `validRows*K` 个元素。CPU 模型同步执行，不验证硬件事件流水。
 - `validate_manual_splitk.py` 48 组和 `validate_direct_batch.py` 1,458 个既有回归通过。
 
-**CANN 编译、正式精度、性能 PENDING**。尤其需要检查 TT 非对齐 producer 是否被实际 case 命中；没有实际 shape/plan/profile 时不能推断具体耗时原因。
+## 正式结果：通过但退化
+
+代码 `4507c59`，kernel SHA `d327a0632c87335a657528005b25eb9a9578086c3691f602947159baa30f2b3d`，256400 字节。[正式提交 6abcaadc694b590c3c2ada90](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcaadc694b590c3c2ada90) **CANN 编译通过，15/15 Pass**，每点 precision_ratio=1。
+
+耗时 `[2.22,3.98,4.40,7.77,5.67,10.56,9.79,94.15,82.75,96.90,87.87,96.75,15.11,13.01,9.40]` µs。第 8 点相对手写 Split-K 父版 **67.80→94.15 µs**；15 点合计 517.73→540.33 µs，没有整体收益。查询返回通过 case 的 msg 为空，因此没有实际 shape、plan 或 kernel 名；不能证明具体分支命中，也不能把退化精确归因为 LoadData2D 或常驻策略。精确 SoC、重复 A/B、msprof 和额外设备覆盖仍 PENDING。
+
+该分支保留失败对照，恢复 `experiment/manual-splitk-tiny`。不要提交本路径相近参数变体。下一步研究 Matmul 库本身的 A cache/片上输入能力和现有 GM handoff 成本；手写 A 常驻的源码读取次数不能说明它优于库的实际复用。
+
+原始结果保存于本机 Git 忽略 `artifacts/ragged-tt-resident-a/6abcaadc694b590c3c2ada90.json`。其他 Agent 可通过提交链接复查结果；本机 artifact 不随 GitHub 上传。
 
 ## 设备验证与交接
 

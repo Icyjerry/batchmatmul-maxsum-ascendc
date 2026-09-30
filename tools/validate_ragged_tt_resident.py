@@ -144,6 +144,7 @@ int main() {
         if(bm*((k+15)/16*16)*2+128*128*4+1024>512*1024)continue;
         const unsigned m0=(m-1)/bm*bm,n0=(n-1)/128*128;
         Check(m,n,k,m0,n0,bm);++cases;
+        if(m0 || n0) {Check(m,n,k,0,0,bm);++cases;}
     }
     // Execute negative-only dot products through the extracted loaders as well.
     negativeA=true;

@@ -2,6 +2,14 @@
 
 每条新记录必须带代码 commit/SHA、设备、CANN、case、命令和实际结果。空白数据不得补成零或推测值。
 
+## 2026-09-30 · CANNJudge CLI · 大 TT 非对齐 A 常驻失败对照
+
+- 分支 `experiment/ragged-tt-resident-a`，代码 `4507c59`，kernel SHA256 `d327a0632c87335a657528005b25eb9a9578086c3691f602947159baa30f2b3d`，256400 字节；从较快的 `d2718c8` 派生。dry-run 仅上传 kernel.asc。`python3 /private/tmp/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /private/tmp/bmmms-judge-ragged-tt-resident/project --no-wait`；随后查询同一任务至 Pass。[提交 6abcaadc694b590c3c2ada90](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcaadc694b590c3c2ada90)。
+- 假设：BF16 B1 TT 大矩阵非对齐尾块使用手写 producer，把每个 M tile / N shard 的完整 A 在 L1 复用，B 和 L0 双缓冲。A 的 NZ slab 使用 padded K 跨度，经 2D block transpose 转成 ZZ；保留 ND ring、AIV Max 和 finalizer。host 查询实际容量，M tile 128/64 和 N shard 自适应，低资源或 pins 回退。没有新增 GM 通路。
+- CPU：`validate_ragged_tt_resident.py` production/TUNING 各 465 个路由、资源和独立任务覆盖检查；231 组抽取实际加载 helper 的 NZ/ZZ/ZN、完整 tile/尾块/复用和小形状独立数值模型通过。既有 Split-K 48 组、direct batch 1,458 配置通过；不是设备性能证据。
+- **CANN 编译通过，15/15 Pass**，各点 precision_ratio=1。时间 `[2.22,3.98,4.40,7.77,5.67,10.56,9.79,94.15,82.75,96.90,87.87,96.75,15.11,13.01,9.40]` µs；第 8 点相对父版 67.80→94.15 µs，15 点合计 517.73→540.33 µs，候选无整体收益，不合并最快版。
+- 目标 CANN9；精确 SoC、实际 shape/layout/plan、msprof、重复 A/B 未取得，通过 case 的 msg 为空。无法确认新路径命中或具体瓶颈来源。原始 JSON 保存于本机 Git 忽略 `artifacts/ragged-tt-resident-a/6abcaadc694b590c3c2ada90.json`。详细说明 [RAGGED_TT_RESIDENT_A.md](RAGGED_TT_RESIDENT_A.md)；不再提交该路径相近参数变体。
+
 ## 2026-09-30 · CANNJudge CLI · 紧凑 NZ ring 首版 Runtime Error
 
 编译期 callback baseN 版 `21dae0d`，kernel SHA `34faa07f6d898386f0dec10da0a68fc0f013a67152529b650e9fd1d6e3644912`，257417 字节；[提交 6abca4d0694b590c3c26d435](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abca4d0694b590c3c26d435) **编译通过，第 8 点 Runtime Error 507015，7/15 Pass**。前 7 点 `[2.12,3.98,4.27,8.32,5.12,10.83,10.14]` µs，后 7 点 Skipped。日志 device 0，目标核 `bmmms_dual<bf16,true,true,true,128>`；目标点无有效时长。取消运行时 user info 传递未解决故障，不能归因为用户标量传递。三版均不合并通过版，暂不提交相近变体。原始失败日志及 JSON 已保存至本机 Git 忽略 `artifacts/nz-ring-max/`；精确 SoC、实际 shape/plan、底层异常地址未提供。
