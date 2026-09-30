@@ -9,12 +9,13 @@ root = Path(__file__).resolve().parents[1]
 src = (root / 'kernel.asc').read_text()
 shapes = src[src.index('struct Shape {'):src.index('template <AscendC::HardEvent')]
 host = src[src.index('struct Plan {'):src.index('using CacheKey =')]
+stream_dual = 27 if 'if(p.schedule.dual==27)' in src else 26
 stub = (root / 'tests/cpu/planner_stub.hpp').read_text()
 stub = stub.replace('uint32_t m=0,n=0; static bool rejectFirst;',
     'uint32_t m=0,n=0; static bool rejectFirst,rejectStream; static unsigned tilerCalls;')
 stub = stub.replace('if(rejectFirst){', 'if(rejectStream && ++tilerCalls>1)return -1;\n        if(rejectFirst){')
 stub += '\nbool matmul_tiling::MatmulApiTiling::rejectStream=false;\nunsigned matmul_tiling::MatmulApiTiling::tilerCalls=0;\n'
-host_model = stub + shapes + host + r'''
+checks = r'''
 int main() {
     unsigned routes=0;
     for(int m: {1024,1025,1537,2047})for(int n: {1024,1025,2049,4095})
@@ -44,6 +45,7 @@ int main() {
     std::cout << "cube stream host routing/workspace: " << routes << " configurations\n";
 }
 '''
+host_model = stub + shapes + host + checks.replace('26', str(stream_dual))
 
 start = src.index('    for(int64_t task=worker;', src.index('void bmmms_dual('))
 producer = src[start:src.index('        } else {\n        for(uint32_t nt=begin;', start)]
@@ -58,7 +60,8 @@ compiler = shutil.which('clang++') or shutil.which('c++')
 assert compiler
 with tempfile.TemporaryDirectory(prefix='bmmms-cube-stream-') as tmp:
     for name, code, flags in [('host', host_model, []), ('host-pins', host_model, ['-DBMMMS_TUNING']),
-                              ('producer-consumer', model, [])]:
+                              ('producer-consumer-nd', model, ['-DTEST_NZ=0']),
+                              ('producer-consumer-nz', model, ['-DTEST_NZ=1'])]:
         cpp, exe = Path(tmp) / (name + '.cpp'), Path(tmp) / name
         cpp.write_text(code)
         subprocess.run([compiler, '-std=c++17', '-O2', *flags, str(cpp), '-o', str(exe)], check=True)

@@ -7,6 +7,9 @@
 #include <map>
 #include <tuple>
 #include <vector>
+#ifndef TEST_NZ
+#define TEST_NZ 0
+#endif
 // INSERT_SHAPES
 constexpr int PIPE_FIX=1,PIPE_V=2;
 struct Context {
@@ -57,6 +60,11 @@ void Max(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint64
         dst.at(r*p.d*8+c)=std::max(a.at(r*p.e*8+c),b.at(r*p.f*8+c));
 }
 template<int P>void PipeBarrier(){}
+void Duplicate(LocalTensor<float> dst,float value,uint64_t* masks,unsigned repeats,unsigned blockStride,unsigned repStride) {
+    assert(!masks[0] && blockStride==1);
+    for(unsigned r=0;r<repeats;++r)for(unsigned lane=0;lane<64;++lane)
+        if((masks[1]>>lane)&1)dst.at(r*repStride*8+lane)=value;
+}
 void Consume(unsigned slot);
 template<int M>void CrossCoreWaitFlag(unsigned flag){assert(M==2 && flag==2+(st.sequence&1));}
 template<int M,int P>void CrossCoreSetFlag(unsigned slot){assert(M==2 && P==PIPE_FIX && slot==(st.sequence&1));Consume(slot);++st.sequence;}
@@ -78,11 +86,15 @@ struct Engine {
         assert(Sync && !atomic && sequential && hasTile);hasTile=false;
         const unsigned width=std::min(st.s.baseN,cols-position);st.nt=(st.n0+position)/st.s.baseN;
         assert(dst.offset==st.worker*2*st.s.baseM*st.s.baseN+(st.sequence&1)*st.s.baseM*st.s.baseN);
-        assert(rows*width<=st.s.baseM*st.s.baseN);
-        for(unsigned r=0;r<rows;++r)for(unsigned c=0;c<width;++c) {
+        const unsigned mp=(rows+15)/16*16,np=(width+15)/16*16;
+        assert(mp*np<=st.s.baseM*st.s.baseN);
+        const unsigned writeCols=TEST_NZ?np:width;
+        for(unsigned r=0;r<rows;++r)for(unsigned c=0;c<writeCols;++c) {
             float dot=0;
-            for(unsigned q=0;q<st.s.k;++q)dot+=a.at(q*st.s.m+r)*b.at((position+c)*st.s.k+q);
-            dst.at(r*width+c)=dot;
+            if(c<width)for(unsigned q=0;q<st.s.k;++q)dot+=a.at(q*st.s.m+r)*b.at((position+c)*st.s.k+q);
+            else dot=1e30f; // adversarial padded columns must be masked before Max
+            if constexpr(TEST_NZ)dst.at((c/16)*mp*16+r*16+c%16)=dot;
+            else dst.at(r*width+c)=dot;
         }
         position+=width;
     }
@@ -90,8 +102,9 @@ struct Engine {
 };
 namespace AscendC {
 void Consume(unsigned slot) {
-    constexpr bool STREAM=true;
+    constexpr bool STREAM=true,NZ=TEST_NZ;
     const auto& s=st.s;const unsigned nt=st.nt,tiles=1,width=s.baseN,slotSize=s.baseM*s.baseN;
+    const unsigned m0=st.m0;
     GlobalTensor<float> ring{&st.ring,st.worker*2*slotSize};
     // Independently identify the shard containing this first tile boundary.
     unsigned shard=0;while(shard+1<s.nSplit && (shard+1)*s.nTiles/s.nSplit<=st.n0/s.baseN)++shard;
@@ -118,15 +131,12 @@ void RunWorker(const Schedule& s,unsigned worker) {
 // INSERT_PRODUCER
     assert(st.sequence==sequence && !mm.active);
 }
-int main() {
-    unsigned cases=0;
-    for(unsigned batch: {1U,2U})for(unsigned m: {17U,33U,65U})for(unsigned n: {31U,33U,65U,97U})
-    for(unsigned k: {40U,72U})for(unsigned ns: {1U,2U})for(unsigned workers: {1U,3U})for(bool negative:{false,true}) {
+void Check(unsigned batch,unsigned m,unsigned n,unsigned k,unsigned ns,unsigned workers,bool negative,unsigned tile) {
         st=Context{};st.negative=negative;auto& s=st.s;
-        s.b=batch;s.m=m;s.n=n;s.k=k;s.baseM=s.baseN=32;s.window=1;s.kSplit=1;
-        s.mTiles=(m+31)/32;s.nTiles=(n+31)/32;s.nSplit=std::min(ns,s.nTiles);
+        s.b=batch;s.m=m;s.n=n;s.k=k;s.baseM=s.baseN=tile;s.window=1;s.kSplit=1;
+        s.mTiles=(m+tile-1)/tile;s.nTiles=(n+tile-1)/tile;s.nSplit=std::min(ns,s.nTiles);
         s.workers=std::min(workers,unsigned(s.b*s.mTiles*s.nSplit));
-        st.a.resize(batch*m*k);st.b.resize(batch*n*k);st.ring.resize(s.workers*2*32*32,1e30f);
+        st.a.resize(batch*m*k);st.b.resize(batch*n*k);st.ring.resize(s.workers*2*tile*tile,1e30f);
         for(unsigned z=0;z<batch;++z)for(unsigned r=0;r<m;++r)for(unsigned q=0;q<k;++q)st.a[z*m*k+q*m+r]=A(z,r,q);
         for(unsigned z=0;z<batch;++z)for(unsigned c=0;c<n;++c)for(unsigned q=0;q<k;++q)st.b[z*n*k+c*k+q]=B(z,q,c);
         for(unsigned w=0;w<s.workers;++w)RunWorker(s,w);
@@ -141,7 +151,16 @@ int main() {
             }
             assert(actual==golden);if(negative)assert(actual<0);
         }
-        ++cases;
+}
+int main() {
+    unsigned cases=0;
+    for(unsigned batch: {1U,2U})for(unsigned m: {17U,33U,65U})for(unsigned n: {31U,33U,65U,97U})
+    for(unsigned k: {40U,72U})for(unsigned ns: {1U,2U})for(unsigned workers: {1U,3U})for(bool negative:{false,true}) {
+        Check(batch,m,n,k,ns,workers,negative,32);++cases;
     }
-    std::cout << "cube stream extracted producer/compact ND consumer/oracle: " << cases << " configurations\n";
+    for(unsigned m:{1U,65U,129U})for(unsigned n:{127U,129U,255U,257U})
+    for(unsigned ns:{1U,2U})for(bool negative:{false,true}) {
+        Check(1,m,n,40,ns,3,negative,128);++cases;
+    }
+    std::cout << "cube stream extracted producer/" << (TEST_NZ?"NZ":"ND") << " consumer/oracle: " << cases << " configurations\n";
 }
