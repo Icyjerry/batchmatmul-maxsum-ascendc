@@ -21,3 +21,11 @@
 `python3 tools/validate_tiny_tt_vector.py`：抽取实际新kernel与MicroIndices执行700个整数算术/边界/对齐/生命周期/尾块/全负/重复batch配置；每个y恰有一个writer，输入和y两端guard不变，实际InitBuffer总量逐case等于host预算。production/TUNING各432host尝试、360选择，资源/pins/布局等回退通过。30个独立实际FP16/BF16存储值的FP32/FP64对照通过，最大绝对误差9.54e-7。
 
 该CPU模型同步执行，不证明真实Ascend事件、指令或速度。正式CANN编译、15/15精度、性能PENDING；仍应独立正式模板只替换kernel.asc，dry-run并提交一次，记录SHA/ID，不能按case编号断言命中。无收益保留该分支，不继续相近参数试验。整体大幅提升目标仍未达成。
+
+## 2026-09-30 · 一次 A 整理与双 query 正式结果
+
+代码 `55225cc`，kernel SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`，[正式提交 6abd3263694b590c3c776446](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd3263694b590c3c776446) **CANN编译通过，15/15 Pass，precision_ratio均为1**。
+
+耗时 `[2.32, 3.75, 4.19, 5.66, 5.2, 10.57, 9.6, 69.03, 83.27, 97.45, 87.37, 95.91, 15.07, 12.72, 9.55]` μs，合计511.66 μs。第4点相对原通过版8.08→5.66 μs（1.43×），相对单行Vector首版6.01→5.66。其余kernel未修改，其它点的单次差异不能归因；合计时长不是正式分数，且未经过同设备重复A/B，整体重大突破仍未达成。实际shape/plan/profile未取得，不声称新路由命中。
+
+本分支作为后续结构研究起点，保留 `experiment/manual-splitk-tiny` 与 `experiment/tiny-tt-vector` 对照；不继续Gather或query块大小相近参数提交。下一动作审查手写Cube A/B rectangular LoadData是否能用A2/A3的真实矩形加载API减少逐行指令，此API/设计尚未核实。CPU700实际源码执行、production/TUNING各432host尝试、30量化FP64对照通过，与正式证据分别报告。原始JSON本机Git忽略 `artifacts/tiny-tt-query-block/`。
