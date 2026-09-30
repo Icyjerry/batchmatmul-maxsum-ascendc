@@ -1,8 +1,12 @@
 # 接手状态 · 2026-09-30
 
-## 当前候选：小 TT 整批单 AIV
+## 2026-09-30 · 单 AIV 小 TT 首版正式结果
 
-分支 `experiment/tiny-tt-vector`，kernel SHA `4bef4346c0e746711b41ca936510b05b319ee18f09752b2414d767d1ab453b29`。整批FP32点积/Max(N)/Sum(M)在一个AIV完成，取消该族Cube/GM/Vector交接；700组抽取源码与production/TUNING各432host尝试（360选择）通过，30组量化FP64 oracle最大绝对误差9.54e-7。正式CANN/NPU/性能PENDING。详见 [TINY_TT_VECTOR.md](TINY_TT_VECTOR.md)。下一动作：独立正式模板只替换kernel.asc，dry-run/submit/query；无明显收益恢复 `experiment/manual-splitk-tiny`。整体大幅提升仍未达成。
+代码 `a3c65a4`，kernel SHA `4bef4346c0e746711b41ca936510b05b319ee18f09752b2414d767d1ab453b29`，[正式提交 6abd2f7e694b590c3c75d2b6](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd2f7e694b590c3c75d2b6) **CANN编译通过，15/15 Pass，precision_ratio均为1**。
+
+耗时 `[2.14, 4, 4.32, 6.01, 5.77, 10.62, 10.26, 69.43, 84.84, 98.39, 88.22, 96.78, 15.83, 13.32, 9.1]` μs，合计519.03 μs，对照保留版517.73 μs。第4点8.08→6.01 μs（1.34×），有局部收益，整体仍无明显提升。未取得实际shape/plan/profile及重复A/B，不声称路由命中或稳定加速。其它点的单次变化不能归因于本算法。首版CPU700个实际kernel执行、production/TUNING各432个host尝试和30个量化数值对照通过。
+
+保留该独立分支，不并入main。下一假设：首版每M行单独Gather与归约屏障，改为一次A UB整理、两M行批量点积和归约；这项查询块重排尚未实现/验证，不是再调同一路径tile参数。整体大幅提升未达成。原始JSON本机Git忽略 `artifacts/tiny-tt-vector/`。
 
 ## 当前：恢复较快通过版，配对 M 实验无整体收益
 
