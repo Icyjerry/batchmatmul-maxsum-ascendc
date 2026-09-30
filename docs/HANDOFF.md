@@ -1,5 +1,13 @@
 # 接手状态 · 2026-10-01
 
+## 2026-10-01 · packed-B 读写重叠候选（正式PENDING）
+
+当前分支 `experiment/packed-b-pipeline`，父 `3e9b090`。仅case12已有预处理阶段变为CQ双缓冲：当前块MTE3写出后，先发起下一块MTE2读取，再等当前输出完成并Free；保持全局完成屏障和flag12。
+宏0/1各650个实际源码延迟DMA模型执行通过；逐字packed-B、N/K尾块、唯一writer、buffer保护、空任务与输入早/晚完成顺序检查通过。
+反向剥离改动后与父kernel逐字节一致，host/Cube/归约/flag/资源/其它路径未改。没有新增GM区域。
+正式CANN/NPU精度/性能PENDING；下一动作独立模板dry-run后CLI提交并观察同一ID到终态。
+详情 [PACKED_B_PIPELINE.md](PACKED_B_PIPELINE.md)。没有本次性能结论，整体重大突破仍未达成。
+
 ## 当前：恢复 query-block，通过版未并入新 B 驻留实验
 
 当前分支 `experiment/tiny-tt-query-block`，通过kernel代码 `55225cc` / SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`。

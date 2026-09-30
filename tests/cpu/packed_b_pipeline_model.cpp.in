@@ -1,0 +1,145 @@
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <deque>
+#include <functional>
+#include <iostream>
+#include <memory>
+#include <vector>
+#define __aicore__
+using half=uint16_t;
+struct Schedule {int64_t b,m,n,k;uint32_t baseM,baseN,mTiles,nTiles,nSplit,workers;};
+struct Buffer {
+    std::vector<uint16_t> words;bool used=false,readPending=false,writePending=false;
+    explicit Buffer(size_t n):words(n,0xdead){}
+};
+struct State {
+    unsigned aiv=0,live=0,peak=0,reads=0,writes=0,overlaps=0;
+    std::function<void()> finishWrite;
+    std::vector<unsigned>* owners=nullptr;
+} st;
+bool earlyRead=false;
+namespace AscendC {
+enum class TPosition {VECIN};
+enum class HardEvent {V_MTE2,V_MTE3,MTE3_V};
+template<class T>struct LocalTensor {
+    std::shared_ptr<Buffer> memory;size_t offset=0;
+    T& at(size_t i)const{assert(offset+i<memory->words.size());return reinterpret_cast<T&>(memory->words[offset+i]);}
+    template<class U>LocalTensor<U> ReinterpretCast()const{return {memory,offset};}
+};
+template<class T>struct GlobalTensor {
+    std::vector<T>* memory;size_t offset=0;
+    GlobalTensor operator[](size_t i)const{assert(offset+i<memory->size());return {memory,offset+i};}
+    T& at(size_t i)const{return memory->at(offset+i);}
+};
+template<TPosition P,int N>struct TQue {
+    std::shared_ptr<Buffer> buffers[N];
+    struct Input {LocalTensor<uint16_t> tensor;std::function<void()> finish;};
+    std::deque<Input> ready;std::function<void()> pendingRead;
+    TQue(unsigned bytes){for(auto& p:buffers)p=std::make_shared<Buffer>(bytes/2);}
+    template<class T>LocalTensor<T> AllocTensor(){
+        for(auto& p:buffers)if(!p->used){assert(!p->readPending && !p->writePending);p->used=true;
+            st.peak=std::max(st.peak,++st.live);return {p};}
+        assert(false);return {};
+    }
+    template<class T>void EnQue(LocalTensor<T> data){
+        assert(data.memory->readPending && pendingRead);
+        ready.push_back({{data.memory,data.offset},pendingRead});pendingRead={};
+        if(earlyRead)ready.back().finish();
+    }
+    template<class T>LocalTensor<T> DeQue(){
+        assert(!ready.empty());auto entry=ready.front();ready.pop_front();
+        if(entry.tensor.memory->readPending)entry.finish();
+        assert(!entry.tensor.memory->readPending);return {entry.tensor.memory,entry.tensor.offset};
+    }
+    template<class T>void FreeTensor(LocalTensor<T> data){
+        assert(data.memory->used && !data.memory->readPending && !data.memory->writePending);
+        data.memory->used=false;--st.live;
+    }
+    ~TQue(){assert(ready.empty() && !pendingRead);for(auto& p:buffers)assert(!p->used && !p->readPending && !p->writePending);}
+};
+TQue<TPosition::VECIN,2>* activeQueue=nullptr;
+unsigned GetBlockIdx(){return st.aiv;}
+struct DataCopyExtParams {uint32_t count,length,srcStride,dstStride,reserved;};
+template<class T>struct DataCopyPadExtParams {bool enabled;uint8_t left,right;T value;};
+template<class T>void Duplicate(LocalTensor<T> dst,T value,unsigned count){
+    assert(!dst.memory->readPending && !dst.memory->writePending);
+    for(unsigned i=0;i<count;++i)dst.at(i)=value;
+}
+template<class T>void DataCopyPad(LocalTensor<T> dst,GlobalTensor<T> src,DataCopyExtParams p,DataCopyPadExtParams<T>){
+    assert(dst.memory->used && !dst.memory->readPending && !dst.memory->writePending);
+    assert(!activeQueue->pendingRead);
+    dst.memory->readPending=true;++st.reads;
+    if(st.finishWrite){assert(st.live==2);++st.overlaps;}
+    activeQueue->pendingRead=[=]{
+        assert(!dst.memory->writePending);
+        unsigned cols=p.length/2,inPitch=cols+p.srcStride/2,outPitch=(cols+15)/16*16+p.dstStride*16;
+        for(unsigned r=0;r<p.count;++r)for(unsigned c=0;c<cols;++c)dst.at(r*outPitch+c)=src.at(r*inPitch+c);
+        dst.memory->readPending=false;
+    };
+}
+template<class T>void DataCopy(GlobalTensor<T> dst,LocalTensor<T> src,unsigned count){
+    assert(src.memory->used && !src.memory->readPending && !src.memory->writePending && !st.finishWrite);
+    src.memory->writePending=true;++st.writes;
+    st.finishWrite=[=]{
+        assert(src.memory->used && !src.memory->readPending);
+        for(unsigned i=0;i<count;++i){assert(++st.owners->at(dst.offset+i)==1);dst.at(i)=src.at(i);}
+        src.memory->writePending=false;
+    };
+}
+}
+template<AscendC::HardEvent E>void Fence(){
+    if(E==AscendC::HardEvent::MTE3_V){assert(st.finishWrite);st.finishWrite();st.finishWrite={};}
+}
+// @HELPER@
+template<class T>void Pack(AscendC::TQue<AscendC::TPosition::VECIN,2>& cq,
+    AscendC::GlobalTensor<T> b,AscendC::GlobalTensor<T> packed,const Schedule& s){
+// @PACK@
+}
+unsigned cases=0;
+void Run(Schedule s){
+    s.nTiles=(s.n+s.baseN-1)/s.baseN;
+    const unsigned kPanels=(s.k+s.baseM/2-1)/(s.baseM/2);
+    std::vector<uint16_t> input(s.b*s.k*s.n),output(s.b*s.nTiles*s.k*s.baseN+64,0xdead);
+    for(size_t i=0;i<input.size();++i)input[i]=(i*197+23)%65536;
+    auto before=input;
+    std::vector<unsigned> owners(output.size());
+    unsigned tasks=0,overlaps=0,peak=0;
+    for(unsigned aiv=0;aiv<2*s.workers;++aiv){
+        st=State{};st.aiv=aiv;st.owners=&owners;
+        {AscendC::TQue<AscendC::TPosition::VECIN,2> cq((s.baseM/2)*s.baseN*4);
+        AscendC::activeQueue=&cq;Pack(cq,AscendC::GlobalTensor<uint16_t>{&input},AscendC::GlobalTensor<uint16_t>{&output},s);}
+        assert(!st.finishWrite && st.live==0 && st.reads==st.writes);
+        unsigned expected=aiv<s.b*s.nTiles*kPanels?(s.b*s.nTiles*kPanels-1-aiv)/(2*s.workers)+1:0;
+        assert(st.reads==expected);tasks+=st.writes;overlaps+=st.overlaps;peak=std::max(peak,st.peak);
+#if BMMMS_PACK_B_PIPELINE
+        assert(st.overlaps==(expected?expected-1:0));
+#else
+        assert(st.overlaps==0);
+#endif
+    }
+    assert(input==before && tasks==s.b*s.nTiles*kPanels);
+    for(int64_t b=0;b<s.b;++b)for(unsigned nt=0;nt<s.nTiles;++nt)
+    for(int64_t k=0;k<s.k;++k)for(unsigned n=0;n<s.baseN;++n){
+        size_t at=(b*s.nTiles+nt)*s.k*s.baseN+k*s.baseN+n;
+        assert(owners[at]==1);
+        uint16_t gold=nt*s.baseN+n<s.n?input[b*s.k*s.n+k*s.n+nt*s.baseN+n]:0;
+        assert(output[at]==gold);
+    }
+    for(size_t i=s.b*s.nTiles*s.k*s.baseN;i<output.size();++i)assert(output[i]==0xdead && owners[i]==0);
+#if BMMMS_PACK_B_PIPELINE
+    assert(peak==(s.b*s.nTiles*kPanels>2*s.workers?2u:1u));
+#else
+    assert(peak==1 && overlaps==0);
+#endif
+    ++cases;
+}
+int main(){
+    for(bool early:{false,true}){earlyRead=early;
+    for(unsigned bm:{32u,128u})for(unsigned bn:{32u,128u,256u})
+    for(unsigned k:{40u,136u,1536u})for(int delta:{-1,0,1})for(unsigned b:{1u,2u})for(unsigned workers:{1u,3u,20u})
+        Run({b,1,int64_t(bn)*2+delta,k,bm,bn,0,0,1,workers});
+    Run({1,1,1,8,128,128,0,0,1,20});
+    }
+    std::cout<<"Pack mode "<<BMMMS_PACK_B_PIPELINE<<": "<<cases<<" actual deferred-DMA pack executions: bytes/padding/ownership/guards/queue lifetimes/overlap PASS\n";
+}
