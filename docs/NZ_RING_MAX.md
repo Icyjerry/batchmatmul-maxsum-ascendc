@@ -20,3 +20,7 @@
 首版 `9c7a006` 同时把库 C 类型/tiler 改为 GM NZ，[提交 6abca137694b590c3c249f19](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abca137694b590c3c249f19) 编译通过，但第 8 点新 BF16 TT NZ kernel 在设备 4 上发生 507015 Runtime Error；前 7 点 Pass、后 7 点 Skipped。平台没有给出底层异常地址。原始 query 日志在 `/private/tmp/nz-ring-query.log`，不入 Git。
 
 下一修正版恢复库 C/tiler 为父版 ND，仅输出回调写 NZ，以排除新增的库 NZ 调度/原始奇数 M/N 约束。此为待检验的隔离假设，尚不能宣称它是已定位的错误原因。该修正版正式精度和 latency：PENDING。精确 SoC、实际隐藏 shape/plan、完整 msprof 及重复 A/B：PENDING。
+
+ND 调度修正版 `5de5952`、SHA `9e6717adbcfa291b6899e48ebd79e1b7b8f2768ab1df8ff19f96195ab300d481`，[提交 6abca32b694b590c3c25d63d](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abca32b694b590c3c25d63d) 仍在第 8 点 Runtime Error 507015，前 7 点通过、后 7 点跳过；底层原因未提供。因此恢复 ND 库调度未解决故障。原始 JSON 在 `/private/tmp/bmmms-6abca32b694b590c3c25d63d.json`。
+
+当前实现把 callback baseN 改为模板常量，128/256 两种 host 计划分别实例化，取消 `SetUserDefInfo` 传递标量；其它 baseN 回退旧 ND producer/consumer。此措施去掉未观测的回调运行时信息依赖，不代表已证明用户信息传递有错。[CANN9 Fixpipe 文档](https://www.hiascend.com/doc_center/source/en/CANNCommunityEdition/900/API/ascendcopapi/atlasascendc_api_07_0251.html) 的 NZ srcStride/dstStride 单位已核对，与目前模型一致。当前修正版正式验证 PENDING。

@@ -36,8 +36,8 @@ with tempfile.TemporaryDirectory(prefix='bmmms-nz-ring-') as directory:
     subprocess.run([compiler, '-std=c++14', '-O2', str(cpp), '-o', str(exe)], check=True)
     subprocess.run([str(exe)], check=True)
 
-callback = source[source.index('__aicore__ inline void CompactNZCopyOut('):
-                  source.index('template <typename T, bool TX1, bool TX2, bool NZ = false>')]
+callback = source[source.index('template<uint32_t BASE_N>\n__aicore__ inline void CompactNZCopyOut('):
+                  source.index('template <typename T, bool TX1, bool TX2, bool NZ = false,')]
 callback_model = r'''
 #include <cassert>
 #include <cstdint>
@@ -81,7 +81,9 @@ int main() {
             for(int g=0;g<bn/16;++g) for(int r=0;r<rows;++r) for(int lane=0;lane<16;++lane)
                 cube[g*mp*16+r*16+lane]=p*100000+g*1000+r*16+lane;
             AscendC::DataCopyOutParams cp{uint16_t(rows*2),uint16_t(bn/16),p};
-            CompactNZCopyOut(ring.data(),{reinterpret_cast<int8_t*>(cube.data())},&cp,bn,0);
+            if(bn==64) CompactNZCopyOut<64>(ring.data(),{reinterpret_cast<int8_t*>(cube.data())},&cp,0,0);
+            if(bn==128) CompactNZCopyOut<128>(ring.data(),{reinterpret_cast<int8_t*>(cube.data())},&cp,0,0);
+            if(bn==256) CompactNZCopyOut<256>(ring.data(),{reinterpret_cast<int8_t*>(cube.data())},&cp,0,0);
         }
         for(int p=0;p<tiles;++p) for(int g=0;g<bn/16;++g)
         for(int r=0;r<rows;++r) for(int lane=0;lane<16;++lane)
