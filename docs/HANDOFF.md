@@ -2,7 +2,7 @@
 
 ## 当前：紧凑 NZ ring 与直接 NZ MaxSim
 
-工作分支 `experiment/nz-ring-max` 从较快的手写 Split-K 父版派生。为大 TT、完整 K、现有 dual=1 路径接入 Matmul 输出回调：L0C 以 NZ 写到原 GM ring，AIV 直接按 NZ 做 Max。保留现有窗口/分片/slot 容量和 finalizer。特别注意：库的 `enSequentialWrite=true` 会把所有 tile 写到同一起点，因此回调必须显式按 curN 定位。抽取回调的 90 组单位/窗口检查、1,344 组消费尾块/负值地址模型及父版模型通过。CANN 编译、正式精度/性能 **PENDING**。执行说明见 [NZ_RING_MAX.md](NZ_RING_MAX.md)。下一条动作：官方 CLI 提交当前 kernel 并查询同一 submission，记录 15 点结果；若退化则保留反例并恢复最快父版。
+工作分支 `experiment/nz-ring-max` 从较快的手写 Split-K 父版派生。大 TT 完整 K 的 dual=1 路径接入 Matmul 输出回调：L0C 以 NZ 写到原 GM ring，AIV 直接按 NZ 做 Max，保留窗口/分片/slot 容量和 finalizer。库 `enSequentialWrite=true` 会把所有 tile 写到同一起点，因此回调显式按 curN 定位。抽取回调的 90 组单位/窗口检查、1,344 组尾块/负值地址模型及父版模型通过。首版 `9c7a006`，[正式提交 6abca137694b590c3c249f19](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abca137694b590c3c249f19) **CANN 编译通过，但第 8 点 Runtime Error 507015**；前 7 点通过，后续跳过。日志确认第 8 点命中新 BF16 TT kernel，未给底层异常地址。当前修正版把库 C 类型和 tiler 恢复 ND，只由回调写 NZ，排除库 NZ 调度及原始 M/N 对齐限制；错误原因仍未证实，正式精度/性能 **PENDING**。见 [NZ_RING_MAX.md](NZ_RING_MAX.md)。下一条动作：提交当前修正版，查询同一 submission；日志 `/private/tmp/nz-ring-query.log`。
 
 ## 宽 N 尾块 A 常驻实验：正式通过但退化
 

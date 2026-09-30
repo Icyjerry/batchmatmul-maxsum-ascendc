@@ -5,7 +5,7 @@
 ## 实现与依据
 
 - 只在 B=1、TX1/TX2=true、M/N/K≥512、现有 dual=1 且 kSplit=1 时设置 NZ 标记。其它路线保留父路径。
-- C 类型和 host tiler 使用 GM NZ。Matmul 的自定义 DataCopyOut 回调以 `Fixpipe<float,float,CFG_NZ>` 写入既有环形槽；每个 N tile 的偏移为 `curN*baseN*ceil(rows/16)*16`，dstStride 为 `ceil(rows/16)*16*16*4/32` 个 32B 单位。
+- C 类型和 host tiler 保留 GM ND；自定义 DataCopyOut 回调负责实际输出布局，以 `Fixpipe<float,float,CFG_NZ>` 写入既有环形槽。每个 N tile 的偏移为 `curN*baseN*ceil(rows/16)*16`，dstStride 为 `ceil(rows/16)*16*16*4/32` 个 32B 单位。
 - AIV 从每个 16 列 NZ slab 读取各自负责的行，压紧到 UB；屏蔽无效 N lane 为负无穷，树形 Max 合并 slab，最后做 16 lane 行 Max。后续 partial 和 Sum(M) 复用父版。
 - 不能仅调用 `IterateAll(...,0,true)` 并假设多 tile 自动连续追加。开源 scheduler 明确将顺序写各 tile 送到同一 gm 起点；此实现的回调显式补充 curN 偏移。
 
@@ -17,4 +17,6 @@
 
 `validate_manual_splitk.py` 48 组模型、`validate_direct_batch.py` 1,458 组模型通过。CPU 模型不验证真实 Fixpipe、回调同步、Matmul 内部 L0C 布局或设备性能。
 
-正式 CANN 编译、15 点精度和 latency：PENDING。精确 SoC、实际隐藏 shape/plan、msprof 及重复 A/B：PENDING。正式结果到达后记录到 PERF_LOG，并据此决定保留或回退；未经性能证据不称为更快版。
+首版 `9c7a006` 同时把库 C 类型/tiler 改为 GM NZ，[提交 6abca137694b590c3c249f19](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abca137694b590c3c249f19) 编译通过，但第 8 点新 BF16 TT NZ kernel 在设备 4 上发生 507015 Runtime Error；前 7 点 Pass、后 7 点 Skipped。平台没有给出底层异常地址。原始 query 日志在 `/private/tmp/nz-ring-query.log`，不入 Git。
+
+下一修正版恢复库 C/tiler 为父版 ND，仅输出回调写 NZ，以排除新增的库 NZ 调度/原始奇数 M/N 约束。此为待检验的隔离假设，尚不能宣称它是已定位的错误原因。该修正版正式精度和 latency：PENDING。精确 SoC、实际隐藏 shape/plan、完整 msprof 及重复 A/B：PENDING。
