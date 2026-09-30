@@ -1,5 +1,15 @@
 # 接手状态 · 2026-10-01
 
+## 活动正式任务：手写full-K两半M
+
+代码 `1d2ff79` / kernel SHA `fa88b68c61ec22fdaa050f75df5aaa61aba187854476d5d462d21ac59327c1d1`。
+[正式提交 6abd58a2694b590c3c88d669](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd58a2694b590c3c88d669)，最新权威查询 **Running**。
+独立官方模板dry-run只包含kernel.asc，267521 bytes，SHA一致。未修改模板main/CMake/golden/正式测试。
+下一动作 `python3 /private/tmp/query_bmmms_submission.py 6abd58a2694b590c3c88d669` 查询同一ID至终态；不能因等待超时重提。
+CPU模型与提交信息见 [MANUAL_FULLK_M.md](MANUAL_FULLK_M.md)；CANN9精度与性能仍待终态，整体重大提升未达成。
+
+
+
 ## 当前：手写完整K两半M的结构候选，待正式评测
 
 分支 `experiment/manual-fullk-m`，kernel SHA `fa88b68c61ec22fdaa050f75df5aaa61aba187854476d5d462d21ac59327c1d1`。

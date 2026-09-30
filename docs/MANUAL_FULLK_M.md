@@ -52,3 +52,8 @@ AIV代码体与父manual逐字一致，只采用既有span=1/2布局的实际sch
 独立官方模板只替换kernel.asc，dry-run后提交一次。对同一ID查询到终态，保留kernel SHA、15点precision/time和原始结果的私有本机副本。
 比较第8点与query-block69.03μs；第11点是否可能命中新路径以容量/实测plan为准，不假定。
 没有明显收益则归档这一结构并恢复query-block，不继续相近tile参数提交。整体重大提升尚未达成。
+
+## 正式任务已接受
+
+代码 `1d2ff79`，kernel SHA `fa88b68c61ec22fdaa050f75df5aaa61aba187854476d5d462d21ac59327c1d1`，267521 bytes。
+[提交 6abd58a2694b590c3c88d669](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd58a2694b590c3c88d669) 最新查询Running；同一ID继续查询，不重新发起。正式结果PENDING。
