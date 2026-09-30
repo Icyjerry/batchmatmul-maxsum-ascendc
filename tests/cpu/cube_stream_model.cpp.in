@@ -1,0 +1,147 @@
+// CPU instruction/control mocks. Does not model the CANN scheduler or event timing.
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstdint>
+#include <iostream>
+#include <map>
+#include <tuple>
+#include <vector>
+// INSERT_SHAPES
+constexpr int PIPE_FIX=1,PIPE_V=2;
+struct Context {
+    Schedule s{};bool negative=false;
+    unsigned batch=0,m0=0,n0=0,nt=0,worker=0,sequence=0,sets=0,ends=0;
+    std::vector<float> a,b,ring;
+    std::map<std::tuple<unsigned,unsigned,unsigned>,float> maxima;
+} st;
+float A(unsigned b,unsigned m,unsigned k){return st.negative?float(1+(b+m+3*k)%3):float(int((b+7*m+3*k)%7)-3);}
+float B(unsigned b,unsigned k,unsigned n){return -float(1+(b+5*k+3*n)%3);}
+namespace AscendC {
+template<class T>struct GlobalTensor {
+    std::vector<T>* data;size_t offset=0;
+    GlobalTensor operator[](size_t i)const {assert(offset+i<data->size());return {data,offset+i};}
+    T& at(size_t i)const {assert(offset+i<data->size());return data->at(offset+i);}
+};
+template<class T>struct LocalTensor {
+    std::vector<T>* data;size_t offset=0;
+    LocalTensor operator[](size_t i)const {assert(offset+i<data->size());return {data,offset+i};}
+    T& at(size_t i)const {return data->at(offset+i);}
+};
+struct Queue {
+    std::vector<float> data;bool allocated=false;
+    template<class T>LocalTensor<T> AllocTensor(){assert(!allocated);allocated=true;std::fill(data.begin(),data.end(),1e30f);return {&data,0};}
+    template<class T>void EnQue(LocalTensor<T>){}
+    template<class T>LocalTensor<T> DeQue(){return {&data,0};}
+    template<class T>void FreeTensor(LocalTensor<T>){assert(allocated);allocated=false;}
+};
+struct DataCopyExtParams {uint16_t blocks;uint32_t len,srcStride,dstStride,reserved;};
+template<class T>struct DataCopyPadExtParams {bool enabled;uint8_t left,right;T fill;};
+template<class T>void DataCopyPad(LocalTensor<T> dst,GlobalTensor<T> source,DataCopyExtParams p,DataCopyPadExtParams<T> pad) {
+    assert(!pad.left && p.len%4==0 && p.srcStride%4==0);
+    unsigned count=p.len/4,aligned=(count+7)/8*8;
+    for(unsigned r=0;r<p.blocks;++r) {
+        for(unsigned c=0;c<count;++c)dst.at(r*(aligned+p.dstStride*8)+c)=source.at(r*(count+p.srcStride/4)+c);
+        if(pad.enabled)for(unsigned c=count;c<aligned;++c)dst.at(r*(aligned+p.dstStride*8)+c)=pad.fill;
+    }
+}
+enum class ReduceOrder {ORDER_ONLY_VALUE};
+void WholeReduceMax(LocalTensor<float> dst,LocalTensor<float> x,uint64_t count,unsigned rows,
+    unsigned dstStride,unsigned blockStride,unsigned repeatStride,ReduceOrder) {
+    assert(dstStride==1 && blockStride==1);
+    for(unsigned r=0;r<rows;++r){float v=-INFINITY;for(unsigned c=0;c<count;++c)v=std::max(v,x.at(r*repeatStride*8+c));dst.at(r)=v;}
+}
+struct BinaryRepeatParams {unsigned a,b,c,d,e,f;};
+void Max(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint64_t count,unsigned repeats,BinaryRepeatParams p) {
+    for(unsigned r=0;r<repeats;++r)for(unsigned c=0;c<count;++c)
+        dst.at(r*p.d*8+c)=std::max(a.at(r*p.e*8+c),b.at(r*p.f*8+c));
+}
+template<int P>void PipeBarrier(){}
+void Consume(unsigned slot);
+template<int M>void CrossCoreWaitFlag(unsigned flag){assert(M==2 && flag==2+(st.sequence&1));}
+template<int M,int P>void CrossCoreSetFlag(unsigned slot){assert(M==2 && P==PIPE_FIX && slot==(st.sequence&1));Consume(slot);++st.sequence;}
+}
+struct Engine {
+    AscendC::GlobalTensor<float> a,b;unsigned rows=0,cols=0,position=0;
+    bool active=false,hasTile=false;
+    void SetOrgShape(int64_t m,int64_t n,int64_t k,int64_t kb,unsigned width){assert(m==st.s.m && n==st.s.n && k==st.s.k && kb==k && width==st.s.baseN);}
+    void SetTensorA(AscendC::GlobalTensor<float> x,bool tx){assert(tx && !active);a=x;++st.sets;}
+    void SetTensorB(AscendC::GlobalTensor<float> x,bool tx){assert(tx);b=x;}
+    void SetTail(unsigned r,unsigned c,unsigned k) {
+        assert(k==st.s.k && !active);rows=r;cols=c;position=0;active=true;
+        st.batch=a.offset/(st.s.m*st.s.k);st.m0=a.offset%(st.s.m*st.s.k);
+        assert(b.offset/(st.s.n*st.s.k)==st.batch);
+        st.n0=b.offset%(st.s.n*st.s.k)/st.s.k;
+    }
+    template<bool Sync>bool Iterate(){assert(Sync && active && !hasTile && position<cols);hasTile=true;return true;}
+    template<bool Sync>void GetTensorC(AscendC::GlobalTensor<float> dst,unsigned atomic,bool sequential) {
+        assert(Sync && !atomic && sequential && hasTile);hasTile=false;
+        const unsigned width=std::min(st.s.baseN,cols-position);st.nt=(st.n0+position)/st.s.baseN;
+        assert(dst.offset==st.worker*2*st.s.baseM*st.s.baseN+(st.sequence&1)*st.s.baseM*st.s.baseN);
+        assert(rows*width<=st.s.baseM*st.s.baseN);
+        for(unsigned r=0;r<rows;++r)for(unsigned c=0;c<width;++c) {
+            float dot=0;
+            for(unsigned q=0;q<st.s.k;++q)dot+=a.at(q*st.s.m+r)*b.at((position+c)*st.s.k+q);
+            dst.at(r*width+c)=dot;
+        }
+        position+=width;
+    }
+    void End(){assert(active && !hasTile && position==cols);active=false;++st.ends;}
+};
+namespace AscendC {
+void Consume(unsigned slot) {
+    constexpr bool STREAM=true;
+    const auto& s=st.s;const unsigned nt=st.nt,tiles=1,width=s.baseN,slotSize=s.baseM*s.baseN;
+    GlobalTensor<float> ring{&st.ring,st.worker*2*slotSize};
+    // Independently identify the shard containing this first tile boundary.
+    unsigned shard=0;while(shard+1<s.nSplit && (shard+1)*s.nTiles/s.nSplit<=st.n0/s.baseN)++shard;
+    for(unsigned sub=0;sub<2;++sub) {
+        const unsigned rowStart=sub*s.baseM/2;
+        const unsigned valid=std::min<unsigned>(s.baseM,s.m-st.m0);
+        const unsigned rows=valid<=rowStart?0:std::min(s.baseM/2,valid-rowStart);
+        std::vector<float> mx(s.baseM,-INFINITY),rr(s.baseM,0);
+        LocalTensor<float> maxima{&mx},row{&rr};Queue cq;cq.data.resize(s.baseM/2*s.baseN);
+        for(unsigned r=0;r<rows;++r) {
+            auto key=std::make_tuple(st.batch,st.m0+rowStart+r,shard);
+            if(st.maxima.count(key))mx[r]=st.maxima.at(key);
+        }
+// INSERT_CONSUMER
+        for(unsigned r=0;r<rows;++r)st.maxima[std::make_tuple(st.batch,st.m0+rowStart+r,shard)]=mx[r];
+    }
+}
+}
+void RunWorker(const Schedule& s,unsigned worker) {
+    constexpr bool TX1=true,TX2=true,STREAM=true;
+    AscendC::GlobalTensor<float> a{&st.a},b{&st.b},ring{&st.ring,worker*2*s.baseM*s.baseN};
+    const unsigned slotSize=s.baseM*s.baseN;const int64_t tasks=s.b*s.mTiles*s.nSplit;
+    Engine mm;unsigned sequence=0;st.worker=worker;st.sequence=0;
+// INSERT_PRODUCER
+    assert(st.sequence==sequence && !mm.active);
+}
+int main() {
+    unsigned cases=0;
+    for(unsigned batch: {1U,2U})for(unsigned m: {17U,33U,65U})for(unsigned n: {31U,33U,65U,97U})
+    for(unsigned k: {40U,72U})for(unsigned ns: {1U,2U})for(unsigned workers: {1U,3U})for(bool negative:{false,true}) {
+        st=Context{};st.negative=negative;auto& s=st.s;
+        s.b=batch;s.m=m;s.n=n;s.k=k;s.baseM=s.baseN=32;s.window=1;s.kSplit=1;
+        s.mTiles=(m+31)/32;s.nTiles=(n+31)/32;s.nSplit=std::min(ns,s.nTiles);
+        s.workers=std::min(workers,unsigned(s.b*s.mTiles*s.nSplit));
+        st.a.resize(batch*m*k);st.b.resize(batch*n*k);st.ring.resize(s.workers*2*32*32,1e30f);
+        for(unsigned z=0;z<batch;++z)for(unsigned r=0;r<m;++r)for(unsigned q=0;q<k;++q)st.a[z*m*k+q*m+r]=A(z,r,q);
+        for(unsigned z=0;z<batch;++z)for(unsigned c=0;c<n;++c)for(unsigned q=0;q<k;++q)st.b[z*n*k+c*k+q]=B(z,q,c);
+        for(unsigned w=0;w<s.workers;++w)RunWorker(s,w);
+        assert(st.sets==batch*s.mTiles*s.nSplit && st.ends==st.sets);
+        for(unsigned z=0;z<batch;++z) {
+            float actual=0,golden=0;
+            for(unsigned r=0;r<m;++r) {
+                float got=-INFINITY,expected=-INFINITY;
+                for(unsigned shard=0;shard<s.nSplit;++shard)got=std::max(got,st.maxima.at(std::make_tuple(z,r,shard)));
+                for(unsigned c=0;c<n;++c){float dot=0;for(unsigned q=0;q<k;++q)dot+=A(z,r,q)*B(z,q,c);expected=std::max(expected,dot);}
+                assert(got==expected);actual+=got;golden+=expected;
+            }
+            assert(actual==golden);if(negative)assert(actual<0);
+        }
+        ++cases;
+    }
+    std::cout << "cube stream extracted producer/compact ND consumer/oracle: " << cases << " configurations\n";
+}

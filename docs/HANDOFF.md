@@ -1,5 +1,10 @@
 # 接手状态 · 2026-09-30
 
+## 当前：独立 MDL K 面板流水候选
+
+分支 `experiment/mdl-shard-pipeline`，kernel SHA `9cf72c174b5ef077db5e8c06826df39718fe926d10efc86391f88e6a5359751e`。从较快通过版复用已正式通过的独立 AIC/ND stream 基础，改变输入为 `CFG_MDL`，显式匹配 host MDL tiler并保留新查询的 step/depth/DB，不启用 K reorder。96个host配置（production/TUNING分别）与384个抽取producer/consumer配置通过；CANN9/NPU/正式性能 PENDING。详情 [MDL_SHARD_PIPELINE.md](MDL_SHARD_PIPELINE.md)。下一条动作：正式 CLI dry-run/submit/query，并按实际结果决定保留或回退。整体大幅提升仍未达成。
+
+
 ## 最新：库内建 NZ 流水正式通过，无整体收益
 
 `experiment/builtin-nz-stream` / `fcbf29b`，kernel SHA `895be634247274f702cfbebaba858c8087a309c0554cd44977c178ced77d9225`。[提交 6abcb535694b590c3c317c3e](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcb535694b590c3c317c3e) **CANN编译通过、15/15 Pass**。在独立AIC stream engine上采用库内建 GM NZ C/GetTensorC，无DataCopyOut回调；AIV直接NZ DMA和树形Max。ND/NZ实际producer/consumer抽取各432配置通过，host各96检查通过。第8点相对最快通过版67.80→66.40、第11点88.16→89.04 µs，没有整体收益，不替换较快版本。没有实际shape/plan/kernel/profile，不能声称新路由命中或稳定提速；本次正式任务未出现之前callback的运行错误，不代表callback故障已修复。
