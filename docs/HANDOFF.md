@@ -1,9 +1,10 @@
 # 接手状态 · 2026-09-30
 
-## 当前：两个M块共享B的K面板候选
+## 当前：配对M首版正式通过无收益，补齐64行覆盖
 
-分支 `experiment/paired-m-breuse`，kernel SHA `e3b770b876e90cc2c6796626858467099824a7c1341b4ba40a44d6e9a83cfebb`。新手写producer按K面板LoadB一次、两个不同M块分别MMAD，双L0C完整累加后写原ND ring，复用manual AIV/finalizer；大K TT资源合适时dual28。CPU168个实际producer物理块/尾块/独立数学/事件/复用计数通过；host360代表组合中22选择，production/TUNING均通过。CANN9/NPU/正式性能 PENDING。见 [PAIRED_M_B_REUSE.md](PAIRED_M_B_REUSE.md)。下一条动作：正式CLI dry-run/submit/query，按结果保留或恢复最快父版。整体大幅提升仍未达成。
+分支 `experiment/paired-m-breuse`，首版 `cff0441` / SHA `e3b770b876e90cc2c6796626858467099824a7c1341b4ba40a44d6e9a83cfebb`，[正式提交 6abcc1f7694b590c3c39b751](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcc1f7694b590c3c39b751) **CANN编译通过，15/15 Pass**，合计517.73→525.90 μs，第11点88.16→89.95，无收益。实际shape/plan/profile未取得，无法证明是否命中128行pair。
 
+覆盖修正版保留旧baseM=64或128、每次MMAD行块不变，配成128或256行任务，补齐首版排除的64行TT族。kernel SHA `c6cca6ba9a120336ab4548b7f6898dd6b793291cc0b6adea0ff20d5ad86a00b3`。CPU172个真实producer物理块/独立算术/事件模型通过；host360代表组合中120选择（首版22），production/TUNING均通过。修正版CANN/NPU/性能PENDING，下一条动作是CLI dry-run/submit/query，详见 [PAIRED_M_B_REUSE.md](PAIRED_M_B_REUSE.md)。无收益则恢复最快父版并保留证据，不继续相近参数变体。整体大幅提升仍未达成。
 
 ## 最新：独立 MDL shard 正式通过，无收益
 

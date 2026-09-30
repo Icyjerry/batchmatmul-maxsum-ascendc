@@ -17,8 +17,8 @@ int main() {
     for(int n:{1536,2048,3072})for(int k:{2048,2056,3072})for(int dtype:{1,2}) {
         Shape s{1,m,n,k,dtype,1,1};auto p=MakePlan(s,cores);const auto& d=p.schedule;
         if(d.dual!=28)continue;
-        assert(d.baseM==256 && d.baseN==128 && d.window==1 && d.kSplit==1);
-        assert(d.mTiles==Ceil(m,256) && d.nTiles==Ceil(n,128));
+        assert((d.baseM==128 || d.baseM==256) && d.baseN==128 && d.window==1 && d.kSplit==1);
+        assert(d.mTiles==Ceil(m,d.baseM) && d.nTiles==Ceil(n,128));
         assert(d.workers>0 && d.workers<=cores && d.workers<=d.mTiles*d.nSplit);
         assert(p.cubeBlocks==d.workers && p.systemBytes==Ceil(hw->system,512)*512 && !d.earlySum);
         const auto parts=uint64_t(d.nSplit)*d.mTiles*d.baseM*4;
