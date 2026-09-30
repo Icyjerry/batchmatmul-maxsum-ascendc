@@ -1,5 +1,14 @@
 # 接手状态 · 2026-10-01
 
+## 当前：完整 K A 驻留宽窗口候选，待正式评测
+
+分支 `experiment/fullk-wide-window`，kernel SHA `af0d52b9c2e8f34fd43c5df4577a0d9f8d2adf456b7f57c5cbb642904ab170fc`。
+新增固定双UB的N块消费者，支持原GM宽window1..8；Cube producer、其它manual分支、partial/finalizer与原任务/tiler/workspace保持不变。
+CPU420 producer、9216消费者延迟DMA/双AIV credit/释放后覆写模型通过；production/TUNING各1400 host配置（1000选择，父候选16），未修改公开真实8.3 tiler同样各1400/1000通过。tiny700回归通过。
+独立官方模板dry-run仅kernel.asc，270486 bytes、SHA一致；CANN9编译/NPU精度/性能PENDING，没有活动正式任务。
+下一动作：CLI对该独立模板一次提交，记录ID并查询同一任务至终态。无收益归档，不继续相近参数；整体重大提升未达成。
+详见 [FULLK_WIDE_WINDOW.md](FULLK_WIDE_WINDOW.md)。
+
 ## 最新：手写 full-K 两半 M 正式通过，宽窗口覆盖存在缺口
 
 分支 `experiment/manual-fullk-m`；代码 `1d2ff79`，kernel SHA `fa88b68c61ec22fdaa050f75df5aaa61aba187854476d5d462d21ac59327c1d1`。

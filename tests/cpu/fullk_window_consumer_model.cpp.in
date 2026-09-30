@@ -1,0 +1,122 @@
+// Extracted wide-window consumer; delayed DMA and destructive ring reuse.
+// CPU vector semantics only, not CANN/hardware timing or instruction precision.
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <deque>
+#include <functional>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <vector>
+#define __aicore__
+constexpr int PIPE_MTE2=1,PIPE_V=2;
+struct Schedule {int64_t b,m,n,k;uint32_t baseM,baseN,window;};
+struct Model {
+ Schedule s;uint32_t slot,slotSize,nt,tiles,rows,sub=0,copies=0;
+ int waits[2]={},releases[2]={};unsigned completed=0;
+ std::vector<float>* ring;
+ std::deque<std::function<void()>> dma;
+ void Flush(){while(!dma.empty()){auto f=dma.front();dma.pop_front();f();++completed;}}
+} st;
+namespace AscendC {
+enum class TPosition{VECIN};enum class ReduceOrder{ORDER_ONLY_VALUE};
+struct Storage {std::vector<float> data;bool pending=false;explicit Storage(size_t n):data(n,1e30f){}};
+template<class T>struct LocalTensor {
+ std::shared_ptr<Storage> mem;size_t offset=0;
+ LocalTensor operator[](size_t i)const{assert(offset+i<mem->data.size());return {mem,offset+i};}
+ float& At(size_t i)const{assert(offset+i<mem->data.size());return mem->data.at(offset+i);}
+};
+template<class T>struct GlobalTensor {
+ std::vector<T>* data;size_t offset=0;
+ GlobalTensor operator[](size_t i)const{assert(offset+i<data->size());return {data,offset+i};}
+ T At(size_t i)const{assert(offset+i<data->size());return data->at(offset+i);}
+};
+template<TPosition P,int N>struct TQue {
+ std::shared_ptr<Storage> mem[N];bool used[N]={};std::deque<int> fifo;
+ explicit TQue(size_t n){for(auto& m:mem)m=std::make_shared<Storage>(n);}
+ template<class T>LocalTensor<T> AllocTensor(){for(int i=0;i<N;++i)if(!used[i]){used[i]=true;return {mem[i],0};}assert(false);return {};}
+ template<class T>void EnQue(LocalTensor<T> t){for(int i=0;i<N;++i)if(mem[i]==t.mem){assert(used[i]);fifo.push_back(i);return;}assert(false);}
+ template<class T>LocalTensor<T> DeQue(){assert(!fifo.empty());int i=fifo.front();fifo.pop_front();st.Flush();return {mem[i],0};}
+ template<class T>void FreeTensor(LocalTensor<T> t){for(int i=0;i<N;++i)if(mem[i]==t.mem){assert(used[i]&&!mem[i]->pending);used[i]=false;return;}assert(false);}
+ ~TQue(){assert(fifo.empty());for(bool u:used)assert(!u);}
+};
+struct DataCopyExtParams{uint16_t blockCount;uint32_t blockLen,srcStride,dstStride,rsv;};
+template<class T>struct DataCopyPadExtParams{bool pad;uint32_t left,right;T value;};
+void DataCopyPad(LocalTensor<float> dst,GlobalTensor<float> src,DataCopyExtParams p,DataCopyPadExtParams<float> pad){
+ assert(!pad.pad&&!dst.mem->pending);assert(p.blockCount==st.rows);
+ const uint32_t cols=p.blockLen/4,BN=st.s.baseN,width=BN*st.s.window;
+ assert(p.blockLen%4==0&&cols>0&&cols<=BN&&p.srcStride==(width-cols)*4&&p.dstStride==(BN-cols)/8);
+ const size_t expected=st.slot*st.slotSize+st.sub*(st.s.baseM/2)*width+st.copies*BN;
+ assert(src.offset==expected);++st.copies;dst.mem->pending=true;
+ const auto slot=st.slot;
+ st.dma.push_back([=]{
+  assert(st.releases[0]!=1||st.releases[1]!=1); // no GM copy after destructive reuse
+  for(uint32_t r=0;r<p.blockCount;++r)for(uint32_t j=0;j<cols;++j)dst.At(r*BN+j)=src.At(r*width+j);
+  dst.mem->pending=false;
+ });
+}
+template<int Mode>void CrossCoreWaitFlag(uint32_t slot){assert(Mode==2&&slot==st.slot&&st.waits[st.sub]++==0);}
+template<int Mode,int P>void CrossCoreSetFlag(uint32_t flag){
+ assert(Mode==2&&P==PIPE_MTE2&&flag==4+st.slot&&st.releases[st.sub]==0);
+ assert(st.copies==(st.rows?st.tiles:0)); // slot credit requires ALL valid N-tile reads
+ st.Flush();++st.releases[st.sub];
+ if(st.releases[0]&&st.releases[1]) {
+  auto a=st.ring->begin()+st.slot*st.slotSize;
+  std::fill(a,a+st.slotSize,1e30f); // producer may immediately overwrite released ring
+ }
+}
+template<int P>void PipeBarrier(){assert(P==PIPE_V);}
+void WholeReduceMax(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,uint32_t reps,
+ uint32_t ds,uint32_t bs,uint32_t rs,ReduceOrder){
+ assert(mask>=1&&mask<=64&&reps==st.rows&&ds==1&&bs==1&&rs==st.s.baseN/8&&!src.mem->pending);
+ for(uint32_t r=0;r<reps;++r){float v=-std::numeric_limits<float>::infinity();
+  for(uint32_t j=0;j<mask;++j)v=std::max(v,src.At(r*rs*8+j));dst.At(r)=v;}
+}
+void Max(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint32_t n){
+ assert(!a.mem->pending&&!b.mem->pending);for(uint32_t i=0;i<n;++i)dst.At(i)=std::max(a.At(i),b.At(i));
+}
+}
+// INSERT_CONSUMER
+
+float Value(int m,int n,bool neg){return neg?-float(1+(m*7+n*13)%59):float((m*11+n*17)%67)-33;}
+void Run(uint32_t BM,uint32_t BN,uint32_t W,uint32_t m,uint32_t n,uint32_t begin,uint32_t end,bool neg){
+ Schedule s{1,m,n,32,BM,BN,W};uint32_t slotSize=BM*BN*W;
+ std::vector<float> ring(2*slotSize+16,1e30f);
+ AscendC::TQue<AscendC::TPosition::VECIN,2> q[2]={
+  AscendC::TQue<AscendC::TPosition::VECIN,2>(BM/2*BN),AscendC::TQue<AscendC::TPosition::VECIN,2>(BM/2*BN)};
+ AscendC::LocalTensor<float> maxima[2],row[2];
+ for(int sub=0;sub<2;++sub){maxima[sub]={std::make_shared<AscendC::Storage>(BM),0};row[sub]={std::make_shared<AscendC::Storage>(4*BM),0};
+  std::fill(maxima[sub].mem->data.begin(),maxima[sub].mem->data.end(),-std::numeric_limits<float>::infinity());}
+ uint32_t seq=0;
+ for(uint32_t nt=begin;nt<end;nt+=W,++seq){
+  st=Model{};st.s=s;st.slot=seq&1;st.slotSize=slotSize;st.nt=nt;st.tiles=std::min(W,end-nt);st.ring=&ring;
+  for(uint32_t r=0;r<m;++r)for(uint32_t c=0;c<st.tiles*BN&&nt*BN+c<n;++c)
+   ring[st.slot*slotSize+r*BN*W+c]=Value(r,nt*BN+c,neg);
+  // Both AIVs must finish their final GM DMA before slot reuse. Exercise both orders.
+  for(int turn=0;turn<2;++turn){uint32_t sub=turn^(seq&1);st.sub=sub;st.copies=0;
+   st.rows=m>sub*BM/2?std::min(BM/2,m-sub*BM/2):0;
+   ManualFullMConsumeWindow(q[sub],{&ring},s,slotSize,sub*BM/2,st.rows,nt,st.tiles,seq,maxima[sub],row[sub]);
+   assert(st.waits[sub]==1&&st.releases[sub]==1&&st.dma.empty());
+   for(uint32_t r=0;r<st.rows;++r){float gold=-std::numeric_limits<float>::infinity();
+    for(uint32_t c=begin*BN;c<std::min(n,(nt+st.tiles)*BN);++c)gold=std::max(gold,Value(sub*BM/2+r,c,neg));
+    assert(maxima[sub].At(r)==gold);if(neg)assert(gold<0);}
+  }
+  assert(st.releases[0]==1&&st.releases[1]==1);
+ }
+ float sum=0,gold=0;
+ for(uint32_t r=0;r<m;++r){float mx=-std::numeric_limits<float>::infinity();
+  for(uint32_t c=begin*BN;c<std::min(n,end*BN);++c)mx=std::max(mx,Value(r,c,neg));
+  sum+=maxima[r/(BM/2)].At(r%(BM/2));gold+=mx;}
+ assert(sum==gold);
+ for(size_t i=2*slotSize;i<ring.size();++i)assert(ring[i]==1e30f);
+}
+int main(){unsigned cases=0;
+ for(uint32_t bm:{64u,128u})for(uint32_t bn:{32u,64u,128u,256u})for(uint32_t w:{1u,2u,3u,4u,5u,6u,7u,8u})
+ for(uint32_t m:{1u,17u,bm/2,bm/2+1,bm-1,bm})for(uint32_t tail:{1u,7u,8u,9u,bn-1,bn})for(bool neg:{false,true}){
+  const uint32_t tiles=2*w+1,n=(tiles-1)*bn+tail;
+  Run(bm,bn,w,m,n,0,tiles,neg);++cases;
+  Run(bm,bn,w,m,n,1,tiles-1,neg);++cases; // shard begins inside N, padded last slot
+ }
+ std::cout<<cases<<" extracted wide-window consumer cases: fixed UB, delayed DMA, two-AIV credit, destructive GM reuse, tails/negative/sequence wrap/full-N Max then Sum PASS\n";
+}
