@@ -1,0 +1,243 @@
+// Executes extracted producer with physical NZ/ZZ/ZN blocks. Not a CANN emulator.
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <deque>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <vector>
+#include <tuple>
+#include <limits>
+#define __aicore__
+using event_t=int;
+constexpr int PIPE_MTE2=1,PIPE_M=2,PIPE_FIX=3,PIPE_V=4;
+struct Schedule {
+    int64_t b,m,n,k;
+    uint32_t baseM,baseN,mTiles,nTiles,nSplit,workers,panelK,panelGroup;
+    uint32_t panelResident=0,panelL1K=0;
+};
+struct Expected {int64_t b,m,n;uint32_t rows,cols,ns;size_t offset;};
+struct Frame {Expected e;std::vector<float> values;};
+struct State {
+    Schedule s;bool tx1,tx2,vectorMode=false;size_t cursor=0;unsigned vectorInit=0;
+    std::vector<Frame> frames;
+    std::vector<unsigned>* writers=nullptr;
+    uint64_t aReads=0,bReads=0,aL0=0,bL0=0,mmads=0,aCopies=0,bCopies=0,aLoads=0,bLoads=0;
+    int lastCWait=-1;
+    std::map<std::tuple<int64_t,int64_t,uint32_t>,float> maxima;
+    std::map<std::pair<int,int>,int> events;
+    int cross[2]={1,1};
+    std::vector<Expected> expected;size_t fixes=0;
+} st;
+bool negativeInput=false;
+int16_t A(int64_t b,int64_t m,int64_t k){return negativeInput?1+(b*13+m*7+k*3)%3:int((b*13+m*7+k*3)%7)-3;}
+int16_t B(int64_t b,int64_t k,int64_t n){return -int16_t(1+(b*11+k*5+n*3)%3);}
+namespace AscendC {
+enum class TPosition {A1,B1,A2,B2,CO1,VECIN,VECCALC};
+enum class HardEvent {M_MTE1,MTE1_M,FIX_M,M_FIX,MTE2_MTE1,MTE1_MTE2,V_MTE3,MTE3_V};
+struct Storage {std::vector<uint8_t> bytes;TPosition pos;Storage(size_t n,TPosition p):bytes(n,0x77),pos(p){}};
+template<class T>struct LocalTensor {
+    std::shared_ptr<Storage> mem;size_t offset=0;
+    LocalTensor operator[](size_t i)const{assert(offset+i*sizeof(T)<mem->bytes.size());return {mem,offset+i*sizeof(T)};}
+    T& at(size_t i)const{assert(offset+(i+1)*sizeof(T)<=mem->bytes.size());return *reinterpret_cast<T*>(&mem->bytes[offset+i*sizeof(T)]);}
+    template<class U>LocalTensor<U> ReinterpretCast()const{return {mem,offset};}
+};
+template<class T>struct GlobalTensor {
+    std::vector<T>* data;size_t offset=0;bool isA=false;
+    GlobalTensor operator[](size_t i)const{assert(offset+i<data->size());return {data,offset+i,isA};}
+    T& at(size_t i)const{assert(offset+i<data->size());return data->at(offset+i);}
+};
+template<TPosition P,int N>struct TQue {
+    std::shared_ptr<Storage> mem[N];bool used[N]={};std::deque<int> fifo;
+    template<class T>LocalTensor<T> AllocTensor(){for(int i=0;i<N;++i)if(!used[i]){used[i]=true;return {mem[i],0};}assert(false);return {};}
+    template<class T>void EnQue(LocalTensor<T> t){for(int i=0;i<N;++i)if(mem[i]==t.mem){assert(used[i]);fifo.push_back(i);return;}assert(false);}
+    template<class T>LocalTensor<T> DeQue(){assert(!fifo.empty());int i=fifo.front();fifo.pop_front();return {mem[i],0};}
+    template<class T>void FreeTensor(LocalTensor<T> t){for(int i=0;i<N;++i)if(mem[i]==t.mem){assert(used[i]);used[i]=false;return;}assert(false);}
+    ~TQue(){assert(fifo.empty());for(bool u:used)assert(!u);}
+};
+template<TPosition P>struct TBuf{std::shared_ptr<Storage> mem;template<class T>LocalTensor<T> Get(){return {mem,0};}};
+struct TPipe {
+    int next[9]={3,0,0,0,0,0,0,0,0};uint64_t l1=0,l0a=0,l0b=0,l0c=0;
+    void Count(TPosition p,uint64_t n){
+        if(p==TPosition::A1||p==TPosition::B1){l1+=n;assert(l1<=512*1024);}
+        if(p==TPosition::A2){l0a+=n;assert(l0a<=65536);}
+        if(p==TPosition::B2){l0b+=n;assert(l0b<=65536);}
+        if(p==TPosition::CO1){l0c+=n;assert(l0c<=131072);}
+    }
+    template<TPosition P,int N>void InitBuffer(TQue<P,N>& q,int depth,uint32_t n){assert(depth==N);Count(P,depth*n);for(auto& m:q.mem)m=std::make_shared<Storage>(n,P);}
+    template<TPosition P>void InitBuffer(TBuf<P>& b,uint32_t n){Count(P,n);b.mem=std::make_shared<Storage>(n,P);}
+    template<HardEvent E>int AllocEventID(){int i=next[int(E)]++;assert(i<8);return i;}
+    template<HardEvent E>void ReleaseEventID(int i){assert(st.events[std::make_pair(int(E),i)]==0);}
+};
+template<HardEvent E>void SetFlag(int i){assert(st.events[std::make_pair(int(E),i)]++==0);}
+template<HardEvent E>void WaitFlag(int i){
+    assert(st.events[std::make_pair(int(E),i)]--==1);
+    if(E==HardEvent::FIX_M)st.lastCWait=i;
+}
+template<int P>void PipeBarrier(){}
+template<int Mode>void CrossCoreWaitFlag(int id){assert(Mode==2);if(st.vectorMode){assert(st.cursor<st.frames.size() && id==int(st.cursor%2));}else {assert(id>=4 && id<6);assert(st.cross[id-4]--==1);}}
+template<int Mode,int P>void CrossCoreSetFlag(int id){assert(Mode==2);if(st.vectorMode){assert(P==PIPE_MTE2 && id>=4 && id<6);if(st.vectorInit<2){assert(id==int(4+st.vectorInit));++st.vectorInit;}else{assert(st.cursor<st.frames.size() && id==int(4+st.cursor%2));++st.cursor;}}else{assert(P==PIPE_FIX && id<2);assert(st.cross[id]++==0);}}
+struct Nd2NzParams {uint32_t ndNum,nValue,dValue,srcDValue,dstNzC0Stride,dstNzNStride;};
+template<class T>struct InitConstValueParams {uint16_t repeats,blocks,gap;T value;};
+template<class T>void InitConstValue(LocalTensor<T> dst,InitConstValueParams<T> p){
+    for(uint32_t r=0;r<p.repeats;++r)for(uint32_t j=0;j<p.blocks*16;++j)
+        dst.at(r*(p.blocks+p.gap)*16+j)=p.value;
+}
+template<class T>void DataCopy(LocalTensor<T> dst,GlobalTensor<T> src,Nd2NzParams p){
+    assert(p.ndNum==1 && p.dstNzNStride==1 && p.dstNzC0Stride%16==0);
+    for(uint32_t r=0;r<p.nValue;++r)for(uint32_t c=0;c<(p.dValue+15)/16*16;++c){
+        dst.at((c/16)*p.dstNzC0Stride*16+r*16+c%16)=c<p.dValue?src.at(r*p.srcDValue+c):0;
+    }
+    (src.isA?st.aReads:st.bReads)+=p.nValue*p.dValue;
+    ++(src.isA?st.aCopies:st.bCopies);
+}
+struct LoadData2DParams {uint32_t repeatTimes=1,srcStride=1,dstGap=0;bool ifTranspose=false;};
+template<class T>void LoadData(LocalTensor<T> dst,LocalTensor<T> src,LoadData2DParams p){
+    assert(p.repeatTimes>0 && p.repeatTimes<=255 && dst.offset%512==0 && src.offset%512==0);
+    for(uint32_t r=0;r<p.repeatTimes;++r)for(uint32_t i=0;i<16;++i)for(uint32_t j=0;j<16;++j)
+        dst.at(r*(p.dstGap+1)*256+i*16+j)=src.at(r*p.srcStride*256+(p.ifTranspose?j*16+i:i*16+j));
+    (dst.mem->pos==TPosition::A2?st.aL0:st.bL0)+=p.repeatTimes*256;
+    ++(dst.mem->pos==TPosition::A2?st.aLoads:st.bLoads);
+}
+struct MmadParams {uint32_t m,n,k;bool cmatrixInitVal;};
+template<class T>void Mmad(LocalTensor<float> c,LocalTensor<T> a,LocalTensor<T> b,MmadParams p){
+    assert(p.m%16==0 && p.n%16==0 && p.k%16==0);++st.mmads;
+    const int slot=c.offset/((st.s.baseM)*st.s.baseN*sizeof(float));
+    assert(st.events[std::make_pair(int(HardEvent::FIX_M),slot)]==0);
+    if(p.cmatrixInitVal) {
+        assert(st.lastCWait==slot);st.lastCWait=-1;
+        // First C can start while the second tile's FIX_M credit is still pending.
+        if(slot==0)assert(st.events[std::make_pair(int(HardEvent::FIX_M),1)]==1);
+    }
+    for(uint32_t m=0;m<p.m;++m)for(uint32_t n=0;n<p.n;++n){
+        const size_t ci=(n/16)*p.m*16+m*16+n%16;
+        float v=p.cmatrixInitVal?0:c.at(ci);
+        for(uint32_t k=0;k<p.k;++k){
+            auto ai=((m/16)*(p.k/16)+k/16)*256+(m%16)*16+k%16;
+            auto bi=((k/16)*(p.n/16)+n/16)*256+(n%16)*16+k%16;
+            v+=float(a.at(ai))*float(b.at(bi));
+        }
+        c.at(ci)=v;
+    }
+}
+struct FixpipeParamsV220 {uint32_t nSize,mSize,srcStride,dstStride;};
+void Fixpipe(GlobalTensor<float> dst,LocalTensor<float> src,FixpipeParamsV220 p){
+    assert(st.fixes<st.expected.size());const auto e=st.expected[st.fixes++];
+    assert(p.srcStride==p.mSize && p.dstStride==st.s.baseN);
+    assert(dst.offset==e.offset);
+    Frame frame{e,std::vector<float>(st.s.baseM*st.s.baseN,1e30f)};
+    for(uint32_t m=0;m<p.mSize;++m)for(uint32_t n=0;n<p.nSize;++n){
+        float v=src.at((n/16)*p.srcStride*16+m*16+n%16),gold=0;
+        if(m<e.rows && n<e.cols)for(uint32_t k=0;k<st.s.k;++k)gold+=float(A(e.b,e.m+m,k))*float(B(e.b,k,e.n+n));
+        assert(v==gold); // checks every output C element, including padded rows/cols
+        dst.at(m*p.dstStride+n)=v;frame.values[m*p.dstStride+n]=v;
+        if(m<e.rows && n<e.cols) {
+            auto key=std::make_tuple(e.b,e.m+m,e.ns);
+            auto it=st.maxima.find(key);
+            if(it==st.maxima.end())st.maxima[key]=v;else it->second=std::max(it->second,v);
+        }
+    }
+    st.frames.push_back(frame);
+}
+enum class ReduceOrder {ORDER_ONLY_VALUE};
+struct DataCopyExtParams {uint32_t blocks,blockLen,srcStride,dstStride,reserved;};
+template<class T>struct DataCopyPadExtParams {bool enabled;uint8_t left,right;T value;};
+template<class T>void Duplicate(LocalTensor<T> dst,T value,uint32_t count){for(unsigned i=0;i<count;++i)dst.at(i)=value;}
+void DataCopyPad(LocalTensor<float> dst,GlobalTensor<float> src,DataCopyExtParams p,DataCopyPadExtParams<float> pad){
+    assert(st.cursor<st.frames.size());auto& f=st.frames[st.cursor];
+    assert(src.offset>=f.e.offset);
+    unsigned origin=src.offset-f.e.offset;
+    unsigned cols=p.blockLen/4,pitch=cols+p.srcStride/4;
+    unsigned outPitch=(cols+7)/8*8+p.dstStride*8;
+    assert(pitch==st.s.baseN && outPitch==st.s.baseN);
+    assert(p.blocks<=st.s.baseM/2 && cols==f.e.cols);
+    for(unsigned r=0;r<p.blocks;++r)for(unsigned c=0;c<(cols+7)/8*8;++c)
+        dst.at(r*outPitch+c)=c<cols?f.values.at(origin+r*pitch+c):pad.value;
+}
+void WholeReduceMax(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,
+    unsigned repeat,unsigned dstStride,unsigned srcBlockStride,unsigned srcRepeatStride,ReduceOrder){
+    assert(mask>0 && mask<=64 && srcBlockStride==1);
+    for(unsigned r=0;r<repeat;++r){float value=-std::numeric_limits<float>::infinity();
+        for(unsigned c=0;c<mask;++c)value=std::max(value,src.at(r*srcRepeatStride*8+c));
+        dst.at(r*dstStride)=value;
+    }
+}
+void Max(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,unsigned count){
+    for(unsigned i=0;i<count;++i)dst.at(i)=std::max(a.at(i),b.at(i));
+}
+void DataCopy(GlobalTensor<float> dst,LocalTensor<float> src,unsigned count){
+    for(unsigned i=0;i<count;++i){assert(++st.writers->at(dst.offset+i)==1);dst.at(i)=src.at(i);}
+}
+}
+template<AscendC::HardEvent E>void Fence(){}
+// INSERT_HELPERS
+// INSERT_VECTOR
+unsigned runs=0;
+void Run(Schedule s,bool neg){
+    negativeInput=neg;s.mTiles=(s.m+s.baseM-1)/s.baseM;s.nTiles=(s.n+s.baseN-1)/s.baseN;
+    assert(s.workers%s.nSplit==0);unsigned groups=s.workers/s.nSplit;
+    assert(groups<=s.mTiles && s.nSplit<=s.nTiles);
+    std::vector<int16_t> a(s.b*s.m*s.k),b(s.b*s.n*s.k);
+    for(int64_t z=0;z<s.b;++z)for(int64_t m=0;m<s.m;++m)for(int64_t k=0;k<s.k;++k)a[z*s.m*s.k+k*s.m+m]=A(z,m,k);
+    for(int64_t z=0;z<s.b;++z)for(int64_t n=0;n<s.n;++n)for(int64_t k=0;k<s.k;++k)b[z*s.n*s.k+n*s.k+k]=B(z,k,n);
+    auto beforeA=a,beforeB=b;
+    unsigned count=s.b*s.nSplit*s.mTiles*s.baseM;
+    std::vector<float> partials(count+32,1e30f);std::vector<unsigned> writers(count+32);
+    uint64_t readsA=0,readsB=0,copiesB=0;
+    for(unsigned worker=0;worker<s.workers;++worker){
+        st=State{};st.s=s;st.tx1=st.tx2=true;st.writers=&writers;
+        unsigned ns=worker%s.nSplit,mg=worker/s.nSplit,sequence=0;
+        for(int64_t z=0;z<s.b;++z)for(unsigned nt=ns*s.nTiles/s.nSplit;nt<(ns+1)*s.nTiles/s.nSplit;++nt)
+        for(unsigned mt=mg;mt<s.mTiles;mt+=groups,++sequence)
+            st.expected.push_back({z,int64_t(mt)*s.baseM,int64_t(nt)*s.baseN,
+                unsigned(std::min<int64_t>(s.baseM,s.m-int64_t(mt)*s.baseM)),
+                unsigned(std::min<int64_t>(s.baseN,s.n-int64_t(nt)*s.baseN)),ns,
+                size_t((sequence&1)*s.baseM*s.baseN)});
+        std::vector<float> ring(2*s.baseM*s.baseN,1e30f);
+        {AscendC::TPipe pipe;RunColumnBCube<int16_t>(pipe,{&a,0,true},{&b,0,false},{&ring},s,worker);}
+        assert(st.fixes==st.expected.size() && !st.cross[0] && !st.cross[1]);
+        for(auto e:st.events)assert(e.second==0);
+        readsA+=st.aReads;readsB+=st.bReads;copiesB+=st.bCopies;
+        for(unsigned sub=0;sub<2;++sub){
+            st.vectorMode=true;st.cursor=0;st.vectorInit=0;
+            AscendC::TPipe pipe;RunVector(pipe,{&ring},{&partials},s,worker,sub);
+            assert(st.cursor==st.frames.size());
+        }
+    }
+    assert(readsA==uint64_t(s.b*s.m*s.k)*s.nTiles);
+    assert(readsB==uint64_t(s.b*s.n*s.k)*groups);
+    assert(copiesB==uint64_t(s.b*s.nTiles)*groups);
+    assert(a==beforeA && b==beforeB);
+    for(unsigned i=0;i<count;++i)assert(writers[i]==1);
+    for(unsigned i=count;i<count+32;++i)assert(writers[i]==0 && partials[i]==1e30f);
+    for(int64_t z=0;z<s.b;++z){float got=0,gold=0;
+        for(int64_t m=0;m<s.m;++m){float merged=-std::numeric_limits<float>::infinity(),expected=merged;
+            for(unsigned ns=0;ns<s.nSplit;++ns){
+                float reference=-std::numeric_limits<float>::infinity();
+                for(int64_t n=int64_t(ns*s.nTiles/s.nSplit)*s.baseN;
+                    n<std::min<int64_t>(s.n,int64_t((ns+1)*s.nTiles/s.nSplit)*s.baseN);++n){
+                    float value=0;for(int64_t k=0;k<s.k;++k)value+=float(A(z,m,k))*float(B(z,k,n));
+                    reference=std::max(reference,value);
+                }
+                float actual=partials[(z*s.nSplit+ns)*s.mTiles*s.baseM+m];
+                assert(actual==reference);merged=std::max(merged,actual);expected=std::max(expected,reference);
+            }
+            assert(merged==expected);if(neg)assert(merged<0);got+=merged;gold+=expected;
+        }
+        assert(got==gold);
+    }
+    ++runs;
+}
+int main(){
+    for(unsigned m:{65u,96u,129u})for(unsigned n:{33u,65u,97u})for(unsigned k:{40u,128u,136u,264u})
+    for(unsigned ns:{1u,2u})for(unsigned mg:{1u,2u})for(bool neg:{false,true})
+        Run({2,m,n,k,32,32,0,0,ns,ns*mg,128,0},neg);
+    for(auto s:std::vector<Schedule>{{1,129,129,136,128,128,0,0,1,2,128,0},
+        {1,257,129,1032,128,128,0,0,2,4,128,0},
+        {1,257,257,1536,128,128,0,0,2,4,128,0},
+        {1,513,65,1544,128,128,0,0,1,3,128,0}})
+        for(bool neg:{false,true})Run(s,neg);
+    std::cout<<runs<<" actual producer and two consumers: C/layout/tails/events/B copies/partial ownership/K-before-Max PASS\n";
+}

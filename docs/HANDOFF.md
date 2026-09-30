@@ -1,5 +1,13 @@
 # 接手状态 · 2026-10-01
 
+## 2026-10-01 · 完整 K 的 B 驻留候选（设备PENDING）
+
+当前分支 `experiment/resident-b-column`，父 `18a93f3`。新增dual29，完整B N块驻留L1，按N外M内复用；AIV保存多个M块的UB行最大值，沿用partial/ring/FinalizeRows，不新增输入GM预处理。
+CPU296真实producer+两名consumer执行通过，production/TUNING各480host配置（各384选择）通过，含尾块、负值、K非16对齐、容量/pins回退。
+这是以完整B驻留替换A缓存取向的结构候选，可能增加A重读；不能据B读取次数声称总流量下降或加速。
+CANN/NPU/正式15点/性能PENDING。下一动作独立正式模板dry-run后CLI提交并观察同一ID到终态；若无收益恢复父版，不继续相近分组参数提交。
+来源、资源预算和对照见 [COLUMN_B_RESIDENCE.md](COLUMN_B_RESIDENCE.md)。整体重大提升仍未达成。
+
 ## 当前工作起点：恢复 query-block 通过版
 
 当前分支 `experiment/tiny-tt-query-block`，kernel仍为代码 `55225cc` / SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`，正式15/15通过，第4点5.66μs。
