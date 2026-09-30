@@ -42,3 +42,8 @@ kernel SHA `af0d52b9c2e8f34fd43c5df4577a0d9f8d2adf456b7f57c5cbb642904ab170fc`，
 独立官方模板dry-run仅kernel.asc，SHA一致；未修改main/CMake/golden/正式测试/依赖。
 这次解决已证实的宽窗口覆盖缺口，完成源码模型后提交一次，以正式CANN编译/15点精度/latency判断其实际效果；不得把1000/16选择比当作速度提升或正式覆盖率。
 若无明显收益归档，恢复query-block，不继续同一架构近邻tile参数试交。整体重大提升仍未达成。
+
+## 正式任务已接受
+
+代码 `9cfb159` / SHA `af0d52b9c2e8f34fd43c5df4577a0d9f8d2adf456b7f57c5cbb642904ab170fc`。
+[提交 6abd5fdd694b590c3c8b955d](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd5fdd694b590c3c8b955d) 最新查询 **Running**，继续同一ID至终态，不能重提。正式结果PENDING。

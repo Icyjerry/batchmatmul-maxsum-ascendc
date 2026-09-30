@@ -1,5 +1,13 @@
 # 接手状态 · 2026-10-01
 
+## 活动正式任务：宽窗口完整 K A 驻留
+
+代码 `9cfb159`，kernel SHA `af0d52b9c2e8f34fd43c5df4577a0d9f8d2adf456b7f57c5cbb642904ab170fc`。
+[提交 6abd5fdd694b590c3c8b955d](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd5fdd694b590c3c8b955d) 最新权威查询 **Running**。
+下一动作 `python3 /private/tmp/query_bmmms_submission.py 6abd5fdd694b590c3c8b955d` 查询同一ID至终态；不因观察超时重提。
+没有正式CANN/精度/性能结果，不将CPU选中1000配置声称提速或隐藏case命中。整体重大提升未达成。
+详见 [FULLK_WIDE_WINDOW.md](FULLK_WIDE_WINDOW.md)。
+
 ## 当前：完整 K A 驻留宽窗口候选，待正式评测
 
 分支 `experiment/fullk-wide-window`，kernel SHA `af0d52b9c2e8f34fd43c5df4577a0d9f8d2adf456b7f57c5cbb642904ab170fc`。
