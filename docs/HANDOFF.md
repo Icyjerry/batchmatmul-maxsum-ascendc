@@ -1,21 +1,17 @@
 # 接手状态 · 2026-10-01
 
-## 活动正式任务：宽窗口完整 K A 驻留
+## 最新：宽窗口完整 K 正式通过，无大幅收益；父缓存审查改变方向
 
-代码 `9cfb159`，kernel SHA `af0d52b9c2e8f34fd43c5df4577a0d9f8d2adf456b7f57c5cbb642904ab170fc`。
-[提交 6abd5fdd694b590c3c8b955d](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd5fdd694b590c3c8b955d) 最新权威查询 **Running**。
-下一动作 `python3 /private/tmp/query_bmmms_submission.py 6abd5fdd694b590c3c8b955d` 查询同一ID至终态；不因观察超时重提。
-没有正式CANN/精度/性能结果，不将CPU选中1000配置声称提速或隐藏case命中。整体重大提升未达成。
-详见 [FULLK_WIDE_WINDOW.md](FULLK_WIDE_WINDOW.md)。
+分支 `experiment/fullk-wide-window`；代码 `9cfb159` / kernel SHA `af0d52b9c2e8f34fd43c5df4577a0d9f8d2adf456b7f57c5cbb642904ab170fc`。
+[提交 6abd5fdd694b590c3c8b955d](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd5fdd694b590c3c8b955d) **Pass，CANN编译成功、15/15，precision_ratio全1**。
+第8点69.03→67.44μs，单次约2.3%不足以证明稳定/大幅收益。其它点不归因；无actual shape/plan/SoC/profile。没有活动正式任务。
+CPU420 producer、9216消费者，以及fake/public真实8.3 tiler production/TUNING各1400 host配置（1000选择）通过。
+详见 [FULLK_WIDE_WINDOW.md](FULLK_WIDE_WINDOW.md)，原始结果本机Git忽略 `artifacts/fullk-wide-window/`。
 
-## 当前：完整 K A 驻留宽窗口候选，待正式评测
-
-分支 `experiment/fullk-wide-window`，kernel SHA `af0d52b9c2e8f34fd43c5df4577a0d9f8d2adf456b7f57c5cbb642904ab170fc`。
-新增固定双UB的N块消费者，支持原GM宽window1..8；Cube producer、其它manual分支、partial/finalizer与原任务/tiler/workspace保持不变。
-CPU420 producer、9216消费者延迟DMA/双AIV credit/释放后覆写模型通过；production/TUNING各1400 host配置（1000选择，父候选16），未修改公开真实8.3 tiler同样各1400/1000通过。tiny700回归通过。
-独立官方模板dry-run仅kernel.asc，270486 bytes、SHA一致；CANN9编译/NPU精度/性能PENDING，没有活动正式任务。
-下一动作：CLI对该独立模板一次提交，记录ID并查询同一任务至终态。无收益归档，不继续相近参数；整体重大提升未达成。
-详见 [FULLK_WIDE_WINDOW.md](FULLK_WIDE_WINDOW.md)。
+**新增诊断**：公开真实tiler1000个dual1计划均有完整K A缓存，824每shard只有一个window；抽取真实Cache Hit/Free/Reset等方法的2024窗口模型证明同窗后续N tile命中已有K面板。父库并非每N tile重复读取A，该优化对多数合成计划没有理论读取量优势。
+这是公开8.3源码证据，不是安装CANN9/profile；见 [NORM_FULLK_CACHE_AUDIT.md](NORM_FULLK_CACHE_AUDIT.md)。
+下一动作：归档本分支、恢复query-block通过kernel；研究A2/A3 L1→L0 TT的加载指令与MMAD发起开销，先核实实际API和物理布局。不能重试只Atlas350支持的LoadData2DV2或已否定Load3D/full-A/window参数结构。
+整体重大提升尚未达成。
 
 ## 最新：手写 full-K 两半 M 正式通过，宽窗口覆盖存在缺口
 

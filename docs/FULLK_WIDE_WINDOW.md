@@ -43,7 +43,14 @@ kernel SHA `af0d52b9c2e8f34fd43c5df4577a0d9f8d2adf456b7f57c5cbb642904ab170fc`，
 这次解决已证实的宽窗口覆盖缺口，完成源码模型后提交一次，以正式CANN编译/15点精度/latency判断其实际效果；不得把1000/16选择比当作速度提升或正式覆盖率。
 若无明显收益归档，恢复query-block，不继续同一架构近邻tile参数试交。整体重大提升仍未达成。
 
-## 正式任务已接受
+## 正式结果：通过，未取得大幅收益
 
-代码 `9cfb159` / SHA `af0d52b9c2e8f34fd43c5df4577a0d9f8d2adf456b7f57c5cbb642904ab170fc`。
-[提交 6abd5fdd694b590c3c8b955d](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd5fdd694b590c3c8b955d) 最新查询 **Running**，继续同一ID至终态，不能重提。正式结果PENDING。
+代码 `9cfb159` / kernel SHA `af0d52b9c2e8f34fd43c5df4577a0d9f8d2adf456b7f57c5cbb642904ab170fc`。
+[提交 6abd5fdd694b590c3c8b955d](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd5fdd694b590c3c8b955d) **Pass，CANN编译成功、15/15，precision_ratio全1**。
+耗时 `[2.19,4.06,4.32,5.60,5.22,10.44,10.11,67.44,84.25,97.75,87.94,96.56,15.80,13.19,9.00]` μs。
+第8点query-block69.03→67.44 μs（单次约2.3%差异），没有证实稳定/大幅收益；其它路径单次变化不归因。没有actual shape/plan/SoC/profile和重复A/B，不宣称新路由命中。
+没有活动正式任务。原始JSON本机Git忽略 `artifacts/fullk-wide-window/`，目录700/文件600。
+
+后续源码审查确认公开父Norm具有窗口内完整K A缓存。真实tiler1000 dual1计划中824每shard只有一个window，手写跨shard A驻留对它们没有理论读取量优势；实际cache方法2024生命周期模型通过。
+详情 [NORM_FULLK_CACHE_AUDIT.md](NORM_FULLK_CACHE_AUDIT.md)，仅公开8.3源码，不冒充安装CANN9或NPU流量证据。
+本架构归档，恢复query-block，不继续full-K驻留/window/tile近邻参数试交。整体重大提升仍未达成。

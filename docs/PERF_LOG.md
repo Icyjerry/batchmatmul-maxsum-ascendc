@@ -1,5 +1,14 @@
 # 2026-09-30 · 配对 M / B 面板复用首版
 
+## 2026-10-01 · 完整 K 宽窗口正式通过，父 Norm 缓存复核
+
+- 代码 `9cfb159` / SHA `af0d52b9c2e8f34fd43c5df4577a0d9f8d2adf456b7f57c5cbb642904ab170fc`；正式ID `6abd5fdd694b590c3c8b955d` Pass，15/15、precision_ratio全1，CANN编译成功。
+- 耗时 `[2.19,4.06,4.32,5.60,5.22,10.44,10.11,67.44,84.25,97.75,87.94,96.56,15.80,13.19,9.00]` μs；第8点69.03→67.44，单次约2.3%差异不足以证明稳定大幅收益；未改路径不归因，无actual shape/plan/profile或重复A/B。
+- 420 producer、9216双AIV延迟DMA/释放后覆写消费者模型通过，fake/public真实8.3 tiler各production/TUNING1400配置/1000选择，旧候选16选择；数字不代表正式命中或速度。
+- 新诊断：公开父Norm1000 dual1计划均具完整K A缓存，824每shard只一window。抽取Cache实际方法2024生命周期/21512首次K-panel读取后，后续N命中，Reset释放；该优化对多数合成计划没有理论A输入读取量优势。
+- 本候选归档恢复query-block，不继续全K A/window近邻试交。下一研究L1→L0 TT搬运与MMAD指令。资料 `FULLK_WIDE_WINDOW.md`、`NORM_FULLK_CACHE_AUDIT.md`。整体重大提升未达成。
+
+
 ## 2026-10-01 · 手写 full-K 两半 M 正式通过与覆盖审查
 
 - 代码 `1d2ff79`，SHA `fa88b68c61ec22fdaa050f75df5aaa61aba187854476d5d462d21ac59327c1d1`；正式ID `6abd58a2694b590c3c88d669` Pass，15/15、precision_ratio全1，CANN编译成功。
