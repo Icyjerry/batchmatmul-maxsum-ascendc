@@ -1,5 +1,15 @@
 # 接手状态 · 2026-10-01
 
+## 当前：完整 K 的 M 方向预载候选待正式验证
+
+分支 `experiment/fullk-m-preload`，kernel SHA `0c37471e6b6b703bda9735fef64dd47523def338c2f338d6000d6f17d80bbdec`。
+库基本M减半、基本N覆盖整个既有窗口，完整K A双缓冲提前读取下一M块；现有GM ring、任务、AIV与finalizer字节保持一致（仅Matmul配置选择改变）。
+公开真实tiler与抽取host：production1775/TUNING1779配置、各128选择；2304实际公开preload谓词/尾块/延迟转移执行通过。700 tiny源码回归通过。
+详见 [FULLK_M_PRELOAD.md](FULLK_M_PRELOAD.md)；这些是公开8.3 CPU源码证据，安装CANN9编译/NPU性能精度PENDING。
+下一动作：独立官方模板dry-run、正式CLI一次并记录ID，查询同一ID至终态。没有收益则归档此架构、恢复query-block。整体重大提升仍未达成。
+
+
+
 ## 当前：恢复 query-block，通过版未并入 packed-B 流水
 
 当前分支 `experiment/tiny-tt-query-block`，通过kernel代码 `55225cc` / SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`。

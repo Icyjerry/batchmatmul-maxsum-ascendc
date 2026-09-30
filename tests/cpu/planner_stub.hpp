@@ -10,7 +10,9 @@
 #include <vector>
 inline int64_t Ceil(int64_t n,int64_t d){assert(d>0);return (n+d-1)/d;}
 namespace AscendC { namespace tiling {
-struct TCubeTiling {uint32_t baseM=0,baseN=0,baseK=0,stepM=0,stepN=0,usedCoreNum=0;};
+struct TCubeTiling {uint32_t baseM=0,baseN=0,baseK=0,stepM=0,stepN=0,usedCoreNum=0;
+    int32_t stepKa=1,stepKb=1,depthA1=2,depthB1=2,dbL0A=2,dbL0B=2,dbL0C=2,iterateOrder=0;
+    int32_t shareL1Size=0,shareL0CSize=0;};
 }}
 namespace platform_ascendc {
 enum class CoreMemType {UB,L1,L0_A,L0_B,L0_C};
@@ -26,16 +28,17 @@ struct PlatformAscendCManager {
 namespace matmul_tiling {
 enum class TPosition {GM,VECIN};enum class CubeFormat{ND,NZ};enum class DataType{DT_FLOAT16,DT_BF16,DT_FLOAT};
 struct MatmulApiTiling {
-    uint32_t m=0,n=0; static bool rejectFirst;
+    uint32_t m=0,n=0,k=32; static bool rejectFirst;
     explicit MatmulApiTiling(platform_ascendc::PlatformAscendCManager&){}
     void SetAType(TPosition,CubeFormat,DataType,bool){} void SetBType(TPosition,CubeFormat,DataType,bool){}
     void SetCType(TPosition,CubeFormat,DataType){} void SetBias(bool){}
     void SetOrgShape(int64_t,int64_t,int64_t){} void SetShape(int64_t,int64_t,int64_t){}
+    void SetMatmulConfigParams(int){}
     void SetBufferSpace(uint64_t,uint64_t,uint64_t){}
-    int SetFixSplit(int bm,int bn,int){m=bm;n=bn;return 0;}
+    int SetFixSplit(int bm,int bn,int bk){m=bm;n=bn;k=bk>0?bk:32;return 0;}
     int GetTiling(AscendC::tiling::TCubeTiling& t){
         if(rejectFirst){rejectFirst=false;return -1;}
-        t.baseM=m;t.baseN=n;t.baseK=32;return 0;
+        t.baseM=m;t.baseN=n;t.baseK=k;t.shareL0CSize=2*m*n*4;return 0;
     }
 };
 bool MatmulApiTiling::rejectFirst=false;
