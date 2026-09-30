@@ -1,5 +1,10 @@
 # 接手状态 · 2026-09-30
 
+## 当前：两个M块共享B的K面板候选
+
+分支 `experiment/paired-m-breuse`，kernel SHA `e3b770b876e90cc2c6796626858467099824a7c1341b4ba40a44d6e9a83cfebb`。新手写producer按K面板LoadB一次、两个不同M块分别MMAD，双L0C完整累加后写原ND ring，复用manual AIV/finalizer；大K TT资源合适时dual28。CPU168个实际producer物理块/尾块/独立数学/事件/复用计数通过；host360代表组合中22选择，production/TUNING均通过。CANN9/NPU/正式性能 PENDING。见 [PAIRED_M_B_REUSE.md](PAIRED_M_B_REUSE.md)。下一条动作：正式CLI dry-run/submit/query，按结果保留或恢复最快父版。整体大幅提升仍未达成。
+
+
 ## 最新：独立 MDL shard 正式通过，无收益
 
 `experiment/mdl-shard-pipeline` / `df0e049`，kernel SHA `9cf72c174b5ef077db5e8c06826df39718fe926d10efc86391f88e6a5359751e`，[正式提交 6abcbaf3694b590c3c353072](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcbaf3694b590c3c353072) **CANN编译通过、15/15 Pass**。独立MatmulImpl从Norm改MDL，host显式匹配并保留K面板分组step/depth/DB；96个host和384个抽取producer/consumer配置通过。第8点67.80→70.86、第11点88.16→89.29 µs，合计517.73→527.49，无收益，不替换最快保留版。详情 [MDL_SHARD_PIPELINE.md](MDL_SHARD_PIPELINE.md)，原始JSON在Git忽略 `artifacts/mdl-shard-pipeline/`。实际shape/plan/profile未取得，不声称路由命中或确切瓶颈。
