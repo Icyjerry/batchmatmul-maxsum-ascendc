@@ -30,7 +30,8 @@ case12 B仍由既有ND2NZ搬入，不增加GM预处理或新的workspace。
 - `python3 tools/validate_rectangular_load.py`：抽取六个真实调用块和真实helper，宏0/1分别执行2888个布局检查；独立dense值oracle逐元素验证NZ→ZZ/ZN，包含非正方形、padding负值、K=8192常驻切片和边界写保护。输入保持不变。
 - 同步CPU指令替身不证明硬件Load3D语义、事件流水或性能；int16小整数仅检验布局，不模拟FP16/BF16舍入。
 - `python3 tools/validate_tiny_tt_vector.py`：700实际源码执行、production/TUNING各432host尝试（各360选择）、30量化FP64对照通过。该路径未修改。
-- CANN编译、正式15点精度/latency：提交前PENDING。
+- [正式提交 6abd38b5694b590c3c7aac99](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd38b5694b590c3c7aac99)：CANN编译通过，15/15精度通过，各precision_ratio=1；总时长512.56μs，父版511.66μs，第6点不变、第12点95.91→97.74，没有明显收益。未取得实际shape/plan/profile和同机重复对照，不证明六个加载点全部命中。
+- 代码 `c4d591b`，SHA `8bf5cf4568efe55df1793a30cef649a4ec29e2849027e29e0aeb93ca0e7ad0ac`；保留失败性能对照，后续恢复父通过版本。整体重大突破未达成。
 
 ## Validation Request
 

@@ -1,13 +1,15 @@
 # 接手状态 · 2026-10-01
 
-## 2026-10-01 · 手写 Cube 矩形加载候选（尚未正式验证）
+## 2026-10-01 · 矩形 Load3D 正式通过，无明显收益
 
-当前分支 `experiment/rectangular-load3d`，从最新15/15通过的query-block版本 `909294b` 派生。
-六个非转置A/B加载点改用typed Load3Dv2完整矩形加载，保留原Load2D宏0对照；没有新GM通路、host调度或缓冲/事件修改。
-API依据、代码范围与对照见 [RECTANGULAR_LOAD3D.md](RECTANGULAR_LOAD3D.md)。
-CPU宏0/1各2888真实加载块布局/边界/尾块/常驻K切片检查通过；未改tiny TT路径700执行与30量化数值检查通过。
-CANN/NPU精度/性能PENDING；下一条动作是独立正式模板dry-run后CLI提交一次候选，并观察该提交直至终态。
-没有本次性能结论，整体重大提升仍未达成。
+代码 `c4d591b`，kernel SHA `8bf5cf4568efe55df1793a30cef649a4ec29e2849027e29e0aeb93ca0e7ad0ac`，[正式提交 6abd38b5694b590c3c7aac99](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd38b5694b590c3c7aac99) **CANN编译通过，15/15 Pass，precision_ratio均为1**。
+
+逐点耗时 `[2.14, 4.11, 4.35, 5.67, 5.27, 10.57, 9.61, 68.95, 83.02, 97.13, 86.78, 97.74, 15.1, 13.02, 9.1]` μs，合计512.56 μs，父版511.66 μs。
+第6点10.57→10.57，第12点95.91→97.74，未见明确收益；其余单次差异不能归因，没有实际shape/plan/profile或重复A/B。
+六个非转置A/B调用点使用typed Load3Dv2，CPU宏0/1各2888真实块布局检查通过。
+这次正式结果证明当前kernel通过15点，不证明所有加载分支命中或全部支持范围已完成设备覆盖。
+保留分支 `experiment/rectangular-load3d` 为反例；后续恢复 `experiment/tiny-tt-query-block` / `909294b` 通过kernel，不继续此加载结构的相近参数提交。
+原始JSON本机Git忽略 `artifacts/rectangular-load3d/`；详见 [RECTANGULAR_LOAD3D.md](RECTANGULAR_LOAD3D.md)。整体重大突破仍未达成。
 
 ## 2026-09-30 · 一次 A 整理与双 query 正式结果
 
