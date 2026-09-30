@@ -1,0 +1,145 @@
+// Execute the extracted producer in a synchronous, bounds-checked CPU model.
+// This is not an Ascend instruction, asynchronous event, or performance model.
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <iostream>
+#include <memory>
+#include <map>
+#include <random>
+#include <vector>
+#define __schedmode__(x)
+#define __global__
+#define __vector__
+#define __gm__
+using GM_ADDR = void*;
+constexpr int PIPE_V=0;
+namespace AscendC {
+uint32_t block=0;
+size_t lastBytes=0;
+std::map<uintptr_t,int> writes;
+uint32_t GetBlockIdx(){return block;}
+enum class TPosition {VECIN,VECOUT,VECCALC};
+enum class RoundMode {CAST_NONE};
+enum class ReduceOrder {ORDER_ONLY_VALUE};
+template<typename T> struct LocalTensor {
+    std::shared_ptr<std::vector<uint8_t>> mem;
+    size_t offset=0;
+    T read(size_t i) const {T v;assert(offset+(i+1)*sizeof(T)<=mem->size());
+        std::memcpy(&v,mem->data()+offset+i*sizeof(T),sizeof(T));return v;}
+    void write(size_t i,T v) const {assert(offset+(i+1)*sizeof(T)<=mem->size());
+        std::memcpy(mem->data()+offset+i*sizeof(T),&v,sizeof(T));}
+    LocalTensor operator[](size_t i) const {assert(offset+i*sizeof(T)<mem->size());return {mem,offset+i*sizeof(T)};}
+    template<typename U> LocalTensor<U> ReinterpretCast() const {return {mem,offset};}
+};
+template<typename T> struct GlobalTensor {
+    T* ptr=nullptr;size_t count=0;
+    void SetGlobalBuffer(T* p,size_t n){ptr=p;count=n;}
+    GlobalTensor operator[](size_t i) const {assert(i<count);return {ptr+i,count-i};}
+    T read(size_t i) const {assert(i<count);return ptr[i];}
+    void write(size_t i,T v) const {assert(i<count);ptr[i]=v;++writes[reinterpret_cast<uintptr_t>(ptr+i)];}
+};
+template<TPosition P> struct TBuf {
+    std::shared_ptr<std::vector<uint8_t>> mem;
+    template<typename T> LocalTensor<T> Get(){assert(mem->size()%sizeof(T)==0);return {mem,0};}
+};
+template<TPosition P,int D> struct TQue: TBuf<P> {
+    int state=0;
+    template<typename T> LocalTensor<T> AllocTensor(){assert(state==0);state=1;return this->template Get<T>();}
+    template<typename T> void EnQue(LocalTensor<T>){assert(state==1);state=2;}
+    template<typename T> LocalTensor<T> DeQue(){assert(state==2);state=3;return this->template Get<T>();}
+    template<typename T> void FreeTensor(LocalTensor<T>){assert(state==3);state=0;}
+};
+struct TPipe {
+    size_t bytes=0;
+    ~TPipe(){lastBytes=bytes;}
+    template<typename B> void InitBuffer(B& b,size_t n){assert(n>0 && n%32==0);
+        b.mem=std::make_shared<std::vector<uint8_t>>(n,0x7f);bytes+=n;}
+    template<typename B> void InitBuffer(B& b,int depth,size_t n){assert(depth==1);InitBuffer(b,n);}
+};
+template<int P> void PipeBarrier(){}
+struct DataCopyExtParams {uint16_t blockCount;uint32_t blockLen,srcStride,dstStride,rsv;};
+template<typename T> struct DataCopyPadExtParams {bool pad;uint8_t left,right;T value;};
+template<typename T> void DataCopyPad(LocalTensor<T> dst,GlobalTensor<T> src,
+    DataCopyExtParams p,DataCopyPadExtParams<T> pad){
+    assert(p.blockLen%sizeof(T)==0 && p.srcStride%sizeof(T)==0 && pad.left==0);
+    const size_t valid=p.blockLen/sizeof(T),stride=(p.blockLen+31)/32*32/sizeof(T)+p.dstStride*32/sizeof(T);
+    for(unsigned r=0;r<p.blockCount;++r){
+        for(size_t i=0;i<valid;++i)dst.write(r*stride+i,src.read(r*(valid+p.srcStride/sizeof(T))+i));
+        for(size_t i=0;i<pad.right;++i)dst.write(r*stride+valid+i,pad.value);
+    }
+}
+template<typename T> void DataCopyPad(GlobalTensor<T> dst,LocalTensor<T> src,DataCopyExtParams p){
+    assert(p.blockCount==1 && p.srcStride==0 && p.dstStride==0 && p.blockLen%sizeof(T)==0);
+    for(size_t i=0;i<p.blockLen/sizeof(T);++i)dst.write(i,src.read(i));
+}
+template<typename T> void CreateVecIndex(LocalTensor<T> dst,T start,uint32_t count){for(unsigned i=0;i<count;++i)dst.write(i,start+i);}
+template<typename T> void Mins(LocalTensor<T> dst,LocalTensor<T> src,T v,uint32_t n){for(unsigned i=0;i<n;++i)dst.write(i,std::min(src.read(i),v));}
+template<typename T> void Muls(LocalTensor<T> dst,LocalTensor<T> src,T v,uint32_t n){for(unsigned i=0;i<n;++i)dst.write(i,src.read(i)*v);}
+template<typename T> void Adds(LocalTensor<T> dst,LocalTensor<T> src,T v,uint32_t n){for(unsigned i=0;i<n;++i)dst.write(i,src.read(i)+v);}
+template<typename T> void Duplicate(LocalTensor<T> dst,T v,uint32_t n){for(unsigned i=0;i<n;++i)dst.write(i,v);}
+template<typename T> void Cast(LocalTensor<float> dst,LocalTensor<T> src,RoundMode,uint32_t n){for(unsigned i=0;i<n;++i)dst.write(i,float(src.read(i)));}
+void Gather(LocalTensor<float> dst,LocalTensor<float> src,LocalTensor<uint32_t> idx,uint32_t base,uint32_t n){
+    assert(dst.offset%32==0 && src.offset%32==0 && idx.offset%32==0);
+    for(unsigned i=0;i<n;++i){unsigned bytes=base+idx.read(i);assert(bytes%4==0);dst.write(i,src.read(bytes/4));}
+}
+struct BinaryRepeatParams {uint8_t dstBlk,src0Blk,src1Blk,dstRep,src0Rep,src1Rep;};
+void Mul(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint64_t mask,uint32_t reps,BinaryRepeatParams p){
+    assert(mask>0 && mask<=64 && reps<=255 && dst.offset%32==0 && a.offset%32==0 && b.offset%32==0);
+    assert(p.dstBlk==1 && p.src0Blk==1 && p.src1Blk==1);
+    for(unsigned r=0;r<reps;++r)for(unsigned i=0;i<mask;++i)
+        dst.write(r*p.dstRep*8+i,a.read(r*p.src0Rep*8+i)*b.read(r*p.src1Rep*8+i));
+}
+void Add(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint32_t n){
+    assert(dst.offset%32==0 && a.offset%32==0 && b.offset%32==0);
+    for(unsigned i=0;i<n;++i)dst.write(i,a.read(i)+b.read(i));
+}
+float tree_sum(std::vector<float> v){
+    size_t power=1;while(power<v.size())power*=2;v.resize(power,0);
+    for(size_t n=power;n>1;n/=2)for(size_t i=0;i<n/2;++i)v[i]=v[2*i]+v[2*i+1];
+    return v[0];
+}
+void WholeReduceSum(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,int reps,int ds,int bs,int rs){
+    assert(src.offset%32==0 && dst.offset%4==0 && mask>0 && mask<=64 && reps<=255 && bs==1);
+    for(int r=0;r<reps;++r){std::vector<float> values;
+        for(unsigned i=0;i<mask;++i)values.push_back(src.read(r*rs*8+i));
+        dst.write(r*ds,tree_sum(values));}
+}
+void WholeReduceMax(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,int reps,int ds,int bs,int rs,ReduceOrder){
+    assert(src.offset%32==0 && dst.offset%8==0 && mask>0 && mask<=64 && reps<=255 && bs==1);
+    for(int r=0;r<reps;++r){float best=-INFINITY;
+        for(unsigned i=0;i<mask;++i)best=std::max(best,src.read(r*rs*8+i));dst.write(r*ds,best);}
+}
+}
+// @SHAPES@
+// @KERNEL@
+int main(){
+    uint32_t cases=0;std::mt19937 rng(81723);
+    for(int m:{1,8,11,15,16})for(int n:{1,16,23,31,32})
+    for(int k:{128,136,184,192,200,248,256})for(bool negative:{false,true})for(int workers:{1,3}){
+        Schedule s{};s.b=3;s.m=m;s.n=n;s.k=k;s.workers=workers;
+        std::vector<int16_t> a(s.b*m*k),b(s.b*n*k);
+        for(auto& v:a)v=negative?1+rng()%3:int(rng()%7)-3;
+        for(auto& v:b)v=negative?-1-int(rng()%3):int(rng()%7)-3;
+        const auto oldA=a,oldB=b;std::vector<float> out(s.b+2,1234567.0f),expected(s.b);
+        AscendC::writes.clear();
+        for(int bi=0;bi<s.b;++bi){double sum=0;
+            for(int row=0;row<m;++row){double best=-INFINITY;
+                for(int col=0;col<n;++col){double dot=0;
+                    for(int kk=0;kk<k;++kk)dot+=double(a[bi*m*k+kk*m+row])*b[bi*n*k+col*k+kk];
+                    best=std::max(best,dot);}sum+=best;}
+            expected[bi]=float(sum);}
+        const size_t ac=(m*k+15)/16*16,kp=(k+15)/16*16;
+        const size_t budget=6*ac+6*n*kp+12*kp+((k+63)/64)*n*256+
+            ((n+7)/8)*32+((2*m+7)/8)*32+32;
+        for(unsigned w=0;w<s.workers;++w){AscendC::block=w;bmmms_tiny_tt_vector<int16_t>(a.data(),b.data(),out.data()+1,s);
+            assert(AscendC::lastBytes==budget && budget+4096<=192*1024);}
+        for(int bi=0;bi<s.b;++bi){assert(out[bi+1]==expected[bi]);
+            assert(AscendC::writes.at(reinterpret_cast<uintptr_t>(&out[bi+1]))==1);}
+        assert(AscendC::writes.size()==size_t(s.b));
+        assert(out.front()==1234567.0f && out.back()==1234567.0f && a==oldA && b==oldB);++cases;
+    }
+    std::cout<<"Extracted tiny TT kernel: "<<cases<<" bounds/alignment/negative/tail/ownership executions PASS\n";
+}

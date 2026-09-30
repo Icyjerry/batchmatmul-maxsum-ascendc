@@ -1,5 +1,9 @@
 # 接手状态 · 2026-09-30
 
+## 当前候选：小 TT 整批单 AIV
+
+分支 `experiment/tiny-tt-vector`，kernel SHA `4bef4346c0e746711b41ca936510b05b319ee18f09752b2414d767d1ab453b29`。整批FP32点积/Max(N)/Sum(M)在一个AIV完成，取消该族Cube/GM/Vector交接；700组抽取源码与production/TUNING各432host尝试（360选择）通过，30组量化FP64 oracle最大绝对误差9.54e-7。正式CANN/NPU/性能PENDING。详见 [TINY_TT_VECTOR.md](TINY_TT_VECTOR.md)。下一动作：独立正式模板只替换kernel.asc，dry-run/submit/query；无明显收益恢复 `experiment/manual-splitk-tiny`。整体大幅提升仍未达成。
+
 ## 当前：恢复较快通过版，配对 M 实验无整体收益
 
 代码 `d4b9044`，kernel SHA `c6cca6ba9a120336ab4548b7f6898dd6b793291cc0b6adea0ff20d5ad86a00b3`，[正式提交 6abcc39a694b590c3c3ada93](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcc39a694b590c3c3ada93) **CANN编译通过，15/15 Pass，precision_ratio均为1**。
