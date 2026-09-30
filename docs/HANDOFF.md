@@ -1,5 +1,35 @@
 # 接手状态 · 2026-10-01
 
+## 当前工作状态：恢复query-block通过kernel
+
+当前分支 `experiment/tiny-tt-query-block`，kernel代码 `55225cc` / SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`，未改变。
+本次仅同步库内完整K M预载的源码反例与研究文档。完整候选、真实公开tiler/host及外K模型保留 `experiment/fullk-m-preload` / `863c6ae`。
+该候选因模型同步反例停止提交，没有活动正式任务。下一动作是下面描述的手写A预取协议研究；整体重大提升尚未达成。
+
+
+
+## 最新：完整K库内M预载被外K同步审查否定，未提交
+
+分支 `experiment/fullk-m-preload` 的候选 `1b278c9` / SHA `0c37471e6b6b703bda9735fef64dd47523def338c2f338d6000d6f17d80bbdec` 已归档，**不得直接提交或并入通过版**。
+新增完整实际ReduceKMultiIter模型：16个A完整K/B非完整K配置复现一次Async、两次Await，补上此前只检查预载谓词的模型缺口。
+这是固定公开8.3源码与标准队列元数据模型反例，不是安装CANN9缺陷的设备证明。未发起正式提交；没有活动评测ID。
+资源模型和host128选择不能证明整个库同步正确，详见 [FULLK_M_PRELOAD.md](FULLK_M_PRELOAD.md)。
+
+下一动作：恢复query-block通过kernel，独立研究手写完整K A ping/pong和下一M预取；明确B K面板释放以及下一M只等待一次，复用现有manual AIV/GM ring。
+先核对现有manual与归档paired-M源，不能复制公开库上述partial-B等待顺序；没有新GM通路许可。该手写方案未实现、未验证，整体重大提升仍未达成。
+
+
+
+## 当前：完整 K 的 M 方向预载候选待正式验证
+
+分支 `experiment/fullk-m-preload`，kernel SHA `0c37471e6b6b703bda9735fef64dd47523def338c2f338d6000d6f17d80bbdec`。
+库基本M减半、基本N覆盖整个既有窗口，完整K A双缓冲提前读取下一M块；现有GM ring、任务、AIV与finalizer字节保持一致（仅Matmul配置选择改变）。
+公开真实tiler与抽取host：production1775/TUNING1779配置、各128选择；2304实际公开preload谓词/尾块/延迟转移执行通过。700 tiny源码回归通过。
+详见 [FULLK_M_PRELOAD.md](FULLK_M_PRELOAD.md)；这些是公开8.3 CPU源码证据，安装CANN9编译/NPU性能精度PENDING。
+下一动作：独立官方模板dry-run、正式CLI一次并记录ID，查询同一ID至终态。没有收益则归档此架构、恢复query-block。整体重大提升仍未达成。
+
+
+
 ## 当前：恢复 query-block，通过版未并入 packed-B 流水
 
 当前分支 `experiment/tiny-tt-query-block`，通过kernel代码 `55225cc` / SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`。

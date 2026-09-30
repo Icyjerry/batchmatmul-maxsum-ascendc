@@ -31,3 +31,14 @@ M方向要求 `singleCoreK/baseK <= stepKa`，且M方向DoubleBuffer开启；N�
 3. CPU模型检查新库基本块与原GM窗口的布局、尾块和全负；正式CANN编译/精度/性能另外验证。
 
 尚无此方案代码或NPU结果，不声明性能收益；整体重大提升未达成。
+
+## 2026-10-01 实现进展
+
+已找到固定公开checkout的同名matmul_preload示例，实际使用GetMDLConfig；CANN9对应API也已核对。
+候选使用一个基本N块覆盖已有窗口、两个半M块，因此可保留同一GM窗口而避免多N重复Await。
+完整资源、真实公开tiler和条件模型见 [FULLK_M_PRELOAD.md](FULLK_M_PRELOAD.md)。正式验证PENDING；这里此前未实现的描述是历史研究状态。
+
+## 完整K外循环补充结论
+
+初步预载谓词模型没有覆盖ReduceKMultiIter的每个outer块。补上完整方法后发现重复Await风险，库候选停止提交；详见 [FULLK_M_PRELOAD.md](FULLK_M_PRELOAD.md) 的最终源码审查。
+不能将本文此前API支持和容量条件当作该候选可用的证明，也不能将公开8.3现象冒充安装CANN9设备故障。
