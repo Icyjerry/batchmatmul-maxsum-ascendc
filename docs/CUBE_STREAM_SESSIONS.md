@@ -27,7 +27,17 @@
 - `python3 tools/validate_cube_stream.py`：production/TUNING 各 96 个 host 路由/workspace 检查，包含新 tiler 拒绝回退和显式 pins；fake tiler 不是 CANN。
 - 抽取实际 streaming producer、consumer DMA/WholeReduceMax/Max 代码，在 CPU mock 执行 384 个配置，比较完整点积→Max→Sum 独立 oracle；覆盖紧凑 ND 尾块、多任务、不同 worker、N shard、batch 一一配对、全负输入、GM 槽位边界。mock Matmul 不证明库内部缓存、事件或数值误差。
 - `validate_manual_splitk.py` 48 组、`validate_direct_batch.py` 1,458 个既有模型回归通过。
-- **CANN 编译、正式15点、设备精度/性能 PENDING**。
+- CANN 编译与正式15点现已通过；具体设备/额外覆盖/profile 仍 PENDING，结果如下。
+
+## 正式结果：通过，无明显收益
+
+首版 `9776448` / SHA `72dcd9b1b4ebc43e4d2ff51758db2a151bb0797705178691994adbb4d827cf00` 的[提交 6abcb16a694b590c3c2f20f7](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcb16a694b590c3c2f20f7) Compile Error：新 launch 中 static_cast 从 void* 到有 __gm__ 限定的 GM_ADDR 被拒绝。`ff18972` 的 reinterpret_cast 候选没有进入评测（立即重提交 HTTP429）；最终 `c7b004e` 复用已有 workspace 地址变量，等请求间隔后正式提交。
+
+`c7b004e` / SHA `9b2a01d71abffcc4aa0ae7e04793a91ceb0f2ef172d73c06c7f369aa3367e471`，257533 字节，[提交 6abcb222694b590c3c2f8de6](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcb222694b590c3c2f8de6) **CANN 编译通过，15/15 Pass**，各点 precision_ratio=1。
+
+时间 `[2.27,3.62,4.26,7.89,5.53,10.62,10.13,67.89,85.21,98.39,88.96,96.54,15.77,13.09,8.96]` µs。相对手写 Split-K 父版，第8点67.80→67.89、第11点88.16→88.96，合计517.73→519.13 µs，无明显目标收益。不替换通过版。通过 case 无 msg，未得到实际 shape/kernel/plan、精确 SoC、重复 A/B 或 msprof；不能证明该路由命中，也不能断言 cache 是主要瓶颈。
+
+此结果证明候选整体可在正式模板编译并通过15点，不证明完整范围设备覆盖。后续利用这个独立 AIC engine 验证库内建 GM NZ 输出/直接 NZ Vector 归约；不接入此前失败的 DataCopyOut 回调，也不继续相近会话参数变体。
 
 ## 正式验证
 

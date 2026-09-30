@@ -2,6 +2,15 @@
 
 每条新记录必须带代码 commit/SHA、设备、CANN、case、命令和实际结果。空白数据不得补成零或推测值。
 
+## 2026-09-30 · CANNJudge CLI · 独立 AIC 库会话流式交接
+
+- 分支 `experiment/cube-stream-sessions`，最终代码 `c7b004e`，SHA `9b2a01d71abffcc4aa0ae7e04793a91ceb0f2ef172d73c06c7f369aa3367e471`，257533字节；父 `11de38b`。仅上传kernel.asc。命令 `python3 /private/tmp/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /private/tmp/bmmms-judge-cube-stream/project --no-wait`，查询至终态。[提交 6abcb222694b590c3c2f8de6](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcb222694b590c3c2f8de6)。
+- 假设：绕开 dual-master wrapper 每window内部End，以 MatmulImpl 对完整Nshard保持库会话并逐tile交接，保留既有GM ring/归约/任务。官方公开源码版本8.3.T9.0.B066指出外层End为空，内部IterateAll会End；不当作CANN9精确header。新 engine 编译是否可用以本次正式结果为准。
+- CPU：production/TUNING各96个真实host路由/workspace/pins/tiler拒绝回退检查；实际producer和consumer DMA/Max抽取384配置与独立点积→Max→Sum oracle一致。Split-K48组、direct-batch1458配置回归通过。不是CANN scheduler/cache/event仿真。
+- 首版 `9776448` / SHA `72dcd9b1b4ebc43e4d2ff51758db2a151bb0797705178691994adbb4d827cf00` [提交 6abcb16a694b590c3c2f20f7](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcb16a694b590c3c2f20f7) Compile Error：launch static_cast丢失GM地址空间限定。`ff18972` 未进入评测（HTTP429）；`c7b004e` 复用已有workspace变量修正后提交。
+- 修正版**CANN编译通过、15/15 Pass**，各precision_ratio=1。时间 `[2.27,3.62,4.26,7.89,5.53,10.62,10.13,67.89,85.21,98.39,88.96,96.54,15.77,13.09,8.96]` µs。第8点67.80→67.89，第11点88.16→88.96，总517.73→519.13，无明显收益，不合入最快版。通过case msg为空，实际shape/plan/kernel命中、精确SoC、重复A/B、msprof仍缺失；不推断缓存或具体硬件瓶颈。
+- 原始JSON本机Git忽略 `artifacts/cube-stream-sessions/`；文档 [CUBE_STREAM_SESSIONS.md](CUBE_STREAM_SESSIONS.md)。后续验证该独立AIC上的库内建NZ输出，避免失败的自定义callback；不重复相近会话参数。
+
 ## 2026-09-30 · CANNJudge CLI · 大 TT 非对齐 A 常驻失败对照
 
 - 分支 `experiment/ragged-tt-resident-a`，代码 `4507c59`，kernel SHA256 `d327a0632c87335a657528005b25eb9a9578086c3691f602947159baa30f2b3d`，256400 字节；从较快的 `d2718c8` 派生。dry-run 仅上传 kernel.asc。`python3 /private/tmp/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /private/tmp/bmmms-judge-ragged-tt-resident/project --no-wait`；随后查询同一任务至 Pass。[提交 6abcaadc694b590c3c2ada90](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcaadc694b590c3c2ada90)。

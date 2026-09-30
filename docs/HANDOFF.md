@@ -1,5 +1,11 @@
 # 接手状态 · 2026-09-30
 
+## 最新：独立 AIC 库会话流式交接通过，无明显提速
+
+`experiment/cube-stream-sessions` / `c7b004e`，kernel SHA `9b2a01d71abffcc4aa0ae7e04793a91ceb0f2ef172d73c06c7f369aa3367e471`，[提交 6abcb222694b590c3c2f8de6](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcb222694b590c3c2f8de6) **编译通过、15/15 Pass**。TT 完整K原dual=1路径在新dual=26改用独立 MatmulImpl，对整个 N shard 做一次会话，逐 tile 顺序写现有 ND 双槽 ring；AIV取消KFC对象和flag9。ND尾块按实际cols紧凑stride读取。第8点67.80→67.89、第11点88.16→88.96 µs，合计517.73→519.13，无明显收益，不替换较快通过版。CPU路由96配置、producer/consumer抽取384配置通过，真实shape/plan/profile未取得。首版有启动GM地址static_cast编译错误，最终复用现有workspace变量修正。
+
+研究发现：官方开源 `8.3.T9.0.B066` 的 dual-master IterateAll 内部调用 mul.End，外层 End 为空；也禁止逐tile Iterate/GetTensorC与LocalTensor输入。该版本不是CANN9精确header，但说明原“移除外层End保留缓存”假设缺乏依据。详见 [CUBE_STREAM_SESSIONS.md](CUBE_STREAM_SESSIONS.md)。后续从此已通过API路径研究**库内建 GM NZ 输出**和直接NZ归约，避免此前失败的自定义回调；不提交相近会话参数变体。大幅整体提升仍未达成。
+
 ## 最新：大 TT 非对齐 A 常驻正式通过但退化
 
 `experiment/ragged-tt-resident-a` / 代码 `4507c59`，kernel SHA `d327a0632c87335a657528005b25eb9a9578086c3691f602947159baa30f2b3d`。[提交 6abcaadc694b590c3c2ada90](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcaadc694b590c3c2ada90) **CANN 编译通过、15/15 Pass**，但第 8 点 67.80→94.15 µs，15 点合计 517.73→540.33 µs。候选对 BF16 B1 TT 大矩阵尾块改用完整 A 常驻 L1、padded K 物理跨度的 LoadData2D 和既有 ND ring/归约；无新增 GM 通路。CPU production/TUNING 各 465 个计划检查、231 组物理块及独立数值模型通过。正式通过 case 无 msg，隐藏 shape/实际 kernel/plan/profile 未取得，不能断言退化来自具体模块。
