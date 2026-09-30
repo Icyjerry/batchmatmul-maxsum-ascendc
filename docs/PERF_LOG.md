@@ -1,3 +1,42 @@
+# 2026-09-30 · 配对 M / B 面板复用首版
+
+## 2026-09-30 · 配对 M 共享 B 覆盖版正式结果
+
+代码 `d4b9044`，kernel SHA `c6cca6ba9a120336ab4548b7f6898dd6b793291cc0b6adea0ff20d5ad86a00b3`，[正式提交 6abcc39a694b590c3c3ada93](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcc39a694b590c3c3ada93) **CANN编译通过，15/15 Pass，precision_ratio均为1**。
+
+逐点耗时 `[2.27,3.90,4.07,7.82,5.30,10.60,10.05,69.57,84.77,99.51,88.07,96.27,15.87,13.10,9.53]` μs，合计 **520.70 μs**，对照保留版517.73 μs。第8点67.80→69.57、第11点88.16→88.07，没有整体收益；未取得实际shape/plan/profile及重复A/B，不能证明路由命中或具体退化原因。CPU172 producer和production/TUNING各360代表host组合（120选择）通过，与正式精度证据分开。
+
+本分支保留代码、模型与失败对照，不继续同一结构相近参数提交。后续恢复 `experiment/manual-splitk-tiny` 的通过kernel，SHA `6e264a6b1979210a58744b2f33ac3aaa5c18ab46a975690d83c7338ab7f2aef5`；审查小矩阵的启动、同步与归约分工开销。整体大幅提升仍未达成。原始JSON在本机Git忽略 `artifacts/paired-m-breuse/`。
+
+
+## 首版正式结果与覆盖修正
+
+首版代码 `cff0441` / SHA `e3b770b876e90cc2c6796626858467099824a7c1341b4ba40a44d6e9a83cfebb`，[正式提交 6abcc1f7694b590c3c39b751](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcc1f7694b590c3c39b751) **CANN编译通过，15/15 Pass，precision_ratio均为1**。
+
+| 点 | 最快保留版μs | 128行首版μs |
+|---|---:|---:|
+| 1 | 2.14 | 2.28 |
+| 2 | 3.96 | 3.63 |
+| 3 | 4.56 | 4.13 |
+| 4 | 8.08 | 7.86 |
+| 5 | 5.31 | 5.32 |
+| 6 | 10.58 | 10.77 |
+| 7 | 10.15 | 10.72 |
+| 8 | 67.80 | 70.43 |
+| 9 | 83.95 | 83.97 |
+| 10 | 97.84 | 98.63 |
+| 11 | 88.16 | 89.95 |
+| 12 | 96.97 | 98.00 |
+| 13 | 15.83 | 16.98 |
+| 14 | 13.20 | 13.79 |
+| 15 | 9.20 | 9.44 |
+
+合计517.73→525.90 μs，第11点88.16→89.95，未见收益。没有实际shape/plan/profile，不能断言命中新producer；其它点也有单次波动。
+
+源码覆盖检查发现首版要求旧baseM=128，排除了64行TT族。覆盖修正版保留旧MMAD行块为bm=64或128，只将两个旧M块配成任务（schedule.baseM=2*bm），不强制把64改成128。固定N/K面板不变；更小bm降低资源需求。CPU追加64行pair的完整与尾部测试，共172个producer配置通过；host360代表组合中120个选择新路径（首版22个），production/TUNING分别通过。真实隐藏case命中未知，此计数不是正式case覆盖率。
+
+覆盖修正kernel SHA `c6cca6ba9a120336ab4548b7f6898dd6b793291cc0b6adea0ff20d5ad86a00b3`；正式编译/精度/性能PENDING。第二次评测用来验证首版漏掉的旧64行族，不引入新的算法假设或N/K参数搜索。原始首版JSON在Git忽略 `artifacts/paired-m-breuse/`。
+
 # 2026-09-30 · 独立 MDL shard 输入流水
 
 ## 正式结果：15/15 通过，无收益

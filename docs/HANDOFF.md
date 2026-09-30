@@ -1,5 +1,13 @@
 # 接手状态 · 2026-09-30
 
+## 当前：恢复较快通过版，配对 M 实验无整体收益
+
+代码 `d4b9044`，kernel SHA `c6cca6ba9a120336ab4548b7f6898dd6b793291cc0b6adea0ff20d5ad86a00b3`，[正式提交 6abcc39a694b590c3c3ada93](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcc39a694b590c3c3ada93) **CANN编译通过，15/15 Pass，precision_ratio均为1**。
+
+逐点耗时 `[2.27,3.90,4.07,7.82,5.30,10.60,10.05,69.57,84.77,99.51,88.07,96.27,15.87,13.10,9.53]` μs，合计 **520.70 μs**，对照保留版517.73 μs。第8点67.80→69.57、第11点88.16→88.07，没有整体收益；未取得实际shape/plan/profile及重复A/B，不能证明路由命中或具体退化原因。CPU172 producer和production/TUNING各360代表host组合（120选择）通过，与正式精度证据分开。
+
+本分支保留代码、模型与失败对照，不继续同一结构相近参数提交。当前恢复 `experiment/manual-splitk-tiny` 的通过kernel，SHA `6e264a6b1979210a58744b2f33ac3aaa5c18ab46a975690d83c7338ab7f2aef5`；审查小矩阵的启动、同步与归约分工开销。整体大幅提升仍未达成。原始JSON在本机Git忽略 `artifacts/paired-m-breuse/`。
+
 ## 最新：独立 MDL shard 正式通过，无收益
 
 `experiment/mdl-shard-pipeline` / `df0e049`，kernel SHA `9cf72c174b5ef077db5e8c06826df39718fe926d10efc86391f88e6a5359751e`，[正式提交 6abcbaf3694b590c3c353072](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcbaf3694b590c3c353072) **CANN编译通过、15/15 Pass**。独立MatmulImpl从Norm改MDL，host显式匹配并保留K面板分组step/depth/DB；96个host和384个抽取producer/consumer配置通过。第8点67.80→70.86、第11点88.16→89.29 µs，合计517.73→527.49，无收益，不替换最快保留版。详情 [MDL_SHARD_PIPELINE.md](MDL_SHARD_PIPELINE.md)，原始JSON在Git忽略 `artifacts/mdl-shard-pipeline/`。实际shape/plan/profile未取得，不声称路由命中或确切瓶颈。
