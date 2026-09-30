@@ -1,5 +1,41 @@
 # 接手状态 · 2026-10-01
 
+## 当前工作状态：恢复 query-block，通过版未并入整 K 驻留候选
+
+分支 `experiment/tiny-tt-query-block`；kernel代码 `55225cc`，SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`，逐字不变。
+手写整K M驻留的窄窗/宽窗两次候选正式均15/15通过，但无大幅收益，源码/模型保留独立分支。当前仅同步结果文档和可独立运行的父Norm缓存审查工具，main未并入候选。
+没有活动正式任务；准确SoC/shape/plan/profile仍未返回，整体重大提升未达成。
+
+**下一条可执行动作**：审查A2/A3 L1→L0 TT加载的实际指令参数与MMAD发起循环。父库窗口内full-K A缓存已由公开源码确认，不能再据每N tile重读A提出相同驻留方案。
+以源码/真实header/example证明矩形/transpose加载能力，构建源/目的物理块地址模型；不能使用仅Atlas350的LoadData2DV2，不能重复已否定的普通MDL、NZ回调、Load3D非转置、full-A/window近邻参数试交。
+缓存审查可在本分支运行 `python3 tools/audit_norm_fullk_cache.py --source /private/tmp/ascendc-api-adv-review`。其它候选CPU工具需要切换其实验分支。
+详见 [NORM_FULLK_CACHE_AUDIT.md](NORM_FULLK_CACHE_AUDIT.md) 和 [FULLK_WIDE_WINDOW.md](FULLK_WIDE_WINDOW.md)。
+
+## 最新：宽窗口完整 K 正式通过，无大幅收益；父缓存审查改变方向
+
+分支 `experiment/fullk-wide-window`；代码 `9cfb159` / kernel SHA `af0d52b9c2e8f34fd43c5df4577a0d9f8d2adf456b7f57c5cbb642904ab170fc`。
+[提交 6abd5fdd694b590c3c8b955d](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd5fdd694b590c3c8b955d) **Pass，CANN编译成功、15/15，precision_ratio全1**。
+第8点69.03→67.44μs，单次约2.3%不足以证明稳定/大幅收益。其它点不归因；无actual shape/plan/SoC/profile。没有活动正式任务。
+CPU420 producer、9216消费者，以及fake/public真实8.3 tiler production/TUNING各1400 host配置（1000选择）通过。
+详见 [FULLK_WIDE_WINDOW.md](FULLK_WIDE_WINDOW.md)，原始结果本机Git忽略 `artifacts/fullk-wide-window/`。
+
+**新增诊断**：公开真实tiler1000个dual1计划均有完整K A缓存，824每shard只有一个window；抽取真实Cache Hit/Free/Reset等方法的2024窗口模型证明同窗后续N tile命中已有K面板。父库并非每N tile重复读取A，该优化对多数合成计划没有理论读取量优势。
+这是公开8.3源码证据，不是安装CANN9/profile；见 [NORM_FULLK_CACHE_AUDIT.md](NORM_FULLK_CACHE_AUDIT.md)。
+下一动作：归档本分支、恢复query-block通过kernel；研究A2/A3 L1→L0 TT的加载指令与MMAD发起开销，先核实实际API和物理布局。不能重试只Atlas350支持的LoadData2DV2或已否定Load3D/full-A/window参数结构。
+整体重大提升尚未达成。
+
+## 最新：手写 full-K 两半 M 正式通过，宽窗口覆盖存在缺口
+
+分支 `experiment/manual-fullk-m`；代码 `1d2ff79`，kernel SHA `fa88b68c61ec22fdaa050f75df5aaa61aba187854476d5d462d21ac59327c1d1`。
+[正式提交 6abd58a2694b590c3c88d669](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd58a2694b590c3c88d669) **Pass：CANN 编译通过，15/15，precision_ratio 全部 1**。没有活动正式任务。
+耗时 `[2.21,4.16,4.28,5.54,5.33,10.35,9.56,68.73,84.13,97.61,87.17,95.93,15.05,12.72,9.71]` μs。
+第8点对照69.03→68.73 μs，没有明显收益；无实际shape/plan/profile及重复A/B，不能确认新路径命中。
+158 producer CPU 执行及 production/TUNING 各1400 host配置（16选择）通过，与正式证据分别报告。
+
+覆盖审查发现：同一1400网格，旧dual1共1000配置，其中984的window为4/5/6/8，被候选window≤2限制直接排除。例B1/M1024/N1024/K1024 TT原M128/N128/W4；B1/M1025/N1025/K1032为W5。这是抽取真实host/fake tiler控制流证据，非实际NPU或隐藏case路由。
+下一动作：独立覆盖修复分支，实现bounded N-tile Vector消费者，保留原宽GM窗口/任务及两半M A驻留producer；检查双AIV窗口credit、最后DMA后释放、尾块及UB资源，完成实际源码模型后才考虑正式候选。
+详见 [MANUAL_FULLK_M.md](MANUAL_FULLK_M.md)。原始结果本机Git忽略 `artifacts/manual-fullk-m/`。整体重大提升尚未达成。
+
 ## 当前工作状态：恢复query-block通过kernel
 
 当前分支 `experiment/tiny-tt-query-block`，kernel代码 `55225cc` / SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`，未改变。
