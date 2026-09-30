@@ -1,5 +1,13 @@
 # 接手状态 · 2026-09-30
 
+## 最新：大 TT 非对齐 A 常驻正式通过但退化
+
+`experiment/ragged-tt-resident-a` / 代码 `4507c59`，kernel SHA `d327a0632c87335a657528005b25eb9a9578086c3691f602947159baa30f2b3d`。[提交 6abcaadc694b590c3c2ada90](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcaadc694b590c3c2ada90) **CANN 编译通过、15/15 Pass**，但第 8 点 67.80→94.15 µs，15 点合计 517.73→540.33 µs。候选对 BF16 B1 TT 大矩阵尾块改用完整 A 常驻 L1、padded K 物理跨度的 LoadData2D 和既有 ND ring/归约；无新增 GM 通路。CPU production/TUNING 各 465 个计划检查、231 组物理块及独立数值模型通过。正式通过 case 无 msg，隐藏 shape/实际 kernel/plan/profile 未取得，不能断言退化来自具体模块。
+
+失败代码、模型和结果已推送独立分支，详细说明 [RAGGED_TT_RESIDENT_A.md](RAGGED_TT_RESIDENT_A.md)，原始 JSON 在 Git 忽略 `artifacts/ragged-tt-resident-a/`。当前后续起点恢复通过版 `experiment/manual-splitk-tiny`，kernel SHA `6e264a6b1979210a58744b2f33ac3aaa5c18ab46a975690d83c7338ab7f2aef5`。大幅整体提升仍未达成。
+
+下一条可执行动作：核对官方 Matmul 的 A cache/片上输入源码与 CANN9 实际 API，分析如何保留库的 K 流水同时减少重复加载或 GM handoff。不要重复提交本次 resident TT 相近参数，也不要据 CPU 读取次数声称优于库；NZ callback 故障仍按下文单独保留。
+
 ## 最新：紧凑 NZ ring 正式失败对照，当前恢复通过版
 
 `experiment/nz-ring-max` 保留失败对照；最新代码 `21dae0d`，kernel SHA `34faa07f6d898386f0dec10da0a68fc0f013a67152529b650e9fd1d6e3644912`。大 TT 完整 K 的 dual=1 路径接入 Matmul 输出回调，L0C 以 NZ 写到原 GM ring，AIV 直接 NZ Max，保留窗口/分片/slot 容量和 finalizer。库 `enSequentialWrite=true` 写同一起点，因此回调显式按 curN 定位。抽取回调的 90 组单位/窗口检查、1,344 组尾块/负值地址模型通过，但三个正式版本均 **CANN 编译通过、第 8 点 Runtime Error 507015**：首版 `9c7a006`、恢复 ND 库调度的 `5de5952`、编译期 baseN 的 `21dae0d`。[最新提交 6abca4d0694b590c3c26d435](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abca4d0694b590c3c26d435) 前 7 点 Pass，后 7 点 Skipped。已证明第 8 点命中新 BF16 TT kernel，未得到底层异常地址；两项隔离未解决故障，不能归因于库 C 格式或用户标量传递。详情 [NZ_RING_MAX.md](NZ_RING_MAX.md)、[PERF_LOG.md](PERF_LOG.md)。
