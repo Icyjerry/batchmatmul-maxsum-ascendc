@@ -1,5 +1,23 @@
 # 接手状态 · 2026-10-01
 
+## 当前工作起点：恢复 query-block 通过版
+
+当前分支 `experiment/tiny-tt-query-block`，kernel仍为代码 `55225cc` / SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`，正式15/15通过，第4点5.66μs。
+矩形Load3D候选已完成正式评测，未见明显收益，保留独立分支；此处只同步结果文档，没有并入其算法改动。
+下一条可执行动作：审查大TT输入ND2NZ的实际K流水/缓冲生命周期，寻找能减少重复输入搬运或重叠Scalar开销的新结构；先以当前源码和官方API排除已有失败路径，不继续Load3D/MDL/session相近变体提交。
+精确隐藏shape、路由、SoC和profile仍缺失；不能将第8–12点的耗时变化归因到某种计划。整体重大提升尚未达成。
+
+## 2026-10-01 · 矩形 Load3D 正式通过，无明显收益
+
+代码 `c4d591b`，kernel SHA `8bf5cf4568efe55df1793a30cef649a4ec29e2849027e29e0aeb93ca0e7ad0ac`，[正式提交 6abd38b5694b590c3c7aac99](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd38b5694b590c3c7aac99) **CANN编译通过，15/15 Pass，precision_ratio均为1**。
+
+逐点耗时 `[2.14, 4.11, 4.35, 5.67, 5.27, 10.57, 9.61, 68.95, 83.02, 97.13, 86.78, 97.74, 15.1, 13.02, 9.1]` μs，合计512.56 μs，父版511.66 μs。
+第6点10.57→10.57，第12点95.91→97.74，未见明确收益；其余单次差异不能归因，没有实际shape/plan/profile或重复A/B。
+六个非转置A/B调用点使用typed Load3Dv2，CPU宏0/1各2888真实块布局检查通过。
+这次正式结果证明当前kernel通过15点，不证明所有加载分支命中或全部支持范围已完成设备覆盖。
+保留分支 `experiment/rectangular-load3d` 为反例；后续恢复 `experiment/tiny-tt-query-block` / `909294b` 通过kernel，不继续此加载结构的相近参数提交。
+原始JSON本机Git忽略 `artifacts/rectangular-load3d/`；详见 [RECTANGULAR_LOAD3D.md](RECTANGULAR_LOAD3D.md)。整体重大突破仍未达成。
+
 ## 2026-09-30 · 一次 A 整理与双 query 正式结果
 
 代码 `55225cc`，kernel SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`，[正式提交 6abd3263694b590c3c776446](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd3263694b590c3c776446) **CANN编译通过，15/15 Pass，precision_ratio均为1**。
