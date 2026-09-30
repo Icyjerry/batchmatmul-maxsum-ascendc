@@ -2,6 +2,14 @@
 
 每条新记录必须带代码 commit/SHA、设备、CANN、case、命令和实际结果。空白数据不得补成零或推测值。
 
+## 2026-09-30 · CANNJudge CLI · 库内建 NZ 输出流水
+
+- 分支 `experiment/builtin-nz-stream`，代码 `fcbf29b`，SHA `895be634247274f702cfbebaba858c8087a309c0554cd44977c178ced77d9225`，259946字节。父stream ND `08559b7`。dry-run只上传kernel.asc，命令 `python3 /private/tmp/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /private/tmp/bmmms-judge-builtin-nz/project --no-wait`，查询同一任务至终态。[提交 6abcb535694b590c3c317c3e](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcb535694b590c3c317c3e)。
+- 假设：独立AIC MatmulImpl以库内建GM NZ C/GetTensorC顺序输出，AIV直接读取自己负责的NZ行并做tree/lane Max，减少NZ→ND转换；不使用任何DataCopyOut callback，不新增GM通路。host重新查询NZ C tiler并保留原任务/tile/worker，默认模板ND不变。
+- CPU `validate_cube_stream.py`：production/TUNING各96路由/workspace/pins/tiler回退；actualproducer、DMA、tail-mask、Max分别ND/NZ各432配置与独立oracle相同，含128tile、M/Ntail、零有效AIV行、全负和巨大正值污染无效NZ列。mock不证明库输出布局/硬件事件/cache性能。
+- **CANN编译通过、15/15 Pass**，各precision_ratio=1。时间 `[2.32,4.09,4.19,8.34,5.50,10.67,10.20,66.40,84.14,98.19,89.04,97.60,16.59,13.78,9.62]` µs。第8点相对ND父版67.89→66.40、第11点88.96→89.04；对较快Split-K版67.80→66.40、88.16→89.04。没有整体大幅收益，不合并最快版，不提交相近输出参数变体。
+- 通过msg为空，精确SoC、shape/plan、actualkernel、新路由是否命中、重复A/B、msprof未取得。未出现此前callback Runtime Error，但不能说callback故障被修复。原始JSON在本机Git忽略 `artifacts/builtin-nz-stream/`；详细 [BUILTIN_NZ_STREAM.md](BUILTIN_NZ_STREAM.md)。下一步从输入搬运和L1/L0分块审查寻找结构候选。
+
 ## 2026-09-30 · CANNJudge CLI · 独立 AIC 库会话流式交接
 
 - 分支 `experiment/cube-stream-sessions`，最终代码 `c7b004e`，SHA `9b2a01d71abffcc4aa0ae7e04793a91ceb0f2ef172d73c06c7f369aa3367e471`，257533字节；父 `11de38b`。仅上传kernel.asc。命令 `python3 /private/tmp/cannjudge_cli.py submit --problem-id 6a9aa054bf41025d6014f3ef --project-dir /private/tmp/bmmms-judge-cube-stream/project --no-wait`，查询至终态。[提交 6abcb222694b590c3c2f8de6](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcb222694b590c3c2f8de6)。
