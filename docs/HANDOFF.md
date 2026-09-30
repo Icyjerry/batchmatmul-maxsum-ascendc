@@ -1,5 +1,17 @@
 # 接手状态 · 2026-10-01
 
+## 最新：完整K库内M预载被外K同步审查否定，未提交
+
+分支 `experiment/fullk-m-preload` 的候选 `1b278c9` / SHA `0c37471e6b6b703bda9735fef64dd47523def338c2f338d6000d6f17d80bbdec` 已归档，**不得直接提交或并入通过版**。
+新增完整实际ReduceKMultiIter模型：16个A完整K/B非完整K配置复现一次Async、两次Await，补上此前只检查预载谓词的模型缺口。
+这是固定公开8.3源码与标准队列元数据模型反例，不是安装CANN9缺陷的设备证明。未发起正式提交；没有活动评测ID。
+资源模型和host128选择不能证明整个库同步正确，详见 [FULLK_M_PRELOAD.md](FULLK_M_PRELOAD.md)。
+
+下一动作：恢复query-block通过kernel，独立研究手写完整K A ping/pong和下一M预取；明确B K面板释放以及下一M只等待一次，复用现有manual AIV/GM ring。
+先核对现有manual与归档paired-M源，不能复制公开库上述partial-B等待顺序；没有新GM通路许可。该手写方案未实现、未验证，整体重大提升仍未达成。
+
+
+
 ## 当前：完整 K 的 M 方向预载候选待正式验证
 
 分支 `experiment/fullk-m-preload`，kernel SHA `0c37471e6b6b703bda9735fef64dd47523def338c2f338d6000d6f17d80bbdec`。

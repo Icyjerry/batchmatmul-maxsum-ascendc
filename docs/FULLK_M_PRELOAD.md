@@ -1,5 +1,28 @@
 # 完整 K、两 M 基本块的库内预载
 
+## 最终源码审查：停止提交，保留反例
+
+候选代码 `1b278c9`，kernel SHA `0c37471e6b6b703bda9735fef64dd47523def338c2f338d6000d6f17d80bbdec`。
+**没有正式提交，也没有CANN9编译、NPU精度或性能结果。**独立官方模板下载成功；未将候选打包提交。
+
+补充完整外K循环后发现：公开 `MatmulMDLSchedulerCommon::ReduceKMultiIter` 在每个K outer块后调用DoPreloadAWait，
+而DoPreloadLoad只在FirstOuterIter发起下一M读取。M有下一块、A完整K、B非完整K时，第二个外K块产生第二次Await而没有新的EnQue。
+在dav220的CubeInBuffer中Await继续调用qid.DeQue；若按模型中标准队列契约执行，就会等待/消费不存在的转移。
+此外ClearL1BufferCache在M/N preload启用时同时跳过A和B的Clear；B非完整K的缓存生命周期也需要真实安装header核对。
+
+`tools/validate_m_preload.py`新增抽取**完整实际ReduceKMultiIter方法**的运行模型，16个代表配置都在第二个outer块复现：一次Async读取、两次Await。
+其它Compute/CopyIn/queue由明确的元数据mock替代，不是完整库/NPU模拟；**不能据此宣称安装CANN9存在同一缺陷**。
+它足以否定先前2304个只检查预载谓词的模型能证明整个候选同步正确；仅A完整K的条件不足以放行当前设计。
+必须先取得安装header或采用独立手写队列协议，不能把该风险带入比赛提交。
+
+原1536K/库64×256的设计若把B也完整驻留：A双buffer384KiB+B单完整buffer768KiB，共1152KiB，超过示例512KiB L1。
+不能靠修正depth几行闭环，也不提交相近参数。此分支保留设计和反例，恢复query-block通过kernel。
+下一项可执行结构研究是独立手写完整K的A双buffer预载：先阅读现有manual/paired-M队列，保留GM ring与AIV，明确B每K块的释放和下一M只等待一次。
+它尚未实现，容量/布局/K尾块与异步顺序仍需模型及正式验证；总体重大提升尚未达成。
+
+以下是实现与初步模型的历史记录，不能覆盖上面的停止结论。
+
+
 ## 假设与区别
 
 保留 query-block 父版 `4f39f98` / kernel `55225cc` 的核心任务、schedule、GM ring、AIV消费和finalizer。

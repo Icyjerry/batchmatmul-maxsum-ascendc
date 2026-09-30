@@ -107,10 +107,18 @@ scheduler=(src/'impl/matmul/scheduler/base/scheduler_mdl_base.h').read_text()
 a=scheduler.index('    __aicore__ inline void DoPreloadLoad()')
 b=scheduler.index('\nprotected:',a)
 methods=scheduler[a:b].replace('__aicore__','')
+common=(src/'impl/matmul/scheduler/base/scheduler_mdl_common.h').read_text()
+a=common.index('    __aicore__ inline void ReduceKMultiIter(bool enPartialSum)')
+b=common.index('\n    __aicore__ inline void Compute(',a)
+outer=common[a:b].replace('__aicore__','')
 predicates=r'''#include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <stdexcept>
+template<typename T>struct LocalTensor{};
+struct SplitParams{int axisL0Len=1;};
+template<const auto& C>struct MatmulFeatureTrait{constexpr bool IsSupportMNL0DB(){return false;}};
 constexpr int PRELOAD_M=1,PRELOAD_N=2,PRELOAD_K=3;
 struct Config{int doMTE2Preload;};constexpr Config ToMatmulConfig(Config c){return c;}
 struct Module{
@@ -128,14 +136,24 @@ struct Module{
   assert(!pending && m==1 && ko==0 && count>0 && count<=bm && width==k);
   pending=true;transferredRows=count;++reads;
  }
- void AwaitLoadData(){assert(pending);pending=false;++waits;}
+ void AwaitLoadData(){++waits;if(!pending)throw std::logic_error("Await without another EnQue");pending=false;}
+ void OuterStart(){idx=0;}bool OuterNext(){return ++idx<total;}
+ int GetOuterKaIdx(){return 0;}int GetOuterKbIdx(){return idx;}
+ bool IsTransposeA(){return true;}bool IsTransposeB(){return true;}
+ template<typename T>void Free(T){}
 };
 #define MATMUL_MODULE(name) (&name)
 template<int MODE>struct Predicates{
  static constexpr Config MM_CFG{MODE};
  int cacheA1Factor_=1,cacheB1Factor_=1;
- Module KLoop,MLoop,NLoop,CopyCubeInA,CopyCubeInB,MatmulShapeTiling;
-'''+methods+r'''
+ Module KLoop,MLoop,NLoop,CopyCubeInA,CopyCubeInB,MatmulShapeTiling,MatmulShapeInfo,BiasScheduler;
+ using BASE_MODULE=Predicates;using TransAT=int;using TransBT=int;using BiasT=int;
+ SplitParams InitSplitAParams(){return {};}SplitParams InitSplitBParams(){return {};}
+ void CopyIn(LocalTensor<int>&,LocalTensor<int>&){DoPreloadLoad();}
+ LocalTensor<int> SplitBias(int){return {};}
+ void Compute(LocalTensor<int>,LocalTensor<int>,LocalTensor<int>,bool,bool,bool,SplitParams&,SplitParams&){}
+ void ClearL1BufferCache(int&,int&){}void ResetCopyInBuffer(){}
+'''+methods+outer+r'''
 };
 int main(){unsigned checks=0;
  for(int bm:{32,64})for(int rows=1;rows<=2*bm;++rows)for(int k:{1024,1032,1536,1544,2048,3072})for(int bk:{64,128}){
@@ -152,6 +170,16 @@ int main(){unsigned checks=0;
   assert(s.CopyCubeInA.transferredRows==(expected?rows-bm:0));
   assert(!s.CopyCubeInB.reads && !s.CopyCubeInB.waits);++checks;
  }
+ unsigned unsafe=0;
+ for(int bm:{32,64})for(int rows:{65,128})for(int k:{1024,1032,1536,1544})for(int bk:{64,128}){
+  if(rows<=bm || rows>2*bm)continue;
+  Predicates<1> s;s.MLoop.rows=rows;s.MLoop.bm=bm;s.MLoop.total=(rows+bm-1)/bm;
+  s.KLoop.total=(k+bk-1)/bk;s.KLoop.k=k;s.CopyCubeInA.bm=bm;s.CopyCubeInA.k=k;
+  bool rejected=false;
+  try{s.ReduceKMultiIter(false);}catch(const std::logic_error&){rejected=true;}
+  assert(rejected && s.KLoop.idx==1 && s.CopyCubeInA.reads==1 && s.CopyCubeInA.waits==2);++unsafe;
+ }
+ std::cout<<"Actual ReduceKMultiIter: "<<unsafe<<" non-full-B configurations reproduce second Await without new EnQue; candidate violates this model's queue contract in the public revision\n";
  std::cout<<"Actual public M-preload predicates: "<<checks<<" full-K/tail/deferred-transfer executions PASS\n";
 }
 '''
@@ -161,5 +189,5 @@ subprocess.run([compiler,'-std=c++17','-O2',str(out/'predicates.cpp'),'-o',str(e
 subprocess.run([str(exe)],check=True)
 print('Kernel SHA256:',hashlib.sha256(source.encode()).hexdigest())
 print('Public tiler revision:',env['revision'])
-print('Existing Cube/Vector source unchanged except config selection. CANN9/NPU validation PENDING.')
+print('Existing Cube/Vector source unchanged except config selection. Candidate withheld: complete public outer-K ordering contradicts the proposed partial-B preload. Not submitted to CANN9/NPU.')
 env['tmp'].cleanup()

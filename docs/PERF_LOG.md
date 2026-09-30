@@ -1,5 +1,16 @@
 # 2026-09-30 · 配对 M / B 面板复用首版
 
+## 2026-10-01 · 完整K M预载：完整外K模型否定，未正式提交
+
+候选 `1b278c9` / SHA `0c37471e6b6b703bda9735fef64dd47523def338c2f338d6000d6f17d80bbdec`，分支 `experiment/fullk-m-preload`。
+库基本M减半、基本N覆盖既有窗口、完整K A双buffer，GM ring/grid/AIV保持原样。
+真实公开tiler+host production1775/TUNING1779配置、各128选择；2304预载谓词模型通过。
+补上**真实ReduceKMultiIter**后，16个代表配置在第二个外K块复现没有新EnQue的第二次Await；前一模型没有覆盖这层循环，不能作为候选同步通过证明。
+仅A完整K且B部分K的库预载方案被当前公开源码证据否定；安装CANN9行为未知，不声称硬件缺陷。
+**未提交正式平台，CANN/NPU精度/latency无结果**。归档结构反例并恢复query-block，不继续相近参数提交。详见 [FULLK_M_PRELOAD.md](FULLK_M_PRELOAD.md)。
+
+
+
 ## 2026-10-01 · packed-B 双缓冲正式通过，无收益
 
 代码 `c763281`，kernel SHA `119f145b81270e2994cd686bb4c621f58c48367be8629b921e6f8705b69813b4`，[正式提交 6abd423a694b590c3c7ee13d](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd423a694b590c3c7ee13d) **CANN编译通过，15/15 Pass，precision_ratio均为1**。
