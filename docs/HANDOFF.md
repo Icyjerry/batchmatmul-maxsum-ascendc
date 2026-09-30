@@ -1,10 +1,12 @@
 # 接手状态 · 2026-09-30
 
-## 当前：配对M首版正式通过无收益，补齐64行覆盖
+## 2026-09-30 · 配对 M 共享 B 覆盖版正式结果
 
-分支 `experiment/paired-m-breuse`，首版 `cff0441` / SHA `e3b770b876e90cc2c6796626858467099824a7c1341b4ba40a44d6e9a83cfebb`，[正式提交 6abcc1f7694b590c3c39b751](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcc1f7694b590c3c39b751) **CANN编译通过，15/15 Pass**，合计517.73→525.90 μs，第11点88.16→89.95，无收益。实际shape/plan/profile未取得，无法证明是否命中128行pair。
+代码 `d4b9044`，kernel SHA `c6cca6ba9a120336ab4548b7f6898dd6b793291cc0b6adea0ff20d5ad86a00b3`，[正式提交 6abcc39a694b590c3c3ada93](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcc39a694b590c3c3ada93) **CANN编译通过，15/15 Pass，precision_ratio均为1**。
 
-覆盖修正版保留旧baseM=64或128、每次MMAD行块不变，配成128或256行任务，补齐首版排除的64行TT族。kernel SHA `c6cca6ba9a120336ab4548b7f6898dd6b793291cc0b6adea0ff20d5ad86a00b3`。CPU172个真实producer物理块/独立算术/事件模型通过；host360代表组合中120选择（首版22），production/TUNING均通过。修正版CANN/NPU/性能PENDING，下一条动作是CLI dry-run/submit/query，详见 [PAIRED_M_B_REUSE.md](PAIRED_M_B_REUSE.md)。无收益则恢复最快父版并保留证据，不继续相近参数变体。整体大幅提升仍未达成。
+逐点耗时 `[2.27,3.90,4.07,7.82,5.30,10.60,10.05,69.57,84.77,99.51,88.07,96.27,15.87,13.10,9.53]` μs，合计 **520.70 μs**，对照保留版517.73 μs。第8点67.80→69.57、第11点88.16→88.07，没有整体收益；未取得实际shape/plan/profile及重复A/B，不能证明路由命中或具体退化原因。CPU172 producer和production/TUNING各360代表host组合（120选择）通过，与正式精度证据分开。
+
+本分支保留代码、模型与失败对照，不继续同一结构相近参数提交。后续恢复 `experiment/manual-splitk-tiny` 的通过kernel，SHA `6e264a6b1979210a58744b2f33ac3aaa5c18ab46a975690d83c7338ab7f2aef5`；审查小矩阵的启动、同步与归约分工开销。整体大幅提升仍未达成。原始JSON在本机Git忽略 `artifacts/paired-m-breuse/`。
 
 ## 最新：独立 MDL shard 正式通过，无收益
 
