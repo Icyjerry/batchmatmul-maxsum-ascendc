@@ -45,7 +45,7 @@ AIV代码体与父manual逐字一致，只采用既有span=1/2布局的实际sch
 - manual AIV函数体与父版逐字相同。新的span布局由producer/ring模型检查；未声称执行了Ascend Vector指令或真实BF16精度。
 - tiny TT既有700个实际源码执行、production/TUNING各432尝试及30量化FP64对照另外回归。
 
-**CANN9编译、NPU精度和性能：PENDING。**新分支不并入main；准确SoC、shape/plan/msprof与同设备重复A/B仍缺失。
+**该 SHA 的 CANN 编译和正式15点精度已通过，性能未见明显收益。**新分支不并入main；准确SoC、shape/plan/msprof与同设备重复A/B仍缺失。
 
 ## 正式计划
 
@@ -53,7 +53,15 @@ AIV代码体与父manual逐字一致，只采用既有span=1/2布局的实际sch
 比较第8点与query-block69.03μs；第11点是否可能命中新路径以容量/实测plan为准，不假定。
 没有明显收益则归档这一结构并恢复query-block，不继续相近tile参数提交。整体重大提升尚未达成。
 
-## 正式任务已接受
+## 正式结果与覆盖审查
 
 代码 `1d2ff79`，kernel SHA `fa88b68c61ec22fdaa050f75df5aaa61aba187854476d5d462d21ac59327c1d1`，267521 bytes。
-[提交 6abd58a2694b590c3c88d669](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd58a2694b590c3c88d669) 最新查询Running；同一ID继续查询，不重新发起。正式结果PENDING。
+[提交 6abd58a2694b590c3c88d669](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd58a2694b590c3c88d669) 已终态 **Pass，15/15，precision_ratio 全1**，CANN 编译成功。
+逐点耗时 `[2.21,4.16,4.28,5.54,5.33,10.35,9.56,68.73,84.13,97.61,87.17,95.93,15.05,12.72,9.71]` μs。
+第8点69.03→68.73、第11点87.37→87.17，不足以证明稳定收益。没有实际shape/plan/SoC/profile，不宣称该提交的新producer命中正式点。
+原始JSON本机Git忽略 `artifacts/manual-fullk-m/`，目录700/文件600；没有活动任务。
+
+同一host网格1400配置中，原dual1共1000：W2为16，W4为160，W5为160，W6为304，W8为360；候选只选16。另400为dual2。
+原宽窗口的库消费者分批读N tile，而复用manual消费者一次将整窗搬入双UB，需要与window成比例的UB；这导致候选限制W≤2，遗漏984个原dual1配置。
+下一结构修复保持原GM窗口，消费者逐N块在固定大小双UB中读取，窗口credit只在最后读取发起/完成后释放。此修复尚未实现；资源过滤仍必需，不能把984配置全部算成可选。
+整体重大提升未达成；本版保留为正式通过对照。

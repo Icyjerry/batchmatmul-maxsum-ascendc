@@ -1,5 +1,13 @@
 # 2026-09-30 · 配对 M / B 面板复用首版
 
+## 2026-10-01 · 手写 full-K 两半 M 正式通过与覆盖审查
+
+- 代码 `1d2ff79`，SHA `fa88b68c61ec22fdaa050f75df5aaa61aba187854476d5d462d21ac59327c1d1`；正式ID `6abd58a2694b590c3c88d669` Pass，15/15、precision_ratio全1，CANN编译成功。
+- 耗时 `[2.21,4.16,4.28,5.54,5.33,10.35,9.56,68.73,84.13,97.61,87.17,95.93,15.05,12.72,9.71]` μs。第8点69.03→68.73，没有明显收益；无实际shape/plan/profile及重复A/B，无法证明新路由命中。
+- CPU158实际producer执行、production/TUNING各1400 host对照（16选择）通过。覆盖审查：旧dual1的1000配置中984为W4/5/6/8，被候选W≤2排除；是假tilerhost控制流证据，不是隐藏case路由或硬件覆盖率。
+- 下一假设是固定UB的N块消费者支持原宽GM窗口，保留任务、producer及workspace，不继续近邻tile参数试交。详情 `MANUAL_FULLK_M.md`。整体重大提升未达成。
+
+
 ## 2026-10-01 · 完整K M预载：完整外K模型否定，未正式提交
 
 候选 `1b278c9` / SHA `0c37471e6b6b703bda9735fef64dd47523def338c2f338d6000d6f17d80bbdec`，分支 `experiment/fullk-m-preload`。
