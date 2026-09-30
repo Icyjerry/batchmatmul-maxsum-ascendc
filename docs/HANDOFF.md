@@ -1,5 +1,15 @@
 # 接手状态 · 2026-10-01
 
+## 当前：手写完整K两半M的结构候选，待正式评测
+
+分支 `experiment/manual-fullk-m`，kernel SHA `fa88b68c61ec22fdaa050f75df5aaa61aba187854476d5d462d21ac59327c1d1`。
+实现独立A1完整K预取/驻留、每B K面板共用两半M、四C缓冲及原schedule/GM窗口发布；没有新增GM通路。
+复用manual AIV，函数体逐字未改；跨K/N没有库内重复Await。158实际producer延迟MTE2/物理布局模型与production/TUNING各1400host对照（16选择）通过。
+详见 [MANUAL_FULLK_M.md](MANUAL_FULLK_M.md)。CPU/静态不构成CANN9或硬件精度/性能证据；整体重大提升未达成。
+下一动作：独立正式模板dry-run后CLI一次提交，记录ID，查询同一任务至终态；无收益归档恢复query-block，不继续近邻参数提交。
+
+
+
 ## 当前工作状态：恢复query-block通过kernel
 
 当前分支 `experiment/tiny-tt-query-block`，kernel代码 `55225cc` / SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`，未改变。
