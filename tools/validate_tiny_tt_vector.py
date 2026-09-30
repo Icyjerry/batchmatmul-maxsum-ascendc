@@ -14,7 +14,9 @@ shapes = source[source.index('struct Shape {'):source.index('template <AscendC::
 start = source.index('template<typename T>\n__schedmode__(1) __global__ __vector__ void bmmms_tiny_tt_vector(')
 end = source.index('\n// Small GEMMs', start)
 kernel = source[start:end]
-model = (root / 'tests/cpu/tiny_tt_model.cpp.in').read_text().replace('// @SHAPES@', shapes).replace('// @KERNEL@', kernel)
+indices = source[source.index('template <bool TRANSPOSED>\n__aicore__ inline void MicroIndices('):source.index('// Exact-K micro GEMMs')]
+indices = indices.replace('__aicore__', '')
+model = (root / 'tests/cpu/tiny_tt_model.cpp.in').read_text().replace('// @SHAPES@', shapes).replace('// @INDICES@', indices).replace('// @KERNEL@', kernel)
 host = source[source.index('struct Plan {'):source.index('using CacheKey =')]
 host_model = (root / 'tests/cpu/planner_stub.hpp').read_text() + shapes + host + r'''
 int main(){

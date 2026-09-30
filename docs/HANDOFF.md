@@ -1,5 +1,9 @@
 # 接手状态 · 2026-09-30
 
+## 当前候选：一次A UB整理与双query归约
+
+分支 `experiment/tiny-tt-query-block`，kernel SHA `6f8c8a16abee84126186928f38c82c9a4c479b0aa571d55727513bea76397b0c`。从第4点6.01 μs的单AIV通过版派生，一次整理全部A，两个query共享计算/归约阶段，保留数学顺序和新UB预算；700实际源码执行、production/TUNING各432host尝试、30量化FP64对照通过。CANN/NPU/性能PENDING。详见 [TINY_TT_QUERY_BLOCK.md](TINY_TT_QUERY_BLOCK.md)。下一动作是正式CLI只替换kernel.asc、dry-run/submit/query；不继续共享B/MDL/会话相近参数实验。整体大幅提升仍未达成。
+
 ## 2026-09-30 · 单 AIV 小 TT 首版正式结果
 
 代码 `a3c65a4`，kernel SHA `4bef4346c0e746711b41ca936510b05b319ee18f09752b2414d767d1ab453b29`，[正式提交 6abd2f7e694b590c3c75d2b6](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abd2f7e694b590c3c75d2b6) **CANN编译通过，15/15 Pass，precision_ratio均为1**。

@@ -79,6 +79,10 @@ template<typename T> void CreateVecIndex(LocalTensor<T> dst,T start,uint32_t cou
 template<typename T> void Mins(LocalTensor<T> dst,LocalTensor<T> src,T v,uint32_t n){for(unsigned i=0;i<n;++i)dst.write(i,std::min(src.read(i),v));}
 template<typename T> void Muls(LocalTensor<T> dst,LocalTensor<T> src,T v,uint32_t n){for(unsigned i=0;i<n;++i)dst.write(i,src.read(i)*v);}
 template<typename T> void Adds(LocalTensor<T> dst,LocalTensor<T> src,T v,uint32_t n){for(unsigned i=0;i<n;++i)dst.write(i,src.read(i)+v);}
+template<typename T> void ShiftRight(LocalTensor<T> dst,LocalTensor<T> src,T v,uint32_t n){for(unsigned i=0;i<n;++i)dst.write(i,src.read(i)>>v);}
+template<typename T> void ShiftLeft(LocalTensor<T> dst,LocalTensor<T> src,T v,uint32_t n){for(unsigned i=0;i<n;++i)dst.write(i,src.read(i)<<v);}
+template<typename T> void Sub(LocalTensor<T> dst,LocalTensor<T> a,LocalTensor<T> b,uint32_t n){for(unsigned i=0;i<n;++i)dst.write(i,a.read(i)-b.read(i));}
+template<typename T> void Add(LocalTensor<T> dst,LocalTensor<T> a,LocalTensor<T> b,uint32_t n){for(unsigned i=0;i<n;++i)dst.write(i,a.read(i)+b.read(i));}
 template<typename T> void Duplicate(LocalTensor<T> dst,T v,uint32_t n){for(unsigned i=0;i<n;++i)dst.write(i,v);}
 template<typename T> void Cast(LocalTensor<float> dst,LocalTensor<T> src,RoundMode,uint32_t n){for(unsigned i=0;i<n;++i)dst.write(i,float(src.read(i)));}
 void Gather(LocalTensor<float> dst,LocalTensor<float> src,LocalTensor<uint32_t> idx,uint32_t base,uint32_t n){
@@ -114,6 +118,7 @@ void WholeReduceMax(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,
 }
 }
 // @SHAPES@
+// @INDICES@
 // @KERNEL@
 int main(){
     uint32_t cases=0;std::mt19937 rng(81723);
@@ -131,9 +136,9 @@ int main(){
                     for(int kk=0;kk<k;++kk)dot+=double(a[bi*m*k+kk*m+row])*b[bi*n*k+col*k+kk];
                     best=std::max(best,dot);}sum+=best;}
             expected[bi]=float(sum);}
-        const size_t ac=(m*k+15)/16*16,kp=(k+15)/16*16;
-        const size_t budget=6*ac+6*n*kp+12*kp+((k+63)/64)*n*256+
-            ((n+7)/8)*32+((2*m+7)/8)*32+32;
+        const size_t ac=(m*k+15)/16*16,kp=(k+15)/16*16,ae=m*(k<=128?128:256),np=(n+7)/8*8;
+        const size_t budget=2*ac+4*std::max(ac,ae)+8*ae+6*n*kp+
+            ((k+63)/64)*2*np*256+2*np*4+((2*m+7)/8)*32+32;
         for(unsigned w=0;w<s.workers;++w){AscendC::block=w;bmmms_tiny_tt_vector<int16_t>(a.data(),b.data(),out.data()+1,s);
             assert(AscendC::lastBytes==budget && budget+4096<=192*1024);}
         for(int bi=0;bi<s.b;++bi){assert(out[bi+1]==expected[bi]);
