@@ -1,9 +1,10 @@
 # 接手状态 · 2026-09-30
 
-## 当前：独立 MDL K 面板流水候选
+## 最新：独立 MDL shard 正式通过，无收益
 
-分支 `experiment/mdl-shard-pipeline`，kernel SHA `9cf72c174b5ef077db5e8c06826df39718fe926d10efc86391f88e6a5359751e`。从较快通过版复用已正式通过的独立 AIC/ND stream 基础，改变输入为 `CFG_MDL`，显式匹配 host MDL tiler并保留新查询的 step/depth/DB，不启用 K reorder。96个host配置（production/TUNING分别）与384个抽取producer/consumer配置通过；CANN9/NPU/正式性能 PENDING。详情 [MDL_SHARD_PIPELINE.md](MDL_SHARD_PIPELINE.md)。下一条动作：正式 CLI dry-run/submit/query，并按实际结果决定保留或回退。整体大幅提升仍未达成。
+`experiment/mdl-shard-pipeline` / `df0e049`，kernel SHA `9cf72c174b5ef077db5e8c06826df39718fe926d10efc86391f88e6a5359751e`，[正式提交 6abcbaf3694b590c3c353072](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abcbaf3694b590c3c353072) **CANN编译通过、15/15 Pass**。独立MatmulImpl从Norm改MDL，host显式匹配并保留K面板分组step/depth/DB；96个host和384个抽取producer/consumer配置通过。第8点67.80→70.86、第11点88.16→89.29 µs，合计517.73→527.49，无收益，不替换最快保留版。详情 [MDL_SHARD_PIPELINE.md](MDL_SHARD_PIPELINE.md)，原始JSON在Git忽略 `artifacts/mdl-shard-pipeline/`。实际shape/plan/profile未取得，不声称路由命中或确切瓶颈。
 
+下一条研究动作：核对A2/A3 Fixpipe直接到UB能力及库交接源码，判断能否削减现有GM ring搬运；不继续相近MDL/session/output参数提交。后续起点恢复 `experiment/manual-splitk-tiny`。整体大幅提升仍未达成。
 
 ## 最新：库内建 NZ 流水正式通过，无整体收益
 
