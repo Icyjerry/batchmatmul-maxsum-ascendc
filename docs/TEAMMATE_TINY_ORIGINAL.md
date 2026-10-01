@@ -6,3 +6,5 @@
 通过组合保留 `experiment/teammate-tiny-dot` / `d5cd4af`；不以原版覆盖该分支。独立官方原模板 `/private/tmp/bmmms-teammate-tiny-original/project`，dry-run仅kernel。下一执行CLI一次 `--no-wait`，立即保存ID，再查同一任务至终态；原版CPU模型未新增，设备编译/精度/性能PENDING。
 
 对照已通过组合任务 `6abe7b90694b590c3c08ed48`，15点μs `[1.98,2.63,3.66,4.13,5.70,10.75,10.25,50.72,68.02,99.81,89.21,97.18,16.30,13.44,9.64]`。只比较正式同一编号；无实际shape/plan/SoC/profile与重复A/B，不推断隐藏路径或稳定速度。
+
+正式任务 **`6abe7f04694b590c3c0ade30`** 已创建。下一 `python3 /private/tmp/query_bmmms_submission.py 6abe7f04694b590c3c0ade30`，只查同一ID到终态，不重复提交。CANN编译/NPU精度/性能PENDING。
