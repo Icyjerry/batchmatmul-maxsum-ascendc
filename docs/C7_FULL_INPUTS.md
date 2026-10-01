@@ -44,4 +44,4 @@ python3 tools/validate_c7_full_inputs_public_tiler.py --source /private/tmp/asce
 
 ## Validation Request
 
-独立官方模板 `/private/tmp/bmmms-c7-full-inputs-official/project`，仅kernel替换；dry-run仅kernel/SHA一致。CANN9/NPU PENDING，尚无正式ID。commit/push后CLI一次结构候选，立即保存ID并查询同一ID至终态。比较父C7 9.68/C8 49.38/C9 67.48μs，全部15点必须通过；无收益则归档恢复父，不扫描附近N片段参数。actual shape/plan/SoC/profile与重复A/B仍缺失，不据单次时间断言路径命中或稳定幅度。
+独立官方模板 `/private/tmp/bmmms-c7-full-inputs-official/project`，仅kernel替换；dry-run仅kernel/SHA一致。代码 `2dc7f30` 已commit/push，正式任务 **`6abe5f1e694b590c3cf8ca02`** 已创建，CANN9/NPU终态PENDING。查询同一ID至终态，勿重复提交。比较父C7 9.68/C8 49.38/C9 67.48μs，全部15点必须通过；无收益则归档恢复父，不扫描附近N片段参数。actual shape/plan/SoC/profile与重复A/B仍缺失，不据单次时间断言路径命中或稳定幅度。

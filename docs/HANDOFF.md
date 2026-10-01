@@ -3,8 +3,8 @@
 ## 最新：C7完整输入/完整A2驻留已实现并通过模型，正式PENDING
 
 当前 `experiment/c7-full-inputs` 从 `fd72a34` 开始，kernel SHA `e8a1512e88e3cc71069d501b9cb934917ac2717cde772f83a9f6fad0daf7f6bb`，303787bytes。仅C7历史TF/FP16小矩阵新dual34：完整A/B一次ND2NZ到L1，完整A一次Load3D驻留L0A，按N切片在B2/原C0做完整K MMAD；复用原direct-batch Vector、原ring/credits/grid/workspace，无新GM/Schedule字段。C8/C9保持，父正式C7 9.68/C8 49.38/C9 67.48μs。
-86立即+86延迟live MMAD producer、2592实际全M/零行消费者、缺last-reader wait负控制通过；fake及固定公开8.3 tiler production/TUNING各3456/432通过。旧整个kernel剥除改动后逐字恢复。不是NPU时序/舍入/速度证据，CANN9/NPU PENDING。独立官方template dry-run仅kernel/SHA一致，尚未正式提交，无活动ID。细节 [C7_FULL_INPUTS.md](C7_FULL_INPUTS.md)。
-下一commit/push后CLI一次结构候选，保存ID即查询同一ID至终态；无收益恢复父，不扫N切片参数。上述TSCM研究已排除：CANN9 A2/A3实际UB→GM→L1，并非直接共享片上通路；不可引入。原始资料Git忽略 `artifacts/c7-full-inputs/`。main/历史标签未动，整体重大目标仍有空间。
+86立即+86延迟live MMAD producer、2592实际全M/零行消费者、缺last-reader wait负控制通过；fake及固定公开8.3 tiler production/TUNING各3456/432通过。旧整个kernel剥除改动后逐字恢复。不是NPU时序/舍入/速度证据，CANN9/NPU PENDING。独立官方template dry-run仅kernel/SHA一致；代码 `2dc7f30` 已commit/push，正式任务 **`6abe5f1e694b590c3cf8ca02`** 已创建，终态未查询。细节 [C7_FULL_INPUTS.md](C7_FULL_INPUTS.md)。
+下一 `python3 /private/tmp/query_bmmms_submission.py 6abe5f1e694b590c3cf8ca02` 查询同一ID至终态，勿重复提交；无收益恢复父，不扫N切片参数。上述TSCM研究已排除：CANN9 A2/A3实际UB→GM→L1，并非直接共享片上通路；不可引入。原始资料Git忽略 `artifacts/c7-full-inputs/`。main/历史标签未动，整体重大目标仍有空间。
 
 ## 当前工作起点：恢复49.38μs组合，保留队友C9
 
