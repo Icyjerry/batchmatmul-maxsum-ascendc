@@ -1,9 +1,10 @@
 # 接手状态 · 2026-10-02
 
-## 当前：用户要求C7原样再交两次
+## 当前：本次C7原样两次复测已完成
 
-分支 `experiment/c7-identical-repeats`，kernel保持c17077f / SHA45234d79…，与官方模板逐字一致。第一次新任务 `6abea238694b590c3c1d35d8` 已终态Pass、15/15、C7 8.04μs，第二次 `6abea331694b590c3c1d8ddd` 已创建PENDING；下一只查询第二次ID至终态，本次两次均已创建不得额外提交，不更改kernel。详见 `docs/C7_IDENTICAL_REPEATS.md`。宽N编译失败源码留 `experiment/c14-manual-frame`，本次不修/不提交该候选。
+分支 `experiment/c7-identical-repeats`，kernel保持 `c17077f` / SHA `45234d7945b6013cc75d2e6c3092c911c9c8ecd5618b82a7c51fd7d9084e0c61`，329378bytes，无算法修改。两个新任务 `6abea238694b590c3c1d35d8`、`6abea331694b590c3c1d8ddd` 均Pass、CANN编译成功、15/15、precision_ratio全1。C7本次8.04/7.67μs，结合此前8.00/7.88，四次范围7.67–8.04、中位7.94、极差/中位数4.7%；C13波动7.1%。支持存在评测波动，几个百分点单测不证明收益。无actualshape/plan/SoC/profile，四次不是总体分布或同机交错A/B。完整15点/ID/SHA见 `docs/C7_IDENTICAL_REPEATS.md`；原始JSON忽略 `artifacts/c7-manual-frame/repeat1.json`、`repeat2.json`。
 
+本次请求的两次已严格完成，没有活动任务，不再额外原样提交。源码和结果已push，main/历史标签不動，整体冲榜目标未完成。宽N编译失败候选保留 `experiment/c14-manual-frame`，未修改/混入复测；若继续优化，回该分支修第2765行device std::min host-only后重跑模型、独立正式编译。不能把通过C7或普通CPU编译当宽N候选通过。
 
 ## 最新通过父版：C7两次8.00/7.88 μs，均15/15
 
