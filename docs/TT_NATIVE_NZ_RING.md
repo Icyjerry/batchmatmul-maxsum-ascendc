@@ -35,4 +35,4 @@ GM每个C槽为 `[ceil(BN/16), BM, 16]`。Cube srcStride=align16(validRows)，ds
 
 ## Validation Request
 
-独立官方模板 `/private/tmp/bmmms-native-nz-official/project` 仅kernel替换，dry-run确认SHA/文件。下一commit/push后CLI一次结构候选，保存ID并查询同一ID至终态，比较父C8 49.38/C9 67.48μs。无收益或失败则归档并恢复父，不调相近输出格式参数。actual shape/plan/SoC/profile和重复A/B仍缺失，不据单次推断路径命中或稳定收益。
+独立官方模板 `/private/tmp/bmmms-native-nz-official/project` 仅kernel替换，dry-run确认SHA/文件。代码 `84e830e` 已commit/push；正式任务 **`6abe3b9b694b590c3ce5450f`** 已创建，CANN/NPU终态PENDING。查询同一ID至终态，比较父C8 49.38/C9 67.48μs；勿重复提交。无收益或失败则归档并恢复父，不调相近输出格式参数。actual shape/plan/SoC/profile和重复A/B仍缺失，不据单次推断路径命中或稳定收益。
