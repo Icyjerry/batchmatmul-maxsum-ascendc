@@ -532,3 +532,5 @@ Kernel SHA256：`d218864289599e2b39ef09d83cfdde68988908bf9400fa42b5bc9b03031783b
 算法改动仍限 `kernel.asc`；不修改 main、CMake、run.sh、golden、正式测试或依赖。workspace 与题面缺失范围见 PROBLEM。截图记录见 PERF_LOG；截图尚未绑定源码 SHA、dtype 和布局。
 
 正式任务 **`6abe82b1694b590c3c0cf647`** 已创建，下一 `python3 /private/tmp/query_bmmms_submission.py 6abe82b1694b590c3c0cf647`，仅查询同一ID到终态，不重交。
+
+正式任务 **`6abe860d694b590c3c0f02a5`** 已创建，下一 `python3 /private/tmp/query_bmmms_submission.py 6abe860d694b590c3c0f02a5`，只查同一ID到终态，不重复提交。

@@ -7,3 +7,5 @@
 CPU输入为整数值，不是FP16/BF16编码；Vector操作同步、Cube仅MTE2可延迟，MMAD/Fixpipe同步。跨核ready抽象，不能证明全硬件流水、误差或性能。模型首次补全未实例化branch API声明、修正预期offset的C++窄化及registry内GM子指针相对基址；没改正式测试/依赖来通过。
 CANN9编译/正式15点/性能PENDING。原日志忽略 `artifacts/teammate-single-tile/`；下一仅官方原模板换kernel、dry-run、commit/push、一次提交存ID并查终态。重点父C5 5.34/C6 10.72，同时C3 3.06/C15 9.47。队友原版C5 5.21/C6 9.73不是重复同机A/B，不能推断隐藏路线或稳定差异。main/历史标签不动。
 
+
+正式任务 **`6abe860d694b590c3c0f02a5`** 已创建，下一 `python3 /private/tmp/query_bmmms_submission.py 6abe860d694b590c3c0f02a5`，只查同一ID到终态，不重复提交。
