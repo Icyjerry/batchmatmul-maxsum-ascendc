@@ -666,3 +666,16 @@ C7 8.00，比父三次最快9.59低16.6%，比中位10.14低21.1%，已超出父
 C14 10.93，相比最新父四次12.72–13.26、中位13.04，低于最快父约14.1%，低于中位约16.2%；大于父样本极差/中位数4.1%，可保留单次结构收益。无actualshape/plan/SoC/profile或同机交错A/B，不能证明因果稳定百分比、路径命中或计算榜单分。C7 7.78在旧候选四次7.67–8.04范围内；它和其它路线源码未改，不归因其波动。没有扩大对齐准入、不改变N分片/GM/完整K→MaxN→SumM、main/标签保持。
 
 正式编译与15点精度表明此次无TPL入口可用于这些正式样本，不代表所有形状/SoC或者完整合法空间通过；整数模型和native证据仍分开。原始JSON Git忽略 `artifacts/wide-n-manual-frame/official-fixed.json`。下一原样确认一次该较大收益，commit/push后创建并立即保存ID，只查同ID至终态，不能继续附近参数扫描。
+
+## 2026-10-02 · 同SHA确认，C14 10.84μs
+
+确认任务 `6abea54c694b590c3c1e7459` **Pass、CANN编译成功、15/15、precision_ratio全1**，kernel/template原样。μs：
+
+```text
+[1.99, 2.78, 3.09, 4.01, 5.42, 9.55, 7.88, 49.56, 67.49, 97.37, 87.11, 95.56, 15.01, 10.84, 8.97]
+```
+
+两次C14 10.93/10.84、中位10.885μs；最新通过父四次12.72/12.94/13.15/13.26，中位13.045μs，候选中位低16.56%；最慢候选10.93仍比最快父12.72低14.07%，两次均低于父样本区间，可保留结构收益。没有实际同机交错A/B/shape/plan/SoC/profile，不称稳定因果百分比。C7 7.78/7.88保持父范围，其它未改路线不归因。
+
+本候选已有CPU/negative controls、正式编译/15点精度/两次速度证据，保留为下一实验父；main/历史标签不动，无活动任务。原JSON忽略 `artifacts/wide-n-manual-frame/confirm-fixed.json`。整体冲榜目标仍未完成。
+下一结构假设：TT原FinalizeFullMTiles分片M合并、写同GM partial内chunk标量、第二次SyncAll、block0二次gather/sum。评估第一barrier后复用死C UB、batch Max所有N分片并只Sum有效M，减少第二barrier和中间M scalar写/读；不得复做失败TT paired-N/worker-Max/NZ或B包扫描。当前尚未实现，需要实际helper/host容量模型、输出/尾mask/同步负控制后才能正式提交。
