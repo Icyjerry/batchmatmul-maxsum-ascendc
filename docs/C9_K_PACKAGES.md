@@ -33,7 +33,7 @@ python3 tools/validate_c9_packages_public_tiler.py --source /private/tmp/ascendc
 - 移除上述C9三个插入区并恢复一条predicate后，kernel与父版逐字一致；无main/CMake/run/golden/依赖修改。
 - 第一次fixture错误把不满足L1的package直接喂producer触发容量assert；修正fixture为只执行有效容量，保留host不够容量的回退断言。fake tiler缺少stepKa/Kb用本模型局部shim补充；真实公开tiler保留原算法/字段。
 
-**CPU不是CANN编译、FP16硬件精度、硬件异步协议或性能证明。CANN9/NPU/正式15点PENDING，暂无活动ID。** 没有actual shape/plan/SoC/profile；正式单次对照也不能证明稳定收益。
+**CPU不是CANN编译、FP16硬件精度、硬件异步协议或性能证明。CANN9/NPU/正式15点PENDING。活动正式任务 `6abe2939694b590c3cdc011a`，候选代码 `d19af3d` 已commit/push；dry-run只含kernel.asc且SHA一致。查询同一ID直到终态，不重复提交。** 没有actual shape/plan/SoC/profile；正式单次对照也不能证明稳定收益。
 
 ## 保留的B-stage实验
 
@@ -42,3 +42,11 @@ python3 tools/validate_c9_packages_public_tiler.py --source /private/tmp/ascendc
 ## 下一动作
 
 独立官方template dry-run确认仅kernel.asc、SHA一致；commit/push后CLI一次正式提交，立即保存ID并查询同一ID至终态。与父版第9点83.11μs、第8点59.66μs比较；无收益则归档，不把用户报告当作自身结果。
+
+## 已提交
+
+正式任务 `6abe2939694b590c3cdc011a`，代码 `d19af3d`，kernel SHA保持上文。查询：
+
+```sh
+python3 /private/tmp/query_bmmms_submission.py 6abe2939694b590c3cdc011a
+```
