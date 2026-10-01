@@ -35,4 +35,4 @@
 
 kernel SHA `269c7d370b48db80e7da48733f558ea6d6675ac844e4b04878ab4eec077c9b3c`，278860字节。
 本机模型日志 `/private/tmp/bmmms-tt-worker-{producer,consumer,final,public}.log`。首次脚本因注释抽取锚点改变退出，修正锚点后全部exit0；没有改变kernel容差/准入来绕过错误。
-独立官方模板 `/private/tmp/bmmms-judge-tt-worker-max/project` 仅替换kernel。CANN9编译/NPU精度/正式性能 **PENDING**；无活动任务，提交后记录同一ID至终态。
+独立官方模板 `/private/tmp/bmmms-judge-tt-worker-max/project` 仅替换kernel。dry-run核对仅kernel/SHA一致；代码 `34956fe` 已commit/push，正式活动任务 [6abe1ed9694b590c3cd68cc9](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe1ed9694b590c3cd68cc9) 已创建。CANN9编译/NPU精度/正式性能 **PENDING**；查询同一ID至终态，不因观察超时重提。
