@@ -1,5 +1,26 @@
 # 2026-09-30 · 配对 M / B 面板复用首版
 
+## 2026-10-01 · 窄 N 完整 K 驻留正式通过，无明显收益
+
+- 代码 `7ffb3ff` / SHA `4bf730de204af997b8eca185c2c2ffe72144874f29b4d59e10d33c81dc68672d`，正式ID `6abe0ee6694b590c3ccdd494` Pass，CANN编译成功、15/15、precision_ratio全1。
+- 耗时 `[2.18,4.18,4.33,5.55,5.44,10.74,10.32,66.45,84.05,97.90,88.93,96.67,16.04,13.36,9.03]` μs。第13点通过TT父15.28→16.04，无明显收益；其它未改路径不归因，无actual shape/plan/SoC/profile及重复A/B。
+- 新完整B L0驻留、A1双queue后续M预取、完整K一次MMAD、尾部补零、原Vector worker流式和；2654 producer，fake/public真实8.3 tiler production/TUNING各5376/504通过。归档实验，不并入main，不重复近邻tile提交；重大提升未达成。
+- TT任务审查新增720真实公开tiler代理计划，物理8/20/24/32核各180；未满核分别0/90/120/120，最大tile关键路径/理想均分分别1.4/2/2/1.6。这是源任务计数，非隐藏case路由或NPU延迟；下一结构转向连续tile任务、相邻N的A驻留和原partial Max合并。
+
+## 2026-10-01 · native A / NZ B 组合正式通过，无明显收益
+
+- 代码 `297abe5` / SHA `8e1fbca3a87bc380a174fbc01a181da8c5d8f9a7b02294d9d4f5895b5914942c`，正式ID `6abe05cf694b590c3cc88e53` Pass，CANN编译成功、15/15、precision_ratio全1。
+- 耗时 `[2.14,4.34,4.29,5.57,5.50,10.78,10.11,67.19,83.43,98.13,88.21,97.49,16.48,13.26,9.14]` μs。第12点TT父95.41→97.49，NZ-B父96.65→97.49；没有明显收益，无actual shape/plan/SoC/profile或重复A/B，不断言路由/根因。
+- 同一接口best_time快照（case顺序）`[1.37,1.83,2.44,3.23,2.33,7.16,3.69,17.32,50.68,68.65,71.25,85.25,5.21,6.08,8.31]` μs。C8/C13/C7当前约3.88/3.16/2.74倍参考，优先级应高于C12约1.14倍。这些数不是同设备A/B或最终得分，接口score字段为0，不能据此声称获得分数。
+- 724实际Cube-body模型、原ND/新NZ各2016、fake host各1728/54通过；与正式证据分开。归档 `experiment/packed-nz-native-a`；不再重复这套A/B加载近邻参数提交。整体重大提升未达成。
+
+## 2026-10-01 · packed-B一次Cube块布局正式通过，无明显收益
+
+- 代码 `0ad246b` / SHA `5a420968d478d3428334a42e562bbe3455d413f6db06a60a432c100282ef494a`，正式ID `6abe0163694b590c3cc61e91` Pass，CANN编译成功、15/15、precision_ratio全1。
+- 耗时 `[2.18,3.78,4.39,5.62,5.38,10.78,10.17,67.93,83.85,99.64,88.43,96.65,16.28,13.33,9.51]` μs。第12点TT父95.41→96.65，无明显收益；无actual shape/plan/SoC/profile和重复A/B，不断言路由或根因，其它未改路径不归因。
+- 原ND/新NZ各2016真实源码布局/延迟DMA执行、NZ全65536bit，fake/public8.3 tiler production/TUNING各1728/54通过。未新增GM/UB分配，队列后半用于预处理输出，SyncAll/flag12未改。
+- 保留独立分支 `experiment/packed-b-nz-once`；下一结构组合是保留连续NZ B，使用已通过TT native A矩形搬运，检查A仍按M16发起的成本。资料 `PACKED_B_NZ_ONCE.md`，本机私有原始资料 `artifacts/packed-b-nz-once/`。整体重大提升未达成。
+
 ## 2026-10-01 · 完整 M 四种布局正式通过，但第12点退化
 
 - 代码 `d0904f8` / SHA `3d2904d008155f2e8be3995b13f1295dfce130aac36ad47fbc0f8a9582bcf5f4`；正式ID `6abde198694b590c3cb643e2` Pass，15/15、precision_ratio全1，CANN编译成功。

@@ -1,0 +1,143 @@
+// Real source finalizer; delayed local/GM copies and a threaded all-AIV barrier.
+// Vector arithmetic is synchronous. This is not Ascend hardware timing.
+#include <algorithm>
+#include <cassert>
+#include <condition_variable>
+#include <cstdint>
+#include <deque>
+#include <functional>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <mutex>
+#include <thread>
+#include <vector>
+#define __aicore__
+#define __gm__
+using GM_ADDR=float*;
+constexpr int PIPE_V=1;
+struct Schedule {int64_t b,m,n,k;uint32_t baseM,baseN,mTiles,nTiles,nSplit,workers;};
+struct Barrier {
+ std::mutex mutex;std::condition_variable cv;unsigned arrived=0,generation=0,count;
+ explicit Barrier(unsigned n):count(n){}
+ void Wait(){std::unique_lock<std::mutex> lock(mutex);auto old=generation;
+  if(++arrived==count){arrived=0;++generation;cv.notify_all();}else cv.wait(lock,[&]{return generation!=old;});}
+};
+struct Shared {
+ Schedule s;std::vector<float> partial,output;Barrier barrier;
+ std::mutex mutex;std::vector<unsigned> writes;unsigned yWrites=0;
+ explicit Shared(Schedule x):s(x),partial(x.nSplit*x.mTiles*x.baseM+16,1e30f),output(17,1e30f),
+  barrier(2*x.workers),writes((x.m+x.baseM/2-1)/(x.baseM/2),0){}
+} *shared;
+thread_local uint32_t block=0;
+thread_local bool merged=false;
+thread_local std::deque<std::function<void()>> pending;
+void Flush(){while(!pending.empty()){auto f=pending.front();pending.pop_front();f();}}
+namespace AscendC {
+enum class TPosition{VECIN,VECOUT,VECCALC};
+enum class HardEvent{MTE2_V};
+struct Storage{std::vector<float> data;bool pending=false;explicit Storage(size_t n):data(n,1e30f){}};
+template<class T>struct LocalTensor {
+ std::shared_ptr<Storage> mem;size_t offset=0;
+ LocalTensor operator[](size_t i)const{assert(offset+i<mem->data.size());return {mem,offset+i};}
+ float& At(size_t i)const{assert(offset+i<mem->data.size());return mem->data.at(offset+i);}
+};
+template<class T>struct GlobalTensor {
+ T* ptr=nullptr;size_t size=0,offset=0;bool output=false;
+ void SetGlobalBuffer(T* p){ptr=p;output=p==shared->output.data();size=output?shared->output.size()-16:shared->partial.size()-16;}
+ GlobalTensor operator[](size_t i)const{assert(offset+i<size);auto x=*this;x.offset+=i;return x;}
+ float Read(size_t i)const{
+  assert(offset+i<size);
+  if(!output&&!merged&&(offset+i)<uint64_t(shared->s.mTiles)*shared->s.baseM){
+   const uint32_t owner=((offset+i)/(shared->s.baseM/2))%(2*shared->s.workers);assert(owner==block);
+  }
+  return ptr[offset+i];
+ }
+};
+template<TPosition P,int N>struct TQue {
+ std::shared_ptr<Storage> mem[N];bool used[N]={};std::deque<int> fifo;
+ template<class T>LocalTensor<T> AllocTensor(){for(int i=0;i<N;++i)if(!used[i]){if(mem[i]->pending)Flush();assert(!mem[i]->pending);used[i]=true;return {mem[i],0};}assert(false);return {};}
+ template<class T>void EnQue(LocalTensor<T> x){for(int i=0;i<N;++i)if(mem[i]==x.mem){assert(used[i]);fifo.push_back(i);return;}assert(false);}
+ template<class T>LocalTensor<T> DeQue(){assert(!fifo.empty());int i=fifo.front();fifo.pop_front();if(mem[i]->pending)Flush();return {mem[i],0};}
+ template<class T>void FreeTensor(LocalTensor<T> x){for(int i=0;i<N;++i)if(mem[i]==x.mem){assert(used[i]);used[i]=false;return;}assert(false);}
+ ~TQue(){Flush();assert(fifo.empty());for(bool v:used)assert(!v);}
+};
+template<TPosition P>struct TBuf{std::shared_ptr<Storage> mem;template<class T>LocalTensor<T> Get(){return {mem,0};}};
+struct TPipe {
+ size_t ub=0;
+ template<TPosition P,int N>void InitBuffer(TQue<P,N>& q,int n,uint32_t bytes){assert(n==N&&bytes%32==0);ub+=n*bytes;assert(ub<192*1024);for(auto& x:q.mem)x=std::make_shared<Storage>(bytes/4);}
+ template<TPosition P>void InitBuffer(TBuf<P>& b,uint32_t bytes){assert(bytes%32==0);ub+=bytes;assert(ub<192*1024);b.mem=std::make_shared<Storage>(bytes/4);}
+};
+uint32_t GetBlockIdx(){return block;}
+template<bool Mode>void SyncAll(){static_assert(Mode);Flush();shared->barrier.Wait();merged=true;}
+template<int Pipe>void PipeBarrier(){static_assert(Pipe==PIPE_V);}
+struct DataCopyExtParams{uint16_t blockCount;uint32_t blockLen,srcStride,dstStride,rsv;};
+template<class T>struct DataCopyPadExtParams{bool pad;uint32_t left,right;T value;};
+void DataCopyPad(LocalTensor<float> dst,GlobalTensor<float> src,DataCopyExtParams p,DataCopyPadExtParams<float> pad){
+ assert(!pad.pad&&p.blockLen%4==0&&p.srcStride%4==0&&!dst.mem->pending);
+ dst.mem->pending=true;
+ pending.push_back([=]{
+  const auto count=p.blockLen/4,dp=(count+7)/8*8+p.dstStride*8,sp=count+p.srcStride/4;
+  for(uint32_t r=0;r<p.blockCount;++r)for(uint32_t i=0;i<count;++i)dst.At(r*dp+i)=src.Read(r*sp+i);
+  dst.mem->pending=false;
+ });
+}
+void DataCopy(GlobalTensor<float> dst,LocalTensor<float> src,uint32_t count){
+ assert(!dst.output&&!src.mem->pending&&count==8&&dst.offset%(shared->s.baseM/2)==0);
+ const uint32_t chunk=dst.offset/(shared->s.baseM/2);
+ assert(chunk%(2*shared->s.workers)==block&&chunk<shared->writes.size());
+ src.mem->pending=true;
+ pending.push_back([=]{
+  std::lock_guard<std::mutex> lock(shared->mutex);assert(++shared->writes[chunk]==1);
+  for(uint32_t i=0;i<count;++i){assert(dst.offset+i<dst.size);dst.ptr[dst.offset+i]=src.At(i);}src.mem->pending=false;
+ });
+}
+void DataCopyPad(GlobalTensor<float> dst,LocalTensor<float> src,DataCopyExtParams p){
+ assert(dst.output&&block==0&&merged&&!src.mem->pending&&p.blockCount==1&&p.blockLen==4&&dst.offset==0);
+ src.mem->pending=true;
+ pending.push_back([=]{std::lock_guard<std::mutex> lock(shared->mutex);assert(++shared->yWrites==1);dst.ptr[0]=src.At(0);src.mem->pending=false;});
+}
+void Duplicate(LocalTensor<float> dst,float value,uint32_t n){assert(!dst.mem->pending);for(uint32_t i=0;i<n;++i)dst.At(i)=value;}
+void Max(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint32_t n){assert(!a.mem->pending&&!b.mem->pending);for(uint32_t i=0;i<n;++i)dst.At(i)=std::max(a.At(i),b.At(i));}
+template<class T,bool Reuse>void ReduceSum(LocalTensor<T> dst,LocalTensor<T> src,LocalTensor<T> tmp,uint32_t n){
+ assert(!src.mem->pending&&!dst.mem->pending);assert(tmp.offset+std::min(n,8u)<=tmp.mem->data.size());
+ float sum=0;for(uint32_t i=0;i<n;++i)sum+=src.At(i);dst.At(0)=sum;
+}
+void WholeReduceSum(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,uint32_t reps,uint32_t ds,uint32_t bs,uint32_t rs){
+ assert(mask==1&&reps>0&&reps<=128&&ds==1&&bs==1&&rs==1&&!src.mem->pending);
+ for(uint32_t r=0;r<reps;++r)dst.At(r)=src.At(r*8);
+}
+}
+template<AscendC::HardEvent E>void Fence(){static_assert(E==AscendC::HardEvent::MTE2_V);Flush();}
+// INSERT_FINALIZER
+
+float Value(uint32_t m,uint32_t ns,bool neg){return neg?-float(1+(m*17+ns*11)%61):float(int((m*17+ns*11)%61)-30);}
+void Run(uint32_t bm,uint32_t m,uint32_t ns,uint32_t workers,bool neg){
+ Schedule s{1,m,ns*128,32,bm,128,(m+bm-1)/bm,ns,ns,workers};Shared state(s);shared=&state;
+ const uint32_t paddedM=s.mTiles*bm;
+ float golden=0;
+ for(uint32_t r=0;r<m;++r){float mx=-std::numeric_limits<float>::infinity();
+  for(uint32_t split=0;split<ns;++split){float v=Value(r,split,neg);state.partial[split*paddedM+r]=v;mx=std::max(mx,v);}golden+=mx;
+ }
+ // Invalid M rows are poisoned, including all later N slabs.
+ std::vector<std::thread> threads;
+ for(uint32_t id=0;id<2*workers;++id)threads.emplace_back([&,id]{
+  block=id;merged=false;assert(pending.empty());AscendC::TPipe pipe;
+  // Include the existing consumer UB footprint in the capacity count.
+  pipe.ub=uint64_t(bm)*128*4+20*bm;
+  FinalizeFullMTiles(state.partial.data(),state.output.data(),s,pipe);Flush();assert(pending.empty());
+ });
+ for(auto& t:threads)t.join();
+ assert(state.output[0]==golden&&state.yWrites==1);
+ for(auto x:state.writes)assert(x==1);
+ for(uint32_t i=1;i<state.output.size();++i)assert(state.output[i]==1e30f);
+ for(uint32_t i=ns*paddedM;i<state.partial.size();++i)assert(state.partial[i]==1e30f);
+ for(uint32_t split=1;split<ns;++split)for(uint32_t r=0;r<m;++r)assert(state.partial[split*paddedM+r]==Value(r,split,neg));
+}
+int main(){unsigned count=0;
+ for(uint32_t bm:{64u,128u})for(uint32_t m:{1u,17u,64u,65u,129u,513u,1537u,8192u})
+ for(uint32_t ns:{1u,3u,16u})for(uint32_t workers:{1u,3u,20u})for(bool neg:{false,true}){
+  Run(bm,m,ns,workers,neg);++count;
+ }
+ std::cout<<count<<" extracted parallel N-merge then M-sum finalizers: real all-AIV barrier, delayed DMA, unique disjoint partial reuse, tail/negative/poison, output/input bounds PASS\n";
+}
