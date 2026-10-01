@@ -50,4 +50,5 @@ GM→UB只读有效M/N，按BN行距落UB，尾部不进入归约；沿N的64列
 检查CANN9编译、15点全精度和时间，优先比较父C7 9.40μs；C8/C9等未改路径时间不能归因该改动。
 没有actual shape/plan/SoC/profile或重复A/B时，只报告单次结果，不保证稳定收益；没有显著收益则归档，不合main，不重复近邻参数提交。
 
-CANN9/NPU精度/性能：PENDING，尚未提交。
+CANN9/NPU精度/性能：PENDING。实现 `a3696cd` 已commit/push；独立原模板仅kernel、306655byte/SHA一致。
+正式提交 **`6abe6705694b590c3cfd63c9`** 已创建，下一只轮询这一ID到终态，不重复提交。
