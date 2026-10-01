@@ -1,10 +1,11 @@
 # 接手状态 · 2026-10-01
 
-## 最新：TT跨tile B包流水已实现/CPU通过，保留C9，正式PENDING
+## 最新：TT跨tile B包流水正式15/15通过，第8点49.38μs
 
 分支 `experiment/tt-b-package-stream` 从通过 `4ac80c9` 开始，kernel SHA `8c03d710d5394a0660e6bedc4c172f7784a1cbe3ef9f1cbc450f231aa1d6a052`。原dual33任务/Vector/partial/ring和整个C9保持，B1两个手动包槽+显式MTE1↔MTE2 credit连续预读到后续tile，包K按L1余量选择；现有kChunk保存B包大小但kSplit仍1，完整s.k后才Max/Sum，无新GM/flags/ABI。
 440立即+440延迟MTE2/MTE1/MMAD+440 eagerMTE2对抗模型、缺last-reader等待负控制、420旧producer/160全部bit模式通过；fake/固定公开8.3 host production/TUNING各6912/720/576通过。具体 [TT_B_PACKAGE_STREAM.md](TT_B_PACKAGE_STREAM.md)。CPU不是CANN9/nativeA queue/硬件精度或时间证明。
-独立官方template dry-run仅kernel/297815bytes/SHA一致。代码 `eb4671c` 已commit/push；活动正式任务 `6abe3059694b590c3cdf6c87`，CANN9/NPU PENDING；下一 `python3 /private/tmp/query_bmmms_submission.py 6abe3059694b590c3cdf6c87` 查询同一ID至终态，不重复提交；对照父C8 59.27/C9 68.54μs。无收益恢复 `4ac80c9` 组合，不重复N pair/worker Max。整体重大提升仍未达到可完成程度。
+独立官方template dry-run仅kernel/297815bytes/SHA一致。代码 `eb4671c` 已commit/push；正式任务 `6abe3059694b590c3cdf6c87` **Pass，CANN编译成功、15/15、precision_ratio全1**。第8点59.27→49.38μs，单次降低16.7%/1.200x；第9点68.54→67.48μs，未改C9不归因该波动。没有actual shape/plan/SoC/profile或重复A/B，不保证稳定幅度或case路线/分数。没有活动任务，原始资料本机Git忽略 `artifacts/tt-b-package-stream/`。
+保留当前通过版为下一实验父版，原组合 `4ac80c9` 保留。下一核对现有ring直接C0/NZ输出：先比对 `fcbf29b` 内建库NZ和三个回调NZ失败实验，确认与当前manual区别。公开固定8.3 copy_cube_out_utils.h 的NZ branch使用基本 `Fixpipe<DstT,SrcT,CFG_NZ>`；需核实安装9.0/A2-A3支持、FP32 stride、真实Vector DMA与无效N -inf模型后才实现。该方向尚未实现/验证，无新输入GM通路；不继续B包参数扫描、不重复N pair/worker Max。整体极限优化目标仍有空间，不能标记complete。
 
 ## 最新：队友C9与TT组合正式15/15通过，第9点68.54μs
 

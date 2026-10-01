@@ -543,3 +543,11 @@ Split-K host 模型两档宏均编译运行，统计是各档相同模型空间�
 - C9父83.11→68.54，单次耗时降低17.5%/1.213x；这是复现用户报告队友约68μs，非超越队友。C8父59.66→59.27，TT保留，不宣称稳定微小收益。其它路径未改，时间变化不归因。没有actual shape/plan/SoC/profile或重复A/B，不推断case路线或排行榜得分。
 - CPU177producer+177延迟MMAD、9216消费者；fake/公开固定8.3 tiler production/TUNING各2560/128通过。MTE1仍同步，不把模型当硬件精度/同步/时间证明。无新GM/flags或main/golden修改。
 - 无活动任务；原始JSON/模型本机Git忽略 `artifacts/c9-k-packages/`。交接 [C9_K_PACKAGES.md](C9_K_PACKAGES.md)。后续以此组合为父版，勿丢C9收益。
+
+## 2026-10-01 · TT跨tile B1包流水
+
+- `experiment/tt-b-package-stream` / `eb4671c`，kernel SHA `8c03d710d5394a0660e6bedc4c172f7784a1cbe3ef9f1cbc450f231aa1d6a052`，父组合 `4ac80c9`。两个B1手动slot、显式MTE1↔MTE2 credit、按L1选包K、跨Nt/M/batch cursor预读；无新GM/flags/ABI，kSplit仍1、完整K后Max，原Vector与C9逐字保留。
+- [正式任务 6abe3059694b590c3cdf6c87](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe3059694b590c3cdf6c87) Pass，CANN编译成功、15/15、precision_ratio全1。耗时μs `[2.15,3.97,4.30,5.60,5.40,10.51,9.68,49.38,67.48,98.19,87.77,96.70,15.25,13.02,9.20]`。
+- C8 59.27→49.38，单次耗时降低16.7%/1.200x；C9 68.54→67.48，其路径未改，不归因波动。没有actual shape/plan/SoC/profile或重复A/B，不称稳定或推断分数。
+- CPU440立即/440延迟MTE2-MTE1-MMAD/440 eagerMTE2、缺reader等待负控制；原420producer/160全部bit模式通过；fake/公开固定8.3 host production/TUNING各6912/720/576通过。A1 queue仍抽象、Fixpipe同步，不代替native时序/硬件精度。
+- 保留为新的通过父版，无活动任务。原始JSON/模型本机Git忽略 `artifacts/tt-b-package-stream/`；交接 [TT_B_PACKAGE_STREAM.md](TT_B_PACKAGE_STREAM.md)。下一核对manual基本NZ ring输出，先对比历史库/回调NZ无收益或runtime失败，避免重复。

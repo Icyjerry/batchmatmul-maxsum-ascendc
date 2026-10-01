@@ -39,5 +39,18 @@ A1 TQue依旧是抽象完成模型，Fixpipe同步；CPU不是native queue实现
 
 ## Validation Request
 
-官方独立模板 `/private/tmp/bmmms-tt-b-stream-official/project`，仅kernel替换；dry-run 297815字节、SHA同上。代码 `eb4671c` 已commit/push，活动正式任务 `6abe3059694b590c3cdf6c87`；CANN9编译/NPU精度/性能PENDING。
-下一 `python3 /private/tmp/query_bmmms_submission.py 6abe3059694b590c3cdf6c87` 查询同一ID至终态，不重复提交。比较父C8 59.27/C9 68.54μs。仍无actual shape/plan/SoC/profile，不根据单次结果断言新route命中或稳定收益；失败/无收益保留实验并恢复父组合，不能丢队友C9。
+官方独立模板 `/private/tmp/bmmms-tt-b-stream-official/project`，仅kernel替换；dry-run 297815字节、SHA同上。代码 `eb4671c` 已commit/push，正式任务 `6abe3059694b590c3cdf6c87` 已Pass，結果如下。没有活动任务。
+
+## 正式结果
+
+[正式任务 6abe3059694b590c3cdf6c87](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe3059694b590c3cdf6c87) **Pass，CANN编译成功、15/15、precision_ratio全1**。kernel SHA与上文一致，耗时μs：
+
+```text
+[2.15,3.97,4.30,5.60,5.40,10.51,9.68,49.38,67.48,98.19,87.77,96.70,15.25,13.02,9.20]
+```
+
+第8点父59.27→49.38μs，单次耗时降低16.7%/1.200x。第9点68.54→67.48μs，其路径逐字未改，不将1.06μs变化归因于TT优化。保留当前候选作为下一实验父版，原组合仍保留 `4ac80c9`。
+
+没有actual shape/plan/SoC/profile或重复A/B，不确认隐藏case路线、不将单次幅度称为稳定收益、不宣称排行榜分数。原始JSON/模型在本机Git忽略 `artifacts/tt-b-package-stream/`，权限700/600。
+
+下一研究现有ring直接存C0/NZ是否能减少FIX格式转换和AIV细粒度DMA。先比对 `fcbf29b` 内建库NZ及三个回调NZ失败实验，它们改变Matmul库，与当前手写完整M producer不同。核实基本Fixpipe `CFG_NZ` 的A2/A3接口和FP32 GM stride后才考虑独立改变同一ring格式；无新输入GM通路、不再试B包参数。该方案尚未实现或验证，不能计作收益。
