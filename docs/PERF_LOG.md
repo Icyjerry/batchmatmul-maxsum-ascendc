@@ -1,5 +1,21 @@
 # 2026-09-30 · 配对 M / B 面板复用首版
 
+## 2026-10-01 · 完整A1/矩形转置/连续任务的N配对正式通过，无收益
+
+代码 `124dc31`，kernel SHA `a7555e313a0bf6bfe34bca301b8769f28c6b127ed85a859292a883a1db33fcc1`，分支 `experiment/tt-fullm-npair`。
+任务 `6abe223b694b590c3cd8474e` Pass，CANN编译成功、15/15、precision_ratio全1。
+耗时 `[2.07,4.54,4.28,5.46,5.36,10.36,10.19,60.83,83.67,97.80,88.19,96.38,15.67,13.04,9.65]` μs。第8点父59.66→60.83μs，无收益；无actual shape/plan/SoC/profile及重复对照，不归因未改路径或断言A2开销。
+440立即+440延迟MMAD实际producer、420旧producer/160 raw-bit layouts、fake host各6912/720/144通过；host/workspace/Vector逐字保持父版。当前设计与旧非驻留/对齐限定N pair有明确区别，但仍未形成正式改善。
+无活动任务，归档原始JSON/日志 `artifacts/tt-fullm-npair/`，恢复父通过版；下一检查单B1双K stage，保持L0子块/L1总容量/GM通路，避免继续相近N pair尝试。详情 [TT_FULLM_NPAIR.md](TT_FULLM_NPAIR.md)。整体重大提升未达成。
+
+## 2026-10-01 · TT worker/M UB Max 驻留正式通过，无收益
+
+代码 `34956fe`，kernel SHA `269c7d370b48db80e7da48733f558ea6d6675ac844e4b04878ab4eec077c9b3c`，分支 `experiment/tt-worker-max`。
+正式任务 `6abe1ed9694b590c3cd68cc9` Pass，CANN编译成功，15/15、precision_ratio全1。
+耗时 `[2.11,4.14,4.41,5.74,5.38,10.72,10.30,59.72,84.31,98.00,89.17,97.46,16.37,13.36,9.60]` μs；第8点父59.66→59.72μs，没有收益，无actual shape/plan/SoC/profile及重复对照，不归因未改路径。无活动任务。
+1440实际消费者/稀疏末级、9216原窗口消费者、440producer/420旧producer/160位模式、288稀疏末级、fake/public8.3 host各6912/720/144通过。代理partial份数144→28是真实源码/任务计数，不是性能改善。
+归档JSON/日志 `artifacts/tt-worker-max/`（Git忽略），恢复父结构；下一检查完整A1驻留/Load3D/连续任务下的A2跨N复用，避免原样重复旧无收益N pair。详情 [TT_WORKER_MAX.md](TT_WORKER_MAX.md)。整体重大提升未达成。
+
 ## 2026-10-01 · TT连续tile任务与并行末级合并正式通过
 
 - 代码 `32c6b1c` / SHA `65e38bb155af9adb068e87dc90c01face21a7cf024d094c54846c5188e9ca120`，正式ID `6abe1a32694b590c3cd3fe15` Pass，CANN编译成功、15/15、precision_ratio全1。

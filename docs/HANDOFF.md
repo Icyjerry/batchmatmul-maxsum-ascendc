@@ -1,5 +1,25 @@
 # 接手状态 · 2026-10-01
 
+## 当前工作起点：恢复59.66μs通过结构，准备B1单stage研究
+
+分支 `experiment/tt-b-stage`，kernel与 `0d4bd04` 逐字相同，SHA `65e38bb155af9adb068e87dc90c01face21a7cf024d094c54846c5188e9ca120`。本次两项结构实验都正式15/15通过但无收益：worker UB Max第8点59.72μs，完整A1 N pair为60.83μs。代码/实际源码模型/原始结果分别保留 `experiment/tt-worker-max` / `fba8b4f` 和 `experiment/tt-fullm-npair` / `0cc9884`；均不合入当前kernel。没有活动评测任务。
+下一条具体动作：核对一个 `2*BK` 的B1 NZ stage能否替代原两个 `BK` buffer。单stage容量与原双queue总容量相同，L0A/B继续原BK/双buffer；从stage的 `innerK*align16(cols)` 元素偏移加载B2，完成该stage最后MTE1读取才Free并预读下一个stage。ND2NZ调用可减半，但预读深度/等待可能抵消收益，不预测加速。先实际源码/物理layout模型验证K8尾、N尾、stage边界和live operand，之后再实现。
+区别旧hierarchical设计的四B1/N pair：当前完整A1驻留，只有一个两K B1缓冲，不加L1/L0/UB或GM通路，不改变host/tasks/Vector。上述新stage尚未实现或验证；整体重大提升未达成。
+
+## 当前：恢复59.66μs父版，仅改变完整A1下的Cube N配对
+
+分支 `experiment/tt-fullm-npair`，基于 `0d4bd04`；kernel SHA `a7555e313a0bf6bfe34bca301b8769f28c6b127ed85a859292a883a1db33fcc1`。不合入无收益worker Max候选；其结果/代码保留独立分支。
+同worker连续区间、同M的两个Nt在K循环内共享A2矩形Load3D，C独立完整K累加后按原Nt/ring顺序输出。A2在两次MMAD之后释放，B2独立release；原host/workspace/Vector逐字保持，无新GM/cross flags。
+区别旧 `7b4d477`：完整A1驻留、一次矩形Load3D、连续任务、BM64及非对齐尾块；旧准入限16对齐/BM128且panelResident=0。避免无证据原样重交。
+440立即MMAD+440延迟MMAD/ordered M-flag/live operand模型、420旧producer/160位模式、fake host production/TUNING各6912/720/144通过。细节 [TT_FULLM_NPAIR.md](TT_FULLM_NPAIR.md)。代码 `124dc31` 已commit/push，正式任务 `6abe223b694b590c3cd8474e` Pass，CANN编译成功、15/15、precision_ratio全1；第8点父59.66→60.83μs，无收益，无actual shape/plan/SoC/profile或重复对照。没有活动任务，原始资料Git忽略 `artifacts/tt-fullm-npair/`。下一恢复59.66μs父版，研究B1一个双K stage替代两个单K queue buffer：同L1预算、L0仍原128 K、ND2NZ调用减半，但预读等待可能增加；必须模型证明物理NZ切片/queue在最后MTE1后释放，不能重复旧4-B1/N pair参数。整体重大提升仍未达成。
+
+## 当前：TT worker/M 的 UB Max 驻留正式通过，但没有收益
+
+分支 `experiment/tt-worker-max`，从当前正式通过59.66μs的 `0d4bd04` 开始。kernel SHA `269c7d370b48db80e7da48733f558ea6d6675ac844e4b04878ab4eec077c9b3c`。
+同M相邻N tile的行最大值留MQ/UB，切M或连续区间尾才写worker partial；nSplit=workers，但任务仍为M×N tiles。末级只读取真正与M相交的worker，未写槽位不初始化也不读取。原dual33选择/完整K Cube/A驻留/ring/flags/标量复用保持，不增加GM通路。
+1440实际新消费者+稀疏末级线程模型、9216原窗口消费者、440producer、420旧producer/160位模式复制回归、288稀疏末级、fake/public固定8.3 production/TUNING各6912/720/144通过。M=N1536/BM=BN128/20核代理partial份数144→28，非时间预测。
+详情 [TT_WORKER_MAX.md](TT_WORKER_MAX.md)。代码 `34956fe` 已commit/push；正式任务 `6abe1ed9694b590c3cd68cc9` Pass，CANN编译成功、15/15、precision_ratio全1；第8点父59.66→59.72μs，没有收益。原始JSON/模型日志本机Git忽略 `artifacts/tt-worker-max/`，无活动任务。下一恢复父 `0d4bd04`，检查Cube侧跨N的A2转换复用；旧N pair `7b4d477` 无收益且限16对齐/BM128/A非驻留，不能原样重交，必须核对新完整A1/Load3D/连续任务差异。整体重大提升仍未达成。
+
 ## 当前：TT连续tile任务正式通过，第8点单次改善8.6%
 
 分支 `experiment/tt-contiguous-tiles`，基于通过TT种子 `a05035e`，kernel SHA `65e38bb155af9adb068e87dc90c01face21a7cf024d094c54846c5188e9ca120`。没有并入窄N驻留或NZ-B候选。
