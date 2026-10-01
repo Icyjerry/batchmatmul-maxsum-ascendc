@@ -4,7 +4,7 @@
 
 分支 `experiment/c14-manual-frame`，实现 `8e6959b`，kernel SHA `b0e0b66495df9606156f73f1d4a1399801ab18f203ff0f9458a7051caca4150f`，340070bytes。首任务host-only std::min编译错误已仅三元运算修复；修复任务 `6abea479694b590c3c1e1f2d` Pass，CANN编译成功、15/15、precision_ratio全1。C14 10.93μs，最新通过父四次12.72–13.26、中位13.04，低于最快父14.1%、低于中位16.2%，超出观察波动4.1%；仅单次收益，无同机交错A/B和actualshape/plan/SoC/profile，不称稳定因果百分比。C7 7.78在旧四次7.67–8.04范围内，其它路线源码未改不归因。
 
-原GM/plan/grid/flags0/4/完整K→MaxN→SumM保持。205行结构候选与模型/native限制和15点结果见 `docs/WIDE_N_MANUAL_FRAME.md`；原JSON忽略 `artifacts/wide-n-manual-frame/official-fixed.json`。下一原样确认一次较大收益、存ID查询终态，不扫附近参数。main/历史标签不动，整体冲榜尚未完成；C7四次重复资料在 `experiment/c7-identical-repeats`。没有活动任务。
+原GM/plan/grid/flags0/4/完整K→MaxN→SumM保持。205行结构候选与模型/native限制和15点结果见 `docs/WIDE_N_MANUAL_FRAME.md`；原JSON忽略 `artifacts/wide-n-manual-frame/official-fixed.json`。下一原样确认一次较大收益、存ID查询终态，不扫附近参数。main/历史标签不动，整体冲榜尚未完成；C7四次重复资料在 `experiment/c7-identical-repeats`。原样确认任务 `6abea54c694b590c3c1e7459` 已创建，下一只查同ID至终态不重交。
 
 ## 最新指令：同一通过源码再复测两次
 
