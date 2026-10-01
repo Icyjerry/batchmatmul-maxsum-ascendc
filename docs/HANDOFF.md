@@ -1,3 +1,9 @@
+# Latest: tiny bit transpose passed15/15 but C2 regressed; archive
+
+Branchexperiment/tiny-bit-transpose, codeeb7c7de / SHA844b8005..., task6abebe23694b590c3c265928 terminalPass, CANNcompilepassed,15/15precision1. C2=4.12 vsparent2.46; no gain. C8=46.22 vsparent46.52 is0.6% on source-identicalTTpath, not an attributable improvement. FullresultTINY_BIT_TRANSPOSE.md, rawJSON ignored artifacts/tiny-bit-transpose/official.json. Noactive task.
+
+Archive this candidate, no unchanged confirmation/parameter scan. Restore passed parent1734f16 in a new independent branch. Next verify CANN9 Brcb and storage-native vector document algorithm (querybroadcast -> FP32Mul -> treeKAdd -> validNMax -> Msum); no implementation yet. Must prove resources, tail and rounding, preserve originalinput/pairedB. Largerpaddedcast/addresssetup are hypotheses only; overallmajoroptimization incomplete. Main/tags unchanged.
+
 # Current: Tiny raw-bit transpose structural candidate, CPU passed
 
 Branch `experiment/tiny-bit-transpose`, parent1734f16. Kernel361238bytes / SHA `844b80051c753717db4011a3586b4fed5dcb83d9937121c62b02dbc7ade4875f`;126addedlines in3regions, removing them restores entire parent. Rawuint16 block transpose before sharedFP32Cast replaces per-tokenGather/indexconstruction. Original arithmetic/task/group/grid/GM, allCube and FT fallback unchanged; realUBguard for padded8-regionframe. CANN900primaryAPI confirms A2/A3uint16 use and strides; no nativeBF16transpose claim.

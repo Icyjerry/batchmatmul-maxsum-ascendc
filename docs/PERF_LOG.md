@@ -1,4 +1,13 @@
 
+## Official terminal result: Pass15/15, no gain, C2 regression
+
+Task `6abebe23694b590c3c265928`, implementation `eb7c7de`, SHA `844b80051c753717db4011a3586b4fed5dcb83d9937121c62b02dbc7ade4875f`: CANN compile successful,15/15Pass, all precision_ratio=1. Times(us): `[1.92, 4.12, 3.28, 4.09, 5.24, 9.67, 8.15, 46.22, 68.01, 98.53, 88.32, 97.03, 16.04, 10.58, 9.1]`. C2=4.12 vs immediateparent2.46, a large unfavorable observation; no beneficial overallresult. Other routes are source-identical but timing changes are not attributable without actualdevice/shape/plan/profile. C8=46.22 vs parent46.52 is only0.6% and not evidence for this tinychange.
+
+Do not confirm/resubmit this candidate or scan transpose parameters. Archive it as a negative structural result and restore the passed parent1734f16 for the next independent experiment. Larger padded casts and address-array scalar setup are possible explanations, not measured bottlenecks. Official15 samples do not establish allK8/tail/dependency configurations; the CPU model has oneVectorFIFO, not hardware subpipelines. RawJSON ignored artifacts/tiny-bit-transpose/official.json. No activeofficialtask; main/tags remain unchanged; overallmajoroptimizationgoal incomplete.
+
+Next study a storage-native document-vector algorithm: broadcast queryK values into N lanes with Brcb, multiply documentstorage[K,N] directly, tree-add acrossK, then validNMax/Msum. This is not another input-transpose tweak; first verify CANN9 API/resource/numerical constraints and compare source API work. No newcode for that algorithm yet.
+
+
 ## Official terminal result: Pass, modest single-run change
 
 Task `6abeb39e694b590c3c22e5d7`, implementation `a770e64`, SHA `a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742`: CANN compile successful, 15/15 Pass, all precision_ratio=1. Times (us): `[1.99, 2.46, 3.11, 4.12, 5.39, 9.97, 8.16, 46.52, 67.79, 99.14, 88.03, 96.45, 15.49, 11.01, 9.56]`.
