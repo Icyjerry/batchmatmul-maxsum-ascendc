@@ -7,7 +7,7 @@
 - 独立工程：`/private/tmp/bmmms-tt-manual-frame-official/project`。8个工程源码逐字等于 `1734f16`；CLI仅上传kernel。CLI生成的 `.cannjudge-project.json` 为本机配置，不属于工程源码或提交文件。
 - 不修改算法、测试或构建；不增加CPU测试。两次按前一任务终态后再提交，取得ID立即保存，查询同一ID至终态。
 - 复测1：`6abeceed694b590c3c2bc7a5`，Pass，15/15，precision_ratio 全1。
-- 复测2：待提交。
+- 复测2：`6abecfc5694b590c3c2c1347`，已提交，终态 PENDING。首次POST HTTP429拒绝、无ID；等待45秒后重试成功生成此唯一第二个任务。
 
 API没有实际SoC/shape/plan/profiling。这是同源码重复测量，不是受控同机A/B；三次范围只能描述这三个样本，不能给出总体波动界。
 
