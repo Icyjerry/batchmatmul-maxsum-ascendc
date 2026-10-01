@@ -44,3 +44,15 @@ python3 tools/validate_c7_manual_frame.py
 CANN9编译、NPU精度、性能 **PENDING**。若有条件另采actual shape/dtype/layout/plan、SoC/核数、CANN、误差、repeat、msprof和交错A/B；CLI结果缺这些元数据时如实保留限制。
 
 正式任务 **`6abe9804694b590c3c18f362`** 已创建，代码 `c17077f`，kernel SHA保持。下一仅查询 `python3 /private/tmp/query_bmmms_submission.py 6abe9804694b590c3c18f362` 至终态；观察超时不能重复提交。CANN9编译/NPU精度/时间PENDING。
+
+## 正式结果
+
+[任务 6abe9804694b590c3c18f362](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe9804694b590c3c18f362) **Pass，CANN编译成功、15/15，precision_ratio全1**，kernel SHA保持。μs：
+
+```text
+[1.99,2.48,3.16,4.01,5.46,9.96,8.00,50.67,67.89,98.21,88.06,96.43,15.76,13.15,9.81]
+```
+
+C7 8.00，比父三次最快9.59低16.6%，比中位10.14低21.1%，已超出父样本9.59–10.28区间和6.8%极差/中位数，形成值得保留的单次结构收益。不是同机受控A/B或稳定因果收益证明，actual shape/plan/SoC/profile仍缺失；其它路线未改，不归因其波动。下一原样再确认一次该较大差距，不扫描参数；若复测回到父波动带如实记录。
+
+原始JSON Git忽略 `artifacts/c7-manual-frame/official.json`。通过版保留独立实验分支，main/历史标签不动。

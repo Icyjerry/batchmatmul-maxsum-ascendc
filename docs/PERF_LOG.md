@@ -626,3 +626,17 @@ C3/C6的新版本三次均低于更早组合 `6abe7b90694b590c3c08ed48` 的单�
 全部资料推送当前 `experiment/teammate-single-tile`，main/历史标签不动。原JSON分别忽略 `artifacts/teammate-single-tile/official.json`、`repeat1.json`、`repeat2.json`；摘要见 `docs/SINGLE_TILE_REPEATS.md`。没有活动任务，kernel保持通过版。
 下一可执行动作：继续当前源码与 `git show 9ab2312:kernel.asc` 的资源化small-tile覆盖审查，按此前执行单先验证 `previousSmall/expandedSmall/SmallFullTileFits/dual23` 的容量、repeat、batch ownership和同步。不继续原样重交；若之后要精确量化某算法收益，需旧版与新版交错重复A/B和实际设备元数据。小矩阵泛化尚未实现/未提交。
 
+
+## 2026-10-02 · C7手动物理frame正式通过
+
+## 正式结果
+
+[任务 6abe9804694b590c3c18f362](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe9804694b590c3c18f362) **Pass，CANN编译成功、15/15，precision_ratio全1**，kernel SHA保持。μs：
+
+```text
+[1.99,2.48,3.16,4.01,5.46,9.96,8.00,50.67,67.89,98.21,88.06,96.43,15.76,13.15,9.81]
+```
+
+C7 8.00，比父三次最快9.59低16.6%，比中位10.14低21.1%，已超出父样本9.59–10.28区间和6.8%极差/中位数，形成值得保留的单次结构收益。不是同机受控A/B或稳定因果收益证明，actual shape/plan/SoC/profile仍缺失；其它路线未改，不归因其波动。下一原样再确认一次该较大差距，不扫描参数；若复测回到父波动带如实记录。
+
+原始JSON Git忽略 `artifacts/c7-manual-frame/official.json`。通过版保留独立实验分支，main/历史标签不动。

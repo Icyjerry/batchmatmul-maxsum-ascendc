@@ -1,5 +1,11 @@
 # 接手状态 · 2026-10-02
 
+## 最新：手动C7入口正式15/15通过，C7 8.00 μs
+
+分支 `experiment/c7-manual-frame`，实现 `c17077f`，kernel SHA `45234d7945b6013cc75d2e6c3092c911c9c8ecd5618b82a7c51fd7d9084e0c61`，329378bytes。正式任务 **`6abe9804694b590c3c18f362` Pass，CANN编译成功、15/15，precision_ratio全1**，μs `[1.99,2.48,3.16,4.01,5.46,9.96,8.00,50.67,67.89,98.21,88.06,96.43,15.76,13.15,9.81]`。
+C7 8.00，比父同SHA三次最快9.59低16.6%、比中位10.14低21.1%，超过观察范围9.59–10.28和极差6.8%；可保留单次较大结构收益，但没有同机A/B/actualshape/plan/SoC/profile，不称稳定因果百分比。其它路线未改，不归因各自波动。CPU/实际实现与限制详见 `docs/C7_MANUAL_FRAME.md`。
+下一原样确认一次本较大收益，commit/push后提交存ID查终态；不是继续两次已完成的父版重复，也不是N参数扫描。若回到父波动带如实记录。原始JSON忽略 `artifacts/c7-manual-frame/official.json`。原通过组合和main/标签保持；目前无活动正式任务。
+
 ## 当前：C7完整输入 + 手动物理frame候选
 
 分支 `experiment/c7-manual-frame`，父 `0fe38f0`，kernel SHA `45234d7945b6013cc75d2e6c3092c911c9c8ecd5618b82a7c51fd7d9084e0c61`。仅kernel新增173行：32byte独立入口、资源选择、launch override，原host plan/GM/grid/其它路径逐字保持。旧full-input/lean两次没有明显收益，本次结合队友manual LocalTensor，移除本路线TPipe/TBuf/事件分配，并保留原全输入/全A2/单B2 N slab/双C0和精确N树Max→有效M Sum。不扫描N参数、不重做失败窄N驻留，无新GM。
