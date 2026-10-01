@@ -1,0 +1,213 @@
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <deque>
+#include <functional>
+#include <iostream>
+#include <memory>
+#include <vector>
+#include <type_traits>
+#include <set>
+#define __aicore__
+using half=uint16_t;
+constexpr bool NZ_B=BMMMS_NZ_B;
+std::vector<bool> copiedBits(65536,false);
+struct Schedule {int64_t b,m,n,k;uint32_t baseM,baseN,mTiles,nTiles,nSplit,workers,tree=0;};
+struct Buffer {
+    static std::set<Buffer*> live;
+    std::vector<uint16_t> words;bool used=false,readPending=false,writePending=false;
+    explicit Buffer(size_t n):words(n,0xdead){live.insert(this);}
+    ~Buffer(){live.erase(this);}
+};
+std::set<Buffer*> Buffer::live;
+struct State {
+    unsigned aiv=0,live=0,peak=0,reads=0,writes=0,overlaps=0;
+    std::function<void()> finishWrite,finishRead;
+    uint64_t transposes=0,cubeCopies=0,nd2nz=0,l0Loads=0;
+    std::vector<unsigned>* owners=nullptr;
+} st;
+bool earlyRead=false;
+namespace AscendC {
+enum class TPosition {VECIN,A1,B1};
+enum class HardEvent {V_MTE2,V_MTE3,MTE3_V};
+template<class T>struct LocalTensor {
+    std::shared_ptr<Buffer> memory;size_t offset=0;
+    LocalTensor operator[](size_t i)const{assert(offset+i<memory->words.size());return {memory,offset+i};}
+    void* GetPhyAddr()const{return memory->words.data()+offset;}
+    T& at(size_t i)const{assert(offset+i<memory->words.size());return reinterpret_cast<T&>(memory->words[offset+i]);}
+    template<class U>LocalTensor<U> ReinterpretCast()const{return {memory,offset};}
+};
+template<class T>struct GlobalTensor {
+    std::vector<T>* memory;size_t offset=0;
+    GlobalTensor operator[](size_t i)const{assert(offset+i<memory->size());return {memory,offset+i};}
+    T& at(size_t i)const{return memory->at(offset+i);}
+};
+template<TPosition P,int N>struct TQue {
+    std::shared_ptr<Buffer> buffers[N];
+    struct Input {LocalTensor<uint16_t> tensor;std::function<void()> finish;};
+    std::deque<Input> ready;
+    TQue(unsigned bytes){for(auto& p:buffers)p=std::make_shared<Buffer>(bytes/2);}
+    template<class T>LocalTensor<T> AllocTensor(){
+        for(auto& p:buffers)if(!p->used){assert(!p->readPending && !p->writePending);p->used=true;
+            st.peak=std::max(st.peak,++st.live);return {p};}
+        assert(false);return {};
+    }
+    template<class T>void EnQue(LocalTensor<T> data){
+        assert(data.memory->readPending && st.finishRead);
+        ready.push_back({{data.memory,data.offset},st.finishRead});st.finishRead={};
+        if(earlyRead)ready.back().finish();
+    }
+    template<class T>LocalTensor<T> DeQue(){
+        assert(!ready.empty());auto entry=ready.front();ready.pop_front();
+        if(entry.tensor.memory->readPending)entry.finish();
+        assert(!entry.tensor.memory->readPending);return {entry.tensor.memory,entry.tensor.offset};
+    }
+    template<class T>void FreeTensor(LocalTensor<T> data){
+        assert(data.memory->used && !data.memory->readPending && !data.memory->writePending);
+        data.memory->used=false;--st.live;
+    }
+    ~TQue(){assert(ready.empty() && !st.finishRead);for(auto& p:buffers)assert(!p->used && !p->readPending && !p->writePending);}
+};
+unsigned GetBlockIdx(){return st.aiv;}
+struct DataCopyExtParams {uint32_t count,length,srcStride,dstStride,reserved;};
+template<class T>struct DataCopyPadExtParams {bool enabled;uint8_t left,right;T value;};
+template<class T>void Duplicate(LocalTensor<T> dst,T value,unsigned count){
+    assert(!dst.memory->readPending && !dst.memory->writePending);
+    for(unsigned i=0;i<count;++i)dst.at(i)=value;
+}
+template<class T>void DataCopyPad(LocalTensor<T> dst,GlobalTensor<T> src,DataCopyExtParams p,DataCopyPadExtParams<T>){
+    assert(dst.memory->used && !dst.memory->readPending && !dst.memory->writePending);
+    assert(!st.finishRead);
+    dst.memory->readPending=true;++st.reads;
+    if(st.finishWrite){assert(st.live==2);++st.overlaps;}
+    st.finishRead=[=]{
+        assert(!dst.memory->writePending);
+        unsigned cols=p.length/2,inPitch=cols+p.srcStride/2,outPitch=(cols+15)/16*16+p.dstStride*16;
+        for(unsigned r=0;r<p.count;++r)for(unsigned c=0;c<cols;++c)dst.at(r*outPitch+c)=src.at(r*inPitch+c);
+        dst.memory->readPending=false;
+    };
+}
+template<class T>void DataCopy(GlobalTensor<T> dst,LocalTensor<T> src,unsigned count){
+    assert(src.memory->used && !src.memory->readPending && !src.memory->writePending && !st.finishWrite);
+    src.memory->writePending=true;++st.writes;
+    st.finishWrite=[=]{
+        assert(src.memory->used && !src.memory->readPending);
+        for(unsigned i=0;i<count;++i){assert(++st.owners->at(dst.offset+i)==1);dst.at(i)=src.at(i);}
+        src.memory->writePending=false;
+    };
+}
+struct TransDataTo5HDParams {bool dstHighHalf=false,srcHighHalf=false;uint8_t repeatTimes=1;uint16_t dstRepStride=0,srcRepStride=0;};
+uint16_t* Check(uint64_t address){
+    for(auto* mem:Buffer::live){
+        auto lo=reinterpret_cast<uint64_t>(mem->words.data()),hi=lo+mem->words.size()*2;
+        if(address>=lo&&address+32<=hi){
+            assert((address-lo)%32==0 && !mem->readPending&&!mem->writePending);
+            return reinterpret_cast<uint16_t*>(address);
+        }
+    }
+    assert(false);return nullptr;
+}
+template<class T>void TransDataTo5HD(uint64_t dst[16],uint64_t src[16],TransDataTo5HDParams p){
+    static_assert(sizeof(T)==2);assert(!p.dstHighHalf&&!p.srcHighHalf&&p.repeatTimes);++st.transposes;
+    for(uint32_t rep=0;rep<p.repeatTimes;++rep){
+        const uint32_t step=p.repeatTimes==1?1:rep;
+        uint16_t bits[16][16];
+        for(uint32_t r=0;r<16;++r){auto a=Check(src[r]+step*p.srcRepStride*32);
+            for(uint32_t c=0;c<16;++c)bits[r][c]=a[c];}
+        for(uint32_t c=0;c<16;++c){auto a=Check(dst[c]+step*p.dstRepStride*32);
+            for(uint32_t r=0;r<16;++r){a[r]=bits[r][c];copiedBits[bits[r][c]]=true;}}
+    }
+}
+struct Nd2NzParams{uint32_t ndNum,nValue,dValue,srcDValue,dstNzC0Stride,dstNzNStride;};
+template<class T>void DataCopy(LocalTensor<T> dst,GlobalTensor<T> src,uint32_t count){
+    assert(!st.finishRead&&!dst.memory->readPending);dst.memory->readPending=true;++st.cubeCopies;
+    st.finishRead=[=]{for(uint32_t i=0;i<count;++i)dst.at(i)=src.at(i);dst.memory->readPending=false;};
+}
+template<class T>void DataCopy(LocalTensor<T> dst,GlobalTensor<T> src,Nd2NzParams p){
+    assert(!st.finishRead&&!dst.memory->readPending);dst.memory->readPending=true;++st.cubeCopies;++st.nd2nz;
+    st.finishRead=[=]{
+        for(uint32_t r=0;r<p.nValue;++r)for(uint32_t c=0;c<p.dValue;++c)
+            dst.at((c/16)*p.dstNzC0Stride*16+r*16+c%16)=src.at(r*p.srcDValue+c);
+        dst.memory->readPending=false;
+    };
+}
+struct LoadData2DParams {uint32_t repeatTimes=1,srcStride=1,dstGap=0;bool ifTranspose=false;};
+template<class T>void LoadData(LocalTensor<T> dst,LocalTensor<T> src,LoadData2DParams p){
+    assert(!src.memory->readPending);assert(p.repeatTimes>0&&p.repeatTimes<=255);++st.l0Loads;
+    for(uint32_t rep=0;rep<p.repeatTimes;++rep)for(uint32_t r=0;r<16;++r)for(uint32_t c=0;c<16;++c)
+        dst.at(rep*(p.dstGap+1)*256+r*16+c)=src.at(rep*p.srcStride*256+(p.ifTranspose?c*16+r:r*16+c));
+}
+
+}
+template<AscendC::HardEvent E>void Fence(){
+    if(E==AscendC::HardEvent::MTE3_V){assert(st.finishWrite);st.finishWrite();st.finishWrite={};}
+}
+// @HELPER@
+// @CUBE@
+
+template<class T>void Pack(AscendC::TQue<AscendC::TPosition::VECIN,2>& cq,
+    AscendC::GlobalTensor<T> b,AscendC::GlobalTensor<T> packed,const Schedule& s){
+// @PACK@
+}
+unsigned cases=0;
+
+void Run(Schedule s){
+    s.nTiles=(s.n+s.baseN-1)/s.baseN;
+    const unsigned kPanels=(s.k+s.baseM/2-1)/(s.baseM/2);
+    std::vector<uint16_t> input(s.b*s.k*s.n),output(s.b*s.nTiles*s.k*s.baseN+64,0xdead);
+    for(size_t i=0;i<input.size();++i)input[i]=(i*197+23)%65536;
+    auto before=input;
+    std::vector<unsigned> owners(output.size());
+    unsigned tasks=0,overlaps=0,peak=0;
+    for(unsigned aiv=0;aiv<2*s.workers;++aiv){
+        st=State{};st.aiv=aiv;st.owners=&owners;
+        {AscendC::TQue<AscendC::TPosition::VECIN,2> cq((s.baseM/2)*s.baseN*4);
+        Pack(cq,AscendC::GlobalTensor<uint16_t>{&input},AscendC::GlobalTensor<uint16_t>{&output},s);}
+        assert(!st.finishWrite && st.live==0 && st.reads==st.writes);
+        unsigned expected=aiv<s.b*s.nTiles*kPanels?(s.b*s.nTiles*kPanels-1-aiv)/(2*s.workers)+1:0;
+        assert(st.reads==expected);tasks+=st.writes;overlaps+=st.overlaps;peak=std::max(peak,st.peak);
+        assert(st.overlaps==0);
+    }
+    assert(input==before && tasks==s.b*s.nTiles*kPanels);
+    for(int64_t b=0;b<s.b;++b)for(unsigned nt=0;nt<s.nTiles;++nt)
+    for(int64_t k=0;k<s.k;++k)for(unsigned n=0;n<s.baseN;++n){
+        size_t at=(b*s.nTiles+nt)*s.k*s.baseN+(NZ_B?(k/16)*s.baseN*16+n*16+k%16:k*s.baseN+n);
+        assert(owners[at]==1);
+        uint16_t gold=nt*s.baseN+n<s.n?input[b*s.k*s.n+k*s.n+nt*s.baseN+n]:0;
+        assert(output[at]==gold);
+    }
+    const uint32_t bk=s.baseN==256?64:128;
+    for(int64_t batch=0;batch<s.b;++batch)for(uint32_t nt=0;nt<s.nTiles;++nt)
+    for(uint32_t k0=0;k0<s.k;k0+=bk){
+        st=State{};
+        const uint32_t count=std::min<int64_t>(bk,s.k-k0),cols=std::min<int64_t>(s.baseN,s.n-int64_t(nt)*s.baseN);
+        AscendC::TQue<AscendC::TPosition::A1,2> aq(32);
+        AscendC::TQue<AscendC::TPosition::B1,2> bq(bk*s.baseN*2);
+        ManualCopyKCase12Packed<uint16_t,true,false,false,false,NZ_B>(aq,bq,
+            {&input},{&output},s,bk,16,cols,batch,0,int64_t(nt)*s.baseN,k0,true,true);
+        auto b1=bq.DeQue<uint16_t>();
+        auto memory=std::make_shared<Buffer>(count*cols);
+        AscendC::LocalTensor<uint16_t> b2{memory};
+        LoadB<NZ_B>(b2,b1,s,count,cols);
+        for(uint32_t k=0;k<count;++k)for(uint32_t n=0;n<cols;++n){
+            const size_t at=((k/16)*(cols/16)+n/16)*256+(n%16)*16+k%16;
+            assert(b2.at(at)==input[batch*s.k*s.n+(k0+k)*s.n+nt*s.baseN+n]);
+        }
+        assert(st.cubeCopies==1 && st.nd2nz==!NZ_B);
+        const uint32_t expected=NZ_B?(cols==s.baseN?1:count/16):count/16;
+        assert(st.l0Loads==expected);
+        bq.FreeTensor(b1);assert(!st.finishRead);
+    }
+    for(size_t i=s.b*s.nTiles*s.k*s.baseN;i<output.size();++i)assert(output[i]==0xdead && owners[i]==0);
+    assert(peak==1 && overlaps==0);
+    ++cases;
+}
+int main(){
+    for(bool early:{false,true}){earlyRead=early;
+    for(unsigned bm:{32u,128u})for(unsigned bn:{16u,32u,128u,256u})
+    for(unsigned k:{16u,32u,48u,64u,80u,144u,1536u})for(int delta:{-16,0,16})for(unsigned b:{1u,2u})for(unsigned workers:{1u,3u,20u})
+        Run({b,1,int64_t(bn)*2+delta,k,bm,bn,0,0,1,workers});
+    }
+    if(NZ_B)assert(std::all_of(copiedBits.begin(),copiedBits.end(),[](bool b){return b;}));
+    std::cout<<"NZ_B="<<NZ_B<<": "<<cases<<" actual pack/Cube-copy/Load2D executions: NZ/ZN bits, all 65536 patterns (NZ mode), tails, immutable input, guards, delayed DMA, queue/source lifetime PASS\n";
+}
