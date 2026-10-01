@@ -34,4 +34,6 @@ UB worker Max候选 `34956fe` 正式15/15通过，但第8点59.66→59.72μs，�
 
 分支 `experiment/tt-fullm-npair`，kernel SHA `a7555e313a0bf6bfe34bca301b8769f28c6b127ed85a859292a883a1db33fcc1`，280265字节。
 模型日志 `/private/tmp/bmmms-tt-fullm-npair-cpu.log`。独立官方模板 `/private/tmp/bmmms-judge-tt-fullm-npair/project` 仅kernel替换，dry-run需核对同SHA。
-代码 `124dc31` 已commit/push，dry-run仅kernel/SHA一致；正式活动任务 [6abe223b694b590c3cd8474e](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe223b694b590c3cd8474e) 已创建。CANN9编译/NPU精度/正式性能 **PENDING**；查询同一ID至终态，不因观察超时重提。
+代码 `124dc31` 已commit/push，dry-run仅kernel/SHA一致；正式活动任务 [6abe223b694b590c3cd8474e](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe223b694b590c3cd8474e) 已创建。正式终态 **Pass：CANN编译成功、15/15、precision_ratio全1**。
+耗时 `[2.07,4.54,4.28,5.46,5.36,10.36,10.19,60.83,83.67,97.80,88.19,96.38,15.67,13.04,9.65]` μs。第8点父59.66→60.83μs，无收益；无actual shape/plan/SoC/profile或重复对照，不归因未改路径，也不能据此证明A2转置不是瓶颈。
+没有活动任务；归档在本机Git忽略 `artifacts/tt-fullm-npair/`，不替换父版本。不继续N pair相近微调。下一研究B1单个两K面板stage，在相同L1/L0/GM预算内减半ND2NZ提交；区别旧hierarchical四B1/paired-N设计，先核对NZ stage切片和最后MTE1读取后的释放/预读。

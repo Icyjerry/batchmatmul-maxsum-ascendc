@@ -1,5 +1,13 @@
 # 2026-09-30 · 配对 M / B 面板复用首版
 
+## 2026-10-01 · 完整A1/矩形转置/连续任务的N配对正式通过，无收益
+
+代码 `124dc31`，kernel SHA `a7555e313a0bf6bfe34bca301b8769f28c6b127ed85a859292a883a1db33fcc1`，分支 `experiment/tt-fullm-npair`。
+任务 `6abe223b694b590c3cd8474e` Pass，CANN编译成功、15/15、precision_ratio全1。
+耗时 `[2.07,4.54,4.28,5.46,5.36,10.36,10.19,60.83,83.67,97.80,88.19,96.38,15.67,13.04,9.65]` μs。第8点父59.66→60.83μs，无收益；无actual shape/plan/SoC/profile及重复对照，不归因未改路径或断言A2开销。
+440立即+440延迟MMAD实际producer、420旧producer/160 raw-bit layouts、fake host各6912/720/144通过；host/workspace/Vector逐字保持父版。当前设计与旧非驻留/对齐限定N pair有明确区别，但仍未形成正式改善。
+无活动任务，归档原始JSON/日志 `artifacts/tt-fullm-npair/`，恢复父通过版；下一检查单B1双K stage，保持L0子块/L1总容量/GM通路，避免继续相近N pair尝试。详情 [TT_FULLM_NPAIR.md](TT_FULLM_NPAIR.md)。整体重大提升未达成。
+
 ## 2026-10-01 · TT worker/M UB Max 驻留正式通过，无收益
 
 代码 `34956fe`，kernel SHA `269c7d370b48db80e7da48733f558ea6d6675ac844e4b04878ab4eec077c9b3c`，分支 `experiment/tt-worker-max`。
