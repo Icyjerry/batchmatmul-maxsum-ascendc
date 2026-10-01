@@ -1,11 +1,11 @@
 # 接手状态 · 2026-10-01
 
-## 当前：窄 N 完整 K producer + B L0 驻留，待正式提交
+## 当前：窄 N 完整 K producer + B L0 驻留，正式PENDING
 
 分支 `experiment/narrow-fullk-persistent`，从正式通过TT种子 `a05035e` 出发；kernel SHA `4bf730de204af997b8eca185c2c2ffe72144874f29b4d59e10d33c81dc68672d`。没有并入无收益NZ-B候选。
 新dual32覆盖FF窄N、小K的N/K尾部：每核完整B L0B驻留；完整A1双queue提前读后续M任务；一次矩形Load3D/完整K MMAD；旧双C/双GM ring与Vector有效N归约保持，worker跨M累加只写最终2个8float slots。父schedule仅dual/earlySum变动，不新增GM。
 2654实际producer CPU、fake/public8.3 tiler production/TUNING各5376/504通过；Vector source与父版逐字一致，独立Max→worker Sum模型通过。CANN9/NPU精度/latency PENDING，整体重大提升未达成。详见 [NARROW_FULLK_PERSISTENT.md](NARROW_FULLK_PERSISTENT.md)。
-下一动作：独立官方模板dry-run确认仅kernel和SHA，commit/push后正式CLI提交一次、立即记录ID；有活动ID时查询同ID，不能超时重交。
+代码 `7ffb3ff` 已commit/push，官方dry-run仅kernel/SHA一致。正式任务 `6abe0ee6694b590c3ccdd494` 已创建，下一动作：`python3 /private/tmp/query_bmmms_submission.py 6abe0ee6694b590c3ccdd494` 查询同ID至终态，不能超时重交。
 
 ## 当前：连续NZ B + native完整M A组合正式通过，无明显收益
 

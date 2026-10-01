@@ -39,4 +39,4 @@
 
 ## 正式验证
 
-独立官方模板 `/private/tmp/bmmms-judge-narrow-fullk/project`，仅kernel替换。CANN9编译/15点精度/latency PENDING；一次结构候选提交并记录ID，同ID追踪至终态。重大提升未达成，不将调用数下降作为加速预测。
+独立官方模板 `/private/tmp/bmmms-judge-narrow-fullk/project`，仅kernel替换，dry-run确认276803字节/SHA一致。代码 `7ffb3ff` 已commit/push；正式任务 [6abe0ee6694b590c3ccdd494](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe0ee6694b590c3ccdd494) 已创建。CANN9编译/15点精度/latency PENDING；同ID追踪至终态。重大提升未达成，不将调用数下降作为加速预测。
