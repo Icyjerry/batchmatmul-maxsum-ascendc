@@ -3,7 +3,7 @@
 ## 当前：TT 单屏障末级归约候选，CPU完成准备正式提交
 
 分支 `experiment/tt-single-barrier`，父cf16501（宽N结构收益两次15/15通过，原分支保留），kernel SHA `71ca6095958a372927c27f088bb081c43cff748169ff98e4ef80a2215b4d62c5`，343178bytes。仅59新增/3修改：TT原第一次barrier后复用死UB，block0 bulk DMA全部原N partial、批量MaxN、有效M分组Sum，取消M标量中转/第二SyncAll；Cube/原消费/plan/grid/GM/C7/C14/fallback逐字父，不能重做失败workerMax/pairedN/NZ/B包。
-324真实抽取末级/延迟三引擎/真实全AIV barrier、六负控制、production/TUNING各3000host/240选择通过；整数模型不模拟native TPipe别名生命周期/舍入/性能。资源/256repeat/pins不足回退旧路，详见 `docs/TT_SINGLE_BARRIER.md`。原模板只kernel/dry-run同SHA，下一commit/push后创建一次并立即存ID查终态；没有活动任务，CANN9/NPU精度/性能PENDING。main/标签不动；父C8最近49.14–50.72μs、C14 10.93/10.84。
+324真实抽取末级/延迟三引擎/真实全AIV barrier、六负控制、production/TUNING各3000host/240选择通过；整数模型不模拟native TPipe别名生命周期/舍入/性能。资源/256repeat/pins不足回退旧路，详见 `docs/TT_SINGLE_BARRIER.md`。原模板只kernel/dry-run同SHA，下一commit/push后创建一次并立即存ID查终态；正式任务 `6abea942694b590c3c1ff692` 已创建，下一只查同ID至终态不重交。CANN9/NPU精度/性能PENDING。main/标签不动；父C8最近49.14–50.72μs、C14 10.93/10.84。
 
 ## 当前：宽N结构收益确认，C14两次10.93/10.84μs
 

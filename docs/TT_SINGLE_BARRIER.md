@@ -36,3 +36,5 @@ python3 tools/validate_tt_batch_finalize.py
 kernel SHA `71ca6095958a372927c27f088bb081c43cff748169ff98e4ef80a2215b4d62c5`，343178bytes。独立原模板仅换kernel/其它7源码逐字父、CLI dry-run只kernel同SHA，日志忽略 `artifacts/tt-single-barrier/cpu.log`（目录700/文件600）。下一commit/push后提交一次，立刻存ID并查询终态；CANN9/NPU精度/性能PENDING。
 
 父最近六次C8为49.14–50.72μs，末两次49.67/49.56μs。无actualshape/plan/SoC/profile，不保证隐藏路线命中；必须15/15且C7/C14保持，大收益原样确认、小于波动差异如实归档、不扫附近分组或tile参数。main/历史标签保持。
+
+正式任务 **`6abea942694b590c3c1ff692`** 已创建，实现 `5c67d94` 已push，kernel/template SHA71ca6095…保持。下一只查询同ID至终态，超时不重交；CANN9/NPU精度/性能PENDING。
