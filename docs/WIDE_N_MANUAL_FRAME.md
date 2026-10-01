@@ -8,7 +8,7 @@
 
 ## 算子改动
 
-kernel新增204行、三个区域：32byte紧凑参数/独立混合入口（及两个小helper）、资源选择、原partial后的launch override。删除三个区域逐字恢复父全部kernel。
+kernel新增205行、三个区域：32byte紧凑参数/独立混合入口（及两个小helper）、资源选择、原partial后的launch override。删除三个区域逐字恢复父全部kernel。
 
 只替换已经选出的B1/BF16/FT/dual21、M16..128/N>=4096/K32..256且M/N/K16对齐、单Mtile/Ksplit/window1、workers=nSplit的原路径。全部显式TUNING pins回退；实际AIC/AIV与L1/L0A/L0B/L0C/UB再次查询，GM capacity/原plan也核对；其它布局、tails、C7/C8/C9/所有旧路径不改。
 
@@ -43,7 +43,15 @@ python3 tools/validate_wide_n_manual_frame.py
 
 ## 正式请求
 
-独立官方原模板只换kernel，其它8文件逐字不变；dry-run SHA核对，commit/push后提交一次、立刻保存ID，只查同任务至终态。CANN9编译/NPU精度/性能 **PENDING**。
+独立官方原模板只换kernel，其它7个源文件逐字不变；dry-run SHA核对，commit/push后提交一次、立刻保存ID，只查同任务至终态。CANN9编译/NPU精度/性能 **PENDING**。
 对照最近通过版 C14 13.15/13.26 μs以及更早相同宽N代码12.61–13.38的正式波动样本；必须15精度全部通过并保留C7约7.9–8.0。实际同机/shape/plan/profile缺失，不将不相关路径浮动归因本次；无收益归档恢复通过父，不能扫描附近tile/分片参数。
 
 正式任务 **`6abea08e694b590c3c1c90f5`** 已创建，代码 `d57fddf` 已commit/push，SHA保持。下一 `python3 /private/tmp/query_bmmms_submission.py 6abea08e694b590c3c1c90f5` 只查同一ID至终态，不能超时重交。CANN9/NPU精度/性能PENDING。
+
+## 2026-10-02 · 设备编译错误修复
+
+首任务 `6abea08e694b590c3c1c90f5` 已Compile Error。唯一native error：设备入口第2765行std::min解析到host-only标准库函数，不允许从aicore调用。普通C++ CPU模型未模拟host/device注解，所以原CPU通过不能证明Ascend编译成功。只将本行拆为非负remaining和三元min，不更改shape/分区/流水/算术/其它源码；host资源选择中的std::min保留。失败原JSON忽略 `artifacts/wide-n-manual-frame/compile-error.json`。
+
+修复源码SHA `b0e0b66495df9606156f73f1d4a1399801ab18f203ff0f9458a7051caca4150f`，340070bytes。实际CPU全套重跑：434producer、四Cube负控制、729AIV、八Vector负控制、production/TUNING各4800host/600选中通过，三个区域去除仍逐字恢复父；整数/抽象协议和native注解限制不变。原日志忽略 `artifacts/wide-n-manual-frame/fixed-cpu.log`。
+
+C7新两次复测均Pass，结合四次C14范围12.72–13.26μs、中位13.04、极差/中位数4.1%；更早宽N同代码范围12.61–13.38仍保留。新候选必须15/15且耗时超过波动范围才称明显收益。没有实际shape/plan/SoC/profile，改动与桶对应未知。独立模板只换kernel，dry-run确认新SHA；下一commit/push后仅提交修复版一次，记录ID并查询终态。新的CANN9/NPU精度/性能PENDING，先前错误任务不是PENDING且不得重新查询/重交它。
