@@ -1,4 +1,28 @@
 
+## 2026-10-02: complete tiny K8 fold, native PENDING
+
+Terminal6abec94f694b590c3c2a0c34 /04bee91 /SHA4d03162f: CANNcompiled15/15Pass/allprecision1. Timesus `[1.97,4.39,3.23,4.02,5.23,9.79,7.83,47.07,67.91,97.87,88.58,97.45,15.91,10.76,9.54]`. C2regression4.39vsbaseline2.46; no overallgain. Does not identifyactualK/route/profile. Archive fullstorage-native/Brcb/Ktree direction, restore1734f16, no repeats/variants/parameter scan. NewTTproducergranularity audit notyetimplemented; existingfullA/Bpackages/doubleL0/singlebarrier alreadyretained. Rawignored artifacts/tiny-all-k8-fold/official.json; noactivejob, main/tags unchanged, goalincomplete.
+
+SHA4d03162f721a879827d85d8c18c99bd49174cc636acd9b9d8f43567cf3eb29fa/kernel360054bytes, baseline1734f16 plus103lines/three regions; no plan/group/grid/GM change. Adds K40/48/56 excess-to32 fold to batchKtree, exactrawA roundup/DMA/sharedCast offsets. MotivationconditionalhistoricalK32–56, notactualroutehit. Completesalgorithmcoverage, nottile scan.
+
+Production/TUNING each10080 hostcontrols,17616 actualintegerentries (120synthetic512KiB chunkboundaries),5652encodedFP16/BF16 group1/2/3 entries/FP64golden maxAbs9.54e-7/nonzeroRel2.93e-6, ninefaultcontrols includingnonpowerKtail. OneFIFO/softwarecasts notnative. Officialtemplateother7sources baseline/dryrunkernelSHA checked. NativePENDING/nojob yet; onecommitpush/submit/saveID/pollsameID. Clearlargegainonlyconfirm, ifnogain archive fullstorage-nativeKtree direction/restoreretainedbaseline; no furthervariants. See TINY_ALL_K8_FOLD. Goalincomplete/main/tags unchanged.
+
+## 2026-10-02: group-wide tiny K tree, native PENDING
+
+Terminal6abec72a694b590c3c296090 / df36ef3 / SHAeeef7efc: CANN compile successful,15/15Pass/allprecision1. Timesus `[1.94,2.57,3.28,4.03,5.42,9.83,8.03,46.44,69.04,99.12,89.01,97.22,16.41,11.22,9.17]`; no clear C2/C3 benefit versusbaseline2.46/3.11; unfavorableC9/C13 retained, unchangedroutes notattributed. HistoricalconditionalprobeK32–56 exposes currentK32/64 coverage gap, not actualhiddenroute evidence. Next exactK8 excess-to32 fold and rawA padding verification, notparameter scan. RawJSON ignored artifacts/tiny-group-ktree/official.json; no activejob, main/tags unchanged, goalincomplete.
+
+SHAeeef7efc6189e9da80cbe9fae60901b51f7c73e4edc7806b4adbc23532218029/kernel359932bytes; baseline1734f16 plus102lines/threeaddedregions. Previous per-row storage-vector native15Pass but no benefit; this changes scratch to[K,ar,pitchN], all-queryBrcb and commonKtree/repeatedMax. ExampleB1M8N64K64: sourceAdd48→7, Kbarriers48→6, Brcb8→1, Max8→1, Mul8 unchanged. Expandedmemory/stridedwrites may offset this; no latency prediction. No plan/group/grid/GM change; realUB/uint8stride fallback.
+
+Production/TUNING each10080 hostcontrols,7200 actualqueued integerentries (48synthetic512KiB boundaryentries),2292 encodedFP16/BF16/group1/2/3 entries, maxAbs9.54e-7/maxNonzeroRel2.93e-6 againstFP64golden, eightnegativecontrols. OneVectorFIFO/softwarecasts notnativehardware/precision. Templateother7sources parent/dry-runkernelSHA checked. CANN9/NPU gates PENDING; no activeformaljob yet; commitpush then one structural submission, ID/pollsameID. See TINY_GROUP_K_TREE. No small-gain parameter scan, main/tags unchanged, goalincomplete.
+
+## 2026-10-02: storage-native tiny structural candidate, native PENDING
+
+Terminal task6abec499694b590c3c288b4a / code155fbd9 / SHA19cd486e: CANN compile successful,15/15Pass/allprecision1. Timesus `[1.96,2.54,3.16,4.09,5.44,9.85,8.11,45.99,67.78,96.58,88.63,96.92,15.76,11.04,9.30]`. C2/C3 no major benefit vsparent2.46/3.11; TT C8 source-identical45.99vs46.52 only1.1%, no tiny attribution. Archive without repeats/parameter scan; next independently validate group-wide K tree reducing per-M Vector calls. UnknownSoC/shapes/plans/profile; native15sample scope only. RawJSONignored artifacts/tiny-storage-vector/official.json, no activejob, goal incomplete.
+
+From passed1734f16, `experiment/tiny-storage-vector`, SHA19cd486e6a0ffcd4caaa4a644e64853ae994a7c0065deb577ba32184b271f794,359398bytes. Keeps document[K,N], query broadcast and fullK32/64 FP32 column tree before validNMax/Msum; removes documentGather, not another transpose/tile tweak. Source only92lines/three addedregions, no newGM/plan/grid, other7template sources byte-equal parent.
+
+Production/TUNING each10080 hostbyte-boundary controls,8352 actualqueued integerentries,864 encodedFP16/BF16 entries/FP64golden maxAbs9.53674e-7/maxNonzeroRel2.93038e-6 under mixedCPU check, seven negativecontrols. OneVectorFIFO/decodedsoftwarecasts are not native hardware/precision/performance. API900Brcb/stride/PipeBarrier text retrieved. CANN9/NPU precision/perf PENDING; see TINY_STORAGE_VECTOR. Nativejob not yet created; commit/push then one structural submission, pollsameID. No small-gain parameter scans. Prior raw-bittranspose26beaac passednative but C2regressed4.12vs2.46; archived. Main/tags unchanged, goalincomplete.
+
 ## Official terminal result: Pass, modest single-run change
 
 Task `6abeb39e694b590c3c22e5d7`, implementation `a770e64`, SHA `a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742`: CANN compile successful, 15/15 Pass, all precision_ratio=1. Times (us): `[1.99, 2.46, 3.11, 4.12, 5.39, 9.97, 8.16, 46.52, 67.79, 99.14, 88.03, 96.45, 15.49, 11.01, 9.56]`.
