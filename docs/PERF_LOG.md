@@ -679,3 +679,19 @@ C14 10.93，相比最新父四次12.72–13.26、中位13.04，低于最快父�
 
 本候选已有CPU/negative controls、正式编译/15点精度/两次速度证据，保留为下一实验父；main/历史标签不动，无活动任务。原JSON忽略 `artifacts/wide-n-manual-frame/confirm-fixed.json`。整体冲榜目标仍未完成。
 下一结构假设：TT原FinalizeFullMTiles分片M合并、写同GM partial内chunk标量、第二次SyncAll、block0二次gather/sum。评估第一barrier后复用死C UB、batch Max所有N分片并只Sum有效M，减少第二barrier和中间M scalar写/读；不得复做失败TT paired-N/worker-Max/NZ或B包扫描。当前尚未实现，需要实际helper/host容量模型、输出/尾mask/同步负控制后才能正式提交。
+
+## 2026-10-02 · 正式通过，C8 47.24μs，仅单次小幅改善
+
+任务 `6abea942694b590c3c1ff692` **Pass、CANN编译成功、15/15、precision_ratio全1**，实现 `5c67d94` / SHA `71ca6095958a372927c27f088bb081c43cff748169ff98e4ef80a2215b4d62c5`。μs：
+
+```text
+[1.94, 2.7, 3.22, 4.01, 5.28, 9.66, 7.85, 47.24, 67.78, 95.19, 87.89, 96.41, 15.14, 10.86, 9.53]
+```
+
+C8 47.24；父最近六次50.67/50.72/49.94/49.14/49.67/49.56，范围49.14–50.72、中位49.805。单次比中位低5.15%、比最快低3.87%；父极差/中位数3.17%，候选在父样本区间外，但没有同机A/B或重复候选，不能称大突破或稳定收益。源码有效减barrier/GM中转，native已验证这些正式样本可安全复用死UB，所有形状/TPipe版本/精确SoC仍未验证。C14 10.86与通过宽N的10.93/10.84相近；其它路线未改不归因浮动。
+
+特别保留C2的不利观测：宽N前四次2.42–2.50，宽N两次2.68/2.78，TT本次2.70。其源码路径未改，仍不能把上升简单消除为噪声或精确归因；没有相同设备交错旧/新，整体最优/榜分未证明。不能仅C14变快就断言整体分数必升。
+
+本候选保留独立分支作为后续结构对照，不再原样提交小幅收益、不扫描tile/分组参数，不合main；最近有两次明确结构收益的组合仍是 `experiment/c14-manual-frame` / `cf16501`。原JSON Git忽略 `artifacts/tt-single-barrier/official.json`，没有活动任务。源码/模型/终态已push，整体冲榜目标仍未完成。
+
+下一需优先两个真实剩余风险：TT在RunManualFullMCube里仍以TPipe/A1 TQue/TBuf及动态event初始化大Schedule，Vector仍每tile重复queue/Max init（旧workerMax无收益不能重复）；研究32byte固定局部frame保留已有B包流水、完整K/MMAD及原task/GM，改变物理生命周期/框架开销，与旧frame方案逐字scope/实际live模型核对后才实现。C2需查看当前和队友tiny入口的启动/地址/归约差别，保留当前资源化batch正确处理，不能盲换whole source或把C14优化回退后总耗时直接当榜分。

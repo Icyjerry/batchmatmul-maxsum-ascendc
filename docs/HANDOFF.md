@@ -1,9 +1,12 @@
 # 接手状态 · 2026-10-02
 
-## 当前：TT 单屏障末级归约候选，CPU完成准备正式提交
+## 当前：宽N明显收益确认；TT单屏障正式通过但仅小幅单测
 
-分支 `experiment/tt-single-barrier`，父cf16501（宽N结构收益两次15/15通过，原分支保留），kernel SHA `71ca6095958a372927c27f088bb081c43cff748169ff98e4ef80a2215b4d62c5`，343178bytes。仅59新增/3修改：TT原第一次barrier后复用死UB，block0 bulk DMA全部原N partial、批量MaxN、有效M分组Sum，取消M标量中转/第二SyncAll；Cube/原消费/plan/grid/GM/C7/C14/fallback逐字父，不能重做失败workerMax/pairedN/NZ/B包。
-324真实抽取末级/延迟三引擎/真实全AIV barrier、六负控制、production/TUNING各3000host/240选择通过；整数模型不模拟native TPipe别名生命周期/舍入/性能。资源/256repeat/pins不足回退旧路，详见 `docs/TT_SINGLE_BARRIER.md`。原模板只kernel/dry-run同SHA，下一commit/push后创建一次并立即存ID查终态；正式任务 `6abea942694b590c3c1ff692` 已创建，下一只查同ID至终态不重交。CANN9/NPU精度/性能PENDING。main/标签不动；父C8最近49.14–50.72μs、C14 10.93/10.84。
+当前分支 `experiment/tt-single-barrier`，实现 `5c67d94`，kernel SHA `71ca6095958a372927c27f088bb081c43cff748169ff98e4ef80a2215b4d62c5`，343178bytes。任务 `6abea942694b590c3c1ff692` Pass、CANN编译成功、15/15、precision_ratio全1；C8 47.24 vs父六次49.14–50.72/中位49.805（单次低5.15%，不称大突破或稳定收益），C14 10.86保持通过宽N10.93/10.84。仅59新增/3修改末级merge/guard/template选择，Cube/old消费者/plan/GM/C7/C14逐字父。324 actualhelper/六negative controls、production/TUNING各3000host/240选择；native只证明15样本，精确SoC/shape/plan/profile/全shape未验证。详见 `docs/TT_SINGLE_BARRIER.md`，原JSON忽略 `artifacts/tt-single-barrier/official.json`。
+
+没有活动任务，不为5%小幅收益再重交/扫附近参数；本分支作为后续结构对照，不合main。最近两次明显宽N收益组合 `experiment/c14-manual-frame` / `cf16501` 保留：C14中位低16.56%。整体冲榜仍未完成；特别C2宽N前四次2.42–2.50、宽N后2.68/2.78、TT2.70，未改tiny源码不能抹除一致的不利观测，不宣称整体最优/榜分提升。
+
+下一：从明确通过组合单独研究TT紧凑manual物理frame（保留既有完整A/B包/任务/GM，减少TPipe/动态event/200B Schedule）；须先独立actual live模型，与旧pairedN/workerMax/NZ有差异，不能微调B包/tile。C2并行目标在同turn独立源码分析启动/地址/归约，与队友tiny比差，不用多Agent；需要重大假设/验证后才提交。所有原model/状态/证据已push，main/标签不动。
 
 ## 当前：宽N结构收益确认，C14两次10.93/10.84μs
 
