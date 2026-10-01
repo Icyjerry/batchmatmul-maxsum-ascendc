@@ -45,3 +45,5 @@ python3 tools/validate_wide_n_manual_frame.py
 
 独立官方原模板只换kernel，其它8文件逐字不变；dry-run SHA核对，commit/push后提交一次、立刻保存ID，只查同任务至终态。CANN9编译/NPU精度/性能 **PENDING**。
 对照最近通过版 C14 13.15/13.26 μs以及更早相同宽N代码12.61–13.38的正式波动样本；必须15精度全部通过并保留C7约7.9–8.0。实际同机/shape/plan/profile缺失，不将不相关路径浮动归因本次；无收益归档恢复通过父，不能扫描附近tile/分片参数。
+
+正式任务 **`6abea08e694b590c3c1c90f5`** 已创建，代码 `d57fddf` 已commit/push，SHA保持。下一 `python3 /private/tmp/query_bmmms_submission.py 6abea08e694b590c3c1c90f5` 只查同一ID至终态，不能超时重交。CANN9/NPU精度/性能PENDING。
