@@ -1,5 +1,7 @@
 # Latest: storage-native tiny broadcast/K-tree candidate, CPU passed, native PENDING
 
+Terminal `6abec499694b590c3c288b4a`: CANN compiled,15/15Pass, precision_ratio all1. C2=2.54vsparent2.46, C3=3.16vs3.11; no major gain. Full times in TINY_STORAGE_VECTOR, raw ignored artifacts/tiny-storage-vector/official.json. Archive source155fbd9 / SHA19cd486e, no repeats/nearby parameter scans. No activejob. Next start from passed1734f16 and study group-wide[K,ar,pitchN] scratch/batchedBrcb/Ktree/Max; reduce per-M barriers/calls, prove newUB/stride bounds. Overallgoal incomplete.
+
 Official task **`6abec499694b590c3c288b4a`** is now created, implementation155fbd9 pushed. Next `python3 /private/tmp/query_bmmms_submission.py 6abec499694b590c3c288b4a`, only query this ID to terminal. Kernel/template SHA19cd486e unchanged; native gates PENDING.
 
 Current `experiment/tiny-storage-vector` from passed1734f16, kernel359398bytes SHA `19cd486e6a0ffcd4caaa4a644e64853ae994a7c0065deb577ba32184b271f794`. Three added regions/92lines, no plan/grid/workspace/other-kernel changes; entire-parent scope inverse verified. Keeps document[K,N], query-only Gather for TF, Brcb+Mul and fullK32/64 FP32 tree before validNMax/originalMsum. Other K/layouts retain parent. See `TINY_STORAGE_VECTOR.md` for official900 API and numerical/model limitations.

@@ -50,3 +50,11 @@ CANN9 compile / native precision / NPU latency PENDING. Commit/push this structu
 Main and historical tags unchanged. Overall substantial competition improvement remains incomplete.
 
 Official task **`6abec499694b590c3c288b4a`** created, implementation `155fbd9` pushed. Kernel/template SHA19cd486e unchanged. Query this ID to terminal; never resubmit on observation timeout. CANN9/nativeprecision/timing PENDING.
+
+## Official terminal: Pass15/15, no major improvement
+
+Task `6abec499694b590c3c288b4a`, implementation155fbd9, same SHA19cd486e: CANN compile successful,15/15Pass, precision_ratio all1. Times(us): `[1.96,2.54,3.16,4.09,5.44,9.85,8.11,45.99,67.78,96.58,88.63,96.92,15.76,11.04,9.30]`. C2=2.54 vs passedparent2.46, C3=3.16 vs3.11, no major smallcase benefit. C8=45.99 vs46.52 is1.1% on source-identical TT route, not evidence for this tiny algorithm; keep all adverse observations as well. Actual SoC/shapes/plans/profile/route-hit not exposed. Official15Pass does not prove all supported groups/tails/float ranges.
+
+Archive this independent structural result; no unchanged confirmation or nearby parameter scan. Raw JSON Git-ignored `artifacts/tiny-storage-vector/official.json` with600 permissions. No active official task; main/tags unchanged, goal remains incomplete.
+
+Next hypothesis from actual source: the per-M K tree serializes ar*(5or6) Add calls and ar WholeReduceMax calls. Arrange product scratch as `[K,ar,pitchN]`, batch all query broadcasts, and reduce K across the entire group using five/six Add calls followed by one repeated validNMax. This retains storage-native multiplication but changes reduction scheduling and scratch lifetime. Requires a new independently checked UB/repeat-stride guard and rounding/tail model; not implemented in this archived branch.

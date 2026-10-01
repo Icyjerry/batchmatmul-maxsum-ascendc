@@ -1,6 +1,8 @@
 
 ## 2026-10-02: storage-native tiny structural candidate, native PENDING
 
+Terminal task6abec499694b590c3c288b4a / code155fbd9 / SHA19cd486e: CANN compile successful,15/15Pass/allprecision1. Timesus `[1.96,2.54,3.16,4.09,5.44,9.85,8.11,45.99,67.78,96.58,88.63,96.92,15.76,11.04,9.30]`. C2/C3 no major benefit vsparent2.46/3.11; TT C8 source-identical45.99vs46.52 only1.1%, no tiny attribution. Archive without repeats/parameter scan; next independently validate group-wide K tree reducing per-M Vector calls. UnknownSoC/shapes/plans/profile; native15sample scope only. RawJSONignored artifacts/tiny-storage-vector/official.json, no activejob, goal incomplete.
+
 From passed1734f16, `experiment/tiny-storage-vector`, SHA19cd486e6a0ffcd4caaa4a644e64853ae994a7c0065deb577ba32184b271f794,359398bytes. Keeps document[K,N], query broadcast and fullK32/64 FP32 column tree before validNMax/Msum; removes documentGather, not another transpose/tile tweak. Source only92lines/three addedregions, no newGM/plan/grid, other7template sources byte-equal parent.
 
 Production/TUNING each10080 hostbyte-boundary controls,8352 actualqueued integerentries,864 encodedFP16/BF16 entries/FP64golden maxAbs9.53674e-7/maxNonzeroRel2.93038e-6 under mixedCPU check, seven negativecontrols. OneVectorFIFO/decodedsoftwarecasts are not native hardware/precision/performance. API900Brcb/stride/PipeBarrier text retrieved. CANN9/NPU precision/perf PENDING; see TINY_STORAGE_VECTOR. Nativejob not yet created; commit/push then one structural submission, pollsameID. No small-gain parameter scans. Prior raw-bittranspose26beaac passednative but C2regressed4.12vs2.46; archived. Main/tags unchanged, goalincomplete.
