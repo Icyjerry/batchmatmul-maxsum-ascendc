@@ -575,3 +575,10 @@ Split-K host 模型两档宏均编译运行，统计是各档相同模型空间�
 - C7父9.40→9.55，无新增收益，归档；C8/C9未改，不归因波动。没有actual shape/plan/SoC/profile或重复A/B，不推断路线、瓶颈或稳定差异。原49.38μs TT+约68μs队友C9组合保持，不合main。
 - CPU1296实际helper：三独立引擎队列/live generation、poison ring、负数/尾块、cyclic/idle、零行无分配及唯一y/guard/credits通过；缺四个Fence、无N尾mask、早信用六负控制通过。合成Cube/companion不是完整原生协议，不模拟舍入或硬件时间。
 - 无活动任务；原始资料本机Git忽略 `artifacts/c7-lean-vector/`；交接 [C7_LEAN_VECTOR.md](C7_LEAN_VECTOR.md)。下一恢复 `e1b3634`，审查C9手写完整window的serial DMA/V与late信用，必须区分旧库dual1/2+flag9/fold组合，先源码同步模型，不重复旧组合提交。
+
+## 2026-10-01 · 队友tiny核心与通过TT/C9组合
+
+`experiment/teammate-tiny-dot`，实现 `0beb87d`，kernel SHA `7d629cfb0bb821fa8be65cfbb7164f72486f8845882fd974b86aa326cd1168e3`。正式任务 **`6abe7b90694b590c3c08ed48` Pass，CANN编译成功、15/15、precision_ratio全1**。耗时μs `[1.98,2.63,3.66,4.13,5.70,10.75,10.25,50.72,68.02,99.81,89.21,97.18,16.30,13.44,9.64]`。
+父C1..4 2.15/3.97/4.30/5.60；本次C2降低33.8%、C3降低14.9%、C4降低26.25%，均单次正式测量，不证明稳定收益。C8/C9源码保持，50.72/68.02变化不归因；没有实际shape/plan/SoC/profile。原始资料 `artifacts/teammate-tiny-dot/official.json` Git忽略。
+用户要求直接测队友原版，下一独立 `experiment/teammate-tiny-original` 保存原文件逐字快照，仅官方原模板替换kernel，CLI提交、保存ID、查询终态，然后与本版逐case对比。当前通过组合保留，不混入C9 WIP，不移main/历史标签。
+

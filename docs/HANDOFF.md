@@ -1,5 +1,11 @@
 # 接手状态 · 2026-10-01
 
+## 当前通过版：队友tiny核心与TT/C9组合，15/15通过
+
+`experiment/teammate-tiny-dot`，实现 `0beb87d`，kernel SHA `7d629cfb0bb821fa8be65cfbb7164f72486f8845882fd974b86aa326cd1168e3`。正式任务 **`6abe7b90694b590c3c08ed48` Pass，CANN编译成功、15/15、precision_ratio全1**。耗时μs `[1.98,2.63,3.66,4.13,5.70,10.75,10.25,50.72,68.02,99.81,89.21,97.18,16.30,13.44,9.64]`。
+父C1..4 2.15/3.97/4.30/5.60；本次C2降低33.8%、C3降低14.9%、C4降低26.25%，均单次正式测量，不证明稳定收益。C8/C9源码保持，50.72/68.02变化不归因；没有实际shape/plan/SoC/profile。原始资料 `artifacts/teammate-tiny-dot/official.json` Git忽略。
+用户要求直接测队友原版，下一独立 `experiment/teammate-tiny-original` 保存原文件逐字快照，仅官方原模板替换kernel，CLI提交、保存ID、查询终态，然后与本版逐case对比。当前通过组合保留，不混入C9 WIP，不移main/历史标签。
+
 ## 当前候选：队友tiny_dot与通过TT/C9组合，正式任务已创建
 
 当前 `experiment/teammate-tiny-dot`，kernel SHA `7d629cfb0bb821fa8be65cfbb7164f72486f8845882fd974b86aa326cd1168e3`，313296byte。以 `e1b3634` 通过kernel为父，提取用户新 `kernel_tiny_dot.asc` short-dot合并Cast/对齐DMA、单核tiny紧凑参数/手动UB/常量K/稀疏行Sum、K65..256独立batch Vector；保留父整个MakePlan、原GM和C8/C9，TUNING显式pins仍生效。来源SHA `72454276ca665e0dd80d2bea6d972a34270442cad8fd3ccf0bd2a6674d4323e7`；截图不能代替该候选正式结果。详情 [TEAMMATE_TINY_DOT.md](TEAMMATE_TINY_DOT.md)。C9窗口WIP仅归档 `8a69048`，未混入。
