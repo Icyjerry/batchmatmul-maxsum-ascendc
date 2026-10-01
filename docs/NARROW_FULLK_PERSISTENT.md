@@ -39,4 +39,6 @@
 
 ## 正式验证
 
-独立官方模板 `/private/tmp/bmmms-judge-narrow-fullk/project`，仅kernel替换，dry-run确认276803字节/SHA一致。代码 `7ffb3ff` 已commit/push；正式任务 [6abe0ee6694b590c3ccdd494](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe0ee6694b590c3ccdd494) 已创建。CANN9编译/15点精度/latency PENDING；同ID追踪至终态。重大提升未达成，不将调用数下降作为加速预测。
+独立官方模板 `/private/tmp/bmmms-judge-narrow-fullk/project`，仅kernel替换，dry-run确认276803字节/SHA一致。代码 `7ffb3ff` 已commit/push；正式任务 [6abe0ee6694b590c3ccdd494](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe0ee6694b590c3ccdd494) **Pass，CANN编译成功、15/15、precision_ratio全部1**。
+耗时 `[2.18,4.18,4.33,5.55,5.44,10.74,10.32,66.45,84.05,97.90,88.93,96.67,16.04,13.36,9.03]` μs，第13点通过TT父15.28→16.04，没有明显收益。无actual shape/plan/SoC/profile及重复A/B，不能确认正式case是否命中新路线或断言退化原因。没有活动任务。
+归档该结构，不并入main；不继续完整K/B驻留的近邻tile试交。重大提升未达成。

@@ -1,5 +1,12 @@
 # 2026-09-30 · 配对 M / B 面板复用首版
 
+## 2026-10-01 · 窄 N 完整 K 驻留正式通过，无明显收益
+
+- 代码 `7ffb3ff` / SHA `4bf730de204af997b8eca185c2c2ffe72144874f29b4d59e10d33c81dc68672d`，正式ID `6abe0ee6694b590c3ccdd494` Pass，CANN编译成功、15/15、precision_ratio全1。
+- 耗时 `[2.18,4.18,4.33,5.55,5.44,10.74,10.32,66.45,84.05,97.90,88.93,96.67,16.04,13.36,9.03]` μs。第13点通过TT父15.28→16.04，无明显收益；其它未改路径不归因，无actual shape/plan/SoC/profile及重复A/B。
+- 新完整B L0驻留、A1双queue后续M预取、完整K一次MMAD、尾部补零、原Vector worker流式和；2654 producer，fake/public真实8.3 tiler production/TUNING各5376/504通过。归档实验，不并入main，不重复近邻tile提交；重大提升未达成。
+- TT任务审查新增720真实公开tiler代理计划，物理8/20/24/32核各180；未满核分别0/90/120/120，最大tile关键路径/理想均分分别1.4/2/2/1.6。这是源任务计数，非隐藏case路由或NPU延迟；下一结构转向连续tile任务、相邻N的A驻留和原partial Max合并。
+
 ## 2026-10-01 · native A / NZ B 组合正式通过，无明显收益
 
 - 代码 `297abe5` / SHA `8e1fbca3a87bc380a174fbc01a181da8c5d8f9a7b02294d9d4f5895b5914942c`，正式ID `6abe05cf694b590c3cc88e53` Pass，CANN编译成功、15/15、precision_ratio全1。

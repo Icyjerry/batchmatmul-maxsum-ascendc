@@ -1,11 +1,12 @@
 # 接手状态 · 2026-10-01
 
-## 当前：窄 N 完整 K producer + B L0 驻留，正式PENDING
+## 当前：窄 N 完整 K 驻留正式通过，无收益；TT任务波次审查
 
 分支 `experiment/narrow-fullk-persistent`，从正式通过TT种子 `a05035e` 出发；kernel SHA `4bf730de204af997b8eca185c2c2ffe72144874f29b4d59e10d33c81dc68672d`。没有并入无收益NZ-B候选。
 新dual32覆盖FF窄N、小K的N/K尾部：每核完整B L0B驻留；完整A1双queue提前读后续M任务；一次矩形Load3D/完整K MMAD；旧双C/双GM ring与Vector有效N归约保持，worker跨M累加只写最终2个8float slots。父schedule仅dual/earlySum变动，不新增GM。
-2654实际producer CPU、fake/public8.3 tiler production/TUNING各5376/504通过；Vector source与父版逐字一致，独立Max→worker Sum模型通过。CANN9/NPU精度/latency PENDING，整体重大提升未达成。详见 [NARROW_FULLK_PERSISTENT.md](NARROW_FULLK_PERSISTENT.md)。
-代码 `7ffb3ff` 已commit/push，官方dry-run仅kernel/SHA一致。正式任务 `6abe0ee6694b590c3ccdd494` 已创建，下一动作：`python3 /private/tmp/query_bmmms_submission.py 6abe0ee6694b590c3ccdd494` 查询同ID至终态，不能超时重交。
+2654实际producer CPU、fake/public8.3 tiler production/TUNING各5376/504通过；Vector source与父版逐字一致，独立Max→worker Sum模型通过。代码 `7ffb3ff` 已commit/push，正式任务 `6abe0ee6694b590c3ccdd494` Pass，CANN编译成功、15/15、precision_ratio全1；第13点通过TT父15.28→16.04μs，没有收益。没有活动任务，整体重大提升未达成。详见 [NARROW_FULLK_PERSISTENT.md](NARROW_FULLK_PERSISTENT.md)。
+新增 `tools/audit_tt_task_waves.py`：固定公开8.3真实tiler、显式物理8/20/24/32核，720个历史C8区间代理计划，330个workers少于物理cores，576选择native29，部分max tiles是理想均分的2倍。例20核M1408/N1025/K1536，NS2/tasks22，最忙10tiles/理想5；M1537/N1537/K1536为14/9。计数不是实测、未知正式shape/route；不能据此预测速度。
+下一动作：保存归档后从 `a05035e` 的通过TT代码建立独立连续tile任务分支。每worker分配M-major扁平tile的连续区间、在区间内相邻N tile保留同一M的完整A；Nsplit按Nt作原partial行槽，最后合并Max再Sum。保持原GM partial/ring通路与flags，不新增GM通路；先验证唯一writer、实际producer/consumer任务顺序、A queue跨任务生命周期、容量和末级N合并，再考虑正式结构候选。该新设计尚未实现或验证，不能算进收益。
 
 ## 当前：连续NZ B + native完整M A组合正式通过，无明显收益
 
