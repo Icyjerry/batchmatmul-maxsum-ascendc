@@ -1,5 +1,11 @@
 # 接手状态 · 2026-10-01
 
+## 最新：B1单stage CPU检查点，优先接入队友C9
+
+分支 `experiment/tt-b-stage` 的WIP已实现：仅dual33的两个BK B1 buffer改为一个2BK stage，同L1总容量；B2仍原BK，切片pitch为align16(validCols)。180实际NZ/B2物理布局配置、440立即MMAD producer、420旧producer/160原始位模式、fake host production/TUNING各6912/720/144通过。kernel SHA `6c62b89655c3918ad1d7e45f2efad4581839e840ae6dc2fec5e467d0d21cd897`。**延迟MTE1读取/queue释放、CANN9编译、NPU精度/性能PENDING，没有正式提交。不得并入通过版。** 原始模型日志本机 `/private/tmp/bmmms-b-stage-layout.log`、`/private/tmp/bmmms-b-stage-producer.log`。
+
+用户提供 `kernel_c9.asc`，报告第9点“68s”，暂按68μs理解，仅用户报告、未取得任务ID。下一优先从通过 `0d4bd04` 分出C9独立分支，提取FP16/NT/dual20的完整A1驻留+B两package队列+晚ring credit路径；不整份覆盖其它已通过路线、不混入上述B-stage。检查实际host容量/producer/consumer后再正式CLI提交。
+
 ## 当前工作起点：恢复59.66μs通过结构，准备B1单stage研究
 
 分支 `experiment/tt-b-stage`，kernel与 `0d4bd04` 逐字相同，SHA `65e38bb155af9adb068e87dc90c01face21a7cf024d094c54846c5188e9ca120`。本次两项结构实验都正式15/15通过但无收益：worker UB Max第8点59.72μs，完整A1 N pair为60.83μs。代码/实际源码模型/原始结果分别保留 `experiment/tt-worker-max` / `fba8b4f` 和 `experiment/tt-fullm-npair` / `0cc9884`；均不合入当前kernel。没有活动评测任务。

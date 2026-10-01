@@ -47,7 +47,7 @@ void Run(Schedule s,bool neg){
   RunManualFullMCube<int16_t,true>(pipe,{&a,0,true},{&b,0,false},{&ring},s,worker);
   assert(AscendC::dma.empty()&&st.fixes==unsigned(end-first));
   assert(st.aCopies==expectedCopies&&st.aDeques==expectedCopies&&st.aReads==expectedA);
-  assert(st.aLoads==st.mmads&&st.bLoads==st.mmads&&st.bCopies==st.mmads);
+  assert(st.aLoads==st.mmads&&st.bLoads==st.mmads&&st.bCopies==uint64_t(end-first)*((s.k+2*(s.baseN==256?64:128)-1)/(2*(s.baseN==256?64:128))));
   assert(!st.cross[0]&&!st.cross[1]);for(auto e:st.events)assert(e.second==0);
   for(size_t i=2*s.baseM*s.baseN;i<ring.size();++i)assert(ring[i]==1e30f);
   for(auto x:st.maxima){auto z=std::get<0>(x.first),m=std::get<1>(x.first);auto nt=std::get<2>(x.first);
