@@ -31,7 +31,7 @@ void Run(Schedule s,bool neg){
  std::vector<float> final(s.b*s.m,-std::numeric_limits<float>::infinity());
  unsigned minTiles=~0u,maxTiles=0;
  for(uint32_t worker=0;worker<s.workers;++worker){
-  st=State{};st.s=s;st.tx1=st.tx2=true;uint32_t seq=0;uint64_t expectedA=0,expectedCopies=0;int64_t lastM=-1;
+  st=State{};st.s=s;st.tx1=st.tx2=true;uint32_t seq=0;uint64_t expectedA=0,expectedCopies=0,expectedALoads=0;int64_t lastM=-1;
   const int64_t total=int64_t(s.b)*s.mTiles*s.nTiles;
   // Independent integer partition oracle, not the extracted helper.
   int64_t first=total*worker/s.workers,end=total*(worker+1)/s.workers;
@@ -43,11 +43,15 @@ void Run(Schedule s,bool neg){
    if(lastM!=task/s.nTiles){expectedA+=uint64_t(rows)*s.k;++expectedCopies;lastM=task/s.nTiles;}
    st.expected.push_back({z,mt*s.baseM,nt*s.baseN,rows,cols,uint32_t(nt),size_t((seq&1)*s.baseM*s.baseN)});
   }
+  for(int64_t t=first;t<end;){
+   ++expectedALoads;t+=(t+1<end&&t%s.nTiles+1<s.nTiles)?2:1;
+  }
+  expectedALoads*=(s.k+(s.baseN==256?64:128)-1)/(s.baseN==256?64:128);
   std::vector<float> ring(2*s.baseM*s.baseN+16,1e30f);AscendC::TPipe pipe;
   RunManualFullMCube<int16_t,true>(pipe,{&a,0,true},{&b,0,false},{&ring},s,worker);
   assert(AscendC::dma.empty()&&st.fixes==unsigned(end-first));
   assert(st.aCopies==expectedCopies&&st.aDeques==expectedCopies&&st.aReads==expectedA);
-  assert(st.aLoads==st.mmads&&st.bLoads==st.mmads&&st.bCopies==st.mmads);
+  assert(st.aLoads==expectedALoads&&st.bLoads==st.mmads&&st.bCopies==st.mmads);
   assert(!st.cross[0]&&!st.cross[1]);for(auto e:st.events)assert(e.second==0);
   for(size_t i=2*s.baseM*s.baseN;i<ring.size();++i)assert(ring[i]==1e30f);
   for(auto x:st.maxima){auto z=std::get<0>(x.first),m=std::get<1>(x.first);auto nt=std::get<2>(x.first);
@@ -80,9 +84,28 @@ int main(){unsigned count=0;
  for(auto s:std::vector<Schedule>{{1,129,257,1032,128,128,0,0,0,3,0,0},
   {1,193,1297,1544,64,128,0,0,0,20,0,0},{1,129,513,1032,64,256,0,0,0,8,0,0},
   {1,257,129,2040,64,128,0,0,0,20,0,0}})for(bool neg:{false,true}){Run(s,neg);++count;}
- std::cout<<count<<" extracted contiguous Cube executions: balanced unique full tile cover, delayed NZ input, cached A release/refresh, both C slots, full-K C/padding/ring/event counts, paired batches, negative Max then Sum PASS\n";
+ std::cout<<count<<" extracted contiguous Cube executions: balanced unique full tile cover, delayed NZ input, cached A release/refresh, paired/unpaired A2 reuse, both C slots, full-K C/padding/ring/event counts, paired batches, negative Max then Sum PASS\n";
 }
 '''
+# Execute MMAD when its ordered M-pipe flag is awaited, not at issue time.
+# The callback reads live A2/B2/C storage, exposing early operand reuse.
+delayed_model=model.replace('namespace AscendC {',
+ 'std::deque<std::function<void()>> mac;\nnamespace AscendC {',1)
+delayed_model=delayed_model.replace(
+ 'template<HardEvent E>void SetFlag(int i){assert(st.events[std::make_pair(int(E),i)]++==0);}',
+ 'template<HardEvent E>void SetFlag(int i){auto f=[=]{assert(st.events[std::make_pair(int(E),i)]++==0);};if(E==HardEvent::M_MTE1)mac.push_back(f);else f();}')
+delayed_model=delayed_model.replace(
+ '    assert(st.events[std::make_pair(int(E),i)]--==1);',
+ '    if(E==HardEvent::M_MTE1)while(st.events[std::make_pair(int(E),i)]==0){assert(!mac.empty());auto f=mac.front();mac.pop_front();f();}\n    assert(st.events[std::make_pair(int(E),i)]--==1);')
+a=delayed_model.index('template<class T>void Mmad(')
+b=delayed_model.index('struct FixpipeParamsV220',a)
+mm=delayed_model[a:b]
+mm=mm.replace('    for(uint32_t m=0;m<p.m;++m)', '    mac.push_back([=]{\n    for(uint32_t m=0;m<p.m;++m)',1)
+mm=mm.rsplit('}\n',1)[0]+'    });\n}\n'
+delayed_model=delayed_model[:a]+mm+delayed_model[b:]
+delayed_model=delayed_model.replace('template<AscendC::HardEvent E>void Fence(){}',
+ 'template<AscendC::HardEvent E>void Fence(){if(E==AscendC::HardEvent::M_FIX)while(!mac.empty()){auto f=mac.front();mac.pop_front();f();}}')
+delayed_model=delayed_model.replace('assert(AscendC::dma.empty()&&st.fixes', 'assert(mac.empty());assert(AscendC::dma.empty()&&st.fixes')
 shapes=src[src.index('struct Shape {'):src.index('template <AscendC::HardEvent')]
 host=src[src.index('struct Plan {'):src.index('using CacheKey =')]
 parent=parent_src[parent_src.index('struct Plan {'):parent_src.index('using CacheKey =')]
@@ -124,7 +147,7 @@ def main():
  compiler=shutil.which('clang++') or shutil.which('c++');assert compiler
  print('Kernel SHA256:',hashlib.sha256(src.encode()).hexdigest(),flush=True)
  with tempfile.TemporaryDirectory(prefix='bmmms-tt-contig-') as d:
-  for name,code,flags in [('cube',model,[]),('legacy-producer',legacy_model,[]),('host',hostmodel,[]),('host-tuning',hostmodel,['-DBMMMS_TUNING'])]:
+  for name,code,flags in [('cube',model,[]),('delayed-mmad',delayed_model,[]),('legacy-producer',legacy_model,[]),('host',hostmodel,[]),('host-tuning',hostmodel,['-DBMMMS_TUNING'])]:
    cpp,exe=Path(d)/(name+'.cpp'),Path(d)/name;cpp.write_text(code)
    subprocess.run([compiler,'-std=c++17','-O2',*flags,str(cpp),'-o',str(exe)],check=True);subprocess.run([str(exe)],check=True)
  print('CANN9/NPU accuracy/latency PENDING; not a timing model.')
