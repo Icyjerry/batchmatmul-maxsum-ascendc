@@ -1,5 +1,11 @@
 # 接手状态 · 2026-10-01
 
+## 当前工作起点：恢复49.38μs组合，保留队友C9
+
+当前分支 `experiment/tt-l1-input-review`，kernel已从 `e1b3634` 逐字恢复，SHA `8c03d710d5394a0660e6bedc4c172f7784a1cbe3ef9f1cbc450f231aa1d6a052`。这是任务 `6abe3059694b590c3cdf6c87` 15/15通过的代码（C8 49.38/C9 67.48μs）；恢复后没有再次提交，不把历史时间称为本轮实测。
+NZ候选源码/模型/结果保留并推送在 `experiment/tt-native-nz-ring` / `f4498bf`（C8 50.44μs），没有活动正式任务，不合入当前kernel。`validate_tt_native_nz.py` 只对归档候选适用，不用于证明恢复版。
+下一条具体动作：读取官方CANN9/A2-A3共享L1/TSCM与UB→L1样例，核对双AIV对AIC的地址/队列所有权及同步规则，评估Vector准备B NZ后直接供Cube读取是否可行。此方向尚未研究或实现；不编造API/地址，不新增GM输入通路，不重复B包参数/旧NZ输出或N pair候选。先有可核对契约和实际源码模型，再决定是否值得实现及正式提交。main/历史标签未动，整体重大目标仍有空间。
+
 ## 最新：手写TT原生NZ ring正式15/15通过，未观察到新增收益
 
 分支 `experiment/tt-native-nz-ring` 从通过 `e1b3634` 开始，kernel SHA `30a697cc03f6aa3ec39f81275ddcfa27f10aaf4f1d31e0cd4bcbfc51bf6ce233`。保留A1/B包流水/host/Vector末级/C9，仅Cube基本CFG_NZ写原ring和AIV slab DMA/tree Max；固定BM×16 FP32 block的32byte stride2BM，尾N置-inf，原credits/GM/预算保持。区别旧Matmul内建NZ/三个callback失败，不调用它们、不宣称故障修复。
