@@ -15,8 +15,8 @@
 #define __aicore__
 #define __gm__
 using GM_ADDR=float*;
-constexpr int PIPE_V=1;
-struct Schedule {int64_t b,m,n,k;uint32_t baseM,baseN,mTiles,nTiles,nSplit,workers;};
+constexpr int PIPE_V=1,PIPE_MTE2=2;
+struct Schedule {int64_t b,m,n,k;uint32_t baseM,baseN,mTiles,nTiles,nSplit,workers,window;};
 struct Barrier {
  std::mutex mutex;std::condition_variable cv;unsigned arrived=0,generation=0,count;
  explicit Barrier(unsigned n):count(n){}
@@ -30,11 +30,18 @@ struct Shared {
   barrier(2*x.workers),writes((x.m+x.baseM/2-1)/(x.baseM/2),0),valid(x.nSplit*x.mTiles*x.baseM,0){}
 } *shared;
 thread_local uint32_t block=0;
-thread_local bool merged=false;
+thread_local bool merged=false,consuming=true;
+thread_local uint32_t syncs=0,seq=0;
+thread_local int64_t taskCursor=0;
+thread_local std::vector<float> ringMemory;
+bool negativeValues=false;
+float Value(uint32_t m,uint32_t n,bool neg){return neg?-float(1+(m*17+n*11)%61):float(int((m*17+n*11)%61)-30);}
+
 thread_local std::deque<std::function<void()>> pending;
 void Flush(){while(!pending.empty()){auto f=pending.front();pending.pop_front();f();}}
 namespace AscendC {
 enum class TPosition{VECIN,VECOUT,VECCALC};
+enum class ReduceOrder{ORDER_ONLY_VALUE};
 enum class HardEvent{MTE2_V};
 struct Storage{std::vector<float> data;bool pending=false;explicit Storage(size_t n):data(n,1e30f){}};
 template<class T>struct LocalTensor {
@@ -43,15 +50,15 @@ template<class T>struct LocalTensor {
  float& At(size_t i)const{assert(offset+i<mem->data.size());return mem->data.at(offset+i);}
 };
 template<class T>struct GlobalTensor {
- T* ptr=nullptr;size_t size=0,offset=0;bool output=false;
- void SetGlobalBuffer(T* p){ptr=p;output=p==shared->output.data();size=output?shared->output.size()-16:shared->partial.size()-16;}
+ T* ptr=nullptr;size_t size=0,offset=0;bool output=false,ring=false;
+ void SetGlobalBuffer(T* p){ptr=p;output=p==shared->output.data();ring=p==ringMemory.data();size=ring?ringMemory.size()-16:output?shared->output.size()-16:shared->partial.size()-16;}
  GlobalTensor operator[](size_t i)const{assert(offset+i<size);auto x=*this;x.offset+=i;return x;}
  float Read(size_t i)const{
   assert(offset+i<size);
-  if(!output&&!merged&&(offset+i)<uint64_t(shared->s.mTiles)*shared->s.baseM){
+  if(!output&&!ring&&!consuming&&!merged&&(offset+i)<uint64_t(shared->s.mTiles)*shared->s.baseM){
    const uint32_t owner=((offset+i)/(shared->s.baseM/2))%(2*shared->s.workers);assert(owner==block);
   }
-  if(!output&&!merged)assert(shared->valid[offset+i]);
+  if(!output&&!ring&&!consuming&&!merged)assert(shared->valid[offset+i]);
   return ptr[offset+i];
  }
 };
@@ -70,12 +77,20 @@ struct TPipe {
  template<TPosition P>void InitBuffer(TBuf<P>& b,uint32_t bytes){assert(bytes%32==0);ub+=bytes;assert(ub<192*1024);b.mem=std::make_shared<Storage>(bytes/4);}
 };
 uint32_t GetBlockIdx(){return block;}
-template<bool Mode>void SyncAll(){static_assert(Mode);Flush();shared->barrier.Wait();merged=true;}
+template<bool Mode>void SyncAll(){static_assert(Mode);Flush();consuming=false;shared->barrier.Wait();merged=++syncs==2;}
 template<int Pipe>void PipeBarrier(){static_assert(Pipe==PIPE_V);}
 struct DataCopyExtParams{uint16_t blockCount;uint32_t blockLen,srcStride,dstStride,rsv;};
 template<class T>struct DataCopyPadExtParams{bool pad;uint32_t left,right;T value;};
 void DataCopyPad(LocalTensor<float> dst,GlobalTensor<float> src,DataCopyExtParams p,DataCopyPadExtParams<float> pad){
  assert(!pad.pad&&p.blockLen%4==0&&p.srcStride%4==0&&!dst.mem->pending);
+ if(src.ring){
+  const auto& s=shared->s;const uint32_t nt=taskCursor%s.nTiles;
+  const uint32_t cols=std::min<int64_t>(s.baseN,s.n-int64_t(nt)*s.baseN);
+  const int64_t remain=s.m-(taskCursor/s.nTiles)*s.baseM-(block%2)*(s.baseM/2);
+  const uint32_t rows=remain<=0?0:std::min<int64_t>(s.baseM/2,remain);
+  assert(p.blockCount==rows&&p.blockLen==cols*4&&p.srcStride==(s.baseN-cols)*4&&p.dstStride==(s.baseN-cols)/8);
+  assert(src.offset==(seq%2)*s.baseM*s.baseN+(block%2)*(s.baseM/2)*s.baseN);
+ }
  dst.mem->pending=true;
  pending.push_back([=]{
   const auto count=p.blockLen/4,dp=(count+7)/8*8+p.dstStride*8,sp=count+p.srcStride/4;
@@ -84,6 +99,19 @@ void DataCopyPad(LocalTensor<float> dst,GlobalTensor<float> src,DataCopyExtParam
  });
 }
 void DataCopy(GlobalTensor<float> dst,LocalTensor<float> src,uint32_t count){
+ if(consuming){
+  const auto& s=shared->s;assert(!dst.output&&!dst.ring&&!src.mem->pending&&count==s.baseM/2);
+  const uint32_t paddedM=s.mTiles*s.baseM,worker=block/2;
+  assert(dst.offset/paddedM==worker&&dst.offset%paddedM%s.baseM==(block%2)*(s.baseM/2));
+  const uint32_t mt=(dst.offset%paddedM)/s.baseM;
+  const int64_t total=s.mTiles*s.nTiles,first=total*worker/s.workers,end=total*(worker+1)/s.workers;
+  assert(std::max(first,int64_t(mt)*s.nTiles)<std::min(end,int64_t(mt+1)*s.nTiles));
+  src.mem->pending=true;
+  pending.push_back([=]{std::lock_guard<std::mutex> lock(shared->mutex);
+   for(uint32_t i=0;i<count;++i){assert(dst.offset+i<dst.size&&++shared->valid[dst.offset+i]==1);dst.ptr[dst.offset+i]=src.At(i);}
+   src.mem->pending=false;
+  });return;
+ }
  assert(!dst.output&&!src.mem->pending&&count==8&&dst.offset%(shared->s.baseM/2)==0);
  const uint32_t chunk=dst.offset/(shared->s.baseM/2);
  assert(chunk%(2*shared->s.workers)==block&&chunk<shared->writes.size());
@@ -110,33 +138,72 @@ void WholeReduceSum(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,
 }
 }
 template<AscendC::HardEvent E>void Fence(){static_assert(E==AscendC::HardEvent::MTE2_V);Flush();}
+// The old consumer model covers joint two-AIV credit release. Here each AIV
+// executes its actual entire task loop; DMA is deferred, and release destroys C.
+namespace AscendC {
+template<int Mode>void CrossCoreWaitFlag(uint32_t slot){
+ assert(Mode==2&&slot==seq%2);const auto& s=shared->s;
+ const int64_t total=s.mTiles*s.nTiles,end=total*(block/2+1)/s.workers;
+ assert(taskCursor<end);
+ std::fill(ringMemory.begin(),ringMemory.end(),1e30f);
+ const uint32_t nt=taskCursor%s.nTiles,m0=taskCursor/s.nTiles*s.baseM;
+ for(uint32_t r=0;r<s.baseM&&m0+r<s.m;++r)
+  for(uint32_t n=0;n<s.baseN&&int64_t(nt)*s.baseN+n<s.n;++n)
+   ringMemory[slot*s.baseM*s.baseN+r*s.baseN+n]=Value(m0+r,nt*s.baseN+n,negativeValues);
+}
+template<int Mode,int P>void CrossCoreSetFlag(uint32_t flag){
+ assert(Mode==2&&P==PIPE_MTE2&&flag==4+seq%2);Flush();
+ std::fill(ringMemory.begin(),ringMemory.end(),1e30f);++seq;++taskCursor;
+}
+void WholeReduceMax(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,uint32_t reps,
+ uint32_t ds,uint32_t bs,uint32_t rs,ReduceOrder){
+ assert(mask>=1&&mask<=64&&reps<=shared->s.baseM/2&&ds==1&&bs==1&&rs==shared->s.baseN/8&&!src.mem->pending);
+ for(uint32_t r=0;r<reps;++r){float v=-std::numeric_limits<float>::infinity();
+  for(uint32_t j=0;j<mask;++j)v=std::max(v,src.At(r*rs*8+j));dst.At(r)=v;}
+}
+}
+// INSERT_CONSUMER
 // INSERT_FINALIZER
 
-float Value(uint32_t m,uint32_t ns,bool neg){return neg?-float(1+(m*17+ns*11)%61):float(int((m*17+ns*11)%61)-30);}
-void Run(uint32_t bm,uint32_t m,uint32_t ns,uint32_t workers,bool neg){
- const uint32_t mt=(m+bm-1)/bm;workers=std::min(workers,mt*ns);
- Schedule s{1,m,ns*128,32,bm,128,mt,ns,workers,workers};Shared state(s);shared=&state;
- const uint32_t paddedM=s.mTiles*bm,total=mt*ns;
- float golden=0;
- for(uint32_t r=0;r<m;++r){float mx=-std::numeric_limits<float>::infinity();
-  for(uint32_t tile=0;tile<ns;++tile)mx=std::max(mx,Value(r,tile,neg));golden+=mx;
- }
- // Independent partition enumeration: write only real worker/M intersections.
- for(uint32_t w=0;w<workers;++w)for(uint32_t task=total*w/workers;task<total*(w+1)/workers;++task){
-  uint32_t m0=(task/ns)*bm;
-  for(uint32_t r=m0;r<std::min(m,m0+bm);++r){
-   const uint32_t i=w*paddedM+r;float value=Value(r,task%ns,neg);
-   if(state.valid[i])state.partial[i]=std::max(state.partial[i],value);else state.partial[i]=value;
-   state.valid[i]=1;
+void Run(uint32_t bm,uint32_t bn,uint32_t m,uint32_t n,uint32_t workers,bool neg){
+ const uint32_t mt=(m+bm-1)/bm,nt=(n+bn-1)/bn;workers=std::min(workers,mt*nt);
+ Schedule s{1,m,n,32,bm,bn,mt,nt,workers,workers,1};Shared state(s);shared=&state;negativeValues=neg;
+ const uint32_t paddedM=mt*bm,total=mt*nt;
+ std::vector<float> expected(state.partial.size(),1e30f);std::vector<unsigned> expectedValid(state.valid.size(),0);
+ uint32_t segments=0;
+ for(uint32_t w=0;w<workers;++w){int64_t old=-1;
+  for(uint32_t task=total*w/workers;task<total*(w+1)/workers;++task){
+   uint32_t key=task/nt,tile=task%nt;if(int64_t(key)!=old){++segments;old=key;}
+   for(uint32_t r=key*bm;r<(key+1)*bm;++r){
+    uint32_t i=w*paddedM+r;float value=-std::numeric_limits<float>::infinity();
+    if(r<m)for(uint32_t c=tile*bn;c<std::min(n,(tile+1)*bn);++c)value=std::max(value,Value(r,c,neg));
+    if(expectedValid[i])expected[i]=std::max(expected[i],value);else expected[i]=value;
+    expectedValid[i]=1;
+   }
   }
  }
- const auto old=state.partial;
- // Invalid M rows are poisoned, including all later N slabs.
+ float golden=0;for(uint32_t r=0;r<m;++r){float mx=-std::numeric_limits<float>::infinity();
+  for(uint32_t c=0;c<n;++c)mx=std::max(mx,Value(r,c,neg));golden+=mx;
+ }
  std::vector<std::thread> threads;
  for(uint32_t id=0;id<2*workers;++id)threads.emplace_back([&,id]{
-  block=id;merged=false;assert(pending.empty());AscendC::TPipe pipe;
-  // Include the existing consumer UB footprint in the capacity count.
-  pipe.ub=uint64_t(bm)*128*4+20*bm;
+  block=id;merged=false;consuming=true;syncs=0;seq=0;taskCursor=total*(id/2)/workers;assert(pending.empty());
+  ringMemory.assign(2*bm*bn+16,1e30f);AscendC::TPipe pipe;
+  AscendC::TQue<AscendC::TPosition::VECIN,2> cq;AscendC::TQue<AscendC::TPosition::VECOUT,1> mq;
+  AscendC::TBuf<AscendC::TPosition::VECCALC> rb;
+  pipe.InitBuffer(cq,2,bm/2*bn*4);pipe.InitBuffer(mq,1,bm*4);pipe.InitBuffer(rb,4*bm*4);
+  AscendC::GlobalTensor<float> ring,partials;ring.SetGlobalBuffer(ringMemory.data());partials.SetGlobalBuffer(state.partial.data());
+  uint32_t sequence=0;
+  ManualFullMConsumeTasks(cq,mq,ring,partials,s,id/2,(id%2)*bm/2,sequence,rb.Get<float>());
+  assert(sequence==uint64_t(total)*(id/2+1)/workers-uint64_t(total)*(id/2)/workers);
+  assert(seq==sequence&&taskCursor==uint64_t(total)*(id/2+1)/workers);
+  AscendC::SyncAll<true>();
+  for(uint32_t r=0;r<paddedM;++r){const uint32_t i=(id/2)*paddedM+r;
+   // Each thread checks its half; finalizer may overwrite Ns0 only after this check.
+   if(r%bm/(bm/2)==id%2)assert(state.valid[i]==expectedValid[i]&&state.partial[i]==expected[i]);
+  }
+  // Separate barrier for model inspection, not a kernel barrier.
+  state.barrier.Wait();
   FinalizeFullMTiles(state.partial.data(),state.output.data(),s,pipe);Flush();assert(pending.empty());
  });
  for(auto& t:threads)t.join();
@@ -144,12 +211,12 @@ void Run(uint32_t bm,uint32_t m,uint32_t ns,uint32_t workers,bool neg){
  for(auto x:state.writes)assert(x==1);
  for(uint32_t i=1;i<state.output.size();++i)assert(state.output[i]==1e30f);
  for(uint32_t i=workers*paddedM;i<state.partial.size();++i)assert(state.partial[i]==1e30f);
- for(uint32_t split=1;split<workers;++split)for(uint32_t r=0;r<paddedM;++r)assert(state.partial[split*paddedM+r]==old[split*paddedM+r]);
+ for(uint32_t split=1;split<workers;++split)for(uint32_t r=0;r<paddedM;++r)assert(state.partial[split*paddedM+r]==expected[split*paddedM+r]);
 }
 int main(){unsigned count=0;
- for(uint32_t bm:{64u,128u})for(uint32_t m:{1u,17u,64u,65u,129u,513u,1537u,8192u})
- for(uint32_t ns:{1u,3u,16u})for(uint32_t workers:{1u,3u,20u})for(bool neg:{false,true}){
-  Run(bm,m,ns,workers,neg);++count;
+ for(uint32_t bm:{64u,128u})for(uint32_t bn:{32u,128u,256u})for(uint32_t m:{1u,17u,65u,129u,513u,1537u})
+ for(uint32_t n:{1u,33u,129u,513u,1537u})for(uint32_t workers:{1u,3u,20u,32u})for(bool neg:{false,true}){
+  Run(bm,bn,m,n,workers,neg);++count;
  }
- std::cout<<count<<" extracted parallel N-merge then M-sum finalizers: real all-AIV barrier, delayed DMA, unique disjoint partial reuse, tail/negative/poison, output/input bounds PASS\n";
+ std::cout<<count<<" actual persistent consumer plus sparse contributor finalizer executions: task/M boundary, delayed DMA and destructive ring, poisoned unwritten slots, unique partial writers, parallel barriers, full valid-N Max then Sum PASS\n";
 }

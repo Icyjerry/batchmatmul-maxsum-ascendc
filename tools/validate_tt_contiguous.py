@@ -9,11 +9,11 @@ ROOT=Path(__file__).resolve().parents[1]
 src=(ROOT/'kernel.asc').read_text()
 parent_src=subprocess.check_output(['git','show','a05035e:kernel.asc'],cwd=ROOT,text=True)
 zero=src[src.index('template<typename T>\n__aicore__ inline void ManualZeroNZTail'):src.index('// One Cube owns one complete small batch.')]
-helpers=src[src.index('// One full-M accumulator:'):src.index('// All N-tile partials are ready')]
+helpers=src[src.index('// One full-M accumulator:'):src.index('// All worker partials are ready')]
 def vector_body(s):
  a=s.index('void bmmms_manual(');a=s.index('\n#else\n    AscendC::TQue',a)
  return s[a:s.index('\n#endif\n}',a)]
-v=vector_body(src).replace('    const auto range=ManualFullMTasks(s,worker,TILE_STREAM);\n    for(int64_t task=range.begin;task<range.end;task+=range.step) {',
+v=vector_body(src).replace('    if constexpr(TILE_STREAM) {\n        ManualFullMConsumeTasks(cq,mq,ring,partials,s,worker,rowStart,sequence,row);\n    } else {\n','').replace('        mq.FreeTensor(maxima);\n    }\n    }\n    if constexpr(RESIDENT_B)', '        mq.FreeTensor(maxima);\n    }\n    if constexpr(RESIDENT_B)').replace('    const auto range=ManualFullMTasks(s,worker,TILE_STREAM);\n    for(int64_t task=range.begin;task<range.end;task+=range.step) {',
  '    for(int64_t task=worker;task<tasks;task+=s.workers) {')
 v=v.replace('    if constexpr(TILE_STREAM) {\n        FinalizeFullMTiles(partial,output,s,pipe);\n    } else if(s.earlySum && s.nSplit==1) {',
  '    if(s.earlySum && s.nSplit==1) {')
@@ -23,7 +23,7 @@ model=(ROOT/'tests/cpu/fullm_transpose_model.cpp.in').read_text().split('void Ru
 model=model.replace('// INSERT_HELPERS',zero+helpers)
 model+=r'''
 void Run(Schedule s,bool neg){
- negativeInput=neg;s.window=1;s.mTiles=(s.m+s.baseM-1)/s.baseM;s.nTiles=(s.n+s.baseN-1)/s.baseN;s.nSplit=s.nTiles;
+ negativeInput=neg;s.window=1;s.mTiles=(s.m+s.baseM-1)/s.baseM;s.nTiles=(s.n+s.baseN-1)/s.baseN;s.nSplit=s.workers;
  std::vector<int16_t> a(s.b*s.m*s.k),b(s.b*s.n*s.k);
  for(int64_t z=0;z<s.b;++z)for(int64_t m=0;m<s.m;++m)for(int64_t k=0;k<s.k;++k)a[z*s.m*s.k+k*s.m+m]=A(z,m,k);
  for(int64_t z=0;z<s.b;++z)for(int64_t k=0;k<s.k;++k)for(int64_t n=0;n<s.n;++n)b[z*s.n*s.k+n*s.k+k]=B(z,k,n);
@@ -95,7 +95,7 @@ int main(){unsigned checked=0,selected=0,halfM=0;
   auto a=Parent::MakePlan(s,cores);auto b=Candidate::MakePlan(s,cores);++checked;
   auto x=a.schedule,y=b.schedule;
   if(y.dual==33){++selected;assert(dtype==2&&s.tx1&&s.tx2&&(x.dual==1||x.dual==29));
-   assert(y.window==1&&y.nSplit==y.nTiles&&y.workers==unsigned(cores));halfM+=y.baseM<x.baseM;
+   assert(y.window==1&&y.nSplit==y.workers&&y.workers==unsigned(cores));halfM+=y.baseM<x.baseM;
    uint64_t bm=y.baseM,bn=y.baseN,bk=bn==256?64:128,kp=Ceil(k,16)*16,chunks=Ceil(m,bm/2);
    assert(2*bm*kp+4*bn*bk+4096<=hw->l1&&4*bm*bk<=hw->l0a&&4*bn*bk<=hw->l0b&&8*bm*bn<=hw->l0);
    assert(4*bm*bn+20*bm+8*bm+64+chunks*32+Ceil(chunks,8)*32+4096<hw->ub);
