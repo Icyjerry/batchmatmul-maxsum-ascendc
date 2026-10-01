@@ -1,0 +1,19 @@
+std::vector<int16_t> canonicalExpected;
+int storageEncoding=0;
+float Decode(int16_t value){
+ uint16_t bits=uint16_t(value);if(!storageEncoding)return float(value);
+ if(storageEncoding==2){uint32_t raw=uint32_t(bits)<<16;float f;std::memcpy(&f,&raw,4);return f;}
+ int exp=(bits>>10)&31,mant=bits&1023;assert(exp!=31);
+ float v=exp?std::ldexp(float(1024+mant),exp-25):std::ldexp(float(mant),-24);
+ return bits&0x8000?-v:v;
+}
+struct BrcbRepeatParams {uint16_t dstBlkStride=1;uint8_t dstRepStride=8;};
+unsigned brcbs=0;
+template<class T>struct LocalTensor;
+template<class T>void Brcb(LocalTensor<T> dst,LocalTensor<T> src,uint8_t repeats,BrcbRepeatParams p){
+ static_assert(sizeof(T)==4);assert(repeats==4||repeats==8);
+ assert(p.dstBlkStride==1&&p.dstRepStride==8&&dst.offset%32==0&&src.offset%32==0);
+ assert(dst.offset+repeats*64*4<=src.offset||src.offset+repeats*8*4<=dst.offset);++brcbs;
+ Push(1,[=]{for(unsigned r=0;r<repeats;++r)for(unsigned i=0;i<8;++i)for(unsigned j=0;j<8;++j)
+  dst.write(r*p.dstRepStride*8+i*p.dstBlkStride*8+j,src.read(r*8+i));});
+}

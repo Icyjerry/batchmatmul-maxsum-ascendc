@@ -1,3 +1,11 @@
+# Latest: storage-native tiny broadcast/K-tree candidate, CPU passed, native PENDING
+
+Current `experiment/tiny-storage-vector` from passed1734f16, kernel359398bytes SHA `19cd486e6a0ffcd4caaa4a644e64853ae994a7c0065deb577ba32184b271f794`. Three added regions/92lines, no plan/grid/workspace/other-kernel changes; entire-parent scope inverse verified. Keeps document[K,N], query-only Gather for TF, Brcb+Mul and fullK32/64 FP32 tree before validNMax/originalMsum. Other K/layouts retain parent. See `TINY_STORAGE_VECTOR.md` for official900 API and numerical/model limitations.
+
+Production/TUNING each10080 hostcontrols,8352 actual queued entries/54432 active/7488 idleblocks,864 encodedFP16/BF16 entries against FP64golden (maxAbs9.54e-7/nonzeroRel2.93e-6), seven negative controls passed. Independent template other7sources parent, dry-run onlykernel sameSHA. CANN9/nativeprecision/performance PENDING. Next commit/push, submitone, saveID and pollsameID toterminal; no repeats unless clear large benefit. CPUlog ignored artifacts/tiny-storage-vector/cpu.log.
+
+Prior raw-bittranspose26beaac official6abebe23694b590c3c265928 passed15/15 but C2=4.12vsparent2.46; archived/pushed, no parameter scan. Current starts from passed1734f16 without that regression candidate. User exact-two-repeat request was fully completed74e0dd2 (both15/15), do not redo. No activeofficialjob yet. Main/tags unchanged; overalllargeoptimizationgoal incomplete.
+
 # Latest: TT manual frame official Pass, modest single-run gain only
 
 Branch `experiment/tt-manual-frame`, implementationa770e64 / SHA `a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742`, task `6abeb39e694b590c3c22e5d7`: CANN compile successful, 15/15 Pass, all precision_ratio=1. C8=46.52 vs parent median48.45 (3.98% single-run decrease), only1.52% below fastest47.24. Not a large breakthrough; do not repeat or scan parameters. C2=2.46 overlaps old range; retain C7=8.16/C10=99.14 unfavorable timing as well. See TT_MANUAL_FRAME; rawJSON ignored in artifacts/tt-manual-frame/official.json.

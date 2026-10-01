@@ -1,4 +1,10 @@
 
+## 2026-10-02: storage-native tiny structural candidate, native PENDING
+
+From passed1734f16, `experiment/tiny-storage-vector`, SHA19cd486e6a0ffcd4caaa4a644e64853ae994a7c0065deb577ba32184b271f794,359398bytes. Keeps document[K,N], query broadcast and fullK32/64 FP32 column tree before validNMax/Msum; removes documentGather, not another transpose/tile tweak. Source only92lines/three addedregions, no newGM/plan/grid, other7template sources byte-equal parent.
+
+Production/TUNING each10080 hostbyte-boundary controls,8352 actualqueued integerentries,864 encodedFP16/BF16 entries/FP64golden maxAbs9.53674e-7/maxNonzeroRel2.93038e-6 under mixedCPU check, seven negativecontrols. OneVectorFIFO/decodedsoftwarecasts are not native hardware/precision/performance. API900Brcb/stride/PipeBarrier text retrieved. CANN9/NPU precision/perf PENDING; see TINY_STORAGE_VECTOR. Nativejob not yet created; commit/push then one structural submission, pollsameID. No small-gain parameter scans. Prior raw-bittranspose26beaac passednative but C2regressed4.12vs2.46; archived. Main/tags unchanged, goalincomplete.
+
 ## Official terminal result: Pass, modest single-run change
 
 Task `6abeb39e694b590c3c22e5d7`, implementation `a770e64`, SHA `a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742`: CANN compile successful, 15/15 Pass, all precision_ratio=1. Times (us): `[1.99, 2.46, 3.11, 4.12, 5.39, 9.97, 8.16, 46.52, 67.79, 99.14, 88.03, 96.45, 15.49, 11.01, 9.56]`.
