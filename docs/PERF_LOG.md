@@ -567,3 +567,11 @@ Split-K host 模型两档宏均编译运行，统计是各档相同模型空间�
 - C7父9.68→9.40，单次约2.9%，尚未形成明显收益，不当新增重大突破；C8/C9未改，不归因变化。无actual shape/plan/SoC/profile或重复A/B，不推断路线命中、稳定差异或瓶颈。
 - CPU86立即/86延迟live MMAD、2592实际原全M/零行消费者、缺last-reader wait负控制通过；fake及固定公开8.3 production/TUNING各3456/432。模型MTE1/Fixpipe同步，没有FP16舍入和全硬件配置时序，不代替设备精度/时间。
 - 无活动任务，源码和证据保留独立分支，不合main；原49.38μs组合保持。资料Git忽略 `artifacts/c7-full-inputs/`；交接 [C7_FULL_INPUTS.md](C7_FULL_INPUTS.md)。下一评估C7专用Vector消费，当前未实现，不重复附近N块参数。
+
+## 2026-10-01 · C7专用单C缓冲Vector
+
+- `experiment/c7-lean-vector` / `a3696cd`，kernel SHA `0fa24fce76929aee569311905518ee963be5097e7589161a6c525f1996eb6b05`，父 `d793083`。仅dual34专用消费：空闲AIV零UB，活动AIV单C TBuf、有效N树形Max→一次有效M WholeReduceSum→唯一4byte y；四个HardEvent保护C/sum和原GM信用。Cube/host/grid/原GM/workspace/C8/C9及其它Vector逐字保持父。
+- [正式任务 6abe6705694b590c3cfd63c9](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe6705694b590c3cfd63c9) Pass，CANN编译成功、15/15、precision_ratio全1。耗时μs `[2.12,3.91,4.33,5.53,5.46,10.72,9.55,49.74,67.73,99.48,88.31,96.83,15.95,13.30,9.12]`。
+- C7父9.40→9.55，无新增收益，归档；C8/C9未改，不归因波动。没有actual shape/plan/SoC/profile或重复A/B，不推断路线、瓶颈或稳定差异。原49.38μs TT+约68μs队友C9组合保持，不合main。
+- CPU1296实际helper：三独立引擎队列/live generation、poison ring、负数/尾块、cyclic/idle、零行无分配及唯一y/guard/credits通过；缺四个Fence、无N尾mask、早信用六负控制通过。合成Cube/companion不是完整原生协议，不模拟舍入或硬件时间。
+- 无活动任务；原始资料本机Git忽略 `artifacts/c7-lean-vector/`；交接 [C7_LEAN_VECTOR.md](C7_LEAN_VECTOR.md)。下一恢复 `e1b3634`，审查C9手写完整window的serial DMA/V与late信用，必须区分旧库dual1/2+flag9/fold组合，先源码同步模型，不重复旧组合提交。

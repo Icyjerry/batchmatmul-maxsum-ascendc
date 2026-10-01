@@ -1,10 +1,10 @@
 # 接手状态 · 2026-10-01
 
-## 当前候选：C7专用单C缓冲Vector，正式任务已创建
+## 最新：C7专用单C缓冲Vector正式15/15通过，无新增收益，归档
 
 当前 `experiment/c7-lean-vector` 从 `d793083` 开始，kernel SHA `0fa24fce76929aee569311905518ee963be5097e7589161a6c525f1996eb6b05`。仅dual34专用Vector helper/调用：空闲AIV只归还原mode2 credits，活动AIV单C TBuf、行Max→直接WholeReduceSum→唯一4byte y写；显式V→MTE2/MTE2→V/V→MTE3/MTE3→V保护单UB和sum。Cube/host/launch/grid/原GM/workspace/C8/C9整个旧源码逐字保持，父正式15/15 C7 9.40μs；最佳TT+C9组合 `e1b3634` 不动。
-1296实际helper CPU组合通过，三种独立引擎顺序、live generation、destructive GM复用、负数/N尾、cyclic batch/idle AIV、唯一y/guards及信用配平；缺四个Fence、N尾无mask、早信用六个负控制全部检出。模型合成Cube与另一AIV，不代替完整硬件调度/舍入/性能。详见 [C7_LEAN_VECTOR.md](C7_LEAN_VECTOR.md)。实现 `a3696cd` 已commit/push；独立原模板dry-run仅kernel、306655byte/SHA一致。正式提交 **`6abe6705694b590c3cfd63c9`** 已创建，CANN编译/正式精度/性能PENDING。
-下一条：`python3 /private/tmp/query_bmmms_submission.py 6abe6705694b590c3cfd63c9`，只轮询这一任务至终态。无显著C7收益即归档、不合main、不扫描相邻参数；先保留C9约68μs与TT49.38μs。原资料Git忽略 `artifacts/c7-lean-vector/`。整体重大优化目标尚未完成。
+1296实际helper CPU组合通过，三种独立引擎顺序、live generation、destructive GM复用、负数/N尾、cyclic batch/idle AIV、唯一y/guards及信用配平；缺四个Fence、N尾无mask、早信用六个负控制全部检出。模型合成Cube与另一AIV，不代替完整硬件调度/舍入/性能。详见 [C7_LEAN_VECTOR.md](C7_LEAN_VECTOR.md)。实现 `a3696cd` 已commit/push；独立原模板dry-run仅kernel、306655byte/SHA一致。正式任务 **`6abe6705694b590c3cfd63c9` Pass，CANN编译成功、15/15、precision_ratio全1**；C7父9.40→9.55μs，无新增收益。C8/C9未改，不归因49.74/67.73波动；没有actual shape/plan/SoC/profile或重复A/B。
+无活动任务；归档候选，不合main、不扫描相邻参数。下一恢复 `e1b3634` 原C9约68μs+TT49.38μs组合，再审查C9手写N window消费：现有两C queue仍serial Copy→Reduce→下一tile，到全窗口Vector结束才还2/3 credit。与旧dual-consumer-overlap仅库dual1/2+flag9/fold不同；只评估同两buffer DMA/V重叠及最后GM读后信用，不混入fold/矩阵乘/参数扫描，先实际源码三引擎模型证明早credit与UB生命周期。新C9消费尚未实现。原资料Git忽略 `artifacts/c7-lean-vector/`。整体重大优化目标尚未完成。
 
 ## 最新：C7完整输入/完整A2驻留正式15/15通过，尚未形成明显收益
 

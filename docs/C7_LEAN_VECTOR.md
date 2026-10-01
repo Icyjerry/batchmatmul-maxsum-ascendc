@@ -50,5 +50,16 @@ GM→UB只读有效M/N，按BN行距落UB，尾部不进入归约；沿N的64列
 检查CANN9编译、15点全精度和时间，优先比较父C7 9.40μs；C8/C9等未改路径时间不能归因该改动。
 没有actual shape/plan/SoC/profile或重复A/B时，只报告单次结果，不保证稳定收益；没有显著收益则归档，不合main，不重复近邻参数提交。
 
-CANN9/NPU精度/性能：PENDING。实现 `a3696cd` 已commit/push；独立原模板仅kernel、306655byte/SHA一致。
-正式提交 **`6abe6705694b590c3cfd63c9`** 已创建，下一只轮询这一ID到终态，不重复提交。
+上述请求已完成。实现 `a3696cd` 已commit/push；独立原模板仅kernel、306655byte/SHA一致。
+
+## 正式结果：15/15通过，没有新增收益
+
+[正式任务 6abe6705694b590c3cfd63c9](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe6705694b590c3cfd63c9) **Pass，CANN编译成功、15/15、precision_ratio全部1**。耗时μs：
+
+```text
+[2.12, 3.91, 4.33, 5.53, 5.46, 10.72, 9.55, 49.74, 67.73, 99.48, 88.31, 96.83, 15.95, 13.30, 9.12]
+```
+
+C7父9.40→9.55，单次没有新增收益；C8/C9未改，不归因49.74/67.73的波动。没有actual shape/plan/SoC/profile或重复A/B，不能从此结果判断路径命中、精确瓶颈或稳定幅度。
+候选归档保留，**不合main、不当最优、不扫描附近归约参数**；恢复原 `e1b3634` 的C8 49.38/C9 67.48μs通过组合（恢复本身不重复提交）。无活动评测任务；原始JSON/CPU资料本机私有 `artifacts/c7-lean-vector/`。
+该结果与C7完整输入仅小幅变化一起，未支持继续只削减消费初始化/归约操作；下一审查当前C9手写完整N window的DMA/credit顺序。先比较旧dual-consumer-overlap：旧仅库dual1/2，含flag9/fold组合；当前C9手写AIC无库flag9、AIV仍serial Copy→Reduce→下一tile并到全窗口Vector结束才还credit。只评估已有两C queue能否重叠copy与V并在最后GM读取后释放原2/3信用，不改变矩阵乘或Max/Sum指令，避免重复旧组合。尚未实现，没有新性能结论。
