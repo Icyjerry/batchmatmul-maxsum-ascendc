@@ -1,0 +1,190 @@
+// Actual consumer under separately queued MTE2/V/MTE3 engines.
+// Synthetic Cube/companion credits; no native scheduler, instruction timing or FP rounding.
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <cstdint>
+#include <deque>
+#include <functional>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <vector>
+#define __aicore__
+#define __gm__
+using GM_ADDR=void*;
+constexpr int PIPE_MTE2=0,PIPE_V=1,PIPE_MTE3=2;
+struct Schedule {int64_t b,m,n,k;uint32_t baseM,baseN,workers;};
+float Value(uint32_t b,uint32_t m,uint32_t n,bool neg){
+ return neg?-float(1+b*101+(m*7+n*13)%59):float(b*101)+float((m*11+n*17)%67)-33;
+}
+struct Command {std::function<bool()> ready;std::function<void()> run;};
+struct State {
+ Schedule s;uint32_t worker=0,sub=0,issued=0,primes=0,copies=0,writes=0,allocs=0,mode=0;
+ size_t allocated=0;bool neg=false;
+ std::vector<float>* ring;std::vector<float>* output;
+ std::array<std::deque<Command>,3> queues;
+ std::array<int,4> events{};std::array<int,2> credits{},waits{},releases{};
+ std::vector<int> writers;
+ void Push(int engine,std::function<void()> f){queues[engine].push_back({[]{return true;},f});}
+ void Drain(){
+  const std::array<std::array<int,3>,3> orders={{{0,1,2},{1,2,0},{2,0,1}}};
+  while(!queues[0].empty()||!queues[1].empty()||!queues[2].empty()) {
+   bool advanced=false;
+   for(int engine:orders.at(mode))if(!queues[engine].empty()&&queues[engine].front().ready()){
+    auto c=queues[engine].front();queues[engine].pop_front();c.run();advanced=true;break;
+   }
+   assert(advanced&&"cross-engine event deadlock");
+  }
+ }
+} st;
+namespace AscendC {
+enum class TPosition {VECIN,VECCALC,VECOUT};
+enum class HardEvent {V_MTE2,MTE2_V,V_MTE3,MTE3_V};
+enum class ReduceOrder {ORDER_ONLY_VALUE};
+struct Storage {
+ std::vector<float> values;TPosition pos;int generation=-1;
+ Storage(size_t n,TPosition p):values(n,1e30f),pos(p){}
+};
+template<class T>struct LocalTensor {
+ std::shared_ptr<Storage> mem;size_t offset=0;
+ LocalTensor operator[](size_t i)const{assert(offset+i<mem->values.size());return {mem,offset+i};}
+ float& At(size_t i)const{return mem->values.at(offset+i);}
+};
+template<class T>struct GlobalTensor {
+ std::vector<T>* mem=nullptr;size_t offset=0;
+ void SetGlobalBuffer(T* ptr){assert(ptr==st.output->data()+8);mem=st.output;offset=8;}
+ GlobalTensor operator[](size_t i)const{assert(offset+i<mem->size());return {mem,offset+i};}
+ T& At(size_t i)const{return mem->at(offset+i);}
+};
+template<TPosition P>struct TBuf {
+ std::shared_ptr<Storage> mem;
+ template<class T>LocalTensor<T> Get(){assert(mem);return {mem,0};}
+};
+struct TPipe {
+ template<TPosition P>void InitBuffer(TBuf<P>& buf,size_t bytes){
+  assert(bytes%32==0&&!buf.mem);buf.mem=std::make_shared<Storage>(bytes/4,P);
+  ++st.allocs;st.allocated+=bytes;
+ }
+};
+struct DataCopyExtParams {uint16_t blockCount;uint32_t blockLen,srcStride,dstStride,reserved;};
+template<class T>struct DataCopyPadExtParams {bool pad;uint32_t left,right;T value;};
+template<int Mode>void CrossCoreWaitFlag(uint32_t slot){
+ assert(Mode==2&&slot==(st.issued&1));const uint32_t batch=st.worker+st.issued*st.s.workers;
+ assert(batch<st.s.b);++st.issued;
+ st.Push(PIPE_MTE2,[=]{
+  // Independent Cube fixture consumes this AIV's prior credit; companion is abstracted.
+  assert(st.credits[slot]--==1);++st.waits[slot];
+  auto first=st.ring->begin()+slot*st.s.baseM*st.s.baseN;
+  std::fill(first,first+st.s.baseM*st.s.baseN,1e30f);
+  for(uint32_t m=0;m<st.s.m;++m)for(uint32_t n=0;n<st.s.n;++n)
+   first[m*st.s.baseN+n]=Value(batch,m,n,st.neg);
+ });
+}
+template<int Mode,int P>void CrossCoreSetFlag(uint32_t flag){
+ assert(Mode==2&&P==PIPE_MTE2&&flag>=4&&flag<=5);
+ const uint32_t slot=flag-4;const bool prime=st.primes<2;
+ if(prime){assert(slot==st.primes++&&st.issued==0);}else assert(slot==((st.issued-1)&1));
+ st.Push(PIPE_MTE2,[=]{
+  assert(st.credits[slot]++==0);
+  if(!prime) {
+   ++st.releases[slot];auto first=st.ring->begin()+slot*st.s.baseM*st.s.baseN;
+   std::fill(first,first+st.s.baseM*st.s.baseN,1e30f); // immediate destructive reuse
+  }
+ });
+}
+void DataCopyPad(LocalTensor<float> dst,GlobalTensor<float> src,DataCopyExtParams p,DataCopyPadExtParams<float> pad){
+ assert(st.sub==0&&!pad.pad&&dst.mem->pos==TPosition::VECIN);
+ assert(p.blockCount==st.s.m&&p.blockLen==st.s.n*4&&p.srcStride==(st.s.baseN-st.s.n)*4);
+ const uint32_t pitch=(p.blockLen+31)/32*8+p.dstStride*8;
+ assert(pitch==st.s.baseN&&src.mem==st.ring&&src.offset==((st.issued-1)&1)*st.s.baseM*st.s.baseN);
+ const uint32_t batch=st.worker+(st.issued-1)*st.s.workers;++st.copies;
+ st.Push(PIPE_MTE2,[=]{
+  for(uint32_t r=0;r<p.blockCount;++r)for(uint32_t c=0;c<p.blockLen/4;++c)
+   dst.At(r*pitch+c)=src.At(r*(p.blockLen+p.srcStride)/4+c);
+  dst.mem->generation=batch;
+ });
+}
+void DataCopyPad(GlobalTensor<float> dst,LocalTensor<float> src,DataCopyExtParams p){
+ assert(st.sub==0&&p.blockCount==1&&p.blockLen==4&&p.srcStride==0&&p.dstStride==0);
+ assert(dst.mem==st.output&&dst.offset>=8&&dst.offset<8+st.s.b&&src.mem->pos==TPosition::VECOUT);
+ const uint32_t batch=dst.offset-8;
+ assert(batch==st.worker+(st.issued-1)*st.s.workers);++st.writes;
+ st.Push(PIPE_MTE3,[=]{
+  assert(src.mem->generation==int(batch)&&"sum reused before MTE3 completion");
+  assert(st.writers.at(batch)++==0);dst.At(0)=src.At(0);
+ });
+}
+template<int P>void PipeBarrier(){assert(P==PIPE_V);}
+void WholeReduceMax(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,uint32_t reps,
+ uint32_t ds,uint32_t bs,uint32_t rs,ReduceOrder){
+ assert(mask>=1&&mask<=64&&reps==st.s.m&&ds==1&&bs==1&&rs==st.s.baseN/8);
+ const uint32_t batch=st.worker+(st.issued-1)*st.s.workers;
+ st.Push(PIPE_V,[=]{
+  assert(src.mem->generation==int(batch)&&"C read before DMA or overwritten before V completion");
+  for(uint32_t r=0;r<reps;++r){float v=-std::numeric_limits<float>::infinity();
+   for(uint32_t j=0;j<mask;++j)v=std::max(v,src.At(r*rs*8+j));dst.At(r)=v;}
+  dst.mem->generation=batch;
+ });
+}
+void Max(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint32_t count){
+ const uint32_t batch=st.worker+(st.issued-1)*st.s.workers;assert(count==st.s.m);
+ st.Push(PIPE_V,[=]{
+  assert(a.mem->generation==int(batch)&&b.mem->generation==int(batch));
+  for(uint32_t i=0;i<count;++i)dst.At(i)=std::max(a.At(i),b.At(i));dst.mem->generation=batch;
+ });
+}
+void WholeReduceSum(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,uint32_t reps,
+ uint32_t ds,uint32_t bs,uint32_t rs){
+ assert(mask==st.s.m&&mask<=64&&reps==1&&ds==1&&bs==1&&rs==1);
+ const uint32_t batch=st.worker+(st.issued-1)*st.s.workers;
+ st.Push(PIPE_V,[=]{
+  assert(src.mem->generation==int(batch));float sum=0;
+  for(uint32_t i=0;i<mask;++i)sum+=src.At(i);dst.At(0)=sum;dst.mem->generation=batch;
+ });
+}
+}
+template<AscendC::HardEvent E>void Fence(){
+ const int event=int(E);
+ const int from=E==AscendC::HardEvent::V_MTE2||E==AscendC::HardEvent::V_MTE3?PIPE_V:
+  E==AscendC::HardEvent::MTE2_V?PIPE_MTE2:PIPE_MTE3;
+ const int to=E==AscendC::HardEvent::V_MTE2?PIPE_MTE2:E==AscendC::HardEvent::V_MTE3?PIPE_MTE3:PIPE_V;
+ st.Push(from,[=]{assert(st.events[event]++==0);});
+ st.queues[to].push_back({[=]{return st.events[event]>0;},[=]{--st.events[event];}});
+}
+// INSERT_CONSUMER
+
+void Run(uint32_t B,uint32_t M,uint32_t N,uint32_t workers,bool neg,uint32_t mode){
+ Schedule s{B,M,N,384,(M+15)/16*16,(N+15)/16*16,workers};
+ const uint32_t oneC=s.baseM*s.baseN;
+ std::vector<float> output(B+16,1e30f);std::vector<int> writers(B);
+ for(uint32_t worker=0;worker<workers;++worker)for(uint32_t sub=0;sub<2;++sub){
+  st=State{};st.s=s;st.worker=worker;st.sub=sub;st.neg=neg;st.mode=mode;
+  std::vector<float> ring(2*oneC+16,1e30f);
+  st.ring=&ring;st.output=&output;st.writers=writers;
+  AscendC::TPipe pipe;
+  RunSmallFullInputsVector(pipe,{&ring,0},output.data()+8,s,worker,sub);st.Drain();writers=st.writers;
+  const uint32_t batches=worker<B?(B-1-worker)/workers+1:0;
+  assert(st.issued==batches&&st.primes==2&&st.waits[0]+st.waits[1]==int(batches));
+  assert(st.waits==st.releases&&st.credits[0]==1&&st.credits[1]==1);
+  for(int e:st.events)assert(e==0);
+  const bool active=sub==0&&batches;
+  assert(st.allocs==(active?3:0)&&st.copies==(active?batches:0)&&st.writes==(active?batches:0));
+  assert(st.allocated==(active?oneC*4+16*s.baseM+32:0));
+  for(size_t i=2*oneC;i<ring.size();++i)assert(ring[i]==1e30f);
+ }
+ for(uint32_t batch=0;batch<B;++batch){float sum=0;
+  for(uint32_t m=0;m<M;++m){float mx=-std::numeric_limits<float>::infinity();
+   for(uint32_t n=0;n<N;++n)mx=std::max(mx,Value(batch,m,n,neg));if(neg)assert(mx<0);sum+=mx;}
+  assert(writers[batch]==1&&output[8+batch]==sum);
+ }
+ for(int i=0;i<8;++i)assert(output[i]==1e30f&&output[8+B+i]==1e30f);
+}
+int main(){unsigned count=0;
+ for(uint32_t B:{16u,24u,31u})for(uint32_t M:{32u,48u,63u})
+ for(uint32_t N:{128u,129u,191u,192u,193u,255u})for(uint32_t workers:{1u,8u,20u,32u})
+ for(bool neg:{false,true})for(uint32_t mode:{0u,1u,2u}){
+  Run(B,M,N,workers,neg,mode);++count;
+ }
+ std::cout<<count<<" actual lean consumers: queued MTE2/V/MTE3, destructive ring reuse, single C/sum reuse, negatives/tails, cyclic batches/idle AIV and exact y writes PASS\n";
+}

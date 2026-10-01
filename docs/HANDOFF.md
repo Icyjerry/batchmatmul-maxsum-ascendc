@@ -1,5 +1,11 @@
 # 接手状态 · 2026-10-01
 
+## 当前候选：C7专用单C缓冲Vector，CPU通过，正式待提交
+
+当前 `experiment/c7-lean-vector` 从 `d793083` 开始，kernel SHA `0fa24fce76929aee569311905518ee963be5097e7589161a6c525f1996eb6b05`。仅dual34专用Vector helper/调用：空闲AIV只归还原mode2 credits，活动AIV单C TBuf、行Max→直接WholeReduceSum→唯一4byte y写；显式V→MTE2/MTE2→V/V→MTE3/MTE3→V保护单UB和sum。Cube/host/launch/grid/原GM/workspace/C8/C9整个旧源码逐字保持，父正式15/15 C7 9.40μs；最佳TT+C9组合 `e1b3634` 不动。
+1296实际helper CPU组合通过，三种独立引擎顺序、live generation、destructive GM复用、负数/N尾、cyclic batch/idle AIV、唯一y/guards及信用配平；缺四个Fence、N尾无mask、早信用六个负控制全部检出。模型合成Cube与另一AIV，不代替完整硬件调度/舍入/性能。详见 [C7_LEAN_VECTOR.md](C7_LEAN_VECTOR.md)。CANN编译/正式精度/性能PENDING，无活动任务。
+下一条：commit/push候选；独立原模板仅替换kernel、dry-run核SHA，CLI仅提交一次，立刻记录ID，轮询同一任务至终态。无显著C7收益即归档、不合main、不扫描相邻参数；先保留C9约68μs与TT49.38μs。原资料Git忽略 `artifacts/c7-lean-vector/`。整体重大优化目标尚未完成。
+
 ## 最新：C7完整输入/完整A2驻留正式15/15通过，尚未形成明显收益
 
 当前 `experiment/c7-full-inputs` 从 `fd72a34` 开始，kernel SHA `e8a1512e88e3cc71069d501b9cb934917ac2717cde772f83a9f6fad0daf7f6bb`，303787bytes。仅C7历史TF/FP16小矩阵新dual34：完整A/B一次ND2NZ到L1，完整A一次Load3D驻留L0A，按N切片在B2/原C0做完整K MMAD；复用原direct-batch Vector、原ring/credits/grid/workspace，无新GM/Schedule字段。C8/C9保持，父正式C7 9.68/C8 49.38/C9 67.48μs。
