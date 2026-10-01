@@ -1,5 +1,10 @@
 # 接手状态 · 2026-10-02
 
+## 当前：用户要求C7原样再交两次
+
+分支 `experiment/c7-identical-repeats`，kernel保持c17077f / SHA45234d79…，与官方模板逐字一致。第一次新任务 `6abea238694b590c3c1d35d8` 已创建PENDING，第二次未创建；下一只查询这个ID至终态再创建第二次，不更改kernel。详见 `docs/C7_IDENTICAL_REPEATS.md`。宽N编译失败源码留 `experiment/c14-manual-frame`，本次不修/不提交该候选。
+
+
 ## 最新通过父版：C7两次8.00/7.88 μs，均15/15
 
 当前 `experiment/c7-manual-frame`，实现 `c17077f`，kernel SHA `45234d7945b6013cc75d2e6c3092c911c9c8ecd5618b82a7c51fd7d9084e0c61`，329378bytes；首测 `6abe9804694b590c3c18f362`、原样确认 `6abe98e5694b590c3c195fc5` 均Pass、CANN编译成功、15/15，precision_ratio全1。
