@@ -22,6 +22,12 @@
 使用uint16_t类型操作地址列表，FP16/BF16输入没有数值Cast。repeat=baseN/16，dst stride16 blocks、src stride1 block；repeat1必须将两者设0，已按文档处理。
 固定公开8.3 `impl/quantization/antiquant/ascend_antiquant_m200_impl.h` 也采用GetPhyAddr地址列表并处理repeat1的stride0；是公开源码参考，不是安装CANN9编译结果。
 
+## 论文中的复用原则与本题映射
+
+Goto / van de Geijn 的 [High-Performance Implementation of the Level-3 BLAS](https://www.cs.utexas.edu/~flame/pubs/GotoTOMS2.pdf) 在Gepp算法中将B面板packing放在M循环外，供多个A块重复消费。它提供的是CPU分层矩阵乘的成本摊销思路，不提供Ascend指令或本题速度结论。
+本题原实现已将B的连续化放在M循环外；本候选进一步将Cube的块布局也提前准备，避免同一面板在各M任务反复转换。为此付出额外一次Vector转置，是否划算由正式对照判断。
+示例B1/M1536/N6144/K1536、BM128/BN256/BK64：Cube有6912次B面板消费，旧B2转置load发起27648次，新完整N面板6912次；AIV新增2304次K16-plane转换。示例不是正式case shape/plan，调用数也不是延迟预测。
+
 ## CPU/host验证
 
 `python3 tools/validate_packed_b_nz.py`
@@ -41,3 +47,11 @@ kernel SHA `5a420968d478d3428334a42e562bbe3455d413f6db06a60a432c100282ef494a`，
 独立官方模板 `/private/tmp/bmmms-judge-packed-b-nz/project`，dry-run仅kernel.asc/SHA一致。
 代码 `0ad246b` 已推送私有GitHub分支。正式任务 [6abe0163694b590c3cc61e91](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe0163694b590c3cc61e91) 已创建；CANN9编译、NPU精度、latency：PENDING。
 仅提交本次格式结构一次；同一ID查至终态，不用CPU调用数宣称速度。没有大幅收益则保留反例，不提交类似tile/stride参数。
+
+## 正式终态：15/15通过，未见大幅收益
+
+[6abe0163694b590c3cc61e91](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe0163694b590c3cc61e91) **Pass，CANN编译成功、15/15，precision_ratio全1**。
+逐点耗时 `[2.18,3.78,4.39,5.62,5.38,10.78,10.17,67.93,83.85,99.64,88.43,96.65,16.28,13.33,9.51]` μs。
+第12点TT父95.41→96.65，query-block95.91→96.65，没有明显收益。其它未修改路径不归因；无actual shape/plan/SoC/profile和重复A/B，不证明新路径命中或具体瓶颈。
+保留 `0ad246b` 的已通过格式结构和源码模型，原始结果私有本机Git忽略 `artifacts/packed-b-nz-once/`。没有活动正式任务；不做类似packing stride/tile试交。
+剩余源码成本：TF A的resident K面板仍按M16循环Load2D；M128时每K面板8次。可在保留本次连续NZ B的基础上，组合已通过TT的整M raw-bit Load3D A，减少两侧的逐小块搬运发起。这是新的组合假设，不是已证明提速。整体重大提升未达成。

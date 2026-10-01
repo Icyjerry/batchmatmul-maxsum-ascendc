@@ -1,5 +1,12 @@
 # 2026-09-30 · 配对 M / B 面板复用首版
 
+## 2026-10-01 · packed-B一次Cube块布局正式通过，无明显收益
+
+- 代码 `0ad246b` / SHA `5a420968d478d3428334a42e562bbe3455d413f6db06a60a432c100282ef494a`，正式ID `6abe0163694b590c3cc61e91` Pass，CANN编译成功、15/15、precision_ratio全1。
+- 耗时 `[2.18,3.78,4.39,5.62,5.38,10.78,10.17,67.93,83.85,99.64,88.43,96.65,16.28,13.33,9.51]` μs。第12点TT父95.41→96.65，无明显收益；无actual shape/plan/SoC/profile和重复A/B，不断言路由或根因，其它未改路径不归因。
+- 原ND/新NZ各2016真实源码布局/延迟DMA执行、NZ全65536bit，fake/public8.3 tiler production/TUNING各1728/54通过。未新增GM/UB分配，队列后半用于预处理输出，SyncAll/flag12未改。
+- 保留独立分支 `experiment/packed-b-nz-once`；下一结构组合是保留连续NZ B，使用已通过TT native A矩形搬运，检查A仍按M16发起的成本。资料 `PACKED_B_NZ_ONCE.md`，本机私有原始资料 `artifacts/packed-b-nz-once/`。整体重大提升未达成。
+
 ## 2026-10-01 · 完整 M 四种布局正式通过，但第12点退化
 
 - 代码 `d0904f8` / SHA `3d2904d008155f2e8be3995b13f1295dfce130aac36ad47fbc0f8a9582bcf5f4`；正式ID `6abde198694b590c3cb643e2` Pass，15/15、precision_ratio全1，CANN编译成功。
