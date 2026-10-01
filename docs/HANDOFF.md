@@ -1,5 +1,12 @@
 # 接手状态 · 2026-10-02
 
+## 最新通过父版：C7两次8.00/7.88 μs，均15/15
+
+当前 `experiment/c7-manual-frame`，实现 `c17077f`，kernel SHA `45234d7945b6013cc75d2e6c3092c911c9c8ecd5618b82a7c51fd7d9084e0c61`，329378bytes；首测 `6abe9804694b590c3c18f362`、原样确认 `6abe98e5694b590c3c195fc5` 均Pass、CANN编译成功、15/15，precision_ratio全1。
+确认μs `[1.99,2.49,3.08,4.04,5.28,9.73,7.88,50.72,67.77,98.46,88.48,96.56,16.04,13.26,9.55]`。C7两次8.00/7.88、中位7.94；父同SHA三次9.59–10.28、中位10.14；候选均低于父样本区间，中位耗时低21.7%、最慢候选比最快父低16.6%。无实际同机交错A/B/actualshape/plan/SoC/profile，不能保证因果百分比或算榜分；其它路径未改不归因。CPU/负控制/源码范围与两个终态完整见 `docs/C7_MANUAL_FRAME.md`；原JSON忽略 `artifacts/c7-manual-frame/`。没有活动任务，main/历史标签不动。整体极限性能目标仍未完成。
+下一具体动作：从当前通过版独立 `experiment/c14-manual-frame`。源码 `MakePlan` 的 short-M/wide-N BF16路径已dual21、完整A留L0A，不能重做A驻留。`bmmms_manual<...,FULL_A=true>` 仍TPipe/两份placeholderA queue、单份B2/一个两Ntile C0/一个两Ntile GM窗口；Vector终态SyncAll后block0用 `for(ns=1;ns<nSplit;++ns) Max+PipeBarrier` 串行归并。历史64行/8192列/20核代理nSplit16，归并15个API可按连续两半向量repeat折叠成4个API；须仍Max(N)后Sum(M)，不重分M/N任务、不增加GM。先对比历史FULL_A试验，建立实际producer/Vector/末级跨线程模型，再选择“紧凑manual frame + 分片并行归并”这个结构假设。C7已通过不要回退/混未验证。
+同步API研究：900官方SyncAll网页正文通过web未能读取，只能导航壳；9.1或PTO源码不能冒充9.0 header。下一要核实际9.0 SyncAll硬同步是否依赖TPipe、flag保留槽；当前未确认，无C14代码。现有900入口 `https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900/API/ascendcopapi/atlasascendc_api_07_0204.html`；PTO官方文档是硬件barrier比较资料，未从其拷实现/未增加依赖。不能用当前核数/shape注释冒充真正case profile。
+
 ## 最新：手动C7入口正式15/15通过，C7 8.00 μs
 
 分支 `experiment/c7-manual-frame`，实现 `c17077f`，kernel SHA `45234d7945b6013cc75d2e6c3092c911c9c8ecd5618b82a7c51fd7d9084e0c61`，329378bytes。正式任务 **`6abe9804694b590c3c18f362` Pass，CANN编译成功、15/15，precision_ratio全1**，μs `[1.99,2.48,3.16,4.01,5.46,9.96,8.00,50.67,67.89,98.21,88.06,96.43,15.76,13.15,9.81]`。

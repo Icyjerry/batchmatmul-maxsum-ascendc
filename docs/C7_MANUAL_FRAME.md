@@ -58,3 +58,15 @@ C7 8.00，比父三次最快9.59低16.6%，比中位10.14低21.1%，已超出父
 原始JSON Git忽略 `artifacts/c7-manual-frame/official.json`。通过版保留独立实验分支，main/历史标签不动。
 
 原样确认任务 **`6abe98e5694b590c3c195fc5`** 已创建，SHA和模板保持；下一只查询该ID至终态，禁止超时重交。
+
+## 原样确认结果
+
+[任务 6abe98e5694b590c3c195fc5](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe98e5694b590c3c195fc5) **Pass，CANN编译成功、15/15、precision_ratio全1**。代码/kernel/template原样保持，μs：
+
+```text
+[1.99,2.49,3.08,4.04,5.28,9.73,7.88,50.72,67.77,98.46,88.48,96.56,16.04,13.26,9.55]
+```
+
+新C7两次8.00/7.88、中位7.94；父同kernel三次9.59/10.28/10.14、中位10.14、区间9.59–10.28。候选两次均低于父样本区间，中位耗时低21.7%；最快父到最慢候选仍低16.6%。两次不是总体统计或严格同机交错A/B，actual shape/plan/SoC/profile仍未知；不保证稳定因果百分比，不推算排行榜分数。其它代码路径没改，不归因其波动。父/候选5个正式任务各15Pass仍不能证明所有合法shape的native精度覆盖。
+
+本次目标假设已有正式编译/精度/两次速度证据，可作为下一结构实验父版。没有活动任务；原始JSON Git忽略 `artifacts/c7-manual-frame/confirm.json`。main/历史标签不动，整体冲榜目标尚未完成。
