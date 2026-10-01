@@ -1,3 +1,9 @@
+# Latest: TT manual frame official Pass, modest single-run gain only
+
+Branch `experiment/tt-manual-frame`, implementationa770e64 / SHA `a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742`, task `6abeb39e694b590c3c22e5d7`: CANN compile successful, 15/15 Pass, all precision_ratio=1. C8=46.52 vs parent median48.45 (3.98% single-run decrease), only1.52% below fastest47.24. Not a large breakthrough; do not repeat or scan parameters. C2=2.46 overlaps old range; retain C7=8.16/C10=99.14 unfavorable timing as well. See TT_MANUAL_FRAME; rawJSON ignored in artifacts/tt-manual-frame/official.json.
+
+No active task. Main/tags unchanged. Next investigate tiny16-bit block transpose replacing per-tokenFP32Gather/index construction; verify CANN9 API, prior failures, bit/tail/dependency models. Overall major optimization goal remains incomplete.
+
 # 当前：TT 紧凑手动frame结构候选，CPU通过、native待验证
 
 分支 `experiment/tt-manual-frame`，父 `03c3996`；kernel354602bytes、SHA `a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742`。仅新增210行/三个范围，移除即整个源码逐字父；32byte独立入口取消TPipe/队列/动态event，保留完整A/B包预取/原tasks/GM，Vector直接tileMax、双rowstore及父单屏障batchfinal。初稿两处同步风险已修：A1换M明确MTE1_MTE2依赖2，V_MTE3与M_FIX按slot0/1复用。

@@ -1,3 +1,12 @@
+
+## Official terminal result: Pass, modest single-run change
+
+Task `6abeb39e694b590c3c22e5d7`, implementation `a770e64`, SHA `a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742`: CANN compile successful, 15/15 Pass, all precision_ratio=1. Times (us): `[1.99, 2.46, 3.11, 4.12, 5.39, 9.97, 8.16, 46.52, 67.79, 99.14, 88.03, 96.45, 15.49, 11.01, 9.56]`.
+
+C8=46.52 vs three parent runs 47.24-48.88 / median48.45: single-run decrease3.98%, only1.52% below fastest parent. Parent spread3.4%. No large or stable improvement claimed; do not repeat or scan adjacent tile/package parameters. C2=2.46 overlaps old2.42-2.50; previous2.69-2.78 observations cannot establish a stable version cost. C7=8.16 above parent7.75-8.04 and C10=99.14 above parent95.19-98.35 are retained as unfavorable observations. Source unchanged paths do not establish causality for their changes. Actual SoC, shapes, plans, profile and controlled interleaved A/B remain unavailable.
+
+No active official task. Keep this passed structural experiment separate from main; raw JSON ignored at `artifacts/tt-manual-frame/official.json`. Next investigate tiny 16-bit block transpose replacing per-token FP32 Gather/index construction, verify CANN9 TransDataTo5HD and bit/tail/dependency models first. The overall major competition optimization goal remains incomplete.
+
 # 2026-09-30 · 配对 M / B 面板复用首版
 
 ## 2026-10-01 · 完整A1/矩形转置/连续任务的N配对正式通过，无收益
