@@ -1,0 +1,50 @@
+void Run(uint32_t batches,uint32_t M,uint32_t N,uint32_t K,uint32_t workers,uint32_t l0b,bool neg){
+ negativeInput=neg;const uint32_t BM=(M+15)/16*16,BN=(N+15)/16*16,KP=(K+15)/16*16;
+ const uint32_t NB=std::min(BN,l0b/(2*KP)/16*16);assert(NB);
+ Schedule s{batches,M,N,K,BM,BN,1,1,1,workers,0,0};
+ C7KernelShape q{batches,M,N,K,BM,BN,workers,NB};
+ std::vector<int16_t> a(batches*M*K),b(batches*N*K);
+ for(uint32_t z=0;z<batches;++z)for(uint32_t k=0;k<K;++k){
+  for(uint32_t m=0;m<M;++m)a[z*M*K+k*M+m]=A(z,m,k);
+  for(uint32_t n=0;n<N;++n)b[z*N*K+k*N+n]=B(z,k,n);
+ }
+ const auto oldA=a,oldB=b;uint64_t copies=0,mmads=0;
+ const size_t prefix=(batches*BM+127)/128*128;
+ for(uint32_t w=0;w<workers;++w){
+  st=State{};st.s=s;st.tx1=true;st.tx2=false;AscendC::ranges.clear();AscendC::block=w;
+  const size_t base=prefix+size_t(w)*2*BM*BN;
+  for(uint32_t z=w,seq=0;z<batches;z+=workers,++seq)
+   st.expected.push_back({z,0,0,M,N,0,base+size_t(seq&1)*BM*BN});
+  std::vector<float> ring(prefix+size_t(workers)*2*BM*BN+16,1e30f);
+  AscendC::registry={{reinterpret_cast<uintptr_t>(a.data()),{a.size()*2,true}},
+   {reinterpret_cast<uintptr_t>(b.data()),{b.size()*2,false}},
+   {reinterpret_cast<uintptr_t>(ring.data()),{ring.size()*4,false}}};
+  bmmms_c7_manual_frame<int16_t>(a.data(),b.data(),ring.data(),nullptr,q);
+  assert(AscendC::dma.empty()&&st.fixes==st.expected.size());
+  assert(st.aCopies==st.fixes&&st.bCopies==st.fixes&&st.aLoads==st.fixes);
+  assert(st.bLoads==st.fixes*((BN+NB-1)/NB)&&st.mmads==st.bLoads);
+  assert(st.aReads==st.fixes*M*K&&st.bReads==st.fixes*N*K);
+  assert(st.aL0==st.fixes*BM*KP&&st.bL0==st.fixes*BN*KP);
+  assert(st.cross[0]==(w<batches?0:1)&&st.cross[1]==(w<batches?0:1));
+  for(auto e:st.events)assert(e.second==0);
+  assert(AscendC::ranges.size()==(w<batches?4u:0u));
+  for(size_t i=0;i<ring.size();++i)if(i<base||i>=base+2*BM*BN)assert(ring[i]==1e30f);
+  for(uint32_t z=w;z<batches;z+=workers)for(uint32_t m=0;m<M;++m){
+   float mx=-std::numeric_limits<float>::infinity();
+   for(uint32_t n=0;n<N;++n){float v=0;for(uint32_t k=0;k<K;++k)v+=float(A(z,m,k))*float(B(z,k,n));mx=std::max(mx,v);}
+   assert(st.maxima.at(std::make_tuple(z,m,0))==mx);if(neg)assert(mx<0);
+  }
+  copies+=st.aCopies+st.bCopies;mmads+=st.mmads;
+ }
+ assert(a==oldA&&b==oldB&&copies==2*batches&&mmads==uint64_t(batches)*((BN+NB-1)/NB));
+}
+int main(){unsigned count=0;
+ for(uint32_t m:{32u,33u,48u,63u})for(uint32_t n:{128u,129u,192u,255u})
+ for(uint32_t k:{256u,264u,384u,504u})for(uint32_t l0b:{32768u,65536u})for(bool neg:{false,true}){
+  Run(3,m,n,k,2,l0b,neg);++count;
+ }
+ for(uint32_t B:{16u,31u})for(uint32_t workers:{1u,8u,20u,32u}){
+  Run(B,33,129,264,workers,65536,true);++count;
+ }
+ std::cout<<count<<" actual manual producers: physical frames/NZ/ZZ/ZN, full K/N slabs, K8/M/N tails, mixed/all-negative, cyclic/idle, guards and events PASS\n";
+}

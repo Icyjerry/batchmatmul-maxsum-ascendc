@@ -1,0 +1,47 @@
+int main(){
+ auto* hw=platform_ascendc::PlatformAscendCManager::GetInstance();unsigned count=0,hits=0;
+ for(int cores:{1,8,20,32})for(int B:{16,24,31})for(int M:{32,33,48,63})
+ for(int N:{128,129,192,255})for(int K:{256,264,384,504})for(int dt:{1,2})for(int lay=0;lay<4;++lay){
+  hw->aic=std::max(cores,8);hw->aiv=hw->aic*2;Shape s{B,M,N,K,dt,lay/2,lay%2};
+  auto p=MakePlan(s,cores),old=p;auto q=MakeC7ManualFrame(s,p);++count;
+  assert(!memcmp(&p.schedule,&old.schedule,sizeof(Schedule)));
+  assert(p.totalBytes==old.totalBytes&&p.systemBytes==old.systemBytes&&p.cubeBlocks==old.cubeBlocks);
+  if(q.workers){
+   ++hits;assert(dt==1&&lay==2&&q.workers==p.cubeBlocks&&q.workers<=uint32_t(cores));
+   assert(q.b==B&&q.m==M&&q.n==N&&q.k==K&&q.mp==uint32_t(Ceil(M,16)*16)&&q.np==uint32_t(Ceil(N,16)*16));
+   const uint32_t kp=Ceil(K,16)*16;
+   assert(q.nBlock==std::min<uint64_t>(q.np,hw->l0b/(2*kp)/16*16));
+   assert(2ULL*(q.mp+q.np)*kp+4096<=hw->l1&&2ULL*q.mp*kp<=hw->l0a);
+   assert(2ULL*q.nBlock*kp<=hw->l0b&&8ULL*q.mp*q.np<=hw->l0);
+   assert(4ULL*q.mp*q.np+16ULL*q.mp+32+4096<=hw->ub);
+  }
+ }
+ assert(hits);hw->aic=20;hw->aiv=40;Shape hit{24,48,192,384,1,1,0};auto p=MakePlan(hit,20);
+ assert(MakeC7ManualFrame(hit,p).workers);
+ for(auto capacity:{&hw->l1,&hw->l0a,&hw->l0b,&hw->l0,&hw->ub}){
+  auto saved=*capacity;*capacity=4096;
+  auto q=MakeC7ManualFrame(hit,p);
+  assert(!q.workers);
+  *capacity=saved;
+ }
+ hw->l0b=32768;auto q=MakeC7ManualFrame(hit,p);assert(q.workers&&q.nBlock==32);hw->l0b=65536;
+ for(auto bad:{Shape{15,48,192,384,1,1,0},Shape{32,48,192,384,1,1,0},
+  Shape{24,31,192,384,1,1,0},Shape{24,64,192,384,1,1,0},
+  Shape{24,48,127,384,1,1,0},Shape{24,48,256,384,1,1,0},
+  Shape{24,48,192,248,1,1,0},Shape{24,48,192,512,1,1,0},
+  Shape{24,48,192,257,1,1,0}})assert(!MakeC7ManualFrame(bad,p).workers);
+ for(auto field:{&p.schedule.dual,&p.schedule.kSplit,&p.schedule.mTiles,&p.schedule.nTiles,
+  &p.schedule.nSplit,&p.schedule.window,&p.schedule.workers,&p.schedule.baseM,&p.schedule.baseN}){
+  auto saved=*field;*field=9;assert(!MakeC7ManualFrame(hit,p).workers);*field=saved;
+ }
+ auto total=p.totalBytes;p.totalBytes=p.systemBytes;assert(!MakeC7ManualFrame(hit,p).workers);p.totalBytes=total;
+ p.schedule.tree|=16;assert(!MakeC7ManualFrame(hit,p).workers);p.schedule.tree&=~16u;
+#ifdef BMMMS_TUNING
+ for(auto field:{&Tune().group,&Tune().rows,&Tune().dual,&Tune().early,&Tune().tree,
+  &Tune().bm,&Tune().bn,&Tune().window,&Tune().ns,&Tune().ks,&Tune().workers}){
+  Tune()=TuneConfig{};*field=1;assert(!MakeC7ManualFrame(hit,p).workers);
+ }
+ Tune()=TuneConfig{};
+#endif
+ std::cout<<count<<" actual host controls / "<<hits<<" manual frames: full geometry, real capacity queries, reduced L0B, pins, workspace fallback PASS\n";
+}

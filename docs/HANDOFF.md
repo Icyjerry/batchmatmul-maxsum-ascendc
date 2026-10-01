@@ -1,5 +1,11 @@
 # 接手状态 · 2026-10-02
 
+## 当前：C7完整输入 + 手动物理frame候选
+
+分支 `experiment/c7-manual-frame`，父 `0fe38f0`，kernel SHA `45234d7945b6013cc75d2e6c3092c911c9c8ecd5618b82a7c51fd7d9084e0c61`。仅kernel新增173行：32byte独立入口、资源选择、launch override，原host plan/GM/grid/其它路径逐字保持。旧full-input/lean两次没有明显收益，本次结合队友manual LocalTensor，移除本路线TPipe/TBuf/事件分配，并保留原全输入/全A2/单B2 N slab/双C0和精确N树Max→有效M Sum。不扫描N参数、不重做失败窄N驻留，无新GM。
+264立即/264延迟live MMAD、1296三引擎Vector、production/TUNING各6144 host/768选择、硬事件/尾部/信用负控制见 `docs/C7_MANUAL_FRAME.md`，用整数CPU模型，不是native半精度或硬件速度证据。CANN9/NPU精度/性能PENDING，当前尚无新正式任务。
+下一：最终CPU/负控制完成，独立官方模板仅换kernel并核其它8文件，dry-run、commit/push后一次提交、即存ID查终态。父C7同SHA三次9.59–10.28、中位10.14 μs，候选若落同波动区间不称大突破；无actual shape/SoC/plan/profile，不归因其它路径波动。小矩阵泛化方向经源码比较可能主要增加覆盖，暂让位于这个比赛性能假设；原通过分支及main/标签不动。
+
 ## 当前：同一kernel两次复测已完成，三次均15/15通过
 
 用户要求“一模一样再交两次”，已严格完成两次，未额外创建其它任务。首次 `6abe860d694b590c3c0f02a5`、复测1 `6abe87e6694b590c3c102b8c`、复测2 `6abe88a7694b590c3c109c3a`，均Pass、CANN编译成功、15/15、precision_ratio全1。kernel全程不动，实现 `889afe0`，SHA `2e365aaa858b9b9c82765671f108dbe0d28863c5bbc3838a8e89bc7ef842a2f2`，320597bytes；独立模板和每次提交文本一致，按前一个任务终态后才提交下一个。
