@@ -1,0 +1,99 @@
+uint64_t FrameBytes(TinyKernelShape s,bool X,bool Y){
+ uint64_t kp=(s.k+15)/16*16,np=(s.n+7)/8*8;
+ uint64_t ac=s.b*(X?16:s.m)*kp,bc=s.b*(Y?s.n:(s.n+15)/16*16)*kp,ar=s.b*s.m;
+ uint64_t sizes[]={2*(ac+bc),4*(ac+bc),X?2*ac:32,!Y?2*bc:32,4*ar*np*kp,4*ar*np,32*ar,32};
+ uint64_t total=0;for(auto n:sizes)total+=(n+31)/32*32;return total;
+}
+void Clean(){
+ for(auto& q:AscendC::engines)assert(q.empty());for(auto f:AscendC::flags)assert(f.second==0);
+}
+void Bits(){
+ std::vector<bool> seen(65536);unsigned count=0;
+ for(uint32_t kp:{32u,48u,64u})for(uint32_t pitch:{16u,32u,64u})for(uint32_t base=0;base<65536;base+=512){
+  AscendC::ub=std::make_shared<std::vector<uint8_t>>(2*kp*pitch*2+64,0x7f);
+  AscendC::manualBytes=0;AscendC::localEnds.clear();AscendC::flags.clear();AscendC::mode=count%3;
+  auto src=AscendC::LocalTensor<uint16_t>(AscendC::TPosition::VECCALC,0,kp*pitch);
+  auto dst=AscendC::LocalTensor<uint16_t>(AscendC::TPosition::VECCALC,2*kp*pitch,kp*pitch);
+  for(uint32_t r=0;r<kp;++r)for(uint32_t n=0;n<pitch;++n){auto v=uint16_t(base+r*pitch+n);src.write(r*pitch+n,v);seen[v]=true;}
+  for(uint32_t n=0;n<pitch;n+=16)TinyBitTranspose16(dst[n*kp],src[n],pitch,kp);
+  AscendC::PipeBarrier<PIPE_ALL>();Clean();
+  for(uint32_t r=0;r<kp;++r)for(uint32_t n=0;n<pitch;++n)assert(dst.read(n*kp+r)==src.read(r*pitch+n));
+  for(size_t i=4*kp*pitch;i<AscendC::ub->size();++i)assert(AscendC::ub->at(i)==0x7f);++count;
+ }
+ assert(std::all_of(seen.begin(),seen.end(),[](bool b){return b;}));
+ std::cout<<count<<" actual raw transpose rectangles, all 65536 bit patterns, 32/48/64 K strides, 16/32/64 channels, typed addresses/guards PASS\n";
+}
+unsigned cases=0,blocks=0,idle=0,controls=0;
+template<bool X,bool Y,uint32_t KC=0,bool G=true>
+void Entry(Inputs& in,TinyKernelShape s,uint32_t group){
+ bmmms_tiny_bit_transpose<int16_t,X,Y,KC,G>(in.ap,in.bp,in.y.data()+8,s,group);
+}
+template<bool X,bool Y>void Run(uint32_t B,uint32_t M,uint32_t N,uint32_t K,uint32_t group,bool neg,unsigned mode){
+ TinyKernelShape shape{B,M,N,K};if(!TinyBitFrameFits(shape,X,Y,group))return;
+ Inputs in(B,M,N,K,X,Y,neg);auto oldA=in.a,oldB=in.b;
+ auto test=[&](bool specialized){
+  in.Prepare();AscendC::localEnds.clear();AscendC::mode=mode;AscendC::transposes=0;
+  unsigned num=group?(B+group-1)/group:1;
+  for(unsigned z=0;z<num+(group?1:0);++z){
+   Clean();AscendC::block=z;AscendC::manualBytes=0;AscendC::localEnds.clear();
+   AscendC::ub=std::make_shared<std::vector<uint8_t>>(192*1024,0x7f);
+   unsigned b0=group?z*group:0,kp=(K+15)/16*16,am=X?16:M,bn=Y?N:(N+15)/16*16;
+   unsigned batches=b0>=B?0:(group?std::min(group,B-b0):B),ac=batches*am*kp;
+   AscendC::canonicalExpected.assign(ac+batches*bn*kp,0);
+   for(unsigned b=0;b<batches;++b)for(unsigned k=0;k<K;++k){
+    for(unsigned m=0;m<M;++m)AscendC::canonicalExpected[(b*am+m)*kp+k]=in.ap[(b0+b)*M*K+(X?k*M+m:m*K+k)];
+    for(unsigned n=0;n<N;++n)AscendC::canonicalExpected[ac+(b*bn+n)*kp+k]=in.bp[(b0+b)*N*K+(Y?n*K+k:k*N+n)];
+   }
+   if(!group)Entry<X,Y,0,false>(in,shape,group);
+   else if(!specialized)Entry<X,Y>(in,shape,group);
+   else if(K==32)Entry<X,Y,32>(in,shape,group);
+   else if(K==40)Entry<X,Y,40>(in,shape,group);
+   else if(K==48)Entry<X,Y,48>(in,shape,group);
+   else if(K==56)Entry<X,Y,56>(in,shape,group);
+   else Entry<X,Y,64>(in,shape,group);
+   Clean();
+   if(b0>=B){assert(!AscendC::manualBytes);++idle;}
+   else {TinyKernelShape frame{group?std::min(group,B-b0):B,M,N,K};
+    assert(AscendC::manualBytes==FrameBytes(frame,X,Y)&&AscendC::manualBytes+1024<=192*1024);++blocks;}
+   for(size_t i=AscendC::manualBytes;i<AscendC::ub->size();++i)assert(AscendC::ub->at(i)==0x7f);
+  }
+  in.Verify(B,M,N,K,X,Y,neg);assert(in.a==oldA&&in.b==oldB);
+  assert(AscendC::transposes==B*((X?1:0)+(!Y?(N+15)/16:0)));++cases;
+ };
+ test(false);auto expected=in.y;test(true);assert(in.y==expected);
+ // Reference computes the same passed arithmetic per batch, independent layout code.
+ in.Prepare();AscendC::mode=mode;AscendC::canonicalExpected.clear();
+ for(uint32_t b=0;b<B;++b){
+  AscendC::manualBytes=0;AscendC::localEnds.clear();AscendC::ub=std::make_shared<std::vector<uint8_t>>(192*1024,0x7f);
+  TinyCompute<int16_t,X,Y>(in.ap+b*M*K,in.bp+b*N*K,in.y.data()+8+b,{1,M,N,K});Clean();
+ }
+ in.Verify(B,M,N,K,X,Y,neg);assert(in.y==expected&&in.a==oldA&&in.b==oldB);
+}
+void Host(){
+ auto* hw=platform_ascendc::PlatformAscendCManager::GetInstance();
+ for(uint32_t B:{1u,3u,8u,9u,31u,64u})for(uint32_t M:{1u,5u,8u})
+ for(uint32_t N:{1u,7u,16u,17u,31u,63u,64u})for(uint32_t K:{32u,40u,48u,56u,64u})
+ for(uint32_t group:{0u,1u,3u,8u})for(unsigned lay=0;lay<4;++lay){
+  TinyKernelShape s{B,M,N,K},f=s;if(group)f.b=std::min(B,group);
+  bool valid=f.b<=8&&(lay!=1);uint64_t need=FrameBytes(f,lay/2,lay%2)+1024;
+  hw->ub=need;assert(TinyBitFrameFits(s,lay/2,lay%2,group)==valid);
+  hw->ub=need-1;assert(!TinyBitFrameFits(s,lay/2,lay%2,group));++controls;
+ }
+ hw->ub=192*1024;TinyKernelShape s{1,5,17,40};assert(TinyBitFrameFits(s,true,false,0));
+ for(auto field:{&s.b,&s.m,&s.n,&s.k}){auto old=*field;*field=0;assert(!TinyBitFrameFits(s,true,false,0));*field=old;}
+ assert(!TinyBitFrameFits(s,true,false,9));s.k=41;assert(!TinyBitFrameFits(s,true,false,0));s.k=40;
+#ifdef BMMMS_TUNING
+ for(auto p:{&Tune().group,&Tune().rows,&Tune().dual,&Tune().early,&Tune().tree,&Tune().bm,&Tune().bn,
+  &Tune().window,&Tune().ns,&Tune().ks,&Tune().workers}){Tune()=TuneConfig{};*p=1;assert(!TinyBitFrameFits(s,true,false,0));}
+ Tune()=TuneConfig{};
+#endif
+ std::cout<<controls<<" exact UB one-byte boundary/shape/group/layout/pin host controls PASS\n";
+}
+int main(){Bits();Host();
+ for(uint32_t B:{1u,9u,31u})for(uint32_t M:{1u,5u,8u})for(uint32_t N:{1u,7u,16u,17u,63u,64u})
+ for(uint32_t K:{32u,40u,48u,56u,64u})for(uint32_t group:{0u,1u,3u,8u})for(bool neg:{false,true})for(unsigned mode=0;mode<3;++mode){
+  Run<false,false>(B,M,N,K,group,neg,mode);Run<true,false>(B,M,N,K,group,neg,mode);Run<true,true>(B,M,N,K,group,neg,mode);
+ }
+ std::cout<<cases<<" queued actual dynamic/constant tiny entries, "<<blocks<<" active / "<<idle<<" idle blocks PASS\n";
+ std::cout<<"three engine priorities, batch tails, all storage layouts requiring transpose, K8/N masks, negative maxima, same-order passed reference, immutable inputs/UB/y guards PASS\n";
+}

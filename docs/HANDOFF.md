@@ -1,3 +1,13 @@
+# Current: Tiny raw-bit transpose structural candidate, CPU passed
+
+Branch `experiment/tiny-bit-transpose`, parent1734f16. Kernel361238bytes / SHA `844b80051c753717db4011a3586b4fed5dcb83d9937121c62b02dbc7ade4875f`;126addedlines in3regions, removing them restores entire parent. Rawuint16 block transpose before sharedFP32Cast replaces per-tokenGather/indexconstruction. Original arithmetic/task/group/grid/GM, allCube and FT fallback unchanged; realUBguard for padded8-regionframe. CANN900primaryAPI confirms A2/A3uint16 use and strides; no nativeBF16transpose claim.
+
+Production/TUNING each1152 all-bit actualtranspose rectangles,27072 queuedactualentries/185808active/23832idleblocks,10080host byteboundary/pin checks;7negativecontrols passed. Everycanonical padding checked zero; integerCPU notnativefloats/compiler/timing. DetailsTINY_BIT_TRANSPOSE.md; private ignoredCPUlog artifacts/tiny-bit-transpose/cpu.log. Official template other7sources byteequalparent, dry-run onlysamekernelSHA.
+
+Next commit/push -> submitonce -> saveID -> querysameID toterminal. No current candidate official task yet; CANN9/NPU precision/performancePENDING. Require15/15; report all15, retainedC7/C14/C15 and tinycases, do not infer hiddenshapes/routehits/score. Biggain only confirms unchanged; small/no gain not parameter-scanned. Main/tags unchanged, overallgoal incomplete.
+
+ParentTTmanualframe officiallyPass15/15 task6abeb39e694b590c3c22e5d7; C846.52 vs earlier3median48.45 modest3.98% single-run, not big. C22.46 recoversoldrange, retain C78.16/C1099.14 unfavorableobservations. Exactsame-source two repeats fulfilled on74e0dd2, not repeated again.
+
 # Latest: TT manual frame official Pass, modest single-run gain only
 
 Branch `experiment/tt-manual-frame`, implementationa770e64 / SHA `a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742`, task `6abeb39e694b590c3c22e5d7`: CANN compile successful, 15/15 Pass, all precision_ratio=1. C8=46.52 vs parent median48.45 (3.98% single-run decrease), only1.52% below fastest47.24. Not a large breakthrough; do not repeat or scan parameters. C2=2.46 overlaps old range; retain C7=8.16/C10=99.14 unfavorable timing as well. See TT_MANUAL_FRAME; rawJSON ignored in artifacts/tt-manual-frame/official.json.
