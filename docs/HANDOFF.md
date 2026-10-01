@@ -1,3 +1,9 @@
+# 最新：按用户要求 TT 单屏障版原样复测两次
+
+当前复测分支 `experiment/tt-identical-repeats`，父 `03c3996`，kernel SHA `71ca6095958a372927c27f088bb081c43cff748169ff98e4ef80a2215b4d62c5` 保持不动。最近通过任务 `6abea942694b590c3c1ff692`，本次新任务均尚未创建。执行顺序：复测1提交→保存 ID→查询同 ID 至终态→复测2提交→保存 ID→查询终态→逐点三次对照。详见 `docs/TT_IDENTICAL_REPEATS.md`。
+
+原工作区 `experiment/tt-manual-frame` 的未提交源码/模型保留，本次不包含它们。先完成两次重复，不继续修改或提交优化。GitHub 与历史标签保持。
+
 # 接手状态 · 2026-10-02
 
 ## 当前：宽N明显收益确认；TT单屏障正式通过但仅小幅单测
