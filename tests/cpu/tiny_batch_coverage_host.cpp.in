@@ -1,0 +1,38 @@
+int main(){
+ auto* hw=platform_ascendc::PlatformAscendCManager::GetInstance();unsigned selected=0,count=0,full=0;
+ for(int cores:{1,4,20,32})for(uint64_t ub:{8192ull,65536ull,196608ull})
+ for(int B:{1,3,8,9,31,64})for(int M:{1,8,9})for(int N:{1,64,65})
+ for(int K:{32,40,64,72})for(int dt:{1,2})for(int lay=0;lay<4;++lay){
+  hw->aic=cores;hw->aiv=cores*2+1;hw->ub=ub;Shape s{B,M,N,K,dt,lay/2,lay%2};++count;
+  auto fits=TinyVectorFits(s,ub);auto group=TinyVectorBatchGroup(s,ub);
+  auto c=ClassifyMeasured(s,cores,ub,hw->l1,hw->l0);
+  assert((c.dual==24)==(!fits&&group&&Ceil(B,group)<=2*cores));
+  auto cc=ClassifyCase(s,ub);
+  assert((cc.dual==16)==(fits&&!(M==1&&N==1)));
+  if(c.dual!=24&&cc.dual!=16)continue;
+  auto p=MakePlan(s,cores);auto& d=p.schedule;
+  assert(p.totalBytes==0&&p.systemBytes==0&&p.cubeBlocks==0&&!p.small&&!p.micro);
+  if(d.dual==16){assert(fits&&p.finalBlocks==1&&(B==1||B>hw->aiv));++full;}
+  else{
+   assert(d.dual==24&&d.kSplit==1&&d.kChunk==K&&d.b==B&&d.m==M&&d.n==N&&d.k==K);
+   assert(p.finalBlocks==Ceil(B,d.batchGroup)&&p.finalBlocks<=hw->aiv);
+   Shape frame=s;frame.b=std::min<int64_t>(B,d.batchGroup);assert(TinyVectorFits(frame,ub));
+   if(fits)assert(d.batchGroup==1);else assert(d.batchGroup==group);
+   ++selected;
+  }
+ }
+ assert(selected&&full);
+ hw->aic=20;hw->aiv=40;hw->ub=196608;Shape s{9,3,17,40,1,1,0};
+ auto p=TinyGroupPlan(s,hw->ub,hw->aiv,2);assert(p.finalBlocks==5&&p.schedule.batchGroup==2);
+ for(auto bad:{Shape{9,9,17,40,1,1,0},Shape{9,3,65,40,1,1,0},Shape{9,3,17,72,1,1,0}}){
+  bool rejected=false;try{TinyGroupPlan(bad,hw->ub,hw->aiv,2);}catch(const std::invalid_argument&){rejected=true;}assert(rejected);
+ }
+ bool rejected=false;try{TinyGroupPlan(s,hw->ub,2,1);}catch(const std::runtime_error&){rejected=true;}assert(rejected);
+#ifdef BMMMS_TUNING
+ Tune().dual=24;Tune().group=2;p=MakePlan(s,20);assert(p.finalBlocks==5&&p.schedule.batchGroup==2);
+ Tune()=TuneConfig{};Tune().dual=16;Shape tiny{3,3,7,40,1,0,1};p=MakePlan(tiny,20);assert(p.schedule.dual==16&&p.finalBlocks==1);
+ Tune().dual=0;p=MakePlan(tiny,20);assert(p.schedule.dual!=24&&p.schedule.dual!=16);
+ Tune()=TuneConfig{};
+#endif
+ std::cout<<count<<" actual classifiers / "<<selected<<" zero-scratch grouped plans / "<<full<<" single-core frames, real core and UB caps, explicit pins/rejections PASS\n";
+}
