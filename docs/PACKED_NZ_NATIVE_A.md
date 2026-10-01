@@ -33,5 +33,5 @@ A的resident full-K slab仍按M16循环转置Load2D，M128时每K面板8次。�
 
 kernel SHA `8e1fbca3a87bc380a174fbc01a181da8c5d8f9a7b02294d9d4f5895b5914942c`。
 独立官方模板 `/private/tmp/bmmms-judge-packed-nz-native-a/project`；只kernel.asc，main/CMake/golden/正式测试/依赖不变。
-CANN9组合编译、NPU精度、逐点latency PENDING，尚未创建任务。
+代码 `297abe5` 已推送私有GitHub；正式任务 [6abe05cf694b590c3cc88e53](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe05cf694b590c3cc88e53) 已创建。CANN9组合编译、NPU精度、逐点latency PENDING。
 在这次组合结构上提交一次、查询同一ID至终态；没有大幅收益则归档，不继续相邻tile或LoadData stride试交。整体重大提升未达成。

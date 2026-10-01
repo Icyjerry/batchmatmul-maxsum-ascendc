@@ -4,7 +4,7 @@
 
 分支 `experiment/packed-nz-native-a`，kernel SHA `8e1fbca3a87bc380a174fbc01a181da8c5d8f9a7b02294d9d4f5895b5914942c`。只在已通过NZ_B家族接入既有raw-bit A矩形Load3D，保留连续B、原pack屏障/flag12、events、buffers、plan与workspace。
 724实际packed Cube-body执行（C1/C2、完整K/尾块/全负/延迟DMA/资源和事件收支）通过；原ND/新NZ B源码各2016执行和全部65536bit，host各1728/54通过。恢复A分支后kernel与父 `99fc974` 逐字一致。
-详细 [PACKED_NZ_NATIVE_A.md](PACKED_NZ_NATIVE_A.md)；日志 `/private/tmp/bmmms-packed-nz-native-a-cube.log` 和 `...-pack.log`。下一动作：独立官方模板dry-run，commit/push，CLI一次正式提交并记录ID，同ID查询终态。CANN9/NPU精度/性能PENDING，整体重大提升未达成。
+代码 `297abe5` 已commit/push，独立官方模板dry-run仅kernel.asc/SHA一致；正式任务 `6abe05cf694b590c3cc88e53` 已创建。下一动作：`python3 /private/tmp/query_bmmms_submission.py 6abe05cf694b590c3cc88e53` 同ID查询终态，不因超时重提。详细 [PACKED_NZ_NATIVE_A.md](PACKED_NZ_NATIVE_A.md)；日志 `/private/tmp/bmmms-packed-nz-native-a-cube.log` 和 `...-pack.log`。CANN9/NPU精度/性能PENDING，整体重大提升未达成。
 
 ## 最新：packed-B一次块布局转换正式通过，无明显收益
 
