@@ -42,3 +42,5 @@ python3 tools/validate_c7_manual_frame.py
 独立官方原模板只换kernel，其余8文件逐字一致；commit/push后一次CLI提交，立即保存ID并查询同一任务至终态。先CANN编译/15精度，再比较父C7三次9.59/10.28/10.14 μs，中位10.14、极差6.8%；落在原9.59–10.28区间不能叫突破。其它路径源码没变，不归因耗时浮动、不改main或测试适配失败。
 
 CANN9编译、NPU精度、性能 **PENDING**。若有条件另采actual shape/dtype/layout/plan、SoC/核数、CANN、误差、repeat、msprof和交错A/B；CLI结果缺这些元数据时如实保留限制。
+
+正式任务 **`6abe9804694b590c3c18f362`** 已创建，代码 `c17077f`，kernel SHA保持。下一仅查询 `python3 /private/tmp/query_bmmms_submission.py 6abe9804694b590c3c18f362` 至终态；观察超时不能重复提交。CANN9编译/NPU精度/时间PENDING。
