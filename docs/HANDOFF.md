@@ -1,5 +1,26 @@
 # 接手状态 · 2026-10-01
 
+## 当前：窄 N 完整 K producer + B L0 驻留，待正式提交
+
+分支 `experiment/narrow-fullk-persistent`，从正式通过TT种子 `a05035e` 出发；kernel SHA `4bf730de204af997b8eca185c2c2ffe72144874f29b4d59e10d33c81dc68672d`。没有并入无收益NZ-B候选。
+新dual32覆盖FF窄N、小K的N/K尾部：每核完整B L0B驻留；完整A1双queue提前读后续M任务；一次矩形Load3D/完整K MMAD；旧双C/双GM ring与Vector有效N归约保持，worker跨M累加只写最终2个8float slots。父schedule仅dual/earlySum变动，不新增GM。
+2654实际producer CPU、fake/public8.3 tiler production/TUNING各5376/504通过；Vector source与父版逐字一致，独立Max→worker Sum模型通过。CANN9/NPU精度/latency PENDING，整体重大提升未达成。详见 [NARROW_FULLK_PERSISTENT.md](NARROW_FULLK_PERSISTENT.md)。
+下一动作：独立官方模板dry-run确认仅kernel和SHA，commit/push后正式CLI提交一次、立即记录ID；有活动ID时查询同ID，不能超时重交。
+
+## 当前：连续NZ B + native完整M A组合正式通过，无明显收益
+
+分支 `experiment/packed-nz-native-a`，kernel SHA `8e1fbca3a87bc380a174fbc01a181da8c5d8f9a7b02294d9d4f5895b5914942c`。只在已通过NZ_B家族接入既有raw-bit A矩形Load3D，保留连续B、原pack屏障/flag12、events、buffers、plan与workspace。
+724实际packed Cube-body执行（C1/C2、完整K/尾块/全负/延迟DMA/资源和事件收支）通过；原ND/新NZ B源码各2016执行和全部65536bit，host各1728/54通过。恢复A分支后kernel与父 `99fc974` 逐字一致。
+代码 `297abe5` 已commit/push，独立官方模板dry-run仅kernel.asc/SHA一致；正式任务 `6abe05cf694b590c3cc88e53` Pass，CANN编译成功、15/15、precision_ratio全1。第12点95.41→97.49μs，没有明显收益。没有活动正式任务；详细 [PACKED_NZ_NATIVE_A.md](PACKED_NZ_NATIVE_A.md)。原始结果本机私有Git忽略 `artifacts/packed-nz-native-a/`。
+正式接口新增证据：C8当前67.19/best_time17.32，C13 16.48/5.21，C7 10.11/3.69，差距大于C12 97.49/85.25。这是接口参考，不保证同设备可达速度或最终评分。下一动作：恢复通过TT代码，优先审查窄N的完整B驻留是否覆盖非对齐N/K；保留既有workspace，不再重复C12加载微调。整体重大提升未达成。
+
+## 最新：packed-B一次块布局转换正式通过，无明显收益
+
+分支 `experiment/packed-b-nz-once`，kernel SHA `5a420968d478d3428334a42e562bbe3455d413f6db06a60a432c100282ef494a`。在原packed GM区域中一次准备 `[K/16,baseN,16]`，Cube线性copy和bulk非transpose B2 load；使用原C queue空余半区，无新UB/GM分配。A/C/归约和SyncAll/flag12保持原样；原模板默认false，dual31只转换已完成dual6计划。
+CPU原ND/新NZ各2016真实源码执行、全部65536bit（NZ模式）和fake/public8.3 tiler production/TUNING各1728/54通过，首次host夹具auto类型声明已修正。详细 [PACKED_B_NZ_ONCE.md](PACKED_B_NZ_ONCE.md)。
+代码 `0ad246b` 已commit/push，正式任务 `6abe0163694b590c3cc61e91` **Pass，CANN编译成功、15/15、precision_ratio全1**。第12点TT父95.41→96.65μs，无明显收益；无actual shape/plan/SoC/profile和重复A/B，不断言路由/根因。没有活动正式任务。
+下一动作：在本次连续NZ B布局基础上，组合已通过TT的整M raw-bit Load3D A搬运，核对resident全K pitch、C1以及真实Cube producer同步/输出。保留原pack SyncAll/flag12，不新增GM/UB，不再试相邻packing参数。整体重大提升未达成。
+
 ## 当前工作起点：恢复已通过 TT 完整 M 版本
 
 当前分支 `experiment/fullm-transpose-load`，kernel SHA `f0b3908378015b9a98fb5eed58337dd7556737e5ae18b79d1e25c19b497a1b09`，与正式15/15通过的 `d2eeb78` 完全一致。四布局候选与正式退化结果完整保留 `experiment/fullm-storage-layouts` / `acc84d7`；这里同步结果文档，不合入退化算法。没有活动正式任务。
