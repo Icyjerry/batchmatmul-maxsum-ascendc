@@ -1,5 +1,16 @@
 # 接手状态 · 2026-10-01
 
+## 当前：完整 M 单 MMAD 与 TT 转置矩形加载候选
+
+分支 `experiment/fullm-transpose-load`，kernel SHA `f0b3908378015b9a98fb5eed58337dd7556737e5ae18b79d1e25c19b497a1b09`。
+在宽窗通过候选基础上，完整M queue1/A2-B2双缓冲/C2替代两半M/C4；一次half原始16位Load3D整矩形转置替代逐M16 Load2D。BF16不Cast，Mmad仍原T/FP32。
+公开官方CANN9 Load3D明确enTranspose仅half→A2；使用half ReinterpretCast保持bit。真实BF16/硬件指令仍PENDING，不能称BF16 native enTranspose得到文档支持。
+CPU160实际经过全部65536位模式的矩形、420 producer、9216消费者、fake/public8.3 tiler production/TUNING各1400/1000配置通过。
+Vector函数体、计划/任务/GM窗口/workspace/finalizer保持不变（仅dual），低资源与pins回退。
+独立官方模板dry-run仅kernel.asc，270171 bytes且SHA一致。没有活动正式任务。
+下一动作：CLI一次正式提交，记录ID，查询同一任务至终态。无收益归档，不继续近邻参数。整体重大提升未达成。
+详见 [FULLM_TRANSPOSE_LOAD.md](FULLM_TRANSPOSE_LOAD.md)。
+
 ## 最新：宽窗口完整 K 正式通过，无大幅收益；父缓存审查改变方向
 
 分支 `experiment/fullk-wide-window`；代码 `9cfb159` / kernel SHA `af0d52b9c2e8f34fd43c5df4577a0d9f8d2adf456b7f57c5cbb642904ab170fc`。
