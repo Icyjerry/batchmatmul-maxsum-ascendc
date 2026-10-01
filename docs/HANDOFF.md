@@ -1,5 +1,10 @@
 # 接手状态 · 2026-10-02
 
+## 当前：同一kernel原样复测两次，第一次任务已创建
+
+用户要求最新通过版一模一样再交两次。kernel保持 `889afe0` / SHA `2e365aaa858b9b9c82765671f108dbe0d28863c5bbc3838a8e89bc7ef842a2f2`，320597byte；独立提交模板仍仅kernel，dry-run匹配。按顺序执行，第一次 **`6abe87e6694b590c3c102b8c`** 已创建，第二次尚未提交。
+下一：`python3 /private/tmp/query_bmmms_submission.py 6abe87e6694b590c3c102b8c` 查询同任务至终态，再原样创建第二次并立刻保存ID，查至终态。与首次任务 `6abe860d694b590c3c0f02a5` 的15点一起列三次耗时、中位数、min/max及极差/中位数；不额外提交其它候选、不改kernel、不将同版本波动当优化收益。没有实际同机元数据，重复正式任务不等价受控同机A/B。小矩阵Cube泛化工作等这两次复测完成再继续。
+
 ## 最新通过组合：tiny容量/batch分组 + 队友single_tile，15/15通过
 
 当前 `experiment/teammate-single-tile`，实现 `889afe0`，kernel SHA `2e365aaa858b9b9c82765671f108dbe0d28863c5bbc3838a8e89bc7ef842a2f2`，320597byte。正式任务 **`6abe860d694b590c3c0f02a5` Pass，CANN编译成功、15/15、precision_ratio全1**。μs `[1.97,2.39,3.12,4.04,5.28,9.85,9.59,49.78,67.51,97.43,86.97,95.62,14.76,12.61,9.34]`。
