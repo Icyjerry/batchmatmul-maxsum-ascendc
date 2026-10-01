@@ -1,6 +1,6 @@
 # 接手状态
 
-> **最新工作（2026-09-28）：**检出 `experiment/performance-structure-fixes`，文档提交 `2fcac68`（内核实现 `a3c1f7d`，SHA256 `1e92ea2c6a15db6869df08429f3f468fb74b7fb0ed09d6a7cc02f1ff71bbc6a3`）。[CANNJudge 正式提交 498385](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6aba3abb694b590c3cd6cbe3) 已 **Pass，15/15**；平台保存的 `kernel.asc` 与该分支逐字节一致。逐点耗时见该分支的 `docs/PERF_LOG.md`，下一步先定位第 5、8、4、13–15 点的实际 shape/layout/dtype 与运行路径。main kernel仍是历史v1；此处仅更新接手指针。
+> **最新工作（2026-10-02）：**检出 `experiment/tt-single-barrier`，接手提交 `03c3996`，实现 `5c67d94`、kernel SHA `71ca6095958a372927c27f088bb081c43cff748169ff98e4ef80a2215b4d62c5`。正式任务 `6abea942694b590c3c1ff692` Pass、CANN编译成功、15/15；C8 47.24μs相对父49–51仅单次小幅改善，不称大突破。最近有两次明确结构收益的组合是 `experiment/c14-manual-frame` / `cf16501`：两次任务 `6abea479694b590c3c1e1f2d`、`6abea54c694b590c3c1e7459` 均15/15，C14 10.93/10.84μs，对比同源父四次12.72–13.26；C7约7.8μs保持。C2最近约2.7μs高于父约2.5，未证明整体最优/榜分或因果。完整状态/下一动作/限制见最新分支 `docs/HANDOFF.md`、`TT_SINGLE_BARRIER.md`、`WIDE_N_MANUAL_FRAME.md`。没有活动正式任务；不继续小幅重交/附近参数扫描，下一研究TT紧凑物理frame与tiny启动差异。main kernel仍是历史v1；此处仅更新接手指针，历史标签不动。
 
 > **历史起点：**用户确认的最佳原件保存在 `user-best-20260921` tag（`23e3e5a`），当前设备端候选建立在它的后续修复版本上。以下v1内容是main的历史记录，后续开发以顶部新分支接手单为准。
 
