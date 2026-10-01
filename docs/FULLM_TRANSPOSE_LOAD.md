@@ -46,3 +46,8 @@ kernel SHA `f0b3908378015b9a98fb5eed58337dd7556737e5ae18b79d1e25c19b497a1b09`，
 独立官方模板dry-run只包含kernel.asc，SHA一致；没有改变main/CMake/golden/正式测试/依赖。
 结构/资源/物理块模型通过后提交一次，记录ID并查询同一任务至终态；不因等待超时重提，不把CPU命中或调用数作为性能提升。
 若无大幅收益则归档，不做Load3D近邻tile参数重交。整体重大提升尚未达成。
+
+## 正式任务已接受
+
+代码 `d2eeb78` / kernel SHA `f0b3908378015b9a98fb5eed58337dd7556737e5ae18b79d1e25c19b497a1b09`。
+[提交 6abdd9e6694b590c3cb2e3a9](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abdd9e6694b590c3cb2e3a9) 已接受；继续同一ID至终态，不能因等待超时重提。正式结果PENDING。

@@ -1,5 +1,12 @@
 # 接手状态 · 2026-10-01
 
+## 活动正式任务：完整 M 与 TT 矩形转置
+
+代码 `d2eeb78` / kernel SHA `f0b3908378015b9a98fb5eed58337dd7556737e5ae18b79d1e25c19b497a1b09`。
+[提交 6abdd9e6694b590c3cb2e3a9](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abdd9e6694b590c3cb2e3a9) 已接受，正式精度/性能PENDING。
+下一动作 `python3 /private/tmp/query_bmmms_submission.py 6abdd9e6694b590c3cb2e3a9` 查询同一ID至终态；不能因观察超时重提。
+整体重大提升尚未达成；资料 [FULLM_TRANSPOSE_LOAD.md](FULLM_TRANSPOSE_LOAD.md)。
+
 ## 当前：完整 M 单 MMAD 与 TT 转置矩形加载候选
 
 分支 `experiment/fullm-transpose-load`，kernel SHA `f0b3908378015b9a98fb5eed58337dd7556737e5ae18b79d1e25c19b497a1b09`。
