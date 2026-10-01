@@ -1,5 +1,12 @@
 # 2026-09-30 · 配对 M / B 面板复用首版
 
+## 2026-10-01 · 完整 M 四种布局正式通过，但第12点退化
+
+- 代码 `d0904f8` / SHA `3d2904d008155f2e8be3995b13f1295dfce130aac36ad47fbc0f8a9582bcf5f4`；正式ID `6abde198694b590c3cb643e2` Pass，15/15、precision_ratio全1，CANN编译成功。
+- 耗时 `[2.19,3.81,4.34,5.66,5.22,10.75,10.10,67.69,83.17,98.33,88.18,116.40,15.54,13.23,9.03]` μs；第12点TT父95.41→116.40，单次约22%退化，没有整体收益。无actual shape/plan/SoC/profile和重复A/B，不断言路由或具体根因。
+- 四storage原生输入、单/双C、完成父计划后仅dual转换；CPU320矩形全部65536bit、2976 producer、9216消费者和fake/public8.3 tiler production/TUNING各8064/5888通过。
+- 归档 `experiment/fullm-storage-layouts`，恢复通过TT父版；旧pack的连续K面板与原GM按完整N跨行读取的差异是待验证解释。有效字节与API调用数下降不能证明带宽收益。资料 `FULLM_STORAGE_LAYOUTS.md`；本机私有原始资料 `artifacts/fullm-storage-layouts/`。整体重大提升未达成。
+
 ## 2026-10-01 · 完整 M TT 矩形转置正式通过
 
 - 代码 `d2eeb78` / SHA `f0b3908378015b9a98fb5eed58337dd7556737e5ae18b79d1e25c19b497a1b09`；正式ID `6abdd9e6694b590c3cb2e3a9` Pass，15/15、precision_ratio全1，CANN编译成功。

@@ -1,5 +1,19 @@
 # 接手状态 · 2026-10-01
 
+## 当前工作起点：恢复已通过 TT 完整 M 版本
+
+当前分支 `experiment/fullm-transpose-load`，kernel SHA `f0b3908378015b9a98fb5eed58337dd7556737e5ae18b79d1e25c19b497a1b09`，与正式15/15通过的 `d2eeb78` 完全一致。四布局候选与正式退化结果完整保留 `experiment/fullm-storage-layouts` / `acc84d7`；这里同步结果文档，不合入退化算法。没有活动正式任务。
+新增 `python3 tools/audit_b_panel_locality.py`：独立整数地址模型核对原packed与direct来源公式、相同有效字节和不同连续性。示例N6144/K64/BN256：32KiB有效数据，direct64连续段/774656字节地址跨度，packed1段/32768字节跨度；这不是带宽或TLB实测。
+下一动作：保留packed输入视图，研究预处理与Cube消费的重叠是否能在既有全局屏障、跨核flags和full-K A容量内成立。先列出队列/事件与任务依赖，再核对公开CANN/CATLASS流水；不直接删除pack，不重复已否定的pack阶段双缓冲或近邻tile试交。整体重大提升未达成。
+
+## 最新：完整 M 四种存储布局正式通过，但性能退化，归档
+
+分支 `experiment/fullm-storage-layouts`，基于通过TT父版 `b7147a1`；当前kernel SHA `3d2904d008155f2e8be3995b13f1295dfce130aac36ad47fbc0f8a9582bcf5f4`。
+仅kernel算法改动：完整M producer支持TT/TF/FT/FF，新增单C容量选择；在完成父MakePlan最后只转换dual1/20/6→29/30，保留原ring/partial/packed allocation、其它schedule和grid。旧pack区域不使用，没有新GM通路；Vector消费者逐字未改。
+CPU320矩形（A两storage全部65536bit）、2976 producer和9216消费者执行通过；fake/public真实8.3 tiler production/TUNING各8064/5888通过。首次脚本host测试夹具引用不存在字段，已修正，统一脚本exit0，日志 `/private/tmp/bmmms-fullm-storage-cpu.log`。
+代码 `d0904f8` 已commit/push；正式任务 `6abde198694b590c3cb643e2` **Pass，CANN编译成功、15/15、precision_ratio全1**，没有活动正式任务。第12点TT父95.41→116.40μs（单次约22%退化），其它大点未见收益；无actual shape/plan/SoC/profile和重复A/B，不断言路由或具体根因。
+下一动作：归档push后恢复 `experiment/fullm-transpose-load` 的通过kernel，再核对旧packed K面板的GM连续性/输入复用。不要重交直接B或tile参数相近版本；旧pack双缓冲也已正式否定，没有新GM许可。详细 [FULLM_STORAGE_LAYOUTS.md](FULLM_STORAGE_LAYOUTS.md)。整体重大提升未达成。
+
 ## 最新：完整 M TT 转置候选正式通过，第8点单次5.4%改善
 
 分支 `experiment/fullm-transpose-load`；代码 `d2eeb78`，kernel SHA `f0b3908378015b9a98fb5eed58337dd7556737e5ae18b79d1e25c19b497a1b09`。
