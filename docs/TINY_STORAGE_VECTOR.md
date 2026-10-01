@@ -48,3 +48,5 @@ CPU model uses one Vector FIFO, not hardware SIMD subpipelines or real instructi
 CANN9 compile / native precision / NPU latency PENDING. Commit/push this structural candidate, submit once, save ID immediately, query only that ID to terminal. Require15/15, retain all fifteen times and compare against passed parent and observed variation, particularly C2/C3 and existing C7/C14/C15 gains. No actual SoC/shapes/plans/profile means no route-hit or overall-score claim. Only clearly large benefit justifies unchanged confirmation; small/no benefit is archived without nearby parameter scans.
 
 Main and historical tags unchanged. Overall substantial competition improvement remains incomplete.
+
+Official task **`6abec499694b590c3c288b4a`** created, implementation `155fbd9` pushed. Kernel/template SHA19cd486e unchanged. Query this ID to terminal; never resubmit on observation timeout. CANN9/nativeprecision/timing PENDING.

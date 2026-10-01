@@ -1,5 +1,7 @@
 # Latest: storage-native tiny broadcast/K-tree candidate, CPU passed, native PENDING
 
+Official task **`6abec499694b590c3c288b4a`** is now created, implementation155fbd9 pushed. Next `python3 /private/tmp/query_bmmms_submission.py 6abec499694b590c3c288b4a`, only query this ID to terminal. Kernel/template SHA19cd486e unchanged; native gates PENDING.
+
 Current `experiment/tiny-storage-vector` from passed1734f16, kernel359398bytes SHA `19cd486e6a0ffcd4caaa4a644e64853ae994a7c0065deb577ba32184b271f794`. Three added regions/92lines, no plan/grid/workspace/other-kernel changes; entire-parent scope inverse verified. Keeps document[K,N], query-only Gather for TF, Brcb+Mul and fullK32/64 FP32 tree before validNMax/originalMsum. Other K/layouts retain parent. See `TINY_STORAGE_VECTOR.md` for official900 API and numerical/model limitations.
 
 Production/TUNING each10080 hostcontrols,8352 actual queued entries/54432 active/7488 idleblocks,864 encodedFP16/BF16 entries against FP64golden (maxAbs9.54e-7/nonzeroRel2.93e-6), seven negative controls passed. Independent template other7sources parent, dry-run onlykernel sameSHA. CANN9/nativeprecision/performance PENDING. Next commit/push, submitone, saveID and pollsameID toterminal; no repeats unless clear large benefit. CPUlog ignored artifacts/tiny-storage-vector/cpu.log.
