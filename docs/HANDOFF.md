@@ -549,3 +549,5 @@ Kernel SHA256：`d218864289599e2b39ef09d83cfdde68988908bf9400fa42b5bc9b03031783b
 正式任务 **`6abe860d694b590c3c0f02a5`** 已创建，下一 `python3 /private/tmp/query_bmmms_submission.py 6abe860d694b590c3c0f02a5`，只查同一ID到终态，不重复提交。
 
 首次原样复测 `6abe87e6694b590c3c102b8c` **Pass，15/15，precision_ratio全1**。μs `[1.90,2.46,3.18,4.04,5.31,9.72,10.28,49.59,67.60,98.18,88.17,96.84,15.48,13.33,9.42]`。原日志忽略 `artifacts/teammate-single-tile/repeat1.json`。下一原样创建第二次，不重复第一次任务。
+
+第二次原样复测 **`6abe88a7694b590c3c109c3a`** 已创建，下一 `python3 /private/tmp/query_bmmms_submission.py 6abe88a7694b590c3c109c3a`，只查同一任务到终态。本次共请求两次重复，两次均已提交，不能再创建第三次重复任务。
