@@ -1,3 +1,11 @@
+# 最新：TT 单屏障同一源码再测两次，已完成
+
+分支 `experiment/tt-identical-repeats`，kernel同 `03c3996` / SHA `71ca6095958a372927c27f088bb081c43cff748169ff98e4ef80a2215b4d62c5`，未改任何源码。新增任务 `6abeb052694b590c3c220fa2`、`6abeb132694b590c3c223f34` 均Pass、15/15、precision_ratio全1。本次只创建这两个任务，没有活动任务。
+
+C8三次47.24/48.88/48.45，中位48.45，波动3.4%；相比父中位49.805仅观察低2.72%，不将原单次5.15%称稳定收益。C13波动9.9%、C14 5.8%；C2中位2.70仍高于旧2.42–2.50，不消除不利观察、不称整体最优。三次完整结果见 `docs/TT_IDENTICAL_REPEATS.md`，原JSON忽略 `artifacts/tt-identical-repeats/`。
+
+原工作区 `experiment/tt-manual-frame` 未提交kernel与模型保持，不包含本次提交。两次复测需求完成，不再原样重交；后续优化先检查其CPU模型日志并验证真实源码/同步/尾块，不能把未验证WIP当通过版。整体冲榜未完成，main算法/历史标签不动。
+
 # 最新：按用户要求 TT 单屏障版原样复测两次
 
 当前复测分支 `experiment/tt-identical-repeats`，父 `03c3996`，kernel SHA `71ca6095958a372927c27f088bb081c43cff748169ff98e4ef80a2215b4d62c5` 保持不动。最近通过任务 `6abea942694b590c3c1ff692`，本次新任务均尚未创建。执行顺序：复测1提交→保存 ID→查询同 ID 至终态→复测2提交→保存 ID→查询终态→逐点三次对照。详见 `docs/TT_IDENTICAL_REPEATS.md`。
