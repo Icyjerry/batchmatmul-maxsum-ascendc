@@ -36,3 +36,15 @@ GM每个C槽为 `[ceil(BN/16), BM, 16]`。Cube srcStride=align16(validRows)，ds
 ## Validation Request
 
 独立官方模板 `/private/tmp/bmmms-native-nz-official/project` 仅kernel替换，dry-run确认SHA/文件。代码 `84e830e` 已commit/push；正式任务 **`6abe3b9b694b590c3ce5450f`** 已创建，CANN/NPU终态PENDING。查询同一ID至终态，比较父C8 49.38/C9 67.48μs；勿重复提交。无收益或失败则归档并恢复父，不调相近输出格式参数。actual shape/plan/SoC/profile和重复A/B仍缺失，不据单次推断路径命中或稳定收益。
+
+## 正式结果（已完成）
+
+[任务 6abe3b9b694b590c3ce5450f](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe3b9b694b590c3ce5450f) **Pass，CANN编译成功、15/15、precision_ratio全1**；提交源码SHA保持上文。耗时μs：
+
+```text
+[2.09,4.18,4.34,5.38,5.72,10.78,10.21,50.44,68.57,97.94,89.23,96.42,15.90,13.43,9.11]
+```
+
+C8父49.38→50.44，单次未观察到新增收益；C9父67.48→68.57，其代码未变，不归因该波动。没有actual shape/plan/SoC/profile或重复A/B，不据此认定硬件瓶颈、路径命中或稳定差异。原始JSON/CPU日志位于Git忽略 `artifacts/tt-native-nz-ring/`，权限700/600。
+
+候选保留在 `experiment/tt-native-nz-ring`，不合入下一通过父版；下一恢复 `e1b3634` 的ND输出+跨tile B包+C9组合。不重复NZ格式参数或旧callback失败实验。上述Validation Request是历史提交计划，现已完成；没有活动任务。

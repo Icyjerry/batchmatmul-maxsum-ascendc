@@ -551,3 +551,11 @@ Split-K host 模型两档宏均编译运行，统计是各档相同模型空间�
 - C8 59.27→49.38，单次耗时降低16.7%/1.200x；C9 68.54→67.48，其路径未改，不归因波动。没有actual shape/plan/SoC/profile或重复A/B，不称稳定或推断分数。
 - CPU440立即/440延迟MTE2-MTE1-MMAD/440 eagerMTE2、缺reader等待负控制；原420producer/160全部bit模式通过；fake/公开固定8.3 host production/TUNING各6912/720/576通过。A1 queue仍抽象、Fixpipe同步，不代替native时序/硬件精度。
 - 保留为新的通过父版，无活动任务。原始JSON/模型本机Git忽略 `artifacts/tt-b-package-stream/`；交接 [TT_B_PACKAGE_STREAM.md](TT_B_PACKAGE_STREAM.md)。下一核对manual基本NZ ring输出，先对比历史库/回调NZ无收益或runtime失败，避免重复。
+
+## 2026-10-01 · 手写TT原生NZ ring
+
+- `experiment/tt-native-nz-ring` / `84e830e`，kernel SHA `30a697cc03f6aa3ec39f81275ddcfa27f10aaf4f1d31e0cd4bcbfc51bf6ce233`，父 `e1b3634`。仅手写TT基本Fixpipe CFG_NZ写原ring、AIV slab DMA/tree Max；输入流水/host/UB/GM/flags/C9保持，无新GM通路，不使用旧Matmul callback。
+- [正式任务 6abe3b9b694b590c3ce5450f](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe3b9b694b590c3ce5450f) Pass，CANN编译成功、15/15、precision_ratio全1。耗时μs `[2.09,4.18,4.34,5.38,5.72,10.78,10.21,50.44,68.57,97.94,89.23,96.42,15.90,13.43,9.11]`。
+- C8 49.38→50.44，单次未观察到新增收益，归档并恢复父。C9未改，不归因67.48→68.57波动；无actual shape/plan/SoC/profile或重复A/B，不推断路径命中、瓶颈或稳定差异。
+- CPU440立即/440延迟引擎/440 eagerMTE2、420旧producer/160 raw-bit、9216实际NZ消费者及无N-tail mask负控制通过；host/预算逐字父，沿用父证据。本模型Fixpipe同步、A1 queue抽象，不是完整硬件时序或舍入模拟。
+- 无活动任务，原始资料本机Git忽略 `artifacts/tt-native-nz-ring/`；交接 [TT_NATIVE_NZ_RING.md](TT_NATIVE_NZ_RING.md)。后续勿重复NZ格式/旧callback候选，保留C9与49.38μs组合。

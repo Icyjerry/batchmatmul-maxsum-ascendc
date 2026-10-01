@@ -1,10 +1,10 @@
 # 接手状态 · 2026-10-01
 
-## 最新：手写TT原生NZ ring已实现，CPU通过，正式PENDING
+## 最新：手写TT原生NZ ring正式15/15通过，未观察到新增收益
 
 分支 `experiment/tt-native-nz-ring` 从通过 `e1b3634` 开始，kernel SHA `30a697cc03f6aa3ec39f81275ddcfa27f10aaf4f1d31e0cd4bcbfc51bf6ce233`。保留A1/B包流水/host/Vector末级/C9，仅Cube基本CFG_NZ写原ring和AIV slab DMA/tree Max；固定BM×16 FP32 block的32byte stride2BM，尾N置-inf，原credits/GM/预算保持。区别旧Matmul内建NZ/三个callback失败，不调用它们、不宣称故障修复。
-440立即/440延迟引擎/440 eagerMTE2 producer、420旧producer/160所有bit模式、9216实际消费者、缺N-tail mask负控制通过。剥除三个新增区后整个kernel与父逐字一致，host/UB预算沿用已验证父；CANN9/NPU PENDING。代码 `84e830e` 已推送，独立template dry-run仅kernel/SHA一致；正式任务 **`6abe3b9b694b590c3ce5450f`** 已创建，尚未查询终态。详情 [TT_NATIVE_NZ_RING.md](TT_NATIVE_NZ_RING.md)。
-下一 `python3 /private/tmp/query_bmmms_submission.py 6abe3b9b694b590c3ce5450f` 查询同一ID至终态，勿重复提交。对照父49.38/67.48μs，无收益恢复父并归档，不重复格式参数。整体重大目标仍有空间。
+440立即/440延迟引擎/440 eagerMTE2 producer、420旧producer/160所有bit模式、9216实际消费者、缺N-tail mask负控制通过。剥除三个新增区后整个kernel与父逐字一致，host/UB预算沿用已验证父。代码 `84e830e` 已推送，独立template dry-run仅kernel/SHA一致；正式任务 **`6abe3b9b694b590c3ce5450f` Pass，CANN编译成功、15/15、precision_ratio全1**。C8 50.44μs，对照父49.38；C9 68.57μs，代码未变，不归因波动。详情 [TT_NATIVE_NZ_RING.md](TT_NATIVE_NZ_RING.md)。
+无活动任务；候选归档，下一恢复父 `e1b3634` 的49.38μs组合，不重复格式参数。原始资料Git忽略 `artifacts/tt-native-nz-ring/`。没有actual shape/plan/SoC/profile或重复A/B，单次结果仅说明没有观察到新增收益。下一结构研究先核对CANN9 A2/A3支持的Vector到Cube共享L1/TSCM契约，不编造共享地址或API，不新增GM输入通路。整体重大目标仍有空间。
 
 ## 最新：TT跨tile B包流水正式15/15通过，第8点49.38μs
 
