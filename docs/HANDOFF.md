@@ -5,7 +5,7 @@
 分支 `experiment/tt-fullm-npair`，基于 `0d4bd04`；kernel SHA `a7555e313a0bf6bfe34bca301b8769f28c6b127ed85a859292a883a1db33fcc1`。不合入无收益worker Max候选；其结果/代码保留独立分支。
 同worker连续区间、同M的两个Nt在K循环内共享A2矩形Load3D，C独立完整K累加后按原Nt/ring顺序输出。A2在两次MMAD之后释放，B2独立release；原host/workspace/Vector逐字保持，无新GM/cross flags。
 区别旧 `7b4d477`：完整A1驻留、一次矩形Load3D、连续任务、BM64及非对齐尾块；旧准入限16对齐/BM128且panelResident=0。避免无证据原样重交。
-440立即MMAD+440延迟MMAD/ordered M-flag/live operand模型、420旧producer/160位模式、fake host production/TUNING各6912/720/144通过。细节 [TT_FULLM_NPAIR.md](TT_FULLM_NPAIR.md)。无活动任务；下一commit/push/dry-run正式一次并保存ID。整体重大提升仍未达成。
+440立即MMAD+440延迟MMAD/ordered M-flag/live operand模型、420旧producer/160位模式、fake host production/TUNING各6912/720/144通过。细节 [TT_FULLM_NPAIR.md](TT_FULLM_NPAIR.md)。代码 `124dc31` 已commit/push，dry-run仅kernel/SHA一致；正式活动任务 `6abe223b694b590c3cd8474e` 已创建，下一查询同一ID至终态，不因观察超时重提。整体重大提升仍未达成。
 
 ## 当前：TT worker/M 的 UB Max 驻留正式通过，但没有收益
 

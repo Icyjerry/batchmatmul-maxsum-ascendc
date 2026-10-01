@@ -20,7 +20,7 @@ UB worker Max候选 `34956fe` 正式15/15通过，但第8点59.66→59.72μs，�
 `python3 tools/validate_tt_contiguous.py` exit0：
 
 - 440实际paired producer：两batch、M/N/K尾、全负、worker/M边界余单tile/idle worker、A1刷新和释放、逐C及padding、ring guards、所有events/credits最终归零；独立枚举paired组数检查实际A2 Load次数，B读数/MMAD数量保持。
-- 再440个同样实际源码执行，将MMAD及M-pipe SetFlag排队，等待对应event或M_FIX才执行。MMAD callback读取活的A2/B2/C存储，不提前复制值，因此提前覆盖operand会改变C并失败；检查双消费者前A2的最后使用者。ND2NZ依旧延迟，L1→L0和Fixpipe同步；不是完整NPU pipeline emulator。
+- 再440个同样实际源码执行，将MMAD及M-pipe SetFlag排队，等待对应event或M_FIX才执行。MMAD callback读取活的A2/B2/C存储，不提前复制值，因此提前覆盖operand会改变C并失败；检查两个MMAD对A2的最后使用。ND2NZ依旧延迟，L1→L0和Fixpipe同步；不是完整NPU pipeline emulator。
 - 原default false的420producer、160矩形与65536位模式回归通过；fake host production/TUNING各6912/720/144通过。host本次逐字未动，因此不重建公开tiler去重复同一容量证明。
 - 旧Vector本次逐字未动；其父已经正式通过。CPU小整数不是BF16硬件舍入模型。
 
@@ -34,4 +34,4 @@ UB worker Max候选 `34956fe` 正式15/15通过，但第8点59.66→59.72μs，�
 
 分支 `experiment/tt-fullm-npair`，kernel SHA `a7555e313a0bf6bfe34bca301b8769f28c6b127ed85a859292a883a1db33fcc1`，280265字节。
 模型日志 `/private/tmp/bmmms-tt-fullm-npair-cpu.log`。独立官方模板 `/private/tmp/bmmms-judge-tt-fullm-npair/project` 仅kernel替换，dry-run需核对同SHA。
-CANN9编译/NPU精度/正式性能 **PENDING**；无活动任务。commit/push后仅提交该结构候选一次并查询同一ID至终态。
+代码 `124dc31` 已commit/push，dry-run仅kernel/SHA一致；正式活动任务 [6abe223b694b590c3cd8474e](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe223b694b590c3cd8474e) 已创建。CANN9编译/NPU精度/正式性能 **PENDING**；查询同一ID至终态，不因观察超时重提。
