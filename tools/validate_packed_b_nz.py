@@ -27,12 +27,18 @@ model=(root/'tests/cpu/packed_b_nz_model.cpp.in').read_text().replace('// @HELPE
 def region(s,start,end):return s[s.index(start):s.index(end,s.index(start))]
 assert region(src,'// One full-M accumulator:','// Isolated case12 packed-B kernel').split('// Prepare one Cube-ready')[0]==region(parent_src,'// One full-M accumulator:','// Isolated case12 packed-B kernel').split('template<typename T,bool TX1,bool TX2,bool PAD_MN=false,bool SKIP_B=false>\n__aicore__ inline void ManualCopyKCase12Packed')[0]
 # In packed kernel, restore only the three input-stage edits, then compare body.
-a=block.index('                if constexpr(NZ_B) {');b=block.index('                } else if constexpr(TX2)',a)
+a=block.index('                if constexpr(NZ_B) {',block.index('lp.dstGap=0;lp.ifTranspose=!TX2;'));b=block.index('                } else if constexpr(TX2)',a)
 restore=block[:a]+block[b:].replace('                } else if constexpr(TX2)','                if constexpr(TX2)',1)
 restore=restore.replace('PAD_MN,RESIDENT_B,NZ_B>','PAD_MN,RESIDENT_B>')
 a=restore.index('            auto ready=data;');b=restore.index('            Fence<AscendC::HardEvent::V_MTE3>();',a)
 restore=restore[:a]+restore[b:]
 restore=restore.replace('],ready,kr*s.baseN);','],data,kr*s.baseN);')
+native="""                if constexpr(NZ_B) {
+                    // This family holds the complete aligned TT-stored A in L1.
+                    // One raw-bit rectangle replaces the per-M16 Load2D loop.
+                    ManualTransposeFullM(a2,a1,s.k,rows,count,k0);
+                } else if((s.tree&4) && residentA) {"""
+if native in restore:restore=restore.replace(native,'                if((s.tree&4) && residentA) {')
 assert restore==region(parent_src,'void bmmms_manual_case12_packed(','struct Plan {'), 'unrelated packed-kernel mutation'
 shapes=src[src.index('struct Shape {'):src.index('template <AscendC::HardEvent')]
 host=src[src.index('struct Plan {'):src.index('using CacheKey =')]
