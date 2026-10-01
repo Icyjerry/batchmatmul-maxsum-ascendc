@@ -39,5 +39,5 @@ CPU TransDataTo5HD为文档中的16位转置语义模型，非完整异步矩阵
 
 kernel SHA `5a420968d478d3428334a42e562bbe3455d413f6db06a60a432c100282ef494a`，272471 bytes。
 独立官方模板 `/private/tmp/bmmms-judge-packed-b-nz/project`，dry-run仅kernel.asc/SHA一致。
-正式CANN9编译、NPU精度、latency：PENDING，未创建任务。
+代码 `0ad246b` 已推送私有GitHub分支。正式任务 [6abe0163694b590c3cc61e91](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe0163694b590c3cc61e91) 已创建；CANN9编译、NPU精度、latency：PENDING。
 仅提交本次格式结构一次；同一ID查至终态，不用CPU调用数宣称速度。没有大幅收益则保留反例，不提交类似tile/stride参数。

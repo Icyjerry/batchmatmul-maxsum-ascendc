@@ -4,7 +4,7 @@
 
 分支 `experiment/packed-b-nz-once`，kernel SHA `5a420968d478d3428334a42e562bbe3455d413f6db06a60a432c100282ef494a`。在原packed GM区域中一次准备 `[K/16,baseN,16]`，Cube线性copy和bulk非transpose B2 load；使用原C queue空余半区，无新UB/GM分配。A/C/归约和SyncAll/flag12保持原样；原模板默认false，dual31只转换已完成dual6计划。
 CPU原ND/新NZ各2016真实源码执行、全部65536bit（NZ模式）和fake/public8.3 tiler production/TUNING各1728/54通过，首次host夹具auto类型声明已修正。详细 [PACKED_B_NZ_ONCE.md](PACKED_B_NZ_ONCE.md)。
-独立官方模板dry-run仅kernel.asc/SHA一致。下一动作：确认最新统一日志后commit/push候选，CLI正式一次并记录ID，查询同一任务至终态。CANN9/NPU精度/性能 PENDING，整体重大提升未达成。
+代码 `0ad246b` 已commit/push，统一日志exit0；独立官方模板dry-run仅kernel.asc/SHA一致。正式任务 `6abe0163694b590c3cc61e91` 已创建，下一动作：`python3 /private/tmp/query_bmmms_submission.py 6abe0163694b590c3cc61e91` 查询同一ID至终态，不因超时重提。CANN9/NPU精度/性能 PENDING，整体重大提升未达成。
 
 ## 当前工作起点：恢复已通过 TT 完整 M 版本
 
