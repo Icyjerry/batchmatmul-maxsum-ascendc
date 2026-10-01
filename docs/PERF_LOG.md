@@ -1,4 +1,10 @@
 
+## 2026-10-02: complete tiny K8 fold, native PENDING
+
+SHA4d03162f721a879827d85d8c18c99bd49174cc636acd9b9d8f43567cf3eb29fa/kernel360054bytes, baseline1734f16 plus103lines/three regions; no plan/group/grid/GM change. Adds K40/48/56 excess-to32 fold to batchKtree, exactrawA roundup/DMA/sharedCast offsets. MotivationconditionalhistoricalK32–56, notactualroutehit. Completesalgorithmcoverage, nottile scan.
+
+Production/TUNING each10080 hostcontrols,17616 actualintegerentries (120synthetic512KiB chunkboundaries),5652encodedFP16/BF16 group1/2/3 entries/FP64golden maxAbs9.54e-7/nonzeroRel2.93e-6, ninefaultcontrols includingnonpowerKtail. OneFIFO/softwarecasts notnative. Officialtemplateother7sources baseline/dryrunkernelSHA checked. NativePENDING/nojob yet; onecommitpush/submit/saveID/pollsameID. Clearlargegainonlyconfirm, ifnogain archive fullstorage-nativeKtree direction/restoreretainedbaseline; no furthervariants. See TINY_ALL_K8_FOLD. Goalincomplete/main/tags unchanged.
+
 ## 2026-10-02: group-wide tiny K tree, native PENDING
 
 Terminal6abec72a694b590c3c296090 / df36ef3 / SHAeeef7efc: CANN compile successful,15/15Pass/allprecision1. Timesus `[1.94,2.57,3.28,4.03,5.42,9.83,8.03,46.44,69.04,99.12,89.01,97.22,16.41,11.22,9.17]`; no clear C2/C3 benefit versusbaseline2.46/3.11; unfavorableC9/C13 retained, unchangedroutes notattributed. HistoricalconditionalprobeK32–56 exposes currentK32/64 coverage gap, not actualhiddenroute evidence. Next exactK8 excess-to32 fold and rawA padding verification, notparameter scan. RawJSON ignored artifacts/tiny-group-ktree/official.json; no activejob, main/tags unchanged, goalincomplete.

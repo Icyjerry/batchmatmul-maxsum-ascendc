@@ -1,3 +1,9 @@
+# Latest: complete tiny K8 excess fold, CPU passed, native PENDING
+
+Current experiment/tiny-all-k8-fold, kernel360054bytes SHA `4d03162f721a879827d85d8c18c99bd49174cc636acd9b9d8f43567cf3eb29fa`. Scopeinverse entirebaseline1734f16,103addedlines/three regions, no plan/grid/group/GM change. FulltinyK32/40/48/56/64 FF/TF coverage: excessK foldto32, commongroupKtree/repeatedMax. RoundedrawA DMA/cast offsets andhostUB exactK budget fixed forK8non16; inputs immutable/exactvalidN/M. See TINY_ALL_K8_FOLD.
+
+Production/TUNING each10080 hostcontrols,17616 actualentries/121824active/15456idle,5652 encodedFP16/BF16 group1/2/3 entries maxAbs9.54e-7/nonzeroRel2.93e-6, ninefaultcontrols includingmissingnonpowerKtail.120synthetic512KiBentries exercisechunks, notphysicalSoCcapacity. Other7template sources byte-equalbaseline, dry-runkernelSHA checked. NativePENDING/noactivejob yet; next commitpush→onejob/saveID/pollsameID. Parentgroupcandidatepassed15/15 withoutbenefit; if fullK8stillnogain archive this direction/restoreretainedbaseline, no furthervariants. Main/tags unchanged, goalincomplete.
+
 # Latest: group-wide tiny K tree, CPU passed, native PENDING
 
 Terminal6abec72a694b590c3c296090: CANN compiled15/15Pass/allprecision1; C2/C3=2.57/3.28vsbaseline2.46/3.11, no clear benefit. Full15times/limitations in TINY_GROUP_K_TREE; raw ignored artifacts/tiny-group-ktree/official.json. No activejob or repeat. Next finish omitted K40/48/56 coverage via excess-to32 fold, paddedrawA budget/exactK offsets; historicalprobeK32–56 conditional only, no actual formalroute known. Main/tags unchanged, goalincomplete.

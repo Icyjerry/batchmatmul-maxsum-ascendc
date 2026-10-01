@@ -1,5 +1,5 @@
 uint64_t FrameBytes(TinyKernelShape s,bool X,bool Y){
- uint64_t pitch=(s.n+15)/16*16,ar=s.b*s.m,ac=ar*s.k,bc=s.b*s.k*pitch;
+ uint64_t pitch=(s.n+15)/16*16,ar=s.b*s.m,ac=(ar*s.k+15)/16*16,bc=s.b*s.k*pitch;
  uint64_t sizes[]={2*(ac+bc),4*(ac+bc),X?ar*s.k*4:32,X?s.k*4:32,ar*s.k*32,4*ar*s.k*pitch,32*ar,32};
  uint64_t total=0;for(auto n:sizes)total+=(n+31)/32*32;return total;
 }
@@ -21,14 +21,17 @@ template<bool X,bool Y>void Run(uint32_t B,uint32_t M,uint32_t N,uint32_t K,uint
    Clean();AscendC::block=z;AscendC::manualBytes=0;AscendC::localEnds.clear();
    AscendC::ub=std::make_shared<std::vector<uint8_t>>(platform_ascendc::PlatformAscendCManager::GetInstance()->ub,0x7f);
    unsigned b0=group?z*group:0,pitch=(N+15)/16*16;
-   unsigned batches=b0>=B?0:(group?std::min(group,B-b0):B),ac=batches*M*K;
+   unsigned batches=b0>=B?0:(group?std::min(group,B-b0):B),ak=batches*M*K,ac=(ak+15)/16*16;
    AscendC::canonicalExpected.assign(ac+batches*K*pitch,0);
-   for(unsigned i=0;i<ac;++i)AscendC::canonicalExpected[i]=in.ap[b0*M*K+i];
+   for(unsigned i=0;i<ak;++i)AscendC::canonicalExpected[i]=in.ap[b0*M*K+i];
    for(unsigned b=0;b<batches;++b)for(unsigned k=0;k<K;++k)for(unsigned n=0;n<N;++n)
     AscendC::canonicalExpected[ac+(b*K+k)*pitch+n]=in.bp[((b0+b)*K+k)*N+n];
    if(!group)Entry<X,Y,0,false>(in,shape,group);
    else if(!specialized)Entry<X,Y>(in,shape,group);
    else if(K==32)Entry<X,Y,32>(in,shape,group);
+   else if(K==40)Entry<X,Y,40>(in,shape,group);
+   else if(K==48)Entry<X,Y,48>(in,shape,group);
+   else if(K==56)Entry<X,Y,56>(in,shape,group);
    else Entry<X,Y,64>(in,shape,group);
    Clean();
    if(b0>=B){assert(!AscendC::manualBytes);++idle;}
@@ -55,7 +58,7 @@ void Host(){
  for(uint32_t N:{1u,7u,16u,17u,31u,63u,64u})for(uint32_t K:{32u,40u,48u,56u,64u})
  for(uint32_t group:{0u,1u,3u,8u})for(unsigned lay=0;lay<4;++lay){
   TinyKernelShape s{B,M,N,K},f=s;if(group)f.b=std::min(B,group);
-  bool valid=f.b<=8&&!(lay%2)&&(K==32||K==64)&&f.b*M*((N+15)/16*16)/8<=255;uint64_t need=FrameBytes(f,lay/2,lay%2)+1024;
+  bool valid=f.b<=8&&!(lay%2)&&(K>=32&&K<=64&&K%8==0)&&f.b*M*((N+15)/16*16)/8<=255;uint64_t need=FrameBytes(f,lay/2,lay%2)+1024;
   hw->ub=need;assert(TinyStorageFrameFits(s,lay/2,lay%2,group)==valid);
   hw->ub=need-1;assert(!TinyStorageFrameFits(s,lay/2,lay%2,group));++controls;
  }
@@ -114,7 +117,7 @@ template<bool X>bool Quant(unsigned encoding,unsigned M,unsigned N,unsigned K,bo
 }
 void Quantized(){unsigned count=0;double ae=0,re=0;
  for(unsigned enc:{1u,2u})for(unsigned m:{1u,5u,8u})for(unsigned n:{1u,7u,16u,17u,63u,64u})
- for(unsigned k:{32u,64u})for(bool neg:{false,true})for(unsigned mode=0;mode<3;++mode)for(unsigned group:{1u,2u,3u}){
+ for(unsigned k:{32u,40u,48u,56u,64u})for(bool neg:{false,true})for(unsigned mode=0;mode<3;++mode)for(unsigned group:{1u,2u,3u}){
   count+=Quant<false>(enc,m,n,k,neg,mode,group,ae,re);count+=Quant<true>(enc,m,n,k,neg,mode,group,ae,re);
  }
  std::cout<<count<<" actual entries on FP16/BF16 bit values vs FP64 golden / passed FP32 order, maxAbs="<<ae<<", maxNonzeroRel="<<re<<" PASS (mixed 1e-4 CPU check, not native precision)\n";
@@ -127,10 +130,10 @@ int main(){Host();Quantized();
  // Synthetic larger UB checks the supported guard's repeat/chunk boundaries,
  // not an assertion about A2/A3 physical capacity.
  auto* hw=platform_ascendc::PlatformAscendCManager::GetInstance();hw->ub=512*1024;
- for(uint32_t N:{1u,7u,17u,64u})for(uint32_t K:{32u,64u})for(unsigned mode=0;mode<3;++mode){
+ for(uint32_t N:{1u,7u,17u,64u})for(uint32_t K:{32u,40u,48u,56u,64u})for(unsigned mode=0;mode<3;++mode){
   Run<false,false>(8,8,N,K,8,true,mode);Run<true,false>(8,8,N,K,8,true,mode);
  }
  hw->ub=192*1024;
  std::cout<<cases<<" queued actual dynamic/constant tiny entries, "<<blocks<<" active / "<<idle<<" idle blocks PASS\n";
- std::cout<<"three engine priorities, batch tails, FF/TF storage, query-only gather, batched Brcb and group-wide K tree, N masks, negative maxima, passed integer reference, immutable inputs/UB/y guards PASS\n";
+ std::cout<<"three engine priorities, batch tails, FF/TF storage, query-only gather, batched Brcb, exact K8 excess fold and group-wide K tree, N masks, negative maxima, passed integer reference, immutable inputs/UB/y guards PASS\n";
 }

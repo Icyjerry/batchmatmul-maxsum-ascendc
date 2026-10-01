@@ -98,10 +98,11 @@ def main():
    ('terminal','    AscendC::PipeBarrier<PIPE_ALL>();'),
    ('batch-offset','        output=(GM_ADDR)(reinterpret_cast<__gm__ float*>(output)+b0);')]:
    bad=c.replace(line,'');assert bad!=c;run('no-'+name,bad,True)
-  bad=c.replace('for(uint32_t step=k/2;step;step/=2)','for(uint32_t step=k/4;step;step/=2)');assert bad!=c;run('incomplete-K',bad,True)
+  bad=c.replace('for(uint32_t step=32;step;step/=2)','for(uint32_t step=16;step;step/=2)');assert bad!=c;run('incomplete-K',bad,True)
   bad=c.replace('uint64_t(s.n),static_cast<uint8_t>(ar),8,1,stride','uint64_t(pitch),static_cast<uint8_t>(ar),8,1,stride');assert bad!=c;run('no-N-mask',bad,True)
   bad=c.replace('const AscendC::BinaryRepeatParams rp{1,0,1,static_cast<uint8_t>(ar*stride),1,stride};','const AscendC::BinaryRepeatParams rp{1,1,1,static_cast<uint8_t>(ar*stride),1,stride};');assert bad!=c;run('wrong-broadcast',bad,True)
   bad=c.replace('static_cast<uint8_t>(ar*stride),1,stride','stride,1,stride');assert bad!=c;run('wrong-K-stride',bad,True)
- print('Eight input/output/terminal/batch/K-tree/N-tail/broadcast/group-stride controls rejected PASS')
+  bad=c.replace('(step==32?k-32:step)','(step==32?(k==64?32:0):step)');assert bad!=c;run('missing-nonpower-K',bad,True)
+ print('Nine input/output/terminal/batch/K-tree/N-tail/broadcast/group-stride/nonpower-K controls rejected PASS')
  print('CANN9 compile/native precision/NPU timing PENDING; queued CPU model is not a hardware emulator.')
 if __name__=='__main__':main()
