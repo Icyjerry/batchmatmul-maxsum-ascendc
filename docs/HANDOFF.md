@@ -1,5 +1,11 @@
 # 接手状态 · 2026-10-01
 
+## 最新：接入队友C9 package路径，CPU通过，正式PENDING
+
+当前 `experiment/c9-k-packages` 从通过 `0d4bd04` 开始；kernel SHA `5dcb7230bef7e8935aabe6c6c80560dfb0f2d1103b5a5ea223b217bdbe075ebd`。只移植FP16/NT/dual20完整A驻留、B大K包双queue、首tile晚ring credit及C9历史桶predicate；TT59.66μs父版保留，无新GM/flags。用户报告队友第9点“68s”，暂按68μs，仅用户报告无ID。
+177实际producer+177延迟MMAD、9216实际消费者、fake/公开固定8.3 tiler production/TUNING各2560/128通过，MTE1仍同步模型。CANN9编译/正式15点/性能PENDING，尚无活动任务ID。详细 [C9_K_PACKAGES.md](C9_K_PACKAGES.md)。下一立即官方模板dry-run、commit/push后CLI一次提交，保存ID后查询同一ID至终态；父第9点83.11μs、第8点59.66μs。
+TT B-stage WIP已保留并push在 `experiment/tt-b-stage` / `5b58c96`：180物理layout/440 producer/420旧producer/160位模式及fake host通过；delayed MTE1/native queue/CANN/NPU PENDING，未正式提交，不混入本C9候选。整体重大提升仍未达成。
+
 ## 当前工作起点：恢复59.66μs通过结构，准备B1单stage研究
 
 分支 `experiment/tt-b-stage`，kernel与 `0d4bd04` 逐字相同，SHA `65e38bb155af9adb068e87dc90c01face21a7cf024d094c54846c5188e9ca120`。本次两项结构实验都正式15/15通过但无收益：worker UB Max第8点59.72μs，完整A1 N pair为60.83μs。代码/实际源码模型/原始结果分别保留 `experiment/tt-worker-max` / `fba8b4f` 和 `experiment/tt-fullm-npair` / `0cc9884`；均不合入当前kernel。没有活动评测任务。

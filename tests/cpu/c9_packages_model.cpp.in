@@ -1,0 +1,63 @@
+// Test extracted C9 producer with independent paired-batch C/Max/Sum oracle.
+template<bool PAD>void Run(Schedule s,uint32_t package,bool neg){
+ negativeInput=neg;s.mTiles=(s.m+s.baseM-1)/s.baseM;s.nTiles=(s.n+s.baseN-1)/s.baseN;
+ s.nSplit=std::min(s.nSplit,s.nTiles);assert(package>s.kChunk&&package%s.kChunk==0);
+ std::vector<int16_t> a(s.b*s.m*s.k),b(s.b*s.n*s.k);
+ for(int64_t z=0;z<s.b;++z)for(int64_t m=0;m<s.m;++m)for(int64_t k=0;k<s.k;++k)a[z*s.m*s.k+m*s.k+k]=A(z,m,k);
+ for(int64_t z=0;z<s.b;++z)for(int64_t n=0;n<s.n;++n)for(int64_t k=0;k<s.k;++k)b[z*s.n*s.k+n*s.k+k]=B(z,k,n);
+ auto oldA=a,oldB=b;std::map<int64_t,int> seen;
+ std::vector<float> final(s.b*s.m,-std::numeric_limits<float>::infinity());
+ uint64_t readsA=0,readsB=0,mmads=0,bCopies=0;
+ for(uint32_t worker=0;worker<s.workers;++worker){
+  st=State{};st.s=s;st.tx1=false;st.tx2=true;uint32_t sequence=0;uint64_t expectedA=0,expectedB=0,tiles=0;
+  for(int64_t task=worker;task<s.b*s.mTiles*s.nSplit;task+=s.workers){
+   assert(++seen[task]==1);int64_t ns=task%s.nSplit,mt=task/s.nSplit%s.mTiles,z=task/(s.nSplit*s.mTiles);
+   uint32_t rows=std::min<int64_t>(s.baseM,s.m-mt*s.baseM);
+   expectedA+=uint64_t(rows)*s.k;
+   const uint32_t begin=ns*s.nTiles/s.nSplit,end=(ns+1)*s.nTiles/s.nSplit;
+   for(uint32_t nt=begin;nt<end;nt+=s.window,++sequence){
+    for(uint32_t p=0;p<std::min(s.window,end-nt);++p){
+     uint32_t cols=std::min<int64_t>(s.baseN,s.n-int64_t(nt+p)*s.baseN);
+     st.expected.push_back({z,mt*s.baseM,int64_t(nt+p)*s.baseN,rows,cols,uint32_t(ns),
+      size_t((sequence&1)*s.baseM*s.baseN*s.window+p*s.baseN)});
+     expectedB+=uint64_t(cols)*s.k;++tiles;
+    }
+   }
+  }
+  std::vector<float> ring(2*s.baseM*s.baseN*s.window+16,1e30f);AscendC::TPipe pipe;
+  RunCase9<int16_t,PAD>(pipe,{&a,0,true},{&b,0,false},{&ring},s,worker,package);
+  assert(AscendC::dma.empty());assert(st.fixes==tiles&&st.aReads==expectedA&&st.bReads==expectedB);
+  assert(st.mmads==tiles*((s.k+s.kChunk-1)/s.kChunk)&&st.aLoads==st.mmads&&st.bLoads==st.mmads);
+  assert(st.bCopies==tiles*((s.k+package-1)/package));
+  assert(!st.cross[0]&&!st.cross[1]);for(auto e:st.events)assert(e.second==0);
+  for(size_t i=2*s.baseM*s.baseN*s.window;i<ring.size();++i)assert(ring[i]==1e30f);
+  for(auto v:st.maxima){auto z=std::get<0>(v.first),m=std::get<1>(v.first);final[z*s.m+m]=std::max(final[z*s.m+m],v.second);}
+  readsA+=st.aReads;readsB+=st.bReads;mmads+=st.mmads;bCopies+=st.bCopies;
+ }
+ assert(a==oldA&&b==oldB&&seen.size()==uint64_t(s.b)*s.mTiles*s.nSplit);
+ assert(readsA==uint64_t(s.b)*s.m*s.k*s.nSplit&&readsB==uint64_t(s.b)*s.mTiles*s.n*s.k);
+ assert(bCopies==uint64_t(s.b)*s.mTiles*s.nTiles*((s.k+package-1)/package));
+ for(int64_t z=0;z<s.b;++z){float sum=0,gold=0;
+  for(int64_t m=0;m<s.m;++m){float mx=-std::numeric_limits<float>::infinity();
+   for(int64_t n=0;n<s.n;++n){float v=0;for(int64_t k=0;k<s.k;++k)v+=float(A(z,m,k))*float(B(z,k,n));mx=std::max(mx,v);}
+   assert(final[z*s.m+m]==mx);if(neg)assert(mx<0);sum+=final[z*s.m+m];gold+=mx;
+  }assert(sum==gold);
+ }
+}
+int main(){unsigned count=0;
+ for(uint32_t bm:{32u,64u,128u})for(uint32_t bn:{32u,128u,256u})
+ for(uint32_t k:{40u,136u,264u,520u})for(uint32_t package:{256u,512u})for(bool neg:{false,true}){
+  Schedule s{2,bm+17,bn+17,k,bm,bn,0,0,2,3,0,0};s.kChunk=bn==256?64:128;s.window=2;
+  if(uint64_t(bm)*((k+15)/16*16)*2+uint64_t(bn)*package*4>512*1024)continue;
+  Run<true>(s,package,neg);++count;
+ }
+ for(uint32_t ns:{1u,2u,3u})for(uint32_t w:{1u,2u,4u})for(uint32_t workers:{1u,3u,20u})for(bool neg:{false,true}){
+  Schedule s{2,64,192,256,32,64,0,0,ns,workers,0,0};s.kChunk=128;s.window=w;
+  Run<false>(s,256,neg);++count;
+ }
+ for(auto s:std::vector<Schedule>{{1,33,129,1776,32,128,0,0,2,8,0,0},
+  {1,17,33,8192,16,32,0,0,1,3,0,0},{1,129,129,1032,128,128,0,0,2,8,0,0}}){
+  s.kChunk=128;Run<true>(s,256,true);++count;
+ }
+ std::cout<<count<<" actual C9 producers: full-K C, paired batches, NZ tails/package boundaries, complete-window credits, resource/ring guards, negative Max then Sum PASS\n";
+}

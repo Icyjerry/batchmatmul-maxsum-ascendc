@@ -1,0 +1,32 @@
+// Actual MakePlan and selector against explicitly bounded platform shims.
+int main(){unsigned checked=0,selected=0,shrunk=0;
+ auto* hw=platform_ascendc::PlatformAscendCManager::GetInstance();
+ for(int cores:{8,20,24,32})for(int m:{2048,2049,3072,4095})for(int n:{1024,1025,1536,2047})
+ for(int k:{1024,1032,1536,1776,2040})for(int dtype:{1,2})for(int layout=0;layout<4;++layout){
+  hw->aic=cores;hw->aiv=2*cores;Shape s{1,m,n,k,dtype,layout/2,layout%2};auto p=MakePlan(s,cores);++checked;
+  auto q=MakeCase9PackagePlan(s,p);bool dispatch=p.schedule.dual==20&&dtype==1&&!s.tx1&&s.tx2&&q.safe&&q.resident&&q.bK>p.schedule.kChunk;
+  if(!dispatch)continue;
+  ++selected;auto d=p.schedule;
+  assert(q.bK%d.kChunk==0&&q.bK<=Ceil(k,d.kChunk)*d.kChunk);
+  assert(uint64_t(d.baseM)*Ceil(k,16)*32+uint64_t(d.baseN)*q.bK*4<=hw->l1);
+  assert(uint64_t(d.baseM)*d.kChunk*4<=hw->l0a&&uint64_t(d.baseN)*d.kChunk*4<=hw->l0b);
+  uint64_t oneC=uint64_t(d.baseM)*d.baseN*4;
+  assert(oneC*(2*oneC<=131072?2:1)<=hw->l0);
+  auto saved=p;auto reduced=hw->l1;hw->l1=uint64_t(d.baseM)*Ceil(k,16)*32+uint64_t(d.baseN)*d.kChunk*4;
+  auto small=MakeCase9PackagePlan(s,p);assert(small.safe&&small.bK==d.kChunk);++shrunk;hw->l1=reduced;
+  assert(p.totalBytes==saved.totalBytes&&p.systemBytes==saved.systemBytes&&p.cubeBlocks==saved.cubeBlocks);
+  for(auto member:{&hw->l1,&hw->l0a,&hw->l0b,&hw->l0,&hw->ub}){
+   auto old=*member;*member=1024;assert(!MakeCase9PackagePlan(s,p).safe);*member=old;
+  }
+  for(int variant=0;variant<5;++variant){auto bad=p;
+   if(variant==0)bad.schedule.kSplit=2;
+   if(variant==1)++bad.schedule.workers;
+   if(variant==2)bad.schedule.kChunk=120;
+   if(variant==3)bad.totalBytes=bad.systemBytes;
+   if(variant==4)++bad.schedule.mTiles;
+   assert(!MakeCase9PackagePlan(s,bad).safe);
+  }
+ }
+ assert(selected&&shrunk==selected);
+ std::cout<<checked<<" actual host controls, "<<selected<<" eligible C9 package dispatches: physical cores/capacity/shrink/fallback, original workspace unchanged PASS\n";
+}
