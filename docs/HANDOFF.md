@@ -1,11 +1,11 @@
 # 接手状态 · 2026-10-01
 
-## 当前：TT worker/M 的 UB Max 驻留候选，正式任务已提交
+## 当前：TT worker/M 的 UB Max 驻留正式通过，但没有收益
 
 分支 `experiment/tt-worker-max`，从当前正式通过59.66μs的 `0d4bd04` 开始。kernel SHA `269c7d370b48db80e7da48733f558ea6d6675ac844e4b04878ab4eec077c9b3c`。
 同M相邻N tile的行最大值留MQ/UB，切M或连续区间尾才写worker partial；nSplit=workers，但任务仍为M×N tiles。末级只读取真正与M相交的worker，未写槽位不初始化也不读取。原dual33选择/完整K Cube/A驻留/ring/flags/标量复用保持，不增加GM通路。
 1440实际新消费者+稀疏末级线程模型、9216原窗口消费者、440producer、420旧producer/160位模式复制回归、288稀疏末级、fake/public固定8.3 production/TUNING各6912/720/144通过。M=N1536/BM=BN128/20核代理partial份数144→28，非时间预测。
-详情 [TT_WORKER_MAX.md](TT_WORKER_MAX.md)。代码 `34956fe` 已commit/push；正式活动任务 `6abe1ed9694b590c3cd68cc9` 已创建，下一动作查询同一任务至终态，比较父第8点59.66μs，不因观察超时重提。整体重大提升仍未达成。
+详情 [TT_WORKER_MAX.md](TT_WORKER_MAX.md)。代码 `34956fe` 已commit/push；正式任务 `6abe1ed9694b590c3cd68cc9` Pass，CANN编译成功、15/15、precision_ratio全1；第8点父59.66→59.72μs，没有收益。原始JSON/模型日志本机Git忽略 `artifacts/tt-worker-max/`，无活动任务。下一恢复父 `0d4bd04`，检查Cube侧跨N的A2转换复用；旧N pair `7b4d477` 无收益且限16对齐/BM128/A非驻留，不能原样重交，必须核对新完整A1/Load3D/连续任务差异。整体重大提升仍未达成。
 
 ## 当前：TT连续tile任务正式通过，第8点单次改善8.6%
 

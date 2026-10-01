@@ -35,4 +35,6 @@
 
 kernel SHA `269c7d370b48db80e7da48733f558ea6d6675ac844e4b04878ab4eec077c9b3c`，278860字节。
 本机模型日志 `/private/tmp/bmmms-tt-worker-{producer,consumer,final,public}.log`。首次脚本因注释抽取锚点改变退出，修正锚点后全部exit0；没有改变kernel容差/准入来绕过错误。
-独立官方模板 `/private/tmp/bmmms-judge-tt-worker-max/project` 仅替换kernel。dry-run核对仅kernel/SHA一致；代码 `34956fe` 已commit/push，正式活动任务 [6abe1ed9694b590c3cd68cc9](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe1ed9694b590c3cd68cc9) 已创建。CANN9编译/NPU精度/正式性能 **PENDING**；查询同一ID至终态，不因观察超时重提。
+独立官方模板 `/private/tmp/bmmms-judge-tt-worker-max/project` 仅替换kernel。dry-run核对仅kernel/SHA一致；代码 `34956fe` 已commit/push，正式活动任务 [6abe1ed9694b590c3cd68cc9](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe1ed9694b590c3cd68cc9) 已创建。正式终态 **Pass：CANN编译成功、15/15、precision_ratio全1**。
+耗时 `[2.11,4.14,4.41,5.74,5.38,10.72,10.30,59.72,84.31,98.00,89.17,97.46,16.37,13.36,9.60]` μs。第8点父59.66→59.72μs，没有收益；无actual shape/plan/SoC/profile及重复对照，不断言硬件瓶颈或路由命中。没有活动任务，保留失败对照，不替换父通过结构。
+原始JSON和模型日志本机Git忽略 `artifacts/tt-worker-max/`。下一检查Cube L1→L0A跨相邻N复用；旧 `7b4d477` N pair正式无收益，但仅16对齐/BM128、A不驻留；新研究必须证明与该旧路线有实际差异，不能重复原样提交。
