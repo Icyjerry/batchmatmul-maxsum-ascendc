@@ -39,4 +39,5 @@
 独立官方原模板仅替换kernel，dry-run核SHA。commit/push后一次CLI，立即记录ID，只轮询同任务至终态。
 优先观察C1..4，父正式时间2.15/3.97/4.30/5.60μs；同时15点全精度，保留C8/C9。没有actual shape/plan/SoC/profile或重复A/B时，只报告单次变化，不推断截图源码、路由命中或稳定加速。
 
-CANN9编译/NPU精度/性能：PENDING，尚未提交。
+CANN9编译/NPU精度/性能：PENDING。实现 `0beb87d` 已commit/push；独立原模板dry-run only-kernel、313296byte/SHA一致。
+正式提交 **`6abe7b90694b590c3c08ed48`** 已创建，下一只查询这一ID到终态，不重复提交。
