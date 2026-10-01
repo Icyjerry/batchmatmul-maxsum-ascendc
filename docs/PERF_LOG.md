@@ -559,3 +559,11 @@ Split-K host 模型两档宏均编译运行，统计是各档相同模型空间�
 - C8 49.38→50.44，单次未观察到新增收益，归档并恢复父。C9未改，不归因67.48→68.57波动；无actual shape/plan/SoC/profile或重复A/B，不推断路径命中、瓶颈或稳定差异。
 - CPU440立即/440延迟引擎/440 eagerMTE2、420旧producer/160 raw-bit、9216实际NZ消费者及无N-tail mask负控制通过；host/预算逐字父，沿用父证据。本模型Fixpipe同步、A1 queue抽象，不是完整硬件时序或舍入模拟。
 - 无活动任务，原始资料本机Git忽略 `artifacts/tt-native-nz-ring/`；交接 [TT_NATIVE_NZ_RING.md](TT_NATIVE_NZ_RING.md)。后续勿重复NZ格式/旧callback候选，保留C9与49.38μs组合。
+
+## 2026-10-01 · C7完整输入与完整A2驻留
+
+- `experiment/c7-full-inputs` / `2dc7f30`，kernel SHA `e8a1512e88e3cc71069d501b9cb934917ac2717cde772f83a9f6fad0daf7f6bb`，父 `fd72a34`。完整A/B一次ND2NZ到L1、完整A留L0A、按N片段完成全K MMAD，复用原direct-batch Vector/ring/credits/grid/workspace；C8/C9逐字保持，无新GM/ABI。
+- [正式任务 6abe5f1e694b590c3cf8ca02](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe5f1e694b590c3cf8ca02) Pass，CANN编译成功、15/15、precision_ratio全1。耗时μs `[2.17,4.04,4.36,5.56,5.37,10.35,9.40,50.15,67.59,97.01,86.89,96.13,15.28,13.00,8.96]`。
+- C7父9.68→9.40，单次约2.9%，尚未形成明显收益，不当新增重大突破；C8/C9未改，不归因变化。无actual shape/plan/SoC/profile或重复A/B，不推断路线命中、稳定差异或瓶颈。
+- CPU86立即/86延迟live MMAD、2592实际原全M/零行消费者、缺last-reader wait负控制通过；fake及固定公开8.3 production/TUNING各3456/432。模型MTE1/Fixpipe同步，没有FP16舍入和全硬件配置时序，不代替设备精度/时间。
+- 无活动任务，源码和证据保留独立分支，不合main；原49.38μs组合保持。资料Git忽略 `artifacts/c7-full-inputs/`；交接 [C7_FULL_INPUTS.md](C7_FULL_INPUTS.md)。下一评估C7专用Vector消费，当前未实现，不重复附近N块参数。

@@ -45,3 +45,16 @@ python3 tools/validate_c7_full_inputs_public_tiler.py --source /private/tmp/asce
 ## Validation Request
 
 独立官方模板 `/private/tmp/bmmms-c7-full-inputs-official/project`，仅kernel替换；dry-run仅kernel/SHA一致。代码 `2dc7f30` 已commit/push，正式任务 **`6abe5f1e694b590c3cf8ca02`** 已创建，CANN9/NPU终态PENDING。查询同一ID至终态，勿重复提交。比较父C7 9.68/C8 49.38/C9 67.48μs，全部15点必须通过；无收益则归档恢复父，不扫描附近N片段参数。actual shape/plan/SoC/profile与重复A/B仍缺失，不据单次时间断言路径命中或稳定幅度。
+
+## 正式结果（提交计划已完成）
+
+[正式任务 6abe5f1e694b590c3cf8ca02](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe5f1e694b590c3cf8ca02) **Pass，CANN编译成功、15/15、precision_ratio全1**，源码SHA保持上文。耗时μs：
+
+```text
+[2.17,4.04,4.36,5.56,5.37,10.35,9.40,50.15,67.59,97.01,86.89,96.13,15.28,13.00,8.96]
+```
+
+C7父9.68→9.40，单次约2.9%，不足以称为明显或稳定收益；C8/C9未改，50.15/67.59的变化不归因本次。没有actual shape/plan/SoC/profile或重复A/B，不能证明正式shape/路线命中，也不能把小差异断言为新结构瓶颈或效果。
+
+保留 `experiment/c7-full-inputs` 作为独立通过实验，不合main，不作为新最佳或重大突破；原49.38μs组合保持。没有活动任务，原始JSON/模型日志在Git忽略 `artifacts/c7-full-inputs/`。
+下一评估新C7专用Vector消费，不再扫N块/双B2参数：闲AIV只返还原credit，活动AIV单C TBuf和行Reduce直接写y。当前未实现，必须验证单UB的V→MTE2复用、GM credit、MTE3 sum复用、唯一writer和全负/尾块。这是另一个待验证的结构假设，没有新增性能承诺。
