@@ -1,5 +1,9 @@
 # 接手状态 · 2026-10-02
 
+## 最新指令：同一通过源码再复测两次
+
+用户要求原样再提交两次。当前宽N任务 `6abea08e694b590c3c1c90f5` 已终态Compile Error（设备kernel第2765行调用host-only std::min），无性能结果。该候选保留本分支、不在复测中修代码。复测采用最近通过的C7实现 `c17077f` / SHA `45234d7945b6013cc75d2e6c3092c911c9c8ecd5618b82a7c51fd7d9084e0c61`，在独立分支保存两次新任务，不能把旧两次历史复测当本次任务。宽N后续需要替换设备std::min后再独立验证；当前没有活动任务。失败原JSON Git忽略 `artifacts/wide-n-manual-frame/compile-error.json`。
+
 ## 当前：宽N手动frame + 跨Nt B预取 + 批量末级Max候选
 
 分支 `experiment/c14-manual-frame`，父 `124658d`，kernel SHA `a52b0436a89ac9d1558760efce3a80715d3cb79bb54f81d0d51175e66bdd4cc1`，340024bytes。仅kernel新增204行/三个区域，删除即逐字恢复父所有源码；MakePlan/grid/原partial与单双Nt宽GM窗口、ready0/free4、其它路线保持。双B1真正预取Nt+2（原FULL_A的BK=K没有跨Nt预取），C0两tile独立释放，32byte入口取消TPL，Vector有效N fold与两个原UB槽，SyncAll后复用C区、Nsplit批量树形Max→有效M Sum。16分片MP64的末级Max API15→4，不作为速度预测。
