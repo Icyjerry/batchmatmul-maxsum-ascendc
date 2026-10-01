@@ -1,5 +1,7 @@
 # Latest: complete tiny K8 excess fold, CPU passed, native PENDING
 
+Official task **`6abec94f694b590c3c2a0c34`** now created, implementation04bee91 pushed; SHA4d03162f unchanged. Next `python3 /private/tmp/query_bmmms_submission.py 6abec94f694b590c3c2a0c34`, only this ID to terminal; native gates PENDING.
+
 Current experiment/tiny-all-k8-fold, kernel360054bytes SHA `4d03162f721a879827d85d8c18c99bd49174cc636acd9b9d8f43567cf3eb29fa`. Scopeinverse entirebaseline1734f16,103addedlines/three regions, no plan/grid/group/GM change. FulltinyK32/40/48/56/64 FF/TF coverage: excessK foldto32, commongroupKtree/repeatedMax. RoundedrawA DMA/cast offsets andhostUB exactK budget fixed forK8non16; inputs immutable/exactvalidN/M. See TINY_ALL_K8_FOLD.
 
 Production/TUNING each10080 hostcontrols,17616 actualentries/121824active/15456idle,5652 encodedFP16/BF16 group1/2/3 entries maxAbs9.54e-7/nonzeroRel2.93e-6, ninefaultcontrols includingmissingnonpowerKtail.120synthetic512KiBentries exercisechunks, notphysicalSoCcapacity. Other7template sources byte-equalbaseline, dry-runkernelSHA checked. NativePENDING/noactivejob yet; next commitpush→onejob/saveID/pollsameID. Parentgroupcandidatepassed15/15 withoutbenefit; if fullK8stillnogain archive this direction/restoreretainedbaseline, no furthervariants. Main/tags unchanged, goalincomplete.

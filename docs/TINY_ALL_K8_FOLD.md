@@ -35,3 +35,5 @@ OneVectorFIFO model is not hardware subpipeline timing; softwareencodedcasts/FP3
 CANN9compile/nativeprecision/NPUlatency PENDING. Commit/push, one formalstructural submission, immediatelysaveID and pollsameID toterminal. Require15/15; retain all15times and adverse observations, compare actual smallcase changes and existingC7/C14/C15 gains against passedbaseline and observedvariation. UnknownSoC/shape/plan/profile/routehit prohibits claims of controlledspeedup or actualscore. Clearlylarge improvement only warrants unchangedconfirmation. If no gain, archive the completed storage-native/K-tree direction without further variants or nearbyparameter scans, restore passed1734f16 and choose a different structure.
 
 Main/historicaltags unchanged; overallsubstantialcompetitiongoal incomplete.
+
+Official task **`6abec94f694b590c3c2a0c34`** created. Implementation `04bee91` pushed, kernel/template SHA4d03162f unchanged. Query this ID to terminal, native gates PENDING; never resubmit on observation timeout.
