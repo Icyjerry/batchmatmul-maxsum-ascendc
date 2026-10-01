@@ -4,6 +4,8 @@
 
 C7原样两次已完成，分支 `experiment/c7-identical-repeats` 保存四次同SHA耗时；C14 12.72–13.26μs/波动4.1%、C7 7.67–8.04μs。继续 `experiment/c14-manual-frame`：首任务 `6abea08e694b590c3c1c90f5` Compile Error，device std::min host-only，已仅用remaining/三元运算替换。新kernel SHA `b0e0b66495df9606156f73f1d4a1399801ab18f203ff0f9458a7051caca4150f`，340070bytes；新增205行结构/范围和CPU全套重跑通过，普通CPU不证明native注解/精度/性能。独立模板其它7源码一致、dry-run核SHA，下一commit/push后创建修复候选一次并立刻存ID查询终态。不要把首Compile Error当活动任务，也不重复通过C7参数扫描。结果见 `docs/WIDE_N_MANUAL_FRAME.md`；main/标签不动。
 
+修复候选正式任务 **`6abea479694b590c3c1e1f2d`** 已创建，代码 `8e6959b` 已push，SHA b0e0b664…保持。下一只查询同ID至终态，观察超时不得重交；首任务Compile Error已终态。
+
 ## 最新指令：同一通过源码再复测两次
 
 用户要求原样再提交两次。当前宽N任务 `6abea08e694b590c3c1c90f5` 已终态Compile Error（设备kernel第2765行调用host-only std::min），无性能结果。该候选保留本分支、不在复测中修代码。复测采用最近通过的C7实现 `c17077f` / SHA `45234d7945b6013cc75d2e6c3092c911c9c8ecd5618b82a7c51fd7d9084e0c61`，在独立分支保存两次新任务，不能把旧两次历史复测当本次任务。宽N后续需要替换设备std::min后再独立验证；当前没有活动任务。失败原JSON Git忽略 `artifacts/wide-n-manual-frame/compile-error.json`。

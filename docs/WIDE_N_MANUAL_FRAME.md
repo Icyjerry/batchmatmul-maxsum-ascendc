@@ -55,3 +55,5 @@ python3 tools/validate_wide_n_manual_frame.py
 修复源码SHA `b0e0b66495df9606156f73f1d4a1399801ab18f203ff0f9458a7051caca4150f`，340070bytes。实际CPU全套重跑：434producer、四Cube负控制、729AIV、八Vector负控制、production/TUNING各4800host/600选中通过，三个区域去除仍逐字恢复父；整数/抽象协议和native注解限制不变。原日志忽略 `artifacts/wide-n-manual-frame/fixed-cpu.log`。
 
 C7新两次复测均Pass，结合四次C14范围12.72–13.26μs、中位13.04、极差/中位数4.1%；更早宽N同代码范围12.61–13.38仍保留。新候选必须15/15且耗时超过波动范围才称明显收益。没有实际shape/plan/SoC/profile，改动与桶对应未知。独立模板只换kernel，dry-run确认新SHA；下一commit/push后仅提交修复版一次，记录ID并查询终态。新的CANN9/NPU精度/性能PENDING，先前错误任务不是PENDING且不得重新查询/重交它。
+
+修复候选正式任务 **`6abea479694b590c3c1e1f2d`** 已创建，代码 `8e6959b` 已push，SHA b0e0b664…保持。下一只查询同ID至终态，观察超时不得重交；首任务Compile Error已终态。
