@@ -1,5 +1,11 @@
 # 接手状态 · 2026-10-01
 
+## 当前候选：队友tiny_dot原生Vector与通过TT/C9组合，CPU完成
+
+当前 `experiment/teammate-tiny-dot`，kernel SHA `7d629cfb0bb821fa8be65cfbb7164f72486f8845882fd974b86aa326cd1168e3`，313296byte。以 `e1b3634` 通过kernel为父，提取用户新 `kernel_tiny_dot.asc` short-dot合并Cast/对齐DMA、单核tiny紧凑参数/手动UB/常量K/稀疏行Sum、K65..256独立batch Vector；保留父整个MakePlan、原GM和C8/C9，TUNING显式pins仍生效。来源SHA `72454276ca665e0dd80d2bea6d972a34270442cad8fd3ccf0bd2a6674d4323e7`；截图不能代替该候选正式结果。详情 [TEAMMATE_TINY_DOT.md](TEAMMATE_TINY_DOT.md)。C9窗口WIP仅归档 `8a69048`，未混入。
+CPU3600实际tiny动态/特化/父对照、5040实际容量允许的小K256、90short-dot及guards/negatives/四layout/typed UB/Gather/延迟DMA通过；production/TUNING各161280实际selector控制/18640选择，缺输出completion/稀疏Sum身份负控制通过。剥除移植块及对应launch适配后整个kernel逐字恢复 `e1b3634`。模型不是FP16/BF16设备编码/完整异步协议/性能证明。CANN编译/15点精度/性能PENDING，无活动任务。
+下一条：commit/push候选，独立原模板only-kernel dry-run SHA一致；CLI一次正式提交，立刻保存ID再查询同一ID到终态。对照父C1..4 2.15/3.97/4.30/5.60、C8 49.38/C9 67.48μs；未改路径波动不归因。原始资料Git忽略 `artifacts/teammate-tiny-dot/`；main和历史标签不动，整体重大目标仍需证据。
+
 ## 新队友tiny_dot输入，C9消费WIP独立保存
 
 用户提供 `2026-10/kernel_tiny_dot.asc`，5455行、CRLF，SHA `72454276ca665e0dd80d2bea6d972a34270442cad8fd3ccf0bd2a6674d4323e7`，截图前几项更快；截图未给kernel SHA/正式ID，需合并后独立正式验证。优先提取tiny/short-dot/K65..256小矩阵原生Vector逻辑，保留已有TT49.38+C9约68组合，不整份覆盖其它大矩阵分支。
