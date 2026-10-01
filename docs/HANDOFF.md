@@ -5,8 +5,8 @@
 分支 `experiment/fullm-storage-layouts`，基于通过TT父版 `b7147a1`；当前kernel SHA `3d2904d008155f2e8be3995b13f1295dfce130aac36ad47fbc0f8a9582bcf5f4`。
 仅kernel算法改动：完整M producer支持TT/TF/FT/FF，新增单C容量选择；在完成父MakePlan最后只转换dual1/20/6→29/30，保留原ring/partial/packed allocation、其它schedule和grid。旧pack区域不使用，没有新GM通路；Vector消费者逐字未改。
 CPU320矩形（A两storage全部65536bit）、2976 producer和9216消费者执行通过；fake/public真实8.3 tiler production/TUNING各8064/5888通过。首次脚本host测试夹具引用不存在字段，已修正，统一脚本exit0，日志 `/private/tmp/bmmms-fullm-storage-cpu.log`。
-官方独立模板dry-run仅kernel.asc/SHA一致，尚未创建正式任务。CANN9编译/NPU精度/性能 PENDING，不能称为已提速。
-下一动作：CLI正式提交一次并记录ID，查询同一任务至终态。详细 [FULLM_STORAGE_LAYOUTS.md](FULLM_STORAGE_LAYOUTS.md)。整体重大提升未达成。
+代码 `d0904f8` 已commit/push；官方独立模板dry-run仅kernel.asc/SHA一致，正式任务 `6abde198694b590c3cb643e2` 已创建。CANN9编译/NPU精度/性能 PENDING，不能称为已提速。
+下一动作：`python3 /private/tmp/query_bmmms_submission.py 6abde198694b590c3cb643e2` 查询同一任务至终态，记录精度及逐点耗时；不要重提。详细 [FULLM_STORAGE_LAYOUTS.md](FULLM_STORAGE_LAYOUTS.md)。整体重大提升未达成。
 
 ## 最新：完整 M TT 转置候选正式通过，第8点单次5.4%改善
 

@@ -47,6 +47,6 @@ full-M模式dual29使用两个C，dual30使用一个C。K panel在baseN256时为
 
 kernel SHA `3d2904d008155f2e8be3995b13f1295dfce130aac36ad47fbc0f8a9582bcf5f4`，271683 bytes。
 独立官方模板 `/private/tmp/bmmms-judge-fullm-storage/project`，dry-run仅kernel.asc且SHA一致。
-CANN9编译、正式精度和性能：PENDING，尚未创建提交。
+代码 `d0904f8` 已推送私有GitHub分支。正式提交 [6abde198694b590c3cb643e2](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abde198694b590c3cb643e2) 已创建；CANN9编译、正式精度和性能 PENDING，查询同一ID至终态。
 通过模型后仅提交这一结构候选一次，记录ID并查询同一任务至终态；没有同设备重复A/B时只报告单次变化。
 如果没有明显收益，保留反例和已通过TT父版，不提交相邻tile参数。整体重大提升仍未达成。
