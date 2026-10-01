@@ -1,11 +1,12 @@
 # 接手状态 · 2026-10-01
 
-## 当前：TT连续tile任务 + A跨N驻留 + 并行末级合并，正式PENDING
+## 当前：TT连续tile任务正式通过，第8点单次改善8.6%
 
 分支 `experiment/tt-contiguous-tiles`，基于通过TT种子 `a05035e`，kernel SHA `65e38bb155af9adb068e87dc90c01face21a7cf024d094c54846c5188e9ca120`。没有并入窄N驻留或NZ-B候选。
 dual33覆盖B1/BF16/TT的1024..2048 M/N/K区间（父dual1/29且容量满足、没有显式pin）：完整tile连续均分；相邻N tile保留同一M的A1；nSplit=nTiles/W1；全部AIV按M块完成N Max合并再Sum，复用原Ns0行头标量。原partial/ring通路，无新GM/flags。长K容量不足时BM128→64，其余容量全部实际查询。
-440实际producer、420旧producer/all65536bit回归、288真实线程barrier/延迟DMA末级模型通过；fake/public固定8.3 tiler production/TUNING各6912计划/720选择/144容量降M通过。详情 [TT_CONTIGUOUS_TILES.md](TT_CONTIGUOUS_TILES.md)。CANN9/NPU精度/latency PENDING，重大提升未达成。
-代码 `32c6b1c` 已commit/push；官方dry-run仅kernel/SHA一致。正式任务 `6abe1a32694b590c3cd3fe15` 已创建，下一动作：`python3 /private/tmp/query_bmmms_submission.py 6abe1a32694b590c3cd3fe15` 同ID查询终态，不因观察超时重提。
+440实际producer、420旧producer/all65536bit回归、288真实线程barrier/延迟DMA末级模型通过；fake/public固定8.3 tiler production/TUNING各6912计划/720选择/144容量降M通过。代码 `32c6b1c` 已push；正式任务 `6abe1a32694b590c3cd3fe15` Pass，CANN编译成功、15/15、precision_ratio全1；第8点TT种子65.29→59.66μs（单次8.6%），query-block69.03→59.66（单次13.6%）。无actual shape/plan/SoC/profile或重复A/B，不声称稳定收益或新路线命中。详情 [TT_CONTIGUOUS_TILES.md](TT_CONTIGUOUS_TILES.md)。没有活动评测任务，重大提升仍未达成。
+源码计数补充：20核M1408/N1025/K1536最忙10→5tiles，但A读取8.65→11.01MB；M1536/N1536/K1536最忙8→8，A14.16→11.01MB，partial18.4→73.7KB。均是实际host/fake tiler任务代理计数，非测量带宽。
+下一动作：保留该通过结构，在独立分支将Vector的同M相邻N tile最大值留在UB，只在切M/区间末尾写一份worker partial。最终M行块只合并真正与它相交的worker区间；复用原partial布局，不能读取未写的worker/M组合。需要实际源码模型覆盖任务边界、唯一writer、未写区域污染和末级并发，再考虑正式验证。
 
 ## 当前：窄 N 完整 K 驻留正式通过，无收益；TT任务波次审查
 

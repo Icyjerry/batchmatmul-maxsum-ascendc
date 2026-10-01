@@ -1,5 +1,12 @@
 # 2026-09-30 · 配对 M / B 面板复用首版
 
+## 2026-10-01 · TT连续tile任务与并行末级合并正式通过
+
+- 代码 `32c6b1c` / SHA `65e38bb155af9adb068e87dc90c01face21a7cf024d094c54846c5188e9ca120`，正式ID `6abe1a32694b590c3cd3fe15` Pass，CANN编译成功、15/15、precision_ratio全1。
+- 耗时 `[2.29,4.22,4.24,5.63,5.33,10.40,9.70,59.66,83.11,96.93,87.29,96.11,15.24,12.75,8.88]` μs。第8点TT种子65.29→59.66（单次8.6%）、query-block69.03→59.66（单次13.6%）；无actual shape/plan/SoC/profile或重复A/B，不声称稳定收益或新路线命中。其它未改路线不归因。
+- 连续完整K tile分配、A跨N驻留、全部AIV按M合并N最大值再求和；原partial/ring区域，无新GM/flags。440实际producer、420旧producer/65536bits、288线程barrier/延迟DMA末级，fake/public真实8.3 tiler production/TUNING各6912/720/144通过。
+- 保留通过结构，下一独立方向同M相邻N最大值留UB，仅写worker/M区间partial并只合并实际相交worker，避免读未写区域。整体重大提升未达成。
+
 ## 2026-10-01 · 窄 N 完整 K 驻留正式通过，无明显收益
 
 - 代码 `7ffb3ff` / SHA `4bf730de204af997b8eca185c2c2ffe72144874f29b4d59e10d33c81dc68672d`，正式ID `6abe0ee6694b590c3ccdd494` Pass，CANN编译成功、15/15、precision_ratio全1。
