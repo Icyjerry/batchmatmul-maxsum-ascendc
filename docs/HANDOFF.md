@@ -1,10 +1,11 @@
 # 接手状态 · 2026-10-01
 
-## 当前：连续NZ B + native完整M A组合候选，正式PENDING
+## 当前：连续NZ B + native完整M A组合正式通过，无明显收益
 
 分支 `experiment/packed-nz-native-a`，kernel SHA `8e1fbca3a87bc380a174fbc01a181da8c5d8f9a7b02294d9d4f5895b5914942c`。只在已通过NZ_B家族接入既有raw-bit A矩形Load3D，保留连续B、原pack屏障/flag12、events、buffers、plan与workspace。
 724实际packed Cube-body执行（C1/C2、完整K/尾块/全负/延迟DMA/资源和事件收支）通过；原ND/新NZ B源码各2016执行和全部65536bit，host各1728/54通过。恢复A分支后kernel与父 `99fc974` 逐字一致。
-代码 `297abe5` 已commit/push，独立官方模板dry-run仅kernel.asc/SHA一致；正式任务 `6abe05cf694b590c3cc88e53` 已创建。下一动作：`python3 /private/tmp/query_bmmms_submission.py 6abe05cf694b590c3cc88e53` 同ID查询终态，不因超时重提。详细 [PACKED_NZ_NATIVE_A.md](PACKED_NZ_NATIVE_A.md)；日志 `/private/tmp/bmmms-packed-nz-native-a-cube.log` 和 `...-pack.log`。CANN9/NPU精度/性能PENDING，整体重大提升未达成。
+代码 `297abe5` 已commit/push，独立官方模板dry-run仅kernel.asc/SHA一致；正式任务 `6abe05cf694b590c3cc88e53` Pass，CANN编译成功、15/15、precision_ratio全1。第12点95.41→97.49μs，没有明显收益。没有活动正式任务；详细 [PACKED_NZ_NATIVE_A.md](PACKED_NZ_NATIVE_A.md)。原始结果本机私有Git忽略 `artifacts/packed-nz-native-a/`。
+正式接口新增证据：C8当前67.19/best_time17.32，C13 16.48/5.21，C7 10.11/3.69，差距大于C12 97.49/85.25。这是接口参考，不保证同设备可达速度或最终评分。下一动作：恢复通过TT代码，优先审查窄N的完整B驻留是否覆盖非对齐N/K；保留既有workspace，不再重复C12加载微调。整体重大提升未达成。
 
 ## 最新：packed-B一次块布局转换正式通过，无明显收益
 
