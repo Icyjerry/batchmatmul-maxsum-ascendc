@@ -517,3 +517,5 @@ Kernel SHA256：`d218864289599e2b39ef09d83cfdde68988908bf9400fa42b5bc9b03031783b
 本机无 NPU。`tools/validate_cpu_model.py` 专用于旧实验；在当前版本应明确退出 NOT APPLICABLE，不能声称通过。若需复现旧结果，在旧分支的独立 checkout 中运行该脚本。
 
 算法改动仍限 `kernel.asc`；不修改 main、CMake、run.sh、golden、正式测试或依赖。workspace 与题面缺失范围见 PROBLEM。截图记录见 PERF_LOG；截图尚未绑定源码 SHA、dtype 和布局。
+
+正式任务 **`6abe82b1694b590c3c0cf647`** 已创建，下一 `python3 /private/tmp/query_bmmms_submission.py 6abe82b1694b590c3c0cf647`，仅查询同一ID到终态，不重交。
