@@ -1,0 +1,40 @@
+void Run(uint32_t M,uint32_t N,uint32_t K,uint32_t workers,bool neg){
+ negativeInput=neg;const uint32_t BM=(M+31)/32*32,BN=128,nt=(N+BN-1)/BN;
+ assert(workers<=nt);Schedule s{1,M,N,K,BM,BN,1,nt,workers,workers,0,0};s.window=2;
+ WideNKernelShape q{M,N,K,BM,BN,nt,workers,workers};
+ std::vector<int16_t>a(M*K),b(N*K);
+ for(uint32_t m=0;m<M;++m)for(uint32_t k=0;k<K;++k)a[m*K+k]=A(0,m,k);
+ for(uint32_t n=0;n<N;++n)for(uint32_t k=0;k<K;++k)b[n*K+k]=B(0,k,n);
+ auto oldA=a,oldB=b;uint64_t copies=0,mmads=0;size_t prefix=(workers*BM+127)/128*128;
+ for(uint32_t w=0;w<workers;++w){
+  st=State{};st.s=s;st.tx1=false;st.tx2=true;AscendC::block=w;AscendC::ranges.clear();
+  uint32_t begin=w*nt/workers,end=(w+1)*nt/workers;
+  size_t base=prefix+size_t(w)*2*BM*BN;
+  for(uint32_t t=begin;t<end;++t)st.expected.push_back({0,0,int64_t(t*BN),M,std::min(BN,N-t*BN),w,base+((t-begin)&1)*BN});
+  std::vector<float> scratch(prefix+size_t(workers)*2*BM*BN+16,1e30f);
+  AscendC::registry={{reinterpret_cast<uintptr_t>(a.data()),{a.size()*2,true}},
+   {reinterpret_cast<uintptr_t>(b.data()),{b.size()*2,false}},
+   {reinterpret_cast<uintptr_t>(scratch.data()),{scratch.size()*4,false}}};
+  bmmms_wide_n_manual_frame<int16_t>(a.data(),b.data(),scratch.data(),nullptr,q);
+  assert(AscendC::dma.empty()&&AscendC::mte1.empty()&&AscendC::mac.empty()&&AscendC::fix.empty()&&AscendC::targets.empty());
+  assert(st.fixes==end-begin&&st.mmads==end-begin&&st.aCopies==1&&st.bCopies==end-begin);
+  assert(st.aLoads==M/16&&st.bLoads==end-begin&&st.aL0==M*K);
+  assert(st.aReads==M*K&&st.bReads==uint64_t(std::min(N,end*BN)-begin*BN)*K);
+  for(auto e:st.events)assert(e.second==0);assert(st.cross[0]==0&&AscendC::ranges.size()==4);
+  for(size_t i=0;i<scratch.size();++i)if(i<base||i>=base+2*BM*BN)assert(scratch[i]==1e30f);
+  for(uint32_t m=0;m<M;++m){float mx=-std::numeric_limits<float>::infinity();
+   for(uint32_t n=begin*BN;n<std::min(N,end*BN);++n){float v=0;for(uint32_t k=0;k<K;++k)v+=float(A(0,m,k))*float(B(0,k,n));mx=std::max(mx,v);}
+   assert(st.maxima.at(std::make_tuple(0,m,w))==mx);if(neg)assert(mx<0);
+  }
+  copies+=st.bCopies;mmads+=st.mmads;
+ }
+ assert(a==oldA&&b==oldB&&copies==nt&&mmads==nt);
+}
+int main(){unsigned count=0;
+ for(uint32_t M:{16u,32u,48u,64u,96u,128u})for(uint32_t N:{128u,144u,272u,400u,512u,784u})
+ for(uint32_t K:{32u,128u,256u})for(bool neg:{false,true}){
+  Run(M,N,K,1,neg);++count;Run(M,N,K,std::min(3u,(N+127)/128),neg);++count;
+ }
+ Run(64,8192,128,16,true);++count;Run(48,4112,192,20,false);++count;
+ std::cout<<count<<" deferred actual producers: two B1 live panels, MTE1/Cube/Fixpipe queues, K complete, paired windows/tails, physical frames and guards PASS\n";
+}

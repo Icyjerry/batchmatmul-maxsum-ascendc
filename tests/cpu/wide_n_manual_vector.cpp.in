@@ -1,0 +1,219 @@
+// Full actual AIV entry, three engines and a real all-AIV threaded barrier.
+// Synthetic Cube and companion credits, integer arithmetic, no native BF16 rounding.
+#include <algorithm>
+#include <array>
+#include <atomic>
+#include <cassert>
+#include <condition_variable>
+#include <cstdint>
+#include <deque>
+#include <functional>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <mutex>
+#include <thread>
+#include <vector>
+#define __aicore__
+#define __gm__
+#define __global__
+#define __schedmode__(x)
+#define __mix__(...)
+using GM_ADDR=void*;
+constexpr int PIPE_MTE2=0,PIPE_V=1,PIPE_MTE3=2,PIPE_ALL=3;
+struct Shape {uint32_t m,n,k,mp,np,nt,ns;};
+float Value(uint32_t m,uint32_t n,bool neg){return neg?-float(1+(m*13+n*23)%127):float((m*17+n*19)%211)-105;}
+struct Barrier {
+ std::mutex lock;std::condition_variable cv;unsigned arrived=0,generation=0,count;
+ explicit Barrier(unsigned n):count(n){}
+ void Wait(){std::unique_lock<std::mutex> l(lock);auto old=generation;
+  if(++arrived==count){arrived=0;++generation;cv.notify_all();}else cv.wait(l,[&]{return generation!=old;});}
+};
+struct Shared {
+ Shape s;std::vector<float> scratch,output;std::unique_ptr<std::atomic<int>[]> written;
+ Barrier barrier;std::atomic<int> yWrites{0};bool neg;
+ explicit Shared(Shape q,bool n):s(q),scratch((q.ns*q.mp+127)/128*128+q.ns*2*q.mp*q.np+16,1e30f),output(17,1e30f),
+  written(new std::atomic<int>[q.ns*q.mp]),barrier(q.ns*2),neg(n){for(uint32_t i=0;i<q.ns*q.mp;++i)written[i]=0;}
+} *shared;
+struct Command {std::function<bool()> ready;std::function<void()> run;};
+struct State {
+ uint32_t block=0,mode=0,issued=0,copies=0,primes=0,releases=0,allocs=0;bool synced=false;
+ int credit=0;std::array<std::array<int,2>,4> events{};
+ std::array<std::deque<Command>,3> queues;
+ std::vector<float> ub=std::vector<float>(192*1024/4,1e30f),ring;
+ std::vector<int> gen=std::vector<int>(192*1024/4,-9);int ringGen=-9;
+ std::vector<std::pair<size_t,size_t>> ranges;
+ void Push(int engine,std::function<void()> f){queues[engine].push_back({[]{return true;},f});}
+ void Drain(){
+  std::array<std::array<int,3>,3> orders={{{0,1,2},{1,2,0},{2,0,1}}};
+  while(!queues[0].empty()||!queues[1].empty()||!queues[2].empty()){
+   bool advance=false;for(int engine:orders.at(mode))if(!queues[engine].empty()&&queues[engine].front().ready()){
+    auto c=queues[engine].front();queues[engine].pop_front();c.run();advance=true;break;}
+   assert(advance&&"missing dependency/cross-engine deadlock");
+  }
+ }
+};
+thread_local State st;
+namespace AscendC {
+enum class TPosition{VECIN,VECCALC,VECOUT};
+enum class HardEvent{V_MTE2,MTE2_V,V_MTE3,MTE3_V,MTE1_MTE2,MTE2_MTE1};
+enum class ReduceOrder{ORDER_ONLY_VALUE};
+struct Nd2NzParams {uint32_t ndNum,nValue,dValue,srcDValue,dstNzC0Stride,dstNzNStride;};
+struct BinaryRepeatParams{uint32_t dstBlk,src0Blk,src1Blk,dstRep,src0Rep,src1Rep;};
+uint32_t GetBlockIdx(){return st.block;}
+void SetAtomicNone(){}void SetMaskNorm(){}void ResetMask(){}
+template<class T>struct LocalTensor {
+ size_t offset=0,length=0;TPosition pos=TPosition::VECCALC;
+ LocalTensor()=default;
+ LocalTensor(TPosition p,size_t bytes,size_t elems):offset(bytes/4),length(elems),pos(p){
+  assert(bytes%32==0&&bytes+elems*4<=192*1024);bool reused=st.synced&&bytes==0&&p==TPosition::VECCALC;
+  if(reused)assert(elems==shared->s.ns*shared->s.mp&&elems<=2*shared->s.mp*shared->s.np);
+  else {for(auto r:st.ranges)assert(bytes+elems*4<=r.first||bytes>=r.second);st.ranges.push_back({bytes,bytes+elems*4});++st.allocs;}
+ }
+ LocalTensor operator[](size_t i)const{assert(i<length);auto t=*this;t.offset+=i;t.length-=i;return t;}
+ float& At(size_t i)const{assert(i<length);return st.ub.at(offset+i);}
+ int& Gen(size_t i)const{assert(i<length);return st.gen.at(offset+i);}
+};
+template<class T>struct GlobalTensor {
+ enum Kind{PARTS,RING,OUT};Kind kind=PARTS;size_t offset=0;
+ void SetGlobalBuffer(T* p){
+  if(p==shared->output.data()){kind=OUT;offset=0;return;}
+  auto base=reinterpret_cast<uintptr_t>(shared->scratch.data()),ptr=reinterpret_cast<uintptr_t>(p);
+  assert(ptr>=base&&ptr<base+shared->scratch.size()*4);offset=(ptr-base)/4;
+  if(offset){kind=RING;auto& s=shared->s;size_t expected=(s.ns*s.mp+127)/128*128+(st.block/2)*2*s.mp*s.np;assert(offset==expected);offset=0;}
+  else kind=PARTS;
+ }
+ GlobalTensor operator[](size_t i)const{auto t=*this;t.offset+=i;return t;}
+ T& At(size_t i)const{
+  if(kind==OUT){assert(offset+i<1);return shared->output.at(offset+i);}
+  if(kind==RING)return st.ring.at(offset+i);
+  assert(offset+i<shared->s.ns*shared->s.mp);return shared->scratch.at(offset+i);
+ }
+};
+template<HardEvent E>void SetFlag(int id){
+ assert(id>=0&&id<2);int from=E==HardEvent::V_MTE2||E==HardEvent::V_MTE3?PIPE_V:E==HardEvent::MTE2_V?PIPE_MTE2:PIPE_MTE3;
+ st.Push(from,[=]{assert(st.events[int(E)][id]++==0);});
+}
+template<HardEvent E>void WaitFlag(int id){
+ assert(id>=0&&id<2);int to=E==HardEvent::V_MTE2?PIPE_MTE2:E==HardEvent::V_MTE3?PIPE_MTE3:PIPE_V;
+ st.queues[to].push_back({[=]{return st.events[int(E)][id]>0;},[=]{--st.events[int(E)][id];}});
+}
+template<int P>void PipeBarrier(){if(P==PIPE_ALL)st.Drain();else assert(P==PIPE_V);}
+template<int Mode,int Pipe>void CrossCoreSetFlag(int flag){
+ assert(Mode==2&&Pipe==PIPE_MTE2&&flag==4);bool prime=st.primes==0;
+ if(prime){assert(st.issued==0);++st.primes;}else ++st.releases;
+ st.Push(PIPE_MTE2,[=]{assert(st.credit++==0);if(!prime){std::fill(st.ring.begin(),st.ring.end(),1e30f);st.ringGen=-7;}});
+}
+template<int Mode>void CrossCoreWaitFlag(int flag){
+ assert(Mode==2&&flag==0);auto s=shared->s;uint32_t worker=st.block/2;
+ uint32_t begin=worker*s.nt/s.ns,end=(worker+1)*s.nt/s.ns,nt=begin+2*st.issued;
+ assert(nt<end);int gen=st.issued++;
+ st.Push(PIPE_MTE2,[=]{
+  assert(st.credit--==1);std::fill(st.ring.begin(),st.ring.end(),1e30f);st.ringGen=gen;
+  uint32_t cols=std::min(s.n-nt*s.np,std::min(2u,end-nt)*s.np);
+  for(uint32_t r=0;r<s.m;++r)for(uint32_t n=0;n<cols;++n)st.ring[r*2*s.np+n]=Value(r,nt*s.np+n,shared->neg);
+ });
+}
+struct DataCopyExtParams{uint16_t blockCount;uint32_t blockLen,srcStride,dstStride,reserved;};
+template<class T>struct DataCopyPadExtParams{bool pad;uint32_t left,right;T value;};
+void DataCopyPad(LocalTensor<float> dst,GlobalTensor<float> src,DataCopyExtParams p,DataCopyPadExtParams<float> pad){
+ auto s=shared->s;uint32_t sub=st.block%2,start=sub*(s.mp/2),rows=start>=s.m?0:std::min(s.m-start,s.mp/2);
+ uint32_t worker=st.block/2,begin=worker*s.nt/s.ns,end=(worker+1)*s.nt/s.ns,nt=begin+2*(st.issued-1);
+ uint32_t cols=std::min(s.n-nt*s.np,std::min(2u,end-nt)*s.np),width=2*s.np;int gen=st.issued-1;
+ assert(src.kind==GlobalTensor<float>::RING&&src.offset==start*width&&!pad.pad);
+ assert(p.blockCount==rows&&p.blockLen==cols*4&&p.srcStride==(width-cols)*4&&p.dstStride==(width-cols)/8);
+ assert(dst.offset==size_t(gen&1)*s.mp*s.np);++st.copies;
+ st.Push(PIPE_MTE2,[=]{assert(st.ringGen==gen&&"GM released before last DMA");
+  for(uint32_t r=0;r<rows;++r)for(uint32_t c=0;c<cols;++c){dst.At(r*width+c)=src.At(r*width+c);dst.Gen(r*width+c)=gen;}
+ });
+}
+template<class T>void DataCopy(LocalTensor<T>,GlobalTensor<T>,Nd2NzParams){assert(false);}
+void DataCopy(GlobalTensor<float> dst,LocalTensor<float> src,uint32_t count){
+ auto s=shared->s;uint32_t worker=st.block/2,sub=st.block%2;
+ assert(dst.kind==GlobalTensor<float>::PARTS&&dst.offset==worker*s.mp+sub*s.mp/2&&count==s.mp/2);
+ st.Push(PIPE_MTE3,[=]{for(uint32_t i=0;i<count;++i){assert(src.Gen(i)>=0&&"partial read before V completion");
+  dst.At(i)=src.At(i);assert(shared->written[dst.offset+i].fetch_add(1,std::memory_order_release)==0);}});
+}
+void DataCopy(LocalTensor<float> dst,GlobalTensor<float> src,uint32_t count){
+ assert(st.synced&&st.block==0&&src.kind==GlobalTensor<float>::PARTS&&src.offset==0&&count==shared->s.ns*shared->s.mp);
+ st.Push(PIPE_MTE2,[=]{for(uint32_t i=0;i<count;++i){assert(shared->written[i].load(std::memory_order_acquire)==1);dst.At(i)=src.At(i);dst.Gen(i)=777;}});
+}
+void DataCopyPad(GlobalTensor<float> dst,LocalTensor<float> src,DataCopyExtParams p){
+ assert(st.block==0&&dst.kind==GlobalTensor<float>::OUT&&dst.offset==0&&p.blockCount==1&&p.blockLen==4&&!p.srcStride&&!p.dstStride);
+ st.Push(PIPE_MTE3,[=]{assert(src.Gen(0)==777&&"y read before reduction");dst.At(0)=src.At(0);assert(shared->yWrites.fetch_add(1)==0);});
+}
+void Duplicate(LocalTensor<float> dst,float v,uint32_t count){st.Push(PIPE_V,[=]{for(uint32_t i=0;i<count;++i){dst.At(i)=v;dst.Gen(i)=0;}});}
+void Max(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint64_t mask,uint32_t reps,BinaryRepeatParams p){
+ assert(mask>=1&&mask<=64&&reps<=255&&p.dstBlk==1&&p.src0Blk==1&&p.src1Blk==1);
+ int gen=st.synced?777:int(st.issued-1);bool final=st.synced;
+ st.Push(PIPE_V,[=]{for(uint32_t r=0;r<reps;++r)for(uint32_t i=0;i<mask;++i){
+  assert(a.Gen(r*p.src0Rep*8+i)==gen&&b.Gen(r*p.src1Rep*8+i)==gen&&"live C/merge input overwritten or not ready");
+  dst.At(r*p.dstRep*8+i)=std::max(a.At(r*p.src0Rep*8+i),b.At(r*p.src1Rep*8+i));dst.Gen(r*p.dstRep*8+i)=gen;
+ }});
+}
+void Max(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint32_t count){
+ int gen=st.synced?777:int(st.issued-1);bool final=st.synced;
+ st.Push(PIPE_V,[=]{for(uint32_t i=0;i<count;++i){assert(a.Gen(i)>=0&&b.Gen(i)==gen);if(final)assert(a.Gen(i)==777);
+  dst.At(i)=std::max(a.At(i),b.At(i));dst.Gen(i)=gen;}});
+}
+void WholeReduceMax(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,uint32_t reps,uint32_t ds,uint32_t bs,uint32_t rs,ReduceOrder){
+ assert(mask>=1&&mask<=64&&reps<=64&&ds==1&&bs==1&&rs==2*shared->s.np/8);int gen=st.issued-1;
+ st.Push(PIPE_V,[=]{for(uint32_t r=0;r<reps;++r){float mx=-std::numeric_limits<float>::infinity();
+  for(uint32_t i=0;i<mask;++i){assert(src.Gen(r*rs*8+i)==gen&&"C read before DMA or after reuse");mx=std::max(mx,src.At(r*rs*8+i));}
+  dst.At(r)=mx;dst.Gen(r)=gen;
+ }});
+}
+void WholeReduceSum(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,uint32_t reps,uint32_t ds,uint32_t bs,uint32_t rs){
+ assert(st.synced&&mask>=1&&mask<=64&&reps==1&&ds==1&&bs==1&&rs==1);
+ st.Push(PIPE_V,[=]{float total=0;for(uint32_t i=0;i<mask;++i){assert(src.Gen(i)==777);total+=src.At(i);}dst.At(0)=total;dst.Gen(0)=777;});
+}
+void Add(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint64_t mask,uint32_t reps,BinaryRepeatParams){
+ assert(st.synced&&mask==1&&reps==1);st.Push(PIPE_V,[=]{assert(a.Gen(0)==777&&b.Gen(0)==777);dst.At(0)=a.At(0)+b.At(0);dst.Gen(0)=777;});
+}
+template<bool OnlyVector>void SyncAll(){
+ assert(OnlyVector);st.Drain();for(auto e:st.events)for(int v:e)assert(v==0);
+ shared->barrier.Wait();st.synced=true;
+}
+}
+template<AscendC::HardEvent E>void Fence(){assert(false);}
+// INSERT_KERNEL
+void Run(uint32_t M,uint32_t N,uint32_t K,uint32_t ns,bool neg,uint32_t mode){
+ uint32_t MP=(M+31)/32*32,NP=128,nt=(N+127)/128;assert(ns<=nt);
+ Shape q{M,N,K,MP,NP,nt,ns};Shared data(q,neg);shared=&data;
+ WideNKernelShape s{M,N,K,MP,NP,nt,ns,ns};std::vector<std::thread> threads;
+ for(uint32_t id=0;id<2*ns;++id)threads.emplace_back([&,id]{
+  st=State{};st.block=id;st.mode=mode;st.ring.resize(2*MP*NP,1e30f);
+  bmmms_wide_n_manual_frame<int16_t>(nullptr,nullptr,data.scratch.data(),data.output.data(),s);
+  for(auto& engine:st.queues)assert(engine.empty());
+  for(auto e:st.events)for(int v:e)assert(v==0);
+  uint32_t begin=(id/2)*nt/ns,end=(id/2+1)*nt/ns,windows=(end-begin+1)/2;
+  bool rows=(id%2)*(MP/2)<M;
+  assert(st.issued==windows&&st.primes==1&&st.credit==1&&st.releases==windows);
+  assert(st.copies==(rows?windows:0)&&st.allocs==4);
+ });
+ for(auto& t:threads)t.join();assert(data.yWrites.load()==1);
+ float total=0;
+ for(uint32_t m=0;m<M;++m){float mx=-std::numeric_limits<float>::infinity();
+  for(uint32_t n=0;n<N;++n)mx=std::max(mx,Value(m,n,neg));if(neg)assert(mx<0);total+=mx;
+ }
+ assert(data.output[0]==total);
+ for(uint32_t w=0;w<ns;++w){uint32_t begin=w*nt/ns,end=(w+1)*nt/ns;
+  for(uint32_t m=0;m<MP;++m){float mx=-std::numeric_limits<float>::infinity();
+   if(m<M)for(uint32_t n=begin*NP;n<std::min(N,end*NP);++n)mx=std::max(mx,Value(m,n,neg));
+   assert(data.scratch[w*MP+m]==mx&&data.written[w*MP+m]==1);
+  }
+ }
+ size_t prefix=(ns*MP+127)/128*128;for(size_t i=ns*MP;i<data.scratch.size();++i)assert(data.scratch[i]==1e30f);
+ for(uint32_t i=1;i<data.output.size();++i)assert(data.output[i]==1e30f);
+}
+int main(){unsigned count=0;
+ for(uint32_t M:{16u,32u,48u,64u,80u,96u,112u,128u})for(uint32_t N:{80u,112u,144u,400u,592u,784u})
+ for(uint32_t ns:{1u,2u,3u,5u})if(ns<=(N+127)/128)for(bool neg:{false,true})for(uint32_t mode:{0u,1u,2u}){
+  Run(M,N,128,ns,neg,mode);++count;
+ }
+ for(uint32_t ns:{8u,16u,20u,32u})for(bool neg:{false,true}){
+  Run(64,8192,128,ns,neg,ns%3);++count;
+ }
+ Run(48,4112,192,20,true,1);++count;
+ std::cout<<count<<" queued actual AIV entries: destructive GM/C slot reuse, all-AIV barrier/partial ownership, batched odd split merge, exact Max/Sum/y/guards PASS\n";
+}

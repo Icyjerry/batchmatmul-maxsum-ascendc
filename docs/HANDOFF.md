@@ -1,5 +1,11 @@
 # 接手状态 · 2026-10-02
 
+## 当前：宽N手动frame + 跨Nt B预取 + 批量末级Max候选
+
+分支 `experiment/c14-manual-frame`，父 `124658d`，kernel SHA `a52b0436a89ac9d1558760efce3a80715d3cb79bb54f81d0d51175e66bdd4cc1`，340024bytes。仅kernel新增204行/三个区域，删除即逐字恢复父所有源码；MakePlan/grid/原partial与单双Nt宽GM窗口、ready0/free4、其它路线保持。双B1真正预取Nt+2（原FULL_A的BK=K没有跨Nt预取），C0两tile独立释放，32byte入口取消TPL，Vector有效N fold与两个原UB槽，SyncAll后复用C区、Nsplit批量树形Max→有效M Sum。16分片MP64的末级Max API15→4，不作为速度预测。
+434延迟MTE2/MTE1/MMAD/Fixpipe真实producer、729真实AIV/三引擎/全AIV线程barrier、四Cube/八Vector负控制、production/TUNING各4800 host/600选择，整数CPU不是BF16/native硬件证明。API900静态正文已取到，确认无workspace硬同步和batchmode；内部安装9.0 header未取得，无TPL native行为仍待正式编译/运行。文档详见 `docs/WIDE_N_MANUAL_FRAME.md`。
+下一：全CPU最终SHA完成，官方独立模板仅换kernel/其它8文件一致、dry-run核SHA，commit/push后一次提交存ID查询终态；不能观察超时重交。父C14 13.15/13.26及历史同代码12.61–13.38为参考，C7约7.9–8.0保持；若小于波动差距不叫突破。CANN9/NPU精度/时间PENDING，目前无新官方任务。原通过C7分支保留，main/标签不动；无新GM通路，未混入旧失败ragged覆盖或near-tile扫描。
+
 ## 最新通过父版：C7两次8.00/7.88 μs，均15/15
 
 当前 `experiment/c7-manual-frame`，实现 `c17077f`，kernel SHA `45234d7945b6013cc75d2e6c3092c911c9c8ecd5618b82a7c51fd7d9084e0c61`，329378bytes；首测 `6abe9804694b590c3c18f362`、原样确认 `6abe98e5694b590c3c195fc5` 均Pass、CANN编译成功、15/15，precision_ratio全1。
