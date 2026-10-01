@@ -37,3 +37,11 @@ CANN9compile/nativeprecision/NPUlatency PENDING. Commit/push, one formalstructur
 Main/historicaltags unchanged; overallsubstantialcompetitiongoal incomplete.
 
 Official task **`6abec94f694b590c3c2a0c34`** created. Implementation `04bee91` pushed, kernel/template SHA4d03162f unchanged. Query this ID to terminal, native gates PENDING; never resubmit on observation timeout.
+
+## Official terminal: Pass15/15, clear C2 regression
+
+Task `6abec94f694b590c3c2a0c34`, implementation04bee91, SHA4d03162f: CANN compile successful,15/15Pass, precision_ratio all1. Timesus `[1.97,4.39,3.23,4.02,5.23,9.79,7.83,47.07,67.91,97.87,88.58,97.45,15.91,10.76,9.54]`. C2=4.39 vs passedbaseline2.46, a large unfavorable observation. K32/64 groupcandidate was2.57; adding nonpowerK coverage did not produce the intended gain. Without actual shapes/plan/SoC/profile this does not independently establish exact formalK, route or measured bottleneck. C7/C14 changes are on source-identical routes and not attributed to this experiment.
+
+Archive this complete structural direction; no unchanged repeat, further storage-native/broadcast/K-tree variants or nearbyparameter scans. Restore passedbaseline1734f16/a5eef105 for the next independent work. Expanded broadcast/product movement and paddedN arithmetic are possible costs, not measured profiling explanations. Official15Pass establishes those samples, not full supported nativefloat/dependency coverage. RawJSON ignored artifacts/tiny-all-k8-fold/official.json (600); no activeofficialtask. Main/tags unchanged, overallmajorcompetitiongoal remains incomplete.
+
+Next structure audit: examine the retained TT producer's ND-to-NZ transfer granularity versus usefulinput bytes and ManualTransposeFullM/Load3D pipeline on historical conditional M/N/K ranges. First compare archived fullMNpair/nativeNZ/ragged-resident failures, extract actual plan/resource counts with real header or existingfake-tiler model clearly labeled, then choose a structure genuinely absent from those experiments. Current TT already owns fullA1 residency, crossNt Bpackage streaming, doubleL0 and a single finalbarrier; do not propose them again or infer hidden routes from bucket numbers. No next algorithm implemented yet.

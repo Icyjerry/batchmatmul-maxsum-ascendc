@@ -1,5 +1,7 @@
 # Latest: complete tiny K8 excess fold, CPU passed, native PENDING
 
+Terminal6abec94f694b590c3c2a0c34: CANN compiled15/15Pass/allprecision1; C2=4.39vsbaseline2.46, clearunfavorable observation. Full15times in TINY_ALL_K8_FOLD. Archive allstorage-native/Brcb/Ktree variants, no furtherrepeat/nearby tuning. Restore baseline1734f16/a5eef105; next TT ND2NZ/Load3D granularity audit after reviewing oldfullMNpair/nativeNZ/ragged failures, no nextalgorithm yet. No activejob. Main/tags unchanged, overallgoal incomplete.
+
 Official task **`6abec94f694b590c3c2a0c34`** now created, implementation04bee91 pushed; SHA4d03162f unchanged. Next `python3 /private/tmp/query_bmmms_submission.py 6abec94f694b590c3c2a0c34`, only this ID to terminal; native gates PENDING.
 
 Current experiment/tiny-all-k8-fold, kernel360054bytes SHA `4d03162f721a879827d85d8c18c99bd49174cc636acd9b9d8f43567cf3eb29fa`. Scopeinverse entirebaseline1734f16,103addedlines/three regions, no plan/grid/group/GM change. FulltinyK32/40/48/56/64 FF/TF coverage: excessK foldto32, commongroupKtree/repeatedMax. RoundedrawA DMA/cast offsets andhostUB exactK budget fixed forK8non16; inputs immutable/exactvalidN/M. See TINY_ALL_K8_FOLD.

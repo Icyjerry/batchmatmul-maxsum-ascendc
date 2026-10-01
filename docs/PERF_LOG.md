@@ -1,6 +1,8 @@
 
 ## 2026-10-02: complete tiny K8 fold, native PENDING
 
+Terminal6abec94f694b590c3c2a0c34 /04bee91 /SHA4d03162f: CANNcompiled15/15Pass/allprecision1. Timesus `[1.97,4.39,3.23,4.02,5.23,9.79,7.83,47.07,67.91,97.87,88.58,97.45,15.91,10.76,9.54]`. C2regression4.39vsbaseline2.46; no overallgain. Does not identifyactualK/route/profile. Archive fullstorage-native/Brcb/Ktree direction, restore1734f16, no repeats/variants/parameter scan. NewTTproducergranularity audit notyetimplemented; existingfullA/Bpackages/doubleL0/singlebarrier alreadyretained. Rawignored artifacts/tiny-all-k8-fold/official.json; noactivejob, main/tags unchanged, goalincomplete.
+
 SHA4d03162f721a879827d85d8c18c99bd49174cc636acd9b9d8f43567cf3eb29fa/kernel360054bytes, baseline1734f16 plus103lines/three regions; no plan/group/grid/GM change. Adds K40/48/56 excess-to32 fold to batchKtree, exactrawA roundup/DMA/sharedCast offsets. MotivationconditionalhistoricalK32–56, notactualroutehit. Completesalgorithmcoverage, nottile scan.
 
 Production/TUNING each10080 hostcontrols,17616 actualintegerentries (120synthetic512KiB chunkboundaries),5652encodedFP16/BF16 group1/2/3 entries/FP64golden maxAbs9.54e-7/nonzeroRel2.93e-6, ninefaultcontrols includingnonpowerKtail. OneFIFO/softwarecasts notnative. Officialtemplateother7sources baseline/dryrunkernelSHA checked. NativePENDING/nojob yet; onecommitpush/submit/saveID/pollsameID. Clearlargegainonlyconfirm, ifnogain archive fullstorage-nativeKtree direction/restoreretainedbaseline; no furthervariants. See TINY_ALL_K8_FOLD. Goalincomplete/main/tags unchanged.
