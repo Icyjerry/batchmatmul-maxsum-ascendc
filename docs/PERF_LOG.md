@@ -1,4 +1,10 @@
 
+## 2026-10-02: group-wide tiny K tree, native PENDING
+
+SHAeeef7efc6189e9da80cbe9fae60901b51f7c73e4edc7806b4adbc23532218029/kernel359932bytes; baseline1734f16 plus102lines/threeaddedregions. Previous per-row storage-vector native15Pass but no benefit; this changes scratch to[K,ar,pitchN], all-queryBrcb and commonKtree/repeatedMax. ExampleB1M8N64K64: sourceAdd48→7, Kbarriers48→6, Brcb8→1, Max8→1, Mul8 unchanged. Expandedmemory/stridedwrites may offset this; no latency prediction. No plan/group/grid/GM change; realUB/uint8stride fallback.
+
+Production/TUNING each10080 hostcontrols,7200 actualqueued integerentries (48synthetic512KiB boundaryentries),2292 encodedFP16/BF16/group1/2/3 entries, maxAbs9.54e-7/maxNonzeroRel2.93e-6 againstFP64golden, eightnegativecontrols. OneVectorFIFO/softwarecasts notnativehardware/precision. Templateother7sources parent/dry-runkernelSHA checked. CANN9/NPU gates PENDING; no activeformaljob yet; commitpush then one structural submission, ID/pollsameID. See TINY_GROUP_K_TREE. No small-gain parameter scan, main/tags unchanged, goalincomplete.
+
 ## 2026-10-02: storage-native tiny structural candidate, native PENDING
 
 Terminal task6abec499694b590c3c288b4a / code155fbd9 / SHA19cd486e: CANN compile successful,15/15Pass/allprecision1. Timesus `[1.96,2.54,3.16,4.09,5.44,9.85,8.11,45.99,67.78,96.58,88.63,96.92,15.76,11.04,9.30]`. C2/C3 no major benefit vsparent2.46/3.11; TT C8 source-identical45.99vs46.52 only1.1%, no tiny attribution. Archive without repeats/parameter scan; next independently validate group-wide K tree reducing per-M Vector calls. UnknownSoC/shapes/plans/profile; native15sample scope only. RawJSONignored artifacts/tiny-storage-vector/official.json, no activejob, goal incomplete.

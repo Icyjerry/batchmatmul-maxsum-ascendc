@@ -1,3 +1,9 @@
+# Latest: group-wide tiny K tree, CPU passed, native PENDING
+
+Current `experiment/tiny-group-ktree`, baseline kernel1734f16 with102addedlines/three regions; kernel359932bytes SHA `eeef7efc6189e9da80cbe9fae60901b51f7c73e4edc7806b4adbc23532218029`. Uses[K,ar,pitchN] products, batchedBrcb and one whole-group FP32Ktree/repeatedMax; no plan/grid/group/GM changes. ExpandedUB and uint8dststride guarded, unsupported frames retain baseline; oldrawtranspose absent. See TINY_GROUP_K_TREE.
+
+Production/TUNING each10080 hostcontrols,7200 actualentries/49344active/6336idle,2292 encodedFP16/BF16 group1/2/3 entries/FP64golden maxAbs9.54e-7/nonzeroRel2.93e-6, eightnegativecontrols passed.48 actualentries use synthetic512KiBUB to exercise repeat/chunk boundaries (not realSoC capacity). Script temporary-directory indentation mistake fixed, fullmodel passed; oneFIFO nothardware. Independentofficialtemplate other7sources parent, dry-run kernelonly sameSHA. Next commit/push, oneformaljob saveID/pollsameID. No activejob yet. Prior155fbd9 task6abec499694b590c3c288b4a passed15/15 but no major benefit; archivecec9a1b, no repeat. Main/tags unchanged, goalincomplete.
+
 # Latest: storage-native tiny broadcast/K-tree candidate, CPU passed, native PENDING
 
 Terminal `6abec499694b590c3c288b4a`: CANN compiled,15/15Pass, precision_ratio all1. C2=2.54vsparent2.46, C3=3.16vs3.11; no major gain. Full times in TINY_STORAGE_VECTOR, raw ignored artifacts/tiny-storage-vector/official.json. Archive source155fbd9 / SHA19cd486e, no repeats/nearby parameter scans. No activejob. Next start from passed1734f16 and study group-wide[K,ar,pitchN] scratch/batchedBrcb/Ktree/Max; reduce per-M barriers/calls, prove newUB/stride bounds. Overallgoal incomplete.

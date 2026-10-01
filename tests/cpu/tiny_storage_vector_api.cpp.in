@@ -11,7 +11,7 @@ struct BrcbRepeatParams {uint16_t dstBlkStride=1;uint8_t dstRepStride=8;};
 unsigned brcbs=0;
 template<class T>struct LocalTensor;
 template<class T>void Brcb(LocalTensor<T> dst,LocalTensor<T> src,uint8_t repeats,BrcbRepeatParams p){
- static_assert(sizeof(T)==4);assert(repeats==4||repeats==8);
+ static_assert(sizeof(T)==4);assert(repeats>0&&repeats<=255);
  assert(p.dstBlkStride==1&&p.dstRepStride==8&&dst.offset%32==0&&src.offset%32==0);
  assert(dst.offset+repeats*64*4<=src.offset||src.offset+repeats*8*4<=dst.offset);++brcbs;
  Push(1,[=]{for(unsigned r=0;r<repeats;++r)for(unsigned i=0;i<8;++i)for(unsigned j=0;j<8;++j)

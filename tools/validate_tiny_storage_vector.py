@@ -69,6 +69,7 @@ template<HardEvent E>void WaitFlag(int id){
  f=f.replace('a.read(r*p.src0Rep*8+i)*b.read(r*p.src1Rep*8+i)','a.read(r*p.src0Rep*8+(i/8)*p.src0Blk*8+i%8)*b.read(r*p.src1Rep*8+i)')
  f=f.replace('for(unsigned i=0;i<n;++i)dst.write(i,float(src.read(i)));',
   'for(unsigned i=0;i<n;++i){if(!canonicalExpected.empty()){assert(canonicalExpected.size()==n&&src.read(i)==canonicalExpected[i]);}dst.write(i,Decode(src.read(i)));}')
+ f=f.replace('void Add(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint32_t n){Push(1,[=]{','void Add(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint32_t n){Push(1,[=]{assert(n<=255*64);')
  # Keep the unmodified passed TinyCompute as an independent same-order reference.
  kernels=span(s,'struct TinyKernelShape','template<typename T>\n__aicore__ inline void DotGroupCopy(')
  stub=(ROOT/'tests/cpu/planner_stub.hpp').read_text()
@@ -98,8 +99,9 @@ def main():
    ('batch-offset','        output=(GM_ADDR)(reinterpret_cast<__gm__ float*>(output)+b0);')]:
    bad=c.replace(line,'');assert bad!=c;run('no-'+name,bad,True)
   bad=c.replace('for(uint32_t step=k/2;step;step/=2)','for(uint32_t step=k/4;step;step/=2)');assert bad!=c;run('incomplete-K',bad,True)
-  bad=c.replace('uint64_t(s.n),1,8,1,stride','uint64_t(pitch),1,8,1,stride');assert bad!=c;run('no-N-mask',bad,True)
-  bad=c.replace('const AscendC::BinaryRepeatParams rp{1,0,1,stride,1,stride};','const AscendC::BinaryRepeatParams rp{1,1,1,stride,1,stride};');assert bad!=c;run('wrong-broadcast',bad,True)
- print('Seven input/output/terminal/batch/K-tree/N-tail/broadcast controls rejected PASS')
+  bad=c.replace('uint64_t(s.n),static_cast<uint8_t>(ar),8,1,stride','uint64_t(pitch),static_cast<uint8_t>(ar),8,1,stride');assert bad!=c;run('no-N-mask',bad,True)
+  bad=c.replace('const AscendC::BinaryRepeatParams rp{1,0,1,static_cast<uint8_t>(ar*stride),1,stride};','const AscendC::BinaryRepeatParams rp{1,1,1,static_cast<uint8_t>(ar*stride),1,stride};');assert bad!=c;run('wrong-broadcast',bad,True)
+  bad=c.replace('static_cast<uint8_t>(ar*stride),1,stride','stride,1,stride');assert bad!=c;run('wrong-K-stride',bad,True)
+ print('Eight input/output/terminal/batch/K-tree/N-tail/broadcast/group-stride controls rejected PASS')
  print('CANN9 compile/native precision/NPU timing PENDING; queued CPU model is not a hardware emulator.')
 if __name__=='__main__':main()
