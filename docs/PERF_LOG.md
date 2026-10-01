@@ -1,5 +1,14 @@
 # 2026-09-30 · 配对 M / B 面板复用首版
 
+## 2026-10-01 · 完整 M TT 矩形转置正式通过
+
+- 代码 `d2eeb78` / SHA `f0b3908378015b9a98fb5eed58337dd7556737e5ae18b79d1e25c19b497a1b09`；正式ID `6abdd9e6694b590c3cb2e3a9` Pass，15/15、precision_ratio全1，CANN编译成功。
+- 耗时 `[2.26,4.50,4.34,5.62,5.47,10.97,9.51,65.29,83.05,97.21,87.04,95.41,15.28,12.69,9.10]` μs。第8点query-block69.03→65.29（单次约5.4%）、宽窗67.44→65.29；无actual shape/plan/profile及重复A/B，不声称稳定大幅收益或路由命中。
+- 一次完整M MMAD、一次A矩形transpose、一次完整M Fixpipe替代两半M/逐M16发起；手写父版调用数消减不是对原库的速度/指令降幅。
+- 160矩形实际覆盖全部65536位模式、420 producer、9216双AIV延迟DMA消费者、fake/public真实8.3 tiler各production/TUNING1400配置/1000选择通过。
+- 原始资料 `artifacts/fullm-transpose-load/` 私有本机Git忽略。保留通过实验分支；下一结构审查其它storage布局，main/query-block未变。整体重大提升未达成。
+
+
 ## 2026-10-01 · 完整 K 宽窗口正式通过，父 Norm 缓存复核
 
 - 代码 `9cfb159` / SHA `af0d52b9c2e8f34fd43c5df4577a0d9f8d2adf456b7f57c5cbb642904ab170fc`；正式ID `6abd5fdd694b590c3c8b955d` Pass，15/15、precision_ratio全1，CANN编译成功。

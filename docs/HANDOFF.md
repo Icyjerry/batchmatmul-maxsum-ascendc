@@ -1,22 +1,14 @@
 # 接手状态 · 2026-10-01
 
-## 活动正式任务：完整 M 与 TT 矩形转置
+## 最新：完整 M TT 转置候选正式通过，第8点单次5.4%改善
 
-代码 `d2eeb78` / kernel SHA `f0b3908378015b9a98fb5eed58337dd7556737e5ae18b79d1e25c19b497a1b09`。
-[提交 6abdd9e6694b590c3cb2e3a9](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abdd9e6694b590c3cb2e3a9) 已接受，正式精度/性能PENDING。
-下一动作 `python3 /private/tmp/query_bmmms_submission.py 6abdd9e6694b590c3cb2e3a9` 查询同一ID至终态；不能因观察超时重提。
-整体重大提升尚未达成；资料 [FULLM_TRANSPOSE_LOAD.md](FULLM_TRANSPOSE_LOAD.md)。
-
-## 当前：完整 M 单 MMAD 与 TT 转置矩形加载候选
-
-分支 `experiment/fullm-transpose-load`，kernel SHA `f0b3908378015b9a98fb5eed58337dd7556737e5ae18b79d1e25c19b497a1b09`。
-在宽窗通过候选基础上，完整M queue1/A2-B2双缓冲/C2替代两半M/C4；一次half原始16位Load3D整矩形转置替代逐M16 Load2D。BF16不Cast，Mmad仍原T/FP32。
-公开官方CANN9 Load3D明确enTranspose仅half→A2；使用half ReinterpretCast保持bit。真实BF16/硬件指令仍PENDING，不能称BF16 native enTranspose得到文档支持。
-CPU160实际经过全部65536位模式的矩形、420 producer、9216消费者、fake/public8.3 tiler production/TUNING各1400/1000配置通过。
-Vector函数体、计划/任务/GM窗口/workspace/finalizer保持不变（仅dual），低资源与pins回退。
-独立官方模板dry-run仅kernel.asc，270171 bytes且SHA一致。没有活动正式任务。
-下一动作：CLI一次正式提交，记录ID，查询同一任务至终态。无收益归档，不继续近邻参数。整体重大提升未达成。
-详见 [FULLM_TRANSPOSE_LOAD.md](FULLM_TRANSPOSE_LOAD.md)。
+分支 `experiment/fullm-transpose-load`；代码 `d2eeb78`，kernel SHA `f0b3908378015b9a98fb5eed58337dd7556737e5ae18b79d1e25c19b497a1b09`。
+[提交 6abdd9e6694b590c3cb2e3a9](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abdd9e6694b590c3cb2e3a9) **Pass，CANN编译成功、15/15，precision_ratio全1**。
+第8点query-block69.03→65.29μs（单次约5.4%）、宽窗67.44→65.29。无actual shape/plan/SoC/profile和重复A/B，不声称稳定/大幅收益或新路由命中；其它路径变化不归因。
+CPU160实际复制全部65536位模式的矩形、420 producer、9216消费者、fake/public8.3 tiler production/TUNING各1400/1000配置通过。没有活动正式任务。
+资料 [FULLM_TRANSPOSE_LOAD.md](FULLM_TRANSPOSE_LOAD.md)，原始结果本机Git忽略 `artifacts/fullm-transpose-load/`。
+保留通过实验分支，不并入main/query-block，也不做近邻tile参数提交。
+下一动作：原生支持同一full-M流水的其它storage布局（尤其非转置A/转置B的大矩阵），核对完整A的NZ pitch、K offset、B的ZN目的布局和实际预算；不新增GM、不修改其它manual/packed家族。整体重大提升尚未达成。
 
 ## 最新：宽窗口完整 K 正式通过，无大幅收益；父缓存审查改变方向
 

@@ -47,7 +47,14 @@ kernel SHA `f0b3908378015b9a98fb5eed58337dd7556737e5ae18b79d1e25c19b497a1b09`，
 结构/资源/物理块模型通过后提交一次，记录ID并查询同一任务至终态；不因等待超时重提，不把CPU命中或调用数作为性能提升。
 若无大幅收益则归档，不做Load3D近邻tile参数重交。整体重大提升尚未达成。
 
-## 正式任务已接受
+## 正式结果：15/15 通过，有单次局部改善
 
 代码 `d2eeb78` / kernel SHA `f0b3908378015b9a98fb5eed58337dd7556737e5ae18b79d1e25c19b497a1b09`。
-[提交 6abdd9e6694b590c3cb2e3a9](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abdd9e6694b590c3cb2e3a9) 已接受；继续同一ID至终态，不能因等待超时重提。正式结果PENDING。
+[提交 6abdd9e6694b590c3cb2e3a9](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abdd9e6694b590c3cb2e3a9) **Pass，CANN编译成功、15/15，precision_ratio全1**。
+耗时 `[2.26,4.50,4.34,5.62,5.47,10.97,9.51,65.29,83.05,97.21,87.04,95.41,15.28,12.69,9.10]` μs。
+第8点query-block69.03→65.29（单次约5.4%），手写宽窗67.44→65.29；没有同设备重复A/B或实际shape/plan/SoC/profile，不宣称稳定收益、正式路由命中或精确瓶颈。
+其它未改路径的单次变化不归因。此kernel的正式15点通过，不证明所有bit模式/所有资源分支均已上板覆盖。
+没有活动正式任务；原始JSON本机Git忽略 `artifacts/fullm-transpose-load/`，目录700/文件600。
+
+整体重大提升未达成。保留该通过实验分支作为native producer研究对照，main和query-block通过kernel未改；不提交相近tile参数。
+下一结构审查是同一full-M Cube流水对其它输入storage布局的原生ND2NZ/Load3D加载，维持原任务/GM窗口和预算；不得将TT核硬套到非TT数据，也不能擅改其它既有manual/packed家族。
