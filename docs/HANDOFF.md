@@ -649,3 +649,5 @@ Kernel SHA256：`d218864289599e2b39ef09d83cfdde68988908bf9400fa42b5bc9b03031783b
 第二次原样复测 **`6abe88a7694b590c3c109c3a`** 已创建，下一 `python3 /private/tmp/query_bmmms_submission.py 6abe88a7694b590c3c109c3a`，只查同一任务到终态。本次共请求两次重复，两次均已提交，不能再创建第三次重复任务。
 
 正式任务 **`6abeb39e694b590c3c22e5d7`** 已创建，实现 `a770e64` 已push、kernel/template SHA a5eef105…保持。下一仅查询同ID至终态，不因等待超时重交。CANN9/NPU精度/性能 PENDING。
+
+Official task **`6abebe23694b590c3c265928`** created. Implementation `eb7c7de` pushed, kernel/template SHA844b8005 unchanged. Query this same ID to terminal; do not resubmit on observation timeout. CANN9/native precision/performance PENDING.
