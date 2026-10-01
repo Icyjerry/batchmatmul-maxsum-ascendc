@@ -1,5 +1,7 @@
 # Latest: group-wide tiny K tree, CPU passed, native PENDING
 
+Official task **`6abec72a694b590c3c296090`** now created; implementationdf36ef3 pushed. Next `python3 /private/tmp/query_bmmms_submission.py 6abec72a694b590c3c296090`; only this ID to terminal. Kernel/template SHAeeef7efc unchanged, CANN9/nativeprecision/timing PENDING.
+
 Current `experiment/tiny-group-ktree`, baseline kernel1734f16 with102addedlines/three regions; kernel359932bytes SHA `eeef7efc6189e9da80cbe9fae60901b51f7c73e4edc7806b4adbc23532218029`. Uses[K,ar,pitchN] products, batchedBrcb and one whole-group FP32Ktree/repeatedMax; no plan/grid/group/GM changes. ExpandedUB and uint8dststride guarded, unsupported frames retain baseline; oldrawtranspose absent. See TINY_GROUP_K_TREE.
 
 Production/TUNING each10080 hostcontrols,7200 actualentries/49344active/6336idle,2292 encodedFP16/BF16 group1/2/3 entries/FP64golden maxAbs9.54e-7/nonzeroRel2.93e-6, eightnegativecontrols passed.48 actualentries use synthetic512KiBUB to exercise repeat/chunk boundaries (not realSoC capacity). Script temporary-directory indentation mistake fixed, fullmodel passed; oneFIFO nothardware. Independentofficialtemplate other7sources parent, dry-run kernelonly sameSHA. Next commit/push, oneformaljob saveID/pollsameID. No activejob yet. Prior155fbd9 task6abec499694b590c3c288b4a passed15/15 but no major benefit; archivecec9a1b, no repeat. Main/tags unchanged, goalincomplete.
