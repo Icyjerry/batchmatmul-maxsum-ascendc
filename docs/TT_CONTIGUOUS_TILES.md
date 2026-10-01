@@ -50,4 +50,4 @@ Max始终只取有效N；每个K点积完成以后才做Max，所有N partial合
 
 kernel SHA `65e38bb155af9adb068e87dc90c01face21a7cf024d094c54846c5188e9ca120`。
 日志 `/private/tmp/bmmms-tt-contiguous-cpu.log`、`...-public.log`、`bmmms-tt-merge-cpu.log`。
-独立官方模板 `/private/tmp/bmmms-judge-tt-contiguous/project`，只替换kernel.asc；CANN9编译/15点精度/latency PENDING。当前没有活动正式任务，先dry-run核对SHA，commit/push后提交一次；记录ID并同ID追踪。重大提升尚未达成。
+独立官方模板 `/private/tmp/bmmms-judge-tt-contiguous/project`，只替换kernel.asc，dry-run276755字节/SHA一致。代码 `32c6b1c` 已commit/push；正式任务 [6abe1a32694b590c3cd3fe15](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe1a32694b590c3cd3fe15) 已创建。CANN9编译/15点精度/latency PENDING；查询同ID至终态，不因观察超时重提。重大提升尚未达成。

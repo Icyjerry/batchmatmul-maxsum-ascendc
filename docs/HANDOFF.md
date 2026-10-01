@@ -1,11 +1,11 @@
 # 接手状态 · 2026-10-01
 
-## 当前：TT连续tile任务 + A跨N驻留 + 并行末级合并，待正式提交
+## 当前：TT连续tile任务 + A跨N驻留 + 并行末级合并，正式PENDING
 
 分支 `experiment/tt-contiguous-tiles`，基于通过TT种子 `a05035e`，kernel SHA `65e38bb155af9adb068e87dc90c01face21a7cf024d094c54846c5188e9ca120`。没有并入窄N驻留或NZ-B候选。
 dual33覆盖B1/BF16/TT的1024..2048 M/N/K区间（父dual1/29且容量满足、没有显式pin）：完整tile连续均分；相邻N tile保留同一M的A1；nSplit=nTiles/W1；全部AIV按M块完成N Max合并再Sum，复用原Ns0行头标量。原partial/ring通路，无新GM/flags。长K容量不足时BM128→64，其余容量全部实际查询。
 440实际producer、420旧producer/all65536bit回归、288真实线程barrier/延迟DMA末级模型通过；fake/public固定8.3 tiler production/TUNING各6912计划/720选择/144容量降M通过。详情 [TT_CONTIGUOUS_TILES.md](TT_CONTIGUOUS_TILES.md)。CANN9/NPU精度/latency PENDING，重大提升未达成。
-下一动作：独立官方模板dry-run仅kernel/SHA核对，commit/push后正式CLI提交一次、立即保存ID，同ID查到终态。没有活动评测ID。
+代码 `32c6b1c` 已commit/push；官方dry-run仅kernel/SHA一致。正式任务 `6abe1a32694b590c3cd3fe15` 已创建，下一动作：`python3 /private/tmp/query_bmmms_submission.py 6abe1a32694b590c3cd3fe15` 同ID查询终态，不因观察超时重提。
 
 ## 当前：窄 N 完整 K 驻留正式通过，无收益；TT任务波次审查
 
