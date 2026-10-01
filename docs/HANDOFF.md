@@ -5,7 +5,7 @@
 - 工作分支：`experiment/post-tiny-review`，算法逐字恢复通过版 `1734f16`，没有 tiny 广播/K 树候选。
 - `kernel.asc`：354602 bytes；SHA256 `a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742`。
 - 对应正式任务 `6abeb39e694b590c3c22e5d7`：CANN 编译成功，15/15 Pass，precision_ratio 全1。
-- 当前没有活动评测任务或本地验证进程。整体“大幅优化、冲榜”目标未完成；没有新的稳定大收益。
+- 用户本次再次要求当前版原样两次复测。复测1 `6abeceed694b590c3c2bc7a5` 已提交，终态 PENDING；必须查询此ID至终态后再提交复测2，见 [CURRENT_IDENTICAL_REPEATS](CURRENT_IDENTICAL_REPEATS.md)。算法未改。整体“大幅优化、冲榜”目标未完成。
 - main 的算法和历史标签不动。main 接手文档应指向本实验分支，不能把 main 历史 kernel 当作上述通过组合。
 
 先读 [PROBLEM](PROBLEM.md)、[原始验证约定](VALIDATION_REQUEST_v1.md)、[PERF_LOG](PERF_LOG.md)。旧接手条目完整保存在 [历史记录](HANDOFF_HISTORY_20261002.md)；其 PENDING/下一步是历史状态，优先以本文和各实验文档最后的正式终态为准。
