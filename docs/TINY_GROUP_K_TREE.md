@@ -41,3 +41,9 @@ OneVectorFIFO represents command order, not every native hardware subpipeline. S
 CANN9compile/nativeprecision/NPUtiming PENDING. Commit/push; one structural submission; saveID immediately and poll that sameID toterminal. Require15/15 and retain all15times. Compare against passed1734f16 and preceding structural result, keepC7/C14/C15 gains, do not attribute unchanged-route timing or claim route hits/SoC/profile/bestscore. Clearly large benefit only justifies unchanged confirmation; otherwise archive without nearby parameter scans. Main/tags unchanged; overallmajoroptimizationgoal incomplete.
 
 Official task **`6abec72a694b590c3c296090`** created, implementation `df36ef3` pushed, kernel/template SHAeeef7efc unchanged. Query this sameID to terminal; native gates PENDING.
+
+## Official terminal: Pass15/15, no clear benefit
+
+Task `6abec72a694b590c3c296090`, implementationdf36ef3, SHAeeef7efc: CANN compile successful,15/15Pass, precision_ratio all1. Timesus `[1.94,2.57,3.28,4.03,5.42,9.83,8.03,46.44,69.04,99.12,89.01,97.22,16.41,11.22,9.17]`. C2/C3=2.57/3.28 versus passedbaseline2.46/3.11; no clear gain. C9=69.04/C13=16.41 adverse observations retained, not attributed to unchanged routes. No actualSoC/shapes/plan/profile/routehit. RawJSON ignored artifacts/tiny-group-ktree/official.json. No repeat or parameter scan, no activejob, main/tags unchanged; overallgoal incomplete.
+
+Coverage diagnosis: historical conditional probe ranges put smallcasesK32–56, not exact shapes. This algorithm currently accepts only32/64, so nativePass and stable timing cannot prove that a target branch ran. Next finish K8 coverage: fold K40/48/56's excess beyond32 into the first corresponding lanes, then the shared32 tree; rounded rawA padding and exactK offsets must be verified. This addresses omitted algorithm coverage rather than choosing another nearby tiling parameter. No inferred exact formalshape or route claim.

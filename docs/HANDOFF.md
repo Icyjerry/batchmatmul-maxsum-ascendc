@@ -1,5 +1,7 @@
 # Latest: group-wide tiny K tree, CPU passed, native PENDING
 
+Terminal6abec72a694b590c3c296090: CANN compiled15/15Pass/allprecision1; C2/C3=2.57/3.28vsbaseline2.46/3.11, no clear benefit. Full15times/limitations in TINY_GROUP_K_TREE; raw ignored artifacts/tiny-group-ktree/official.json. No activejob or repeat. Next finish omitted K40/48/56 coverage via excess-to32 fold, paddedrawA budget/exactK offsets; historicalprobeK32–56 conditional only, no actual formalroute known. Main/tags unchanged, goalincomplete.
+
 Official task **`6abec72a694b590c3c296090`** now created; implementationdf36ef3 pushed. Next `python3 /private/tmp/query_bmmms_submission.py 6abec72a694b590c3c296090`; only this ID to terminal. Kernel/template SHAeeef7efc unchanged, CANN9/nativeprecision/timing PENDING.
 
 Current `experiment/tiny-group-ktree`, baseline kernel1734f16 with102addedlines/three regions; kernel359932bytes SHA `eeef7efc6189e9da80cbe9fae60901b51f7c73e4edc7806b4adbc23532218029`. Uses[K,ar,pitchN] products, batchedBrcb and one whole-group FP32Ktree/repeatedMax; no plan/grid/group/GM changes. ExpandedUB and uint8dststride guarded, unsupported frames retain baseline; oldrawtranspose absent. See TINY_GROUP_K_TREE.

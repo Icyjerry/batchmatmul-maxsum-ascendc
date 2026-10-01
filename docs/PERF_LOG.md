@@ -1,6 +1,8 @@
 
 ## 2026-10-02: group-wide tiny K tree, native PENDING
 
+Terminal6abec72a694b590c3c296090 / df36ef3 / SHAeeef7efc: CANN compile successful,15/15Pass/allprecision1. Timesus `[1.94,2.57,3.28,4.03,5.42,9.83,8.03,46.44,69.04,99.12,89.01,97.22,16.41,11.22,9.17]`; no clear C2/C3 benefit versusbaseline2.46/3.11; unfavorableC9/C13 retained, unchangedroutes notattributed. HistoricalconditionalprobeK32–56 exposes currentK32/64 coverage gap, not actualhiddenroute evidence. Next exactK8 excess-to32 fold and rawA padding verification, notparameter scan. RawJSON ignored artifacts/tiny-group-ktree/official.json; no activejob, main/tags unchanged, goalincomplete.
+
 SHAeeef7efc6189e9da80cbe9fae60901b51f7c73e4edc7806b4adbc23532218029/kernel359932bytes; baseline1734f16 plus102lines/threeaddedregions. Previous per-row storage-vector native15Pass but no benefit; this changes scratch to[K,ar,pitchN], all-queryBrcb and commonKtree/repeatedMax. ExampleB1M8N64K64: sourceAdd48→7, Kbarriers48→6, Brcb8→1, Max8→1, Mul8 unchanged. Expandedmemory/stridedwrites may offset this; no latency prediction. No plan/group/grid/GM change; realUB/uint8stride fallback.
 
 Production/TUNING each10080 hostcontrols,7200 actualqueued integerentries (48synthetic512KiB boundaryentries),2292 encodedFP16/BF16/group1/2/3 entries, maxAbs9.54e-7/maxNonzeroRel2.93e-6 againstFP64golden, eightnegativecontrols. OneVectorFIFO/softwarecasts notnativehardware/precision. Templateother7sources parent/dry-runkernelSHA checked. CANN9/NPU gates PENDING; no activeformaljob yet; commitpush then one structural submission, ID/pollsameID. See TINY_GROUP_K_TREE. No small-gain parameter scan, main/tags unchanged, goalincomplete.
