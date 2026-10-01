@@ -535,3 +535,11 @@ Split-K host 模型两档宏均编译运行，统计是各档相同模型空间�
 - CPU：456常规+584两级K+2针对性执行通过；逐元素C/补零/地址/事件收支/操作量检查。六种host宏组合production/TUNING各76,424主网格及容量边界通过；pin与预处理、缓存、N/K/UB回归通过。旧nsplit模型抽取误包含PanelL1Capacity导致的CPU编译错误已修正。
 - P3（显式）驻留选择6,026次、P3/H1两级K 8,410次；包含额外边界，不是正式case命中率。kernel净减少15行，不能作为速度证据。
 - CANN编译、真实异步事件、FP16/BF16设备精度、正式15点与性能全部PENDING；没有新增NPU耗时。设备入口 `PERFORMANCE_STRUCTURE_FIXES.md`。
+
+## 2026-10-01 · C9队友K packages与通过TT组合
+
+- `experiment/c9-k-packages` / `d19af3d`，kernel SHA `5dcb7230bef7e8935aabe6c6c80560dfb0f2d1103b5a5ea223b217bdbe075ebd`；从 `0d4bd04` 仅提取队友FP16/NT/dual20完整A+B大K包/晚ring credit与C9桶覆盖。
+- [正式任务 6abe2939694b590c3cdc011a](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe2939694b590c3cdc011a) Pass，CANN编译成功、15/15、precision_ratio全1。耗时μs `[2.16, 4.15, 4.51, 5.54, 5.39, 10.64, 10.26, 59.27, 68.54, 96.11, 88.66, 97.11, 16.38, 13.44, 9.75]`。
+- C9父83.11→68.54，单次耗时降低17.5%/1.213x；这是复现用户报告队友约68μs，非超越队友。C8父59.66→59.27，TT保留，不宣称稳定微小收益。其它路径未改，时间变化不归因。没有actual shape/plan/SoC/profile或重复A/B，不推断case路线或排行榜得分。
+- CPU177producer+177延迟MMAD、9216消费者；fake/公开固定8.3 tiler production/TUNING各2560/128通过。MTE1仍同步，不把模型当硬件精度/同步/时间证明。无新GM/flags或main/golden修改。
+- 无活动任务；原始JSON/模型本机Git忽略 `artifacts/c9-k-packages/`。交接 [C9_K_PACKAGES.md](C9_K_PACKAGES.md)。后续以此组合为父版，勿丢C9收益。

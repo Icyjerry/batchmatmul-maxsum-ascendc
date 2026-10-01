@@ -1,10 +1,11 @@
 # 接手状态 · 2026-10-01
 
-## 最新：接入队友C9 package路径，CPU通过，正式PENDING
+## 最新：队友C9与TT组合正式15/15通过，第9点68.54μs
 
-当前 `experiment/c9-k-packages` 从通过 `0d4bd04` 开始；kernel SHA `5dcb7230bef7e8935aabe6c6c80560dfb0f2d1103b5a5ea223b217bdbe075ebd`。只移植FP16/NT/dual20完整A驻留、B大K包双queue、首tile晚ring credit及C9历史桶predicate；TT59.66μs父版保留，无新GM/flags。用户报告队友第9点“68s”，暂按68μs，仅用户报告无ID。
-177实际producer+177延迟MMAD、9216实际消费者、fake/公开固定8.3 tiler production/TUNING各2560/128通过，MTE1仍同步模型。CANN9编译/正式15点/性能PENDING。代码 `d19af3d` 已commit/push，活动正式任务 `6abe2939694b590c3cdc011a`；只查询同一ID直到终态，不重复提交。详细 [C9_K_PACKAGES.md](C9_K_PACKAGES.md)。下一运行 `python3 /private/tmp/query_bmmms_submission.py 6abe2939694b590c3cdc011a` 查询同一ID至终态；父第9点83.11μs、第8点59.66μs。
-TT B-stage WIP已保留并push在 `experiment/tt-b-stage` / `5b58c96`：180物理layout/440 producer/420旧producer/160位模式及fake host通过；delayed MTE1/native queue/CANN/NPU PENDING，未正式提交，不混入本C9候选。整体重大提升仍未达成。
+当前 `experiment/c9-k-packages`，实现 `d19af3d`，kernel SHA `5dcb7230bef7e8935aabe6c6c80560dfb0f2d1103b5a5ea223b217bdbe075ebd`。从通过 `0d4bd04` 提取队友FP16/NT/dual20完整A1驻留、B大K包双queue、首tile晚ring credit及C9历史桶predicate；TT通过结构保留，无新GM/flags，其余kernel字节保持父版。
+正式任务 `6abe2939694b590c3cdc011a` **Pass，CANN编译成功、15/15，precision_ratio全1**。第9点83.11→68.54μs，单次耗时降低17.5%/1.213x，复现用户报告队友约68μs，不能声称相对队友更快。第8点59.66→59.27μs，仅单次；无actual shape/plan/SoC/profile/重复A/B，不能证明路径命中或稳定收益。没有活动正式任务。
+177实际producer+177延迟MMAD、9216实际Vector消费者、fake/公开固定8.3 tiler production/TUNING各2560/128通过，MTE1仍同步模型。详情 [C9_K_PACKAGES.md](C9_K_PACKAGES.md)，原始资料本机Git忽略 `artifacts/c9-k-packages/`。
+下一保留该组合通过版作为实验父版，继续第8点结构研究；不要恢复旧TT父版时丢掉C9。TT单stage WIP保留并push在 `experiment/tt-b-stage` / `5b58c96`：180 layout/440 producer/420旧producer/160位模式及fake host通过；delayed MTE1/native queue/CANN/NPU仍PENDING，未正式提交、不混入当前组合。必须先完善B1最后MTE1读取后复用验证，再评价有无值得提交的结构差异；不重交已无收益N pair/worker Max。main/历史标签未移动，极限优化目标仍有空间。
 
 ## 当前工作起点：恢复59.66μs通过结构，准备B1单stage研究
 

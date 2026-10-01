@@ -33,20 +33,34 @@ python3 tools/validate_c9_packages_public_tiler.py --source /private/tmp/ascendc
 - 移除上述C9三个插入区并恢复一条predicate后，kernel与父版逐字一致；无main/CMake/run/golden/依赖修改。
 - 第一次fixture错误把不满足L1的package直接喂producer触发容量assert；修正fixture为只执行有效容量，保留host不够容量的回退断言。fake tiler缺少stepKa/Kb用本模型局部shim补充；真实公开tiler保留原算法/字段。
 
-**CPU不是CANN编译、FP16硬件精度、硬件异步协议或性能证明。CANN9/NPU/正式15点PENDING。活动正式任务 `6abe2939694b590c3cdc011a`，候选代码 `d19af3d` 已commit/push；dry-run只含kernel.asc且SHA一致。查询同一ID直到终态，不重复提交。** 没有actual shape/plan/SoC/profile；正式单次对照也不能证明稳定收益。
+**CPU不是CANN编译、FP16硬件精度、硬件异步协议或性能证明。候选代码 `d19af3d` 的正式任务已Pass，详见下方正式结果；dry-run只含kernel.asc且SHA一致。** 没有actual shape/plan/SoC/profile；正式单次对照也不能证明稳定收益。
 
 ## 保留的B-stage实验
 
 `experiment/tt-b-stage` 的 `5b58c96` 保存一个2BK B1 stage、原总L1预算的TT WIP；180物理布局/440 producer/420旧producer/160位模式及fake host通过。延迟MTE1+native queue/CANN/NPU仍PENDING，未正式提交、不混入本候选。
 
-## 下一动作
+## 提交前执行计划（已完成）
 
 独立官方template dry-run确认仅kernel.asc、SHA一致；commit/push后CLI一次正式提交，立即保存ID并查询同一ID至终态。与父版第9点83.11μs、第8点59.66μs比较；无收益则归档，不把用户报告当作自身结果。
 
-## 已提交
+## 提交记录
 
 正式任务 `6abe2939694b590c3cdc011a`，代码 `d19af3d`，kernel SHA保持上文。查询：
 
 ```sh
 python3 /private/tmp/query_bmmms_submission.py 6abe2939694b590c3cdc011a
 ```
+
+## 正式结果
+
+代码 `d19af3d`，[正式任务 6abe2939694b590c3cdc011a](https://cannjudge.cn/public/op_challenge_shanghe_prelim/batchmatmulmaxsum/submission/6abe2939694b590c3cdc011a) **Pass，CANN编译成功、15/15、precision_ratio全部1**。kernel SHA与上文一致。耗时（μs）：
+
+```text
+[2.16, 4.15, 4.51, 5.54, 5.39, 10.64, 10.26, 59.27, 68.54, 96.11, 88.66, 97.11, 16.38, 13.44, 9.75]
+```
+
+第9点通过父版83.11→68.54μs，单次耗时降低17.5%、1.213x，复现用户报告的队友约68μs水平；不是相对队友68μs的新增提速。第8点父59.66→59.27μs，TT保留，没有重复A/B，不宣称0.39μs是稳定改善。
+此次正式评测证明组合版通过15点且出现上述单次耗时；没有actual shape/plan/SoC/profile或重复对照，不能证明隐藏case一定命中新路径或把不同改动分开归因。其它路径byte-identical，时间变化不归因；theory_score/score未用于宣称排行榜分数。
+没有活动评测任务。原始JSON/CPU日志本机Git忽略目录 `artifacts/c9-k-packages/`，mode700/600。
+
+下一从本组合通过版保持队友C9+TT，继续研究第8点的结构瓶颈。B-stage WIP保留 `experiment/tt-b-stage` / `5b58c96`，不能不经delayed MTE1/native queue检查直接混入；后续正式候选必须保持这里的C9组合，以免丢掉收益。主分支/历史标签未移动，整体极限优化目标仍有空间。
