@@ -1,5 +1,10 @@
 # 接手状态 · 2026-10-01
 
+## 新队友tiny_dot输入，C9消费WIP独立保存
+
+用户提供 `2026-10/kernel_tiny_dot.asc`，5455行、CRLF，SHA `72454276ca665e0dd80d2bea6d972a34270442cad8fd3ccf0bd2a6674d4323e7`，截图前几项更快；截图未给kernel SHA/正式ID，需合并后独立正式验证。优先提取tiny/short-dot/K65..256小矩阵原生Vector逻辑，保留已有TT49.38+C9约68组合，不整份覆盖其它大矩阵分支。
+C9消费WIP已在 `experiment/c9-window-review` 增加两个helper和唯一调用（kernel+56/-27）：两现有C queue预读，最后GM读取后PIPE_MTE2归还原2/3信用，保留原Vector运算和全部producer/host/UB/grid/其它代码。剥除helper并恢复旧loop后整个kernel逐字等于 `1d7fd08`。**实际源码CPU同步模型、CANN9编译、NPU精度和性能全部PENDING，未提交，不能混入通过代码。** 下一tiny实验从原 `e1b3634` kernel开始，C9 WIP在此分支保存供后续接替，不丢改动。
+
 ## 当前工作起点：恢复49.38μs TT与队友C9组合，准备审查C9消费window
 
 当前分支 `experiment/c9-window-review`，kernel从 `e1b3634` **逐字恢复**，SHA `8c03d710d5394a0660e6bedc4c172f7784a1cbe3ef9f1cbc450f231aa1d6a052`。恢复的是正式任务 `6abe3059694b590c3cdf6c87` 15/15通过的代码，历史单次C8 49.38/C9 67.48μs；恢复后没有再次提交，不称本轮实测。C7两候选分别保留 `d793083` 和 `75c4d8f`，源码/实际模型/正式结果均已push；新单C消费正式C7 9.55，对照9.40，无新增收益，不合当前kernel。无活动正式任务，main/历史标签未动。
