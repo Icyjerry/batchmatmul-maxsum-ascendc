@@ -39,5 +39,5 @@ A1 TQue依旧是抽象完成模型，Fixpipe同步；CPU不是native queue实现
 
 ## Validation Request
 
-官方独立模板 `/private/tmp/bmmms-tt-b-stream-official/project`，仅kernel替换；dry-run 297815字节、SHA同上。候选尚未正式提交，无活动ID；CANN9编译/NPU精度/性能PENDING。
-下一commit/push后CLI一次提交，保存ID即查询同一ID至终态。比较父C8 59.27/C9 68.54μs。仍无actual shape/plan/SoC/profile，不根据单次结果断言新route命中或稳定收益；失败/无收益保留实验并恢复父组合，不能丢队友C9。
+官方独立模板 `/private/tmp/bmmms-tt-b-stream-official/project`，仅kernel替换；dry-run 297815字节、SHA同上。代码 `eb4671c` 已commit/push，活动正式任务 `6abe3059694b590c3cdf6c87`；CANN9编译/NPU精度/性能PENDING。
+下一 `python3 /private/tmp/query_bmmms_submission.py 6abe3059694b590c3cdf6c87` 查询同一ID至终态，不重复提交。比较父C8 59.27/C9 68.54μs。仍无actual shape/plan/SoC/profile，不根据单次结果断言新route命中或稳定收益；失败/无收益保留实验并恢复父组合，不能丢队友C9。

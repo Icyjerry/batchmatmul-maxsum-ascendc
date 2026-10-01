@@ -4,7 +4,7 @@
 
 分支 `experiment/tt-b-package-stream` 从通过 `4ac80c9` 开始，kernel SHA `8c03d710d5394a0660e6bedc4c172f7784a1cbe3ef9f1cbc450f231aa1d6a052`。原dual33任务/Vector/partial/ring和整个C9保持，B1两个手动包槽+显式MTE1↔MTE2 credit连续预读到后续tile，包K按L1余量选择；现有kChunk保存B包大小但kSplit仍1，完整s.k后才Max/Sum，无新GM/flags/ABI。
 440立即+440延迟MTE2/MTE1/MMAD+440 eagerMTE2对抗模型、缺last-reader等待负控制、420旧producer/160全部bit模式通过；fake/固定公开8.3 host production/TUNING各6912/720/576通过。具体 [TT_B_PACKAGE_STREAM.md](TT_B_PACKAGE_STREAM.md)。CPU不是CANN9/nativeA queue/硬件精度或时间证明。
-独立官方template dry-run仅kernel/297815bytes/SHA一致。尚无正式ID、CANN9/NPU PENDING；下一commit/push后CLI一次提交，立即记录ID，查询同一ID至终态；对照父C8 59.27/C9 68.54μs。无收益恢复 `4ac80c9` 组合，不重复N pair/worker Max。整体重大提升仍未达到可完成程度。
+独立官方template dry-run仅kernel/297815bytes/SHA一致。代码 `eb4671c` 已commit/push；活动正式任务 `6abe3059694b590c3cdf6c87`，CANN9/NPU PENDING；下一 `python3 /private/tmp/query_bmmms_submission.py 6abe3059694b590c3cdf6c87` 查询同一ID至终态，不重复提交；对照父C8 59.27/C9 68.54μs。无收益恢复 `4ac80c9` 组合，不重复N pair/worker Max。整体重大提升仍未达到可完成程度。
 
 ## 最新：队友C9与TT组合正式15/15通过，第9点68.54μs
 
