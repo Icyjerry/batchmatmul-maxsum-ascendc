@@ -1,3 +1,13 @@
+# 当前：TT 紧凑手动frame结构候选，CPU通过、native待验证
+
+分支 `experiment/tt-manual-frame`，父 `03c3996`；kernel354602bytes、SHA `a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742`。仅新增210行/三个范围，移除即整个源码逐字父；32byte独立入口取消TPipe/队列/动态event，保留完整A/B包预取/原tasks/GM，Vector直接tileMax、双rowstore及父单屏障batchfinal。初稿两处同步风险已修：A1换M明确MTE1_MTE2依赖2，V_MTE3与M_FIX按slot0/1复用。
+
+304 actual延迟Cube（两Fix优先）、558 actualAIV（三引擎/线程barrier）、六Cube/九Vector负控制、production/TUNING各5000host/480选择通过；整数模型/合成cross对端，不是CANN/NPU。详见 `docs/TT_MANUAL_FRAME.md`，日志忽略 `artifacts/tt-manual-frame/cpu.log`。独立模板仅kernel，其它7源码逐字父、dry-run同SHA。
+
+用户两次父版原样复测已完成：`6abeb052694b590c3c220fa2`、`6abeb132694b590c3c223f34` 均15/15。含首次C8中位48.45、范围47.24–48.88（3.4%）；C13波动9.9%、C14 5.8%；C2中位2.70仍高于旧2.42–2.50。完整结果 `docs/TT_IDENTICAL_REPEATS.md`，分支74e0dd2已push，不重交第三次。
+
+下一：commit/push本候选→一次正式任务→立刻存ID→只查询同ID至终态。CANN9/NPU精度/时间PENDING；暂无本候选正式任务。大收益才原样确认，小幅/无收益不扫描参数；保留C7/C14已有收益、全面报告C2，不称整体最优。整体冲榜仍未完成，main/标签不动。
+
 # 接手状态 · 2026-10-02
 
 ## 当前：宽N明显收益确认；TT单屏障正式通过但仅小幅单测
