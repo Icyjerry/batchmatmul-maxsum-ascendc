@@ -1,8 +1,13 @@
 # 接手状态 · 2026-10-01
 
+## 当前工作起点：恢复49.38μs TT与队友C9组合，准备审查C9消费window
+
+当前分支 `experiment/c9-window-review`，kernel从 `e1b3634` **逐字恢复**，SHA `8c03d710d5394a0660e6bedc4c172f7784a1cbe3ef9f1cbc450f231aa1d6a052`。恢复的是正式任务 `6abe3059694b590c3cdf6c87` 15/15通过的代码，历史单次C8 49.38/C9 67.48μs；恢复后没有再次提交，不称本轮实测。C7两候选分别保留 `d793083` 和 `75c4d8f`，源码/实际模型/正式结果均已push；新单C消费正式C7 9.55，对照9.40，无新增收益，不合当前kernel。无活动正式任务，main/历史标签未动。
+下一可执行动作：读 `bmmms_case9_packages` 的Vector window loop和 `docs/DUAL_CONSUMER_OPTIMIZATION.md`、`tools/validate_dual_pipeline.py`。当前手写C9仍serial Copy→Reduce→下一tile，完成全窗口V才还2/3信用；旧预取/早信用/fold无收益组合仅库dual1/2且含flag9。先对当前C9无库flag9协议设计两C queue预读/最后GM读后早release的**独立源码三引擎模型**：两AIV顺序、0行、window 1..8、N/M尾、queue在V读完后才重分配、信用后destructive GM覆盖和唯一partial写。保留原ReduceMax/Max指令、host/grid/UB预算/producer/C8，不混fold或微调参数。仅模型证实且能区分旧实验时才实现；这个C9新消费尚未实现/未提交，没有性能结论。整体重大优化目标仍有空间。
+
 ## 最新：C7专用单C缓冲Vector正式15/15通过，无新增收益，归档
 
-当前 `experiment/c7-lean-vector` 从 `d793083` 开始，kernel SHA `0fa24fce76929aee569311905518ee963be5097e7589161a6c525f1996eb6b05`。仅dual34专用Vector helper/调用：空闲AIV只归还原mode2 credits，活动AIV单C TBuf、行Max→直接WholeReduceSum→唯一4byte y写；显式V→MTE2/MTE2→V/V→MTE3/MTE3→V保护单UB和sum。Cube/host/launch/grid/原GM/workspace/C8/C9整个旧源码逐字保持，父正式15/15 C7 9.40μs；最佳TT+C9组合 `e1b3634` 不动。
+归档 `experiment/c7-lean-vector` 从 `d793083` 开始，kernel SHA `0fa24fce76929aee569311905518ee963be5097e7589161a6c525f1996eb6b05`。仅dual34专用Vector helper/调用：空闲AIV只归还原mode2 credits，活动AIV单C TBuf、行Max→直接WholeReduceSum→唯一4byte y写；显式V→MTE2/MTE2→V/V→MTE3/MTE3→V保护单UB和sum。Cube/host/launch/grid/原GM/workspace/C8/C9整个旧源码逐字保持，父正式15/15 C7 9.40μs；最佳TT+C9组合 `e1b3634` 不动。
 1296实际helper CPU组合通过，三种独立引擎顺序、live generation、destructive GM复用、负数/N尾、cyclic batch/idle AIV、唯一y/guards及信用配平；缺四个Fence、N尾无mask、早信用六个负控制全部检出。模型合成Cube与另一AIV，不代替完整硬件调度/舍入/性能。详见 [C7_LEAN_VECTOR.md](C7_LEAN_VECTOR.md)。实现 `a3696cd` 已commit/push；独立原模板dry-run仅kernel、306655byte/SHA一致。正式任务 **`6abe6705694b590c3cfd63c9` Pass，CANN编译成功、15/15、precision_ratio全1**；C7父9.40→9.55μs，无新增收益。C8/C9未改，不归因49.74/67.73波动；没有actual shape/plan/SoC/profile或重复A/B。
 无活动任务；归档候选，不合main、不扫描相邻参数。下一恢复 `e1b3634` 原C9约68μs+TT49.38μs组合，再审查C9手写N window消费：现有两C queue仍serial Copy→Reduce→下一tile，到全窗口Vector结束才还2/3 credit。与旧dual-consumer-overlap仅库dual1/2+flag9/fold不同；只评估同两buffer DMA/V重叠及最后GM读后信用，不混入fold/矩阵乘/参数扫描，先实际源码三引擎模型证明早credit与UB生命周期。新C9消费尚未实现。原资料Git忽略 `artifacts/c7-lean-vector/`。整体重大优化目标尚未完成。
 
