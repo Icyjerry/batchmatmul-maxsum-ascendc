@@ -1,0 +1,41 @@
+int main(){
+ auto* hw=platform_ascendc::PlatformAscendCManager::GetInstance();unsigned total=0,hits=0;
+ for(int cores:{1,3,8,20,32})for(int M:{1024,1025,1536,1537,2048})
+ for(int N:{1024,1025,1536,1537,2048})for(int K:{1024,1536,2048})
+ for(int dt:{1,2})for(int lay=0;lay<4;++lay){
+  hw->aic=std::max(cores,8);hw->aiv=2*hw->aic;Shape s{1,M,N,K,dt,lay/2,lay%2};
+  auto p=MakePlan(s,cores),old=p;bool ok=FullMTilesBatchFits(s,p);++total;
+  assert(!memcmp(&p.schedule,&old.schedule,sizeof(Schedule))&&p.totalBytes==old.totalBytes);
+  if(ok){++hits;const auto& d=p.schedule;uint64_t pm=d.mTiles*d.baseM,count=pm*d.nSplit;
+   assert(dt==2&&lay==3&&d.dual==33&&d.nSplit==d.nTiles);
+   assert((d.nSplit/2)*pm/64<=255&&count*4+((M+63)/64+7)/8*32+32+4096<=hw->ub);
+  }
+ }
+ assert(hits);Shape s{1,1537,1537,1536,2,1,1};auto p=MakePlan(s,20);assert(FullMTilesBatchFits(s,p));
+ auto bytes=p.totalBytes;p.totalBytes=p.systemBytes;assert(!FullMTilesBatchFits(s,p));p.totalBytes=bytes;
+ auto cap=hw->ub;hw->ub=4096;assert(!FullMTilesBatchFits(s,p));hw->ub=0;assert(!FullMTilesBatchFits(s,p));hw->ub=cap;
+ const uint64_t need=4ULL*p.schedule.mTiles*p.schedule.baseM*p.schedule.nSplit+
+  Ceil(Ceil(s.m,64),8)*32+32+4096;
+ hw->ub=need;assert(FullMTilesBatchFits(s,p));hw->ub=need-1;assert(!FullMTilesBatchFits(s,p));hw->ub=cap;
+ auto edge=p;edge.schedule.baseM=128;edge.schedule.mTiles=16;edge.schedule.nTiles=edge.schedule.nSplit=16;
+ edge.totalBytes=edge.systemBytes+1024*1024;Shape repeatEdge{1,2048,2048,1024,2,1,1};
+ assert(!FullMTilesBatchFits(repeatEdge,edge)); // first Max would have 256 repeats
+ for(auto bad:{Shape{2,1537,1537,1536,2,1,1},Shape{1,1537,1537,1536,1,1,1},
+  Shape{1,1537,1537,1536,2,0,1},Shape{1,1537,1537,1536,2,1,0},
+  Shape{1,1023,1537,1536,2,1,1},Shape{1,2049,1537,1536,2,1,1},
+  Shape{1,1537,1023,1536,2,1,1},Shape{1,1537,2049,1536,2,1,1},
+  Shape{1,1537,1537,1023,2,1,1},Shape{1,1537,1537,2049,2,1,1}})
+  assert(!FullMTilesBatchFits(bad,p));
+ for(auto field:{&p.schedule.dual,&p.schedule.kSplit,&p.schedule.earlySum,&p.schedule.baseM,
+  &p.schedule.baseN,&p.schedule.mTiles,&p.schedule.nSplit,&p.schedule.nTiles,&p.schedule.window}){
+  auto save=*field;*field=999;assert(!FullMTilesBatchFits(s,p));*field=save;
+ }
+#ifdef BMMMS_TUNING
+ for(auto field:{&Tune().group,&Tune().rows,&Tune().dual,&Tune().early,&Tune().tree,
+  &Tune().bm,&Tune().bn,&Tune().window,&Tune().ns,&Tune().ks,&Tune().workers}){
+  Tune()=TuneConfig{};*field=1;assert(!FullMTilesBatchFits(s,p));
+ }
+ Tune()=TuneConfig{};
+#endif
+ std::cout<<total<<" actual TT host controls / "<<hits<<" batch finalizers: existing plan/GM untouched, UB byte boundary, repeat256 exclusion, shape/layout/dtype/pins fallback PASS\n";
+}

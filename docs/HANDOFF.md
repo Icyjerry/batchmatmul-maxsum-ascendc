@@ -1,5 +1,10 @@
 # 接手状态 · 2026-10-02
 
+## 当前：TT 单屏障末级归约候选，CPU完成准备正式提交
+
+分支 `experiment/tt-single-barrier`，父cf16501（宽N结构收益两次15/15通过，原分支保留），kernel SHA `71ca6095958a372927c27f088bb081c43cff748169ff98e4ef80a2215b4d62c5`，343178bytes。仅59新增/3修改：TT原第一次barrier后复用死UB，block0 bulk DMA全部原N partial、批量MaxN、有效M分组Sum，取消M标量中转/第二SyncAll；Cube/原消费/plan/grid/GM/C7/C14/fallback逐字父，不能重做失败workerMax/pairedN/NZ/B包。
+324真实抽取末级/延迟三引擎/真实全AIV barrier、六负控制、production/TUNING各3000host/240选择通过；整数模型不模拟native TPipe别名生命周期/舍入/性能。资源/256repeat/pins不足回退旧路，详见 `docs/TT_SINGLE_BARRIER.md`。原模板只kernel/dry-run同SHA，下一commit/push后创建一次并立即存ID查终态；没有活动任务，CANN9/NPU精度/性能PENDING。main/标签不动；父C8最近49.14–50.72μs、C14 10.93/10.84。
+
 ## 当前：宽N结构收益确认，C14两次10.93/10.84μs
 
 分支 `experiment/c14-manual-frame`，实现 `8e6959b`，kernel SHA `b0e0b66495df9606156f73f1d4a1399801ab18f203ff0f9458a7051caca4150f`，340070bytes。修复std::min后的首测 `6abea479694b590c3c1e1f2d` 和原样确认 `6abea54c694b590c3c1e7459` 均Pass、CANN编译成功、15/15、precision_ratio全1。C14两次10.93/10.84、中位10.885；父四次12.72–13.26、中位13.045，观察中位耗时低16.56%、最慢候选比最快父低14.07%，无区间重叠，可保留结构收益。没有实际同机交错A/B/shape/plan/SoC/profile，不保证稳定因果百分比。C7 7.78/7.88保持父范围，其它路线未改不归因。
