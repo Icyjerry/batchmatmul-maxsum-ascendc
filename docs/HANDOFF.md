@@ -2,6 +2,7 @@
 
 ## 当前实验覆盖以下旧状态
 
+- 最新终态：6abf25e6694b590c3c4a0fa3为15/15 Pass，但C4 4.43μs vs父中位4.12，没有收益，候选归档。用户纠正复测对象为当前最优组合1734f16/62ad1cd，要求原样再交两次；下一独立分支恢复该组合。本候选没有活动任务，下文PENDING已过期。详见TINY_TT_PACKED_FRAME末尾。
 - 正式任务 `6abf25e6694b590c3c4a0fa3` 已创建，终态PENDING；下一只查此ID到终态，不再创建新任务。下面“无活动任务/下一提交”是提交前状态，已由本条替代。
 - 当前分支 `experiment/tiny-tt-packed-frame`，实现9711c3d，kernel SHA `bd87dde9612d3c41d0b45550824f7cc75ac4419860e7a22ac579112c5f58431a` /360555bytes。CPU/host/scope通过，CANN/native精度/速度PENDING，无活动正式任务。
 - 恢复62ad1cd/1734f16通过算法为父，没有并入失败TT交换操作数。后者任务6abf2077694b590c3c47a088为15/15，C8 59.72 vs父46.51，C11 89.37 vs父88.03，没有提速，归档3e05d43；见TT_NATIVE_DOCUMENT。
