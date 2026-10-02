@@ -2,6 +2,8 @@
 
 ## 当前用户新增复测请求
 
+最新：任务1 `6abfc955694b590c3ca51a64` 已15/15 Pass；任务2两次POST HTTP429且无ID，尚未创建。下一等待限流解除，仅提交缺少的第二次；下文任务1PENDING已过期。源码仍为最优组合1734f16/a5eef105…，见BEST_IDENTICAL_REPEATS_1002。
+
 任务1已创建 `6abfc955694b590c3ca51a64`，终态PENDING；任务2尚未创建。下一只查任务1同ID，并创建恰好一次任务2、保存新ID再查询。下文“两任务尚未创建”是提交前状态，已被本条替代。
 
 当前分支 `experiment/best-identical-repeats-1002` 从62ad1cd恢复最优组合1734f16，kernel SHA a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742/354602bytes。用户明确复测当前最优组合两次，详见BEST_IDENTICAL_REPEATS_1002；算法未改，下面“不要第三次”仅约束此前已经完成的复测，不取消本次新增请求。当前两任务尚未创建。
