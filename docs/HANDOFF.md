@@ -2,7 +2,7 @@
 
 ## 当前代码和任务
 
-- 工作分支：`experiment/tt-native-document`，新增交换TT操作数/doc原生行L1候选，CPU模型通过，尚未正式提交；通过父为1734f16/current-repeat62ad1cd。没有 tiny 广播/K 树候选。
+- 工作分支：`experiment/tt-native-document`，新增交换TT操作数/doc原生行L1候选，CPU模型通过，正式任务6abf2077694b590c3c47a088已提交，终态PENDING；通过父为1734f16/current-repeat62ad1cd。没有 tiny 广播/K 树候选。
 - `kernel.asc`候选：369170 bytes；SHA256 `bb8fb8407486cb388cf9678f9fac359dfab693a4b30d9eb8f80e8040c615d160`。见 [TT_NATIVE_DOCUMENT](TT_NATIVE_DOCUMENT.md)，CANN/NPU PENDING。
 - 对应正式任务 `6abeb39e694b590c3c22e5d7`：CANN 编译成功，15/15 Pass，precision_ratio 全1。
 - 当前版原样两次复测已完成：`6abeceed694b590c3c2bc7a5` / `6abecfc5694b590c3c2c1347`，均15/15 Pass。C8三次46.52/46.51/46.48 μs，C9三次67.79/67.88/67.91；C2极差/中位6.4%、C15 5.8%。见 [CURRENT_IDENTICAL_REPEATS](CURRENT_IDENTICAL_REPEATS.md)。没有活动任务，不继续第三次；算法未改，整体“大幅优化、冲榜”目标未完成。
@@ -46,4 +46,4 @@ CLI保存的会话可复用，不读取或输出token。每次提交先独立模
 
 ## 当前下一步（优先于上述历史动作）
 
-用户确认计分重点C3/C11/C1/C4/C9，并允许激进尝试和尊重探针做专门优化。见 [SCORE_PRIORITIES](SCORE_PRIORITIES.md)。完整TT operand-swapped/doc原生L1候选已经实现，596 Cube/1098 AIV/12负控制、production/TUNING各5000 fake host通过；代码scope恢复整个父。下一commit/push/dry-run后仅提交此结构一次，立即保存ID并查询同ID至终态。没有活动评测；CPU日志artifacts/tt-native-document/cpu.log，候选原模板见TT_NATIVE_DOCUMENT。
+用户确认计分重点C3/C11/C1/C4/C9，并允许激进尝试和尊重探针做专门优化。见 [SCORE_PRIORITIES](SCORE_PRIORITIES.md)。完整TT operand-swapped/doc原生L1候选已经实现，596 Cube/1098 AIV/12负控制、production/TUNING各5000 fake host通过；代码scope恢复整个父。代码83a0bd2已push、dry-run SHA一致；正式活动任务 `6abf2077694b590c3c47a088`，下一只查询此ID至终态，不创建重复任务。CPU日志artifacts/tt-native-document/cpu.log，候选原模板见TT_NATIVE_DOCUMENT。

@@ -41,3 +41,7 @@
 独立原模板 `/private/tmp/bmmms-tt-native-document-official/project`，其它7个源码与1734f16逐字一致；仅换kernel。commit/push/dry-run后提交一次，取得ID立即保存，只查同ID至终态。对照当前三次C8 46.52/46.51/46.48、C11 88.03/87.73/88.30。无实际shape/plan/SoC/profile，native接口无法确认候选命中。
 
 如果明确大收益再原样确认；否则保留结果并恢复父，不扫同结构附近参数。原始日志忽略artifacts/tt-native-document、目录700/文件600。整体冲榜未完成。
+
+## 已创建正式任务
+
+实现83a0bd2已push，dry-run仅kernel/SHA一致。任务 `6abf2077694b590c3c47a088` 已创建，CANN/native终态PENDING。下一只查询此ID至终态，不因等待重交。
