@@ -2,6 +2,8 @@
 
 ## 当前用户新增复测请求
 
+任务1已创建 `6abfc955694b590c3ca51a64`，终态PENDING；任务2尚未创建。下一只查任务1同ID，并创建恰好一次任务2、保存新ID再查询。下文“两任务尚未创建”是提交前状态，已被本条替代。
+
 当前分支 `experiment/best-identical-repeats-1002` 从62ad1cd恢复最优组合1734f16，kernel SHA a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742/354602bytes。用户明确复测当前最优组合两次，详见BEST_IDENTICAL_REPEATS_1002；算法未改，下面“不要第三次”仅约束此前已经完成的复测，不取消本次新增请求。当前两任务尚未创建。
 
 C4候选6abf25e6694b590c3c4a0fa3 15/15但C4 4.43vs父4.12，没有收益，归档experiment/tiny-tt-packed-frame/579aba8；交换操作数TT也归档。当前不包含这两个候选。下一创建恰好两次最优版任务、立即保存ID、只查对应ID至终态；提交模板dry-run与当前SHA一致。完整源码不修改，原资料忽略artifacts/best-identical-repeats-1002/。整体冲榜未完成。
