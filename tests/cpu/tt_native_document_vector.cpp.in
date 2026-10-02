@@ -1,0 +1,38 @@
+void Run(uint32_t M,uint32_t N,uint32_t BM,uint32_t BN,uint32_t workers,uint32_t NS,bool neg,uint32_t mode){
+ uint32_t MP=(M+BM-1)/BM*BM,nt=(N+BN-1)/BN;assert(NS<=nt);
+ assert((NS/2)*MP/64<=255&&NS*MP*4+256+4096<=192*1024);
+ Shape q{M,N,136,MP,BN,nt,NS,BM,workers};Shared data(q,neg);shared=&data;
+ TTDocumentShape s{M,N,136,BM,BN,256,NS,workers};std::vector<std::thread> threads;
+ for(uint32_t id=0;id<2*workers;++id)threads.emplace_back([&,id]{
+  st=State{};st.block=id;st.mode=mode;st.ring.resize(2*BM*BN,1e30f);
+  bmmms_tt_native_document<int16_t>(nullptr,nullptr,data.scratch.data(),data.output.data(),s);
+  for(auto& engine:st.queues)assert(engine.empty());for(auto e:st.events)for(int v:e)assert(v==0);
+  uint32_t total=(MP/BM)*NS,gb=(id/2)*total/workers,ge=(id/2+1)*total/workers;
+  uint32_t first=(gb/NS)*nt+(gb%NS)*nt/NS,last=(ge/NS)*nt+(ge%NS)*nt/NS;
+  unsigned copies=0;for(uint32_t t=first;t<last;++t)copies+=((t/nt)*BM+(id%2)*BM/2<M);
+  assert(st.issued==last-first&&st.stores==ge-gb&&st.copies==copies&&st.primes==2&&st.releases==last-first);
+  assert(st.credit[0]==1&&st.credit[1]==1&&st.allocs==(id==0?5u:2u));
+ });
+ for(auto& t:threads)t.join();assert(data.yWrites.load()==1);float total=0;
+ for(uint32_t m=0;m<M;++m){float mx=-std::numeric_limits<float>::infinity();
+  for(uint32_t n=0;n<N;++n)mx=std::max(mx,Value(m,n,neg));if(neg)assert(mx<0);total+=mx;
+ }
+ assert(data.output[0]==total);
+ for(uint32_t ns=0;ns<NS;++ns)for(uint32_t m=0;m<MP;++m){float mx=-std::numeric_limits<float>::infinity();
+  if(m<M)for(uint32_t n=ns*nt/NS*BN;n<std::min(N,(ns+1)*nt/NS*BN);++n)mx=std::max(mx,Value(m,n,neg));
+  assert(data.scratch[ns*MP+m]==mx&&data.written[ns*MP+m]==1);
+ }
+ for(size_t i=NS*MP;i<data.scratch.size();++i)assert(data.scratch[i]==1e30f);
+ for(size_t i=1;i<data.output.size();++i)assert(data.output[i]==1e30f);
+}
+int main(){unsigned count=0;
+ for(uint32_t bm:{64u,128u})for(uint32_t m:{65u,129u,513u})for(uint32_t n:{65u,80u,112u,257u,592u})
+ for(uint32_t workers:{1u,3u,20u})for(bool neg:{false,true})for(uint32_t mode=0;mode<3;++mode){
+  uint32_t nt=(n+127)/128;for(uint32_t ns:{1u,nt}){Run(m,n,bm,128,workers,ns,neg,mode);++count;}
+ }
+ for(auto v:std::vector<std::vector<uint32_t>>{{1025,1537,128,128,20,13},
+  {1537,3073,64,128,20,5},{1537,1025,64,256,8,3}})for(bool neg:{false,true})for(uint32_t mode=0;mode<3;++mode){
+  Run(v[0],v[1],v[2],v[3],v[4],v[5],neg,mode);++count;
+ }
+ std::cout<<count<<" actual TT AIV entries: transposed C DMA/32B tails, vertical N Max, online shard Max, destructive GM slots, three engine priorities, unique partial/y writes, valid M sum PASS\n";
+}
