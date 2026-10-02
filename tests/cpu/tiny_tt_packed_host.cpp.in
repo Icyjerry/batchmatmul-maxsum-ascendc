@@ -1,0 +1,34 @@
+int main(){auto* hw=platform_ascendc::PlatformAscendCManager::GetInstance();unsigned count=0,hits=0,four=0;
+ for(uint64_t ub:{65536u,196608u,262144u})for(int M:{1,8,11,15,16})for(int N:{1,16,23,31,32})
+ for(int K:{128,136,192,248,256})for(int dt:{1,2})for(int layout=0;layout<4;++layout){
+  hw->ub=ub;hw->aiv=40;hw->aic=20;Shape s{7,M,N,K,dt,layout/2,layout%2};
+  auto p=MakePlan(s,20);auto old=p;auto q=MakeTinyTTPackedFrame(s,p);++count;
+  assert(!memcmp(&p.schedule,&old.schedule,sizeof(Schedule))&&p.totalBytes==old.totalBytes);
+  if(q.workers){++hits;four+=q.rows==4;assert(layout==3);
+   assert((SmallVectorK256Rows(s)&&q.workers==s.b)||
+     (p.schedule.dual==28&&q.workers==p.finalBlocks&&!p.cubeBlocks));
+   uint64_t kp=Ceil(K,16)*16,ac=Ceil(M*K,16)*16,be=N*kp,np=Ceil(N,8)*8;
+   uint64_t fixed=6*(ac+be)+4*M*kp+4*kp+Ceil(2*M,8)*32+32,perRow=Ceil(K,64)*np*256+np*4;
+   assert((q.rows==2||q.rows==4)&&fixed+q.rows*perRow+4096<=ub);
+   if(q.rows==2)assert(fixed+4*perRow+4096>ub);
+  }
+ }
+ assert(hits&&four);hw->ub=196608;Shape s{5,11,23,192,2,1,1};auto p=MakePlan(s,20);
+ assert(MakeTinyTTPackedFrame(s,p).rows==4);
+ unsigned probe=0;
+ for(int B=4;B<=7;++B)for(int M=8;M<=15;++M)for(int N=16;N<=31;++N)
+ for(int K=128;K<=248;K+=8)for(int dt:{1,2}){
+  Shape v{B,M,N,K,dt,1,1};auto plan=MakePlan(v,20);auto q=MakeTinyTTPackedFrame(v,plan);
+  assert(SmallVectorK256Rows(v)&&q.workers==B);++probe;
+ }
+ hw->ub=4096;assert(!MakeTinyTTPackedFrame(s,p).workers);hw->ub=196608;
+ hw->aiv=1;assert(!MakeTinyTTPackedFrame(s,p).workers);hw->aiv=40;
+#ifdef BMMMS_TUNING
+ for(auto field:{&Tune().group,&Tune().rows,&Tune().dual,&Tune().early,&Tune().tree,
+ &Tune().bm,&Tune().bn,&Tune().window,&Tune().ns,&Tune().ks,&Tune().workers}){
+  Tune()=TuneConfig{};*field=1;assert(!MakeTinyTTPackedFrame(s,p).workers);
+ }Tune()=TuneConfig{};
+#endif
+ std::cout<<count<<" actual host controls / "<<hits<<" selected / "<<four<<" 4-row frames: original plan/GM unchanged, live UB/core guard/pin fallback PASS\n";
+ std::cout<<probe<<" complete historical C4 conditional-range host configurations selected before generic Vector route PASS (not formal shapes)\n";
+}

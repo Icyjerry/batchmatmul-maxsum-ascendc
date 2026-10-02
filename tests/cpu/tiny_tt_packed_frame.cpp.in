@@ -1,0 +1,55 @@
+double worstAbs=0,worstRel=0;unsigned runs=0,encoded=0;
+void Run(uint32_t B,uint32_t M,uint32_t N,uint32_t K,uint32_t workers,uint32_t chunk,int encoding,bool neg){
+ const uint32_t kp=(K+15)/16*16,ac=(M*K+15)/16*16,np=(N+7)/8*8,be=N*kp;
+ const uint64_t bytes=6ULL*(ac+be)+4ULL*M*kp+4*kp+4*((2*M+7)/8*8)+32+
+  uint64_t(chunk)*(uint64_t((K+63)/64)*np*256+np*4);
+ if(bytes+4096>192*1024)return;
+ AscendC::encoding=encoding;
+ std::vector<int16_t>a(B*M*K),b(B*N*K);std::vector<float> y(B+16,1e30f);
+ auto value=[&](uint32_t x,bool positive){
+  if(!encoding)return int16_t(positive?1+x%5:int(x%9)-4);
+  uint16_t sign=positive?0:((x%3==0)?32768:0);
+  return int16_t(sign|(encoding==1?((7+x%4)<<10)|(x*13%1024):((119+x%4)<<7)|(x*17%128)));
+ };
+ for(uint32_t z=0;z<B;++z)for(uint32_t k=0;k<K;++k){
+  for(uint32_t m=0;m<M;++m)a[z*M*K+k*M+m]=value(z*23+m*11+k*7,neg);
+  for(uint32_t n=0;n<N;++n){auto v=value(z*17+n*19+k*3,neg);
+   if(neg)v=encoding?int16_t(uint16_t(v)|32768):int16_t(-v);b[z*N*K+n*K+k]=v;
+  }
+ }
+ auto aa=a,bb=b;AscendC::globals={{reinterpret_cast<uintptr_t>(a.data()),a.size()*2},
+  {reinterpret_cast<uintptr_t>(b.data()),b.size()*2},{reinterpret_cast<uintptr_t>(y.data()+8),B*4}};
+ AscendC::writes.clear();AscendC::flags.clear();assert(AscendC::dma.empty()&&AscendC::outDma.empty());
+ for(uint32_t w=0;w<workers;++w){
+  AscendC::block=w;AscendC::ub=std::make_shared<std::vector<uint8_t>>(192*1024,0x7f);AscendC::manualBytes=0;
+  bmmms_tiny_tt_packed_frame<int16_t>(a.data(),b.data(),y.data()+8,{B,M,N,K,workers,chunk});
+  assert(AscendC::manualBytes==bytes&&AscendC::dma.empty()&&AscendC::outDma.empty());
+  for(auto x:AscendC::flags)assert(x.second==0);
+ }
+ for(uint32_t z=0;z<B;++z){double sum=0;
+  for(uint32_t m=0;m<M;++m){double mx=-INFINITY;
+   for(uint32_t n=0;n<N;++n){double dot=0;for(uint32_t k=0;k<K;++k)
+    dot+=double(AscendC::Decode(a[z*M*K+k*M+m]))*AscendC::Decode(b[z*N*K+n*K+k]);
+    mx=std::max(mx,dot);
+   }
+   if(neg)assert(mx<0);sum+=mx;
+  }
+  float golden=float(sum);double abs=std::abs(double(y[8+z])-golden),rel=abs/std::max(std::abs(double(golden)),1e-30);
+  assert(std::isfinite(y[8+z])&&abs<1e-4&&(rel<1e-4||std::abs(golden)<1e-4));
+  if(!encoding)assert(y[8+z]==golden);
+  worstAbs=std::max(worstAbs,abs);if(std::abs(golden)>=1e-4)worstRel=std::max(worstRel,rel);
+  assert(AscendC::writes.at(reinterpret_cast<uintptr_t>(&y[8+z]))==1);
+ }
+ for(uint32_t i=0;i<8;++i)assert(y[i]==1e30f&&y[8+B+i]==1e30f);
+ assert(a==aa&&b==bb);++runs;encoded+=encoding!=0;
+}
+int main(){
+ for(uint32_t B:{1u,7u})for(uint32_t M:{1u,8u,11u,15u,16u})for(uint32_t N:{1u,16u,23u,31u,32u})
+ for(uint32_t K:{128u,136u,184u,192u,200u,248u,256u})for(uint32_t workers:{1u,3u})
+ for(uint32_t rows:{2u,4u})for(bool neg:{false,true})Run(B,M,N,K,workers,rows,0,neg);
+ for(uint32_t M:{8u,11u,15u,16u})for(uint32_t N:{16u,23u,31u,32u})
+ for(uint32_t K:{128u,136u,192u,248u,256u})for(uint32_t rows:{2u,4u})
+ for(int encoding:{1,2})for(bool neg:{false,true})Run(3,M,N,K,2,rows,encoding,neg);
+ Run(7,11,23,192,20,4,0,true);
+ std::cout<<runs<<" actual packed TT entries / "<<encoded<<" encoded FP16/BF16: immutable input, complete K/MaxN/SumM, actual UB/indices/product bounds, delayed DMA/store, unique output/guards PASS; maxAbs="<<worstAbs<<" nonzeroRel="<<worstRel<<"\n";
+}
