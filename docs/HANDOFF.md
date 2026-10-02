@@ -2,19 +2,15 @@
 
 ## 当前用户新增复测请求
 
-任务2 `6abfca4d694b590c3ca5b6a8` 已创建，终态PENDING；任务1已经15Pass。本轮恰好两次任务均已创建，下一只查任务2同ID至终态，不创建第三次。下文“任务2尚未创建”已过期。
+当前分支 `experiment/best-identical-repeats-1002` 从62ad1cd恢复最优组合1734f16，kernel SHA a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742/354602bytes。用户要求当前最优原样再交两次，已经完全完成：`6abfc955694b590c3ca51a64` / `6abfca4d694b590c3ca5b6a8` 均CANN编译成功、15/15 Pass、precision_ratio全1。总耗时464.23/465.68μs，按用户T换算平均分50.58646/50.82629，不是榜单排名证据。
 
-最新：任务1 `6abfc955694b590c3ca51a64` 已15/15 Pass；任务2两次POST HTTP429且无ID，尚未创建。下一等待限流解除，仅提交缺少的第二次；下文任务1PENDING已过期。源码仍为最优组合1734f16/a5eef105…，见BEST_IDENTICAL_REPEATS_1002。
+完整15点和波动见BEST_IDENTICAL_REPEATS_1002。C4 4.11/4.08、C9 67.34/67.91、C11 86.99/86.97；同源码变化不是新优化收益。第二次POST两次429无ID后等待成功；本轮恰好两任务，没有活动任务，不创建第三次。源码和其它七工程文件逐字等于1734f16；原JSON忽略artifacts/best-identical-repeats-1002/，目录700/文件600。
 
-任务1已创建 `6abfc955694b590c3ca51a64`，终态PENDING；任务2尚未创建。下一只查任务1同ID，并创建恰好一次任务2、保存新ID再查询。下文“两任务尚未创建”是提交前状态，已被本条替代。
-
-当前分支 `experiment/best-identical-repeats-1002` 从62ad1cd恢复最优组合1734f16，kernel SHA a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742/354602bytes。用户明确复测当前最优组合两次，详见BEST_IDENTICAL_REPEATS_1002；算法未改，下面“不要第三次”仅约束此前已经完成的复测，不取消本次新增请求。当前两任务尚未创建。
-
-C4候选6abf25e6694b590c3c4a0fa3 15/15但C4 4.43vs父4.12，没有收益，归档experiment/tiny-tt-packed-frame/579aba8；交换操作数TT也归档。当前不包含这两个候选。下一创建恰好两次最优版任务、立即保存ID、只查对应ID至终态；提交模板dry-run与当前SHA一致。完整源码不修改，原资料忽略artifacts/best-identical-repeats-1002/。整体冲榜未完成。
+C4候选6abf25e6694b590c3c4a0fa3 15/15但C4 4.43vs父4.12，无收益，归档experiment/tiny-tt-packed-frame/579aba8；交换操作数TT也归档。当前不包含这两个候选。下一继续已确认重点C3/C11/C1/C4/C9，尊重已否定结构，优先分析C3维度专门化的动态地址/循环开销；尚未实现，不据此提交参数扫描。整体冲榜未完成。
 
 ## 当前代码和任务
 
-- 工作分支：`experiment/current-identical-repeats`，算法逐字恢复通过版 `1734f16`，没有 tiny 广播/K 树候选。
+- 工作分支：`experiment/best-identical-repeats-1002`，算法逐字恢复通过版 `1734f16`，没有 tiny 广播/K 树候选。
 - `kernel.asc`：354602 bytes；SHA256 `a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742`。
 - 对应正式任务 `6abeb39e694b590c3c22e5d7`：CANN 编译成功，15/15 Pass，precision_ratio 全1。
 - 当前版原样两次复测已完成：`6abeceed694b590c3c2bc7a5` / `6abecfc5694b590c3c2c1347`，均15/15 Pass。C8三次46.52/46.51/46.48 μs，C9三次67.79/67.88/67.91；C2极差/中位6.4%、C15 5.8%。见 [CURRENT_IDENTICAL_REPEATS](CURRENT_IDENTICAL_REPEATS.md)。没有活动任务，不继续第三次；算法未改，整体“大幅优化、冲榜”目标未完成。
