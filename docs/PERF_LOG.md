@@ -753,3 +753,12 @@ C8 47.24；父最近六次50.67/50.72/49.94/49.14/49.67/49.56，范围49.14–50
 | C15 | 9.56 | 9.05 | 9.60 | 9.56 | 5.8% |
 
 C8中位46.51、极差0.09%，C9中位67.88、极差0.18%；C2极差6.4%、C15极差5.8%。这是三个同源码样本，不是受控同机A/B或总体波动界。C8比父三次中位48.45低4.0%，仍为小幅观察收益；C7本组8.11–8.38高于较早四次7.67–8.04，完整保留，不择优报告。无实际SoC/shape/plan/profile，不能推算榜分。完整摘要见CURRENT_IDENTICAL_REPEATS，原JSON忽略artifacts/current-identical-repeats。没有活动任务；Git分支experiment/current-identical-repeats，算法SHA保持，main和标签不动。
+
+
+## 2026-10-02: score priorities and packed TT candidate
+
+See SCORE_PRIORITIES: C3/C11/C1/C4/C9 account for about 75% of the gap to the supplied leader. Minimum total latency is not maximum mean score. TT native-document task 6abf2077694b590c3c47a088 passed 15/15 but C8 regressed to 59.72us (parent median46.51), C11 89.37us (parent88.03), archived branch3e05d43. Its kernel is not included here.
+
+Packed TT candidate9711c3d adds an entry, guard and launch before the actual generic Vector route. That existing front route already has K-only indices/manual UB/per-batch AIV; the new hypothesis is shared Cast, contiguous K-group folds, one final M sum. SHA bd87dde9612d3c41d0b45550824f7cc75ac4419860e7a22ac579112c5f58431a, 360555bytes. CPU3201 entries/576 encoded FP16-BF16/seven negative controls; production and TUNING each3000 host checks and16384 full conditional C4-range checks passed. Three additions removed restore whole1734f16; original plan/workspace unchanged. Native compile/precision/latency PENDING, no active task. See TINY_TT_PACKED_FRAME.
+
+Independent template other seven source files match1734f16. Initial verification encountered untracked template metadata; changed verification to seven original source files, final dry-run SHA matches candidate. No wrong-source submission occurred.

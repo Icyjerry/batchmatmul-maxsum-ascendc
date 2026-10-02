@@ -1,5 +1,15 @@
 # 最新接手状态 · 2026-10-02
 
+## 当前实验覆盖以下旧状态
+
+- 当前分支 `experiment/tiny-tt-packed-frame`，实现9711c3d，kernel SHA `bd87dde9612d3c41d0b45550824f7cc75ac4419860e7a22ac579112c5f58431a` /360555bytes。CPU/host/scope通过，CANN/native精度/速度PENDING，无活动正式任务。
+- 恢复62ad1cd/1734f16通过算法为父，没有并入失败TT交换操作数。后者任务6abf2077694b590c3c47a088为15/15，C8 59.72 vs父46.51，C11 89.37 vs父88.03，没有提速，归档3e05d43；见TT_NATIVE_DOCUMENT。
+- 重点C3/C11/C1/C4/C9贡献约75%追赶差距，见SCORE_PRIORITIES。新候选针对C4共享Cast/连续Kgroup折叠/一次SumM；实际父前置Vector已经手动UB、K-only索引和独立B AIV，不把它们当新增收益。launch必须放在通用Vector之前。
+- CPU3201entry/576编码浮点/7负控制；production与TUNING各3000host、各16384完整历史C4条件范围准入通过。Plan/workspace不变，真实UB/AIV与pins保护。详情TINY_TT_PACKED_FRAME。
+- 下一动作：commit/push后仅一次正式提交，立即保存ID并查同ID至终态。独立模板 `/private/tmp/bmmms-tiny-tt-packed-official/project` 七个其它源码与1734f16逐字一致，dry-run候选SHA匹配。父C4三次4.12/4.12/4.15μs；明确大收益才原样确认，否则归档恢复父，不扫附近参数。原资料忽略artifacts/tiny-tt-packed-frame/。整体冲榜未完成。
+
+以下为父版接手状态，其“下一条可执行动作”已由上文替代；其它约束仍适用。
+
 ## 当前代码和任务
 
 - 工作分支：`experiment/current-identical-repeats`，算法逐字恢复通过版 `1734f16`，没有 tiny 广播/K 树候选。
