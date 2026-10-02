@@ -32,3 +32,7 @@
 独立模板 `/private/tmp/bmmms-tiny-tt-packed-official/project`，其它七源码与1734f16逐字一致，仅kernel替换。commit/push/dry-run后只提交一次，立即保存ID查询至终态。父三次C4 4.12/4.12/4.15μs。明确大收益再原样确认；否则归档恢复父，不扫描附近M块参数，其它未改路线波动不归因。
 
 原始日志忽略artifacts/tiny-tt-packed-frame/，目录700/文件600。整体冲榜目标未完成。
+
+## 已创建任务
+
+实现9711c3d/交接9abebf0已push，独立模板dry-run SHA一致。正式任务 `6abf25e6694b590c3c4a0fa3` 已创建，编译/精度/速度终态PENDING。下一只查询同ID至终态，不因等待重交。
