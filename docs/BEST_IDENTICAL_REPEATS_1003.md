@@ -6,7 +6,7 @@
 
 上一组任务6abfc955694b590c3ca51a64 /6abfca4d694b590c3ca5b6a8已经15/15 Pass，详见BEST_IDENTICAL_REPEATS_1002。本轮独立新增恰好两次，不复用旧ID冒充新提交。
 
-任务1 `6ac08cd7694b590c3cf7a7d8` 已15/15 Pass，precision_ratio全1；任务2尚未创建。下一创建恰好一次任务2，立即保存ID并只查其同ID至终态。为避免上一组429，已经等任务1结束再创建任务2。原日志忽略artifacts/best-identical-repeats-1003/，目录700/文件600。
+任务1 `6ac08cd7694b590c3cf7a7d8` 已15/15 Pass，precision_ratio全1；任务2 `6ac08d9c694b590c3cf806ec` 已创建，终态PENDING。下一只查询任务2同ID至终态；本轮两任务已创建，不创建第三次。先等任务1结束后POST任务2，成功，没有429。原日志忽略artifacts/best-identical-repeats-1003/，目录700/文件600。
 
 保存全部15点status/precision/time；同源码样本不能证明同机受控A/B或新优化收益，接口没有实际SoC/shape/plan/profile。平均分只按用户T换算，不当榜单排名证据。整体冲榜目标尚未完成。
 

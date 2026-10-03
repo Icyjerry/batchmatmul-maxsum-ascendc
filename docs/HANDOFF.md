@@ -2,7 +2,7 @@
 
 ## 10月3日新增两次复测
 
-任务1 `6ac08cd7694b590c3cf7a7d8` 已15/15 Pass、precision全1，任务2尚未创建；下一仅创建缺少的任务2、立即保存ID、只查它到终态。下文“两任务尚未创建”已由本条替代。
+任务1 `6ac08cd7694b590c3cf7a7d8` 已15/15 Pass、precision全1；任务2 `6ac08d9c694b590c3cf806ec` 已创建，终态PENDING。下一只查任务2同ID至终态，两任务已创建，不创建第三次。下文“两任务尚未创建”已由本条替代。
 
 当前分支experiment/best-identical-repeats-1003，从cf52f5e延续最优组合1734f16/a5eef105…/354602bytes，算法与参数未改。用户再次要求“再交两次”，本次独立新增两任务；详情BEST_IDENTICAL_REPEATS_1003。模板dry-run SHA一致，两任务尚未创建，下一先创建任务1/保存ID/查终态，再创建任务2避免限流。旧“不创建第三次”仅约束旧组，不取消本次用户新增要求。原JSON忽略artifacts/best-identical-repeats-1003/。以下10月2日记录为历史状态，当前以本段和新报告末尾为准。
 
