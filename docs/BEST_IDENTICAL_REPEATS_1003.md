@@ -1,5 +1,9 @@
 # 当前最优组合新增两次原样复测 · 2026-10-03
 
+## 用户随后新增一次复测
+
+此前两次已完成后，用户明确“再交一次”。新增任务 `6ac0d57f694b590c3c252456` 已创建，终态PENDING，kernel/template SHA仍a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742/354602bytes，源码和参数不变。下一只查询本ID到真实终态；本新增请求只创建这一次，下文“不创建第三次”仅约束此前两次请求，不取消用户新要求。原结果保存artifacts/best-identical-repeats-1003/extra-one.json，不入Git。
+
 用户新增要求“再交两次”。对象延续上一组：最优组合1734f16，kernel SHA256 `a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742` /354602bytes，源码和参数完全不变。
 
 分支experiment/best-identical-repeats-1003从cf52f5e创建。独立模板/private/tmp/bmmms-tt-manual-frame-official/project与工作区kernel SHA一致；dry-run仅kernel，SHA一致。其它七源码逐字保持1734f16；只改交接文档，不改main/标签。

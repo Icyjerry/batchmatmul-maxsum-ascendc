@@ -1,5 +1,9 @@
 # 最新接手状态 · 2026-10-03
 
+## 用户随后新增一次：正在运行
+
+用户明确“再交一次”，已创建任务 `6ac0d57f694b590c3c252456`，终态PENDING。仍在experiment/best-identical-repeats-1003，最优组合1734f16/a5eef105…/354602bytes，算法/参数未改，dry-run一致。下一只查此ID到真实终态，本次不再创建任务；原结果忽略artifacts/best-identical-repeats-1003/extra-one.json。以下“不创建第三次/无活动任务”只代表此前两次已完成状态，由本条覆盖。详见BEST_IDENTICAL_REPEATS_1003。
+
 ## 10月3日新增两次复测
 
 当前分支experiment/best-identical-repeats-1003，从cf52f5e延续最优组合1734f16/a5eef105…/354602bytes，算法与参数未改。用户新增两次已完全完成：`6ac08cd7694b590c3cf7a7d8` / `6ac08d9c694b590c3cf806ec` 均CANN编译成功、15/15 Pass、precision_ratio全1。总耗时464.52/471.22μs；按用户T换算平均分50.84691/50.01648，不是榜单排名证明。没有活动任务，不创建第三次。
