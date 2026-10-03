@@ -2,7 +2,7 @@
 
 ## 用户随后新增一次复测
 
-此前两次已完成后，用户明确“再交一次”。新增任务 `6ac0d57f694b590c3c252456` 已创建，终态PENDING，kernel/template SHA仍a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742/354602bytes，源码和参数不变。下一只查询本ID到真实终态；本新增请求只创建这一次，下文“不创建第三次”仅约束此前两次请求，不取消用户新要求。原结果保存artifacts/best-identical-repeats-1003/extra-one.json，不入Git。
+此前两次已完成后，用户明确“再交一次”。新增任务 `6ac0d57f694b590c3c252456` 已15/15 Pass、precision_ratio全1，kernel/template SHA仍a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742/354602bytes，源码和参数不变。新增这一次已完全完成，无活动任务；完整结果见本文末尾。总耗时468.89μs、按用户T换算平均分50.58201。下文“不创建第三次”仅约束此前两次请求，不取消用户新要求。原结果保存artifacts/best-identical-repeats-1003/extra-one.json，不入Git。
 
 用户新增要求“再交两次”。对象延续上一组：最优组合1734f16，kernel SHA256 `a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742` /354602bytes，源码和参数完全不变。
 
@@ -49,3 +49,12 @@ Scoring uses the user-provided referenceT and 100/(1+log_1.5(t/T)), then mean ov
 All measurements retained. C13 15.13/16.74us (two-run range/median10.1%) demonstrates substantial single-case variation on unchanged source. C4 3.94/4.12, C9 67.35/68.07, C11 87.35/88.91. No source change or new optimization benefit inferred. Actual SoC/shape/plan/profile unavailable; not controlled same-device A/B or a general variation bound.
 
 The user-requested two new repeats are fully complete. Raw JSON stays ignored under artifacts/best-identical-repeats-1003 with directory700/file600. No further submission is needed for this request. Overall competition optimization goal remains active.
+
+
+## Extra user-requested single repeat: final Pass
+
+Task 6ac0d57f694b590c3c252456, CANN compile success, Pass15/15, all precision_ratio=1. Same1734f16/a5eef105... source and parameters. Exactly one new task for this request; no active task.
+
+Times(us): `[1.9, 2.53, 3.08, 4.08, 5.27, 9.8, 8.18, 46.78, 67.95, 98.24, 88.02, 97.08, 15.99, 10.77, 9.22]`.
+
+Total 468.89us = 0.00046889s. User-referenceT mean score 50.58201; calculated score, not public leaderboard rank evidence. No new algorithm improvement inferred from unchanged-source timing. Raw ignored artifacts/best-identical-repeats-1003/extra-one.json, file600. Overall competition optimization goal remains active.
