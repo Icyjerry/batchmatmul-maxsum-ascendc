@@ -768,3 +768,8 @@ Same1734f16/a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742/354
 ## 2026-10-03: additional single repeat requested
 
 Task 6ac0d57f694b590c3c252456 Pass15/15, all precision_ratio=1, CANN compile success. Same1734f16 SHA a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742, 354602bytes, no algorithm or parameter change. Times(us): `[1.9, 2.53, 3.08, 4.08, 5.27, 9.8, 8.18, 46.78, 67.95, 98.24, 88.02, 97.08, 15.99, 10.77, 9.22]`. Total 468.89us, userT mean score 50.58201 (calculated, not leaderboard evidence). Single request complete, no active task. Full record BEST_IDENTICAL_REPEATS_1003; raw artifact ignored extra-one.json. Overall optimization incomplete.
+
+
+## 2026-10-03: user supplies corrected Tbest
+
+NewTbest(us)=[1.23,1.73,2.34,2.76,3.92,6.46,6.40,17.32,50.10,68.52,70.09,81.09,9.04,9.52,8.11]. Latest task6ac0d57f still468.89us, now56.42050 calculated mean instead of old-reference50.58201. Prior two October3 runs57.00705 /55.29167. Full latest per-case and recent-five recalculation in SCORE_REFERENCE_1003. All native results/source unchanged; no new task. Historical oldT results preserved, do not mix scoring references or infer optimization/rank from recalculation.

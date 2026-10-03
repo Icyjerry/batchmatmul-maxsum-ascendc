@@ -58,3 +58,8 @@ Task 6ac0d57f694b590c3c252456, CANN compile success, Pass15/15, all precision_ra
 Times(us): `[1.9, 2.53, 3.08, 4.08, 5.27, 9.8, 8.18, 46.78, 67.95, 98.24, 88.02, 97.08, 15.99, 10.77, 9.22]`.
 
 Total 468.89us = 0.00046889s. User-referenceT mean score 50.58201; calculated score, not public leaderboard rank evidence. No new algorithm improvement inferred from unchanged-source timing. Raw ignored artifacts/best-identical-repeats-1003/extra-one.json, file600. Overall competition optimization goal remains active.
+
+
+## New user Tbest supersedes prior scoring reference
+
+See SCORE_REFERENCE_1003. Same runs/timings now calculate57.00705 /55.29167 /56.42050 using the new user Tbest. The old50.x numbers remain historical calculations with the oldT; no algorithm change, new timing, or public ranking claimed.
