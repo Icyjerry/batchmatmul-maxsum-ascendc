@@ -2,9 +2,9 @@
 
 ## 10月3日新增两次复测
 
-任务1 `6ac08cd7694b590c3cf7a7d8` 已15/15 Pass、precision全1；任务2 `6ac08d9c694b590c3cf806ec` 已创建，终态PENDING。下一只查任务2同ID至终态，两任务已创建，不创建第三次。下文“两任务尚未创建”已由本条替代。
+当前分支experiment/best-identical-repeats-1003，从cf52f5e延续最优组合1734f16/a5eef105…/354602bytes，算法与参数未改。用户新增两次已完全完成：`6ac08cd7694b590c3cf7a7d8` / `6ac08d9c694b590c3cf806ec` 均CANN编译成功、15/15 Pass、precision_ratio全1。总耗时464.52/471.22μs；按用户T换算平均分50.84691/50.01648，不是榜单排名证明。没有活动任务，不创建第三次。
 
-当前分支experiment/best-identical-repeats-1003，从cf52f5e延续最优组合1734f16/a5eef105…/354602bytes，算法与参数未改。用户再次要求“再交两次”，本次独立新增两任务；详情BEST_IDENTICAL_REPEATS_1003。模板dry-run SHA一致，两任务尚未创建，下一先创建任务1/保存ID/查终态，再创建任务2避免限流。旧“不创建第三次”仅约束旧组，不取消本次用户新增要求。原JSON忽略artifacts/best-identical-repeats-1003/。以下10月2日记录为历史状态，当前以本段和新报告末尾为准。
+完整15点和样本波动见BEST_IDENTICAL_REPEATS_1003：C13 15.13/16.74μs（极差/中位10.1%）、C4 3.94/4.12、C9 67.35/68.07、C11 87.35/88.91。同源码变化不是新优化；真实SoC/shape/plan/profile未知，不是受控同机A/B。两次均无429；源码和八文件模板逐字1734f16。原JSON忽略artifacts/best-identical-repeats-1003/，目录700/文件600。下一继续原已确认C3/C11/C1/C4/C9结构优化，不重复本组任务；整体冲榜未完成。以下10月2日为历史状态，当前以本段为准。
 
 ## 当前用户新增复测请求
 
@@ -16,7 +16,7 @@ C4候选6abf25e6694b590c3c4a0fa3 15/15但C4 4.43vs父4.12，无收益，归档ex
 
 ## 当前代码和任务
 
-- 工作分支：`experiment/best-identical-repeats-1002`，算法逐字恢复通过版 `1734f16`，没有 tiny 广播/K 树候选。
+- 工作分支：`experiment/best-identical-repeats-1003`，算法逐字恢复通过版 `1734f16`，没有 tiny 广播/K 树候选。
 - `kernel.asc`：354602 bytes；SHA256 `a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742`。
 - 对应正式任务 `6abeb39e694b590c3c22e5d7`：CANN 编译成功，15/15 Pass，precision_ratio 全1。
 - 当前版原样两次复测已完成：`6abeceed694b590c3c2bc7a5` / `6abecfc5694b590c3c2c1347`，均15/15 Pass。C8三次46.52/46.51/46.48 μs，C9三次67.79/67.88/67.91；C2极差/中位6.4%、C15 5.8%。见 [CURRENT_IDENTICAL_REPEATS](CURRENT_IDENTICAL_REPEATS.md)。没有活动任务，不继续第三次；算法未改，整体“大幅优化、冲榜”目标未完成。

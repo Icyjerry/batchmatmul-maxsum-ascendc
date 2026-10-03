@@ -758,3 +758,8 @@ C8中位46.51、极差0.09%，C9中位67.88、极差0.18%；C2极差6.4%、C15�
 ## 2026-10-02: best-source two extra repeats requested by user
 
 Same1734f16/62ad1cd kernel SHA a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742, 354602bytes. 6abfc955694b590c3ca51a64 / 6abfca4d694b590c3ca5b6a8 both Pass15/15, precision all1. Totals 464.23/465.68us; means using userT 50.58646/50.82629, calculated not public leaderboard evidence. Second task creation encountered two429 responses without IDs, waited before success. Exactly two tasks created, no active task. Full15 times/spreads and evidence limits in BEST_IDENTICAL_REPEATS_1002. No algorithm changes. Overall optimization incomplete.
+
+
+## 2026-10-03: two more unchanged best-kernel repeats requested
+
+Same1734f16/a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742/354602bytes. 6ac08cd7694b590c3cf7a7d8 / 6ac08d9c694b590c3cf806ec both CANN compile success, Pass15/15, precision all1. Totals 464.52/471.22us; calculated means using userT 50.84691/50.01648. C13 15.13/16.74us, C4 3.94/4.12, C9 67.35/68.07, C11 87.35/88.91; unchanged-source variation, not algorithm improvement. Actual SoC/shape/plan/profile unavailable. Exactly two new tasks; no active task or429. Full results in BEST_IDENTICAL_REPEATS_1003. No source changes; raw artifacts ignored. Overall competition goal incomplete.
