@@ -963,3 +963,5 @@ CPU Breads-50%/Ctiles-MMAD-10%/totalL0elements-12.857% didnot establish hardware
 Archive this experiment, restore wholepassed **a2e6763** (368782B/SHA16b51684), retaining balanced ownership/C8phasedA. Main/historicaltags untouched, overallgoal remains incomplete.
 
 Restored wholea2e6763/368782B/SHA16b51684 onexperiment/c10-pipeline-audit. FailedfullM source/models retained74f9937 onexperiment/c10-full-m-shard; terminaldocs carriedforward. No activejob/repeat/nearby scans. Nextsource pipeline audit only; no newoptimization yet.
+
+Source audit complete: FF GMslot credit acquiredbeforeK MMAD thoughonlyFixpipe writesring; retained C9 useslateacquisition. Independent deferred-credit hypothesis documentedC10_PIPELINE_CREDIT_AUDIT, unimplemented/unsubmitted. Originalgeometry/Plan/Vector unchanged, no inputvolumeclaim. Requiredblocked-credit/readiness faultmodels beforeonegatednativeexperiment. No livejob; kernel remainswholea2e6763.
