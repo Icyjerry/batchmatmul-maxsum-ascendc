@@ -1072,3 +1072,8 @@ CPUproduction&TUNING2592plans/6hits each;1452actualAIV+parent+actualFinalizeRows
 
 
 Whole a2e6763 restored on experiment/c9-b-package-stream-audit. New Cube B cross-tile FIFO arithmetic audit: 15120 worker sequences/83328 packets exact old ordering; conditional20cores C9 same960DMA/31457280sourceelements, startup384->40 (344 moved earlier, not eliminated). Different from historical Vector consumer prefetch and archived lane Max. Actual changed producer/protocol/native compile/timing PENDING, no job. Next deferred-MTE1 reader model before exact-guard implementation gate; details C9_B_PACKAGE_STREAM_AUDIT. Main/tags untouched.
+
+
+## C9 cross-tile Cube B FIFO CPU candidate
+
+Kernel371544B/SHA8ebc3eafd391c48c3f7242107c7fdd7ee2db2fea85ddfc454227340c68ed7724, experiment/c9-b-package-stream. ExactC9guard/defaultfalse B_STREAM, existing2B1TQue slots and task/nt/k cursor; noGM/ABI/geometry/Plan/AIV changes. CPU68new/68parent/68eagerDMA actualproducer configurations,1452unchangedactualAIV+FinalizeRows, production&TUNING2592plans/6hits each,8fault controls PASS. Initial whole-L0 epoch false alarm and batch/M_FIX fault misses fixed in model/data, failedlogs preserved. B-before-current-Fix proxycounts916new/0parent; same packets/traffic, not time. Implicitqueue protection modeled/Fixpipe synchronous, nativePENDING/noID, dryonlykernel371544B/8ebc3eaf. ONEgateafterpush;confirmationonlyPass15/C9<=57.375us. C9_B_PACKAGE_STREAM gives boundaries/risks.

@@ -1,9 +1,9 @@
-# C9 B package stream audit — passed kernel restored
+# C9 B stream candidate — CPU passed, one native gate next
 
-- Current branch experiment/c9-b-package-stream-audit; whole kernel restored a2e6763 /368782B/SHA16b51684, retaining C10 balanced ownership, C8 phased A and C13 frame. C9 lane Max implementation/source/result archived a07150f/ec40e0e (Pass15/C9=67.62us/no gain).
-- New executed arithmetic audit: 15120 sequences/83328 packets exact FIFO/tail/task/batch ordering. Conditional20-core C9 old startup384 -> one-time40, 344 existing DMA calls moved earlier, NOT removed; same960packets/31457280elements. No new kernel implementation/native job yet.
-- NEXT implement exact C9 persistent two-slot Cube B FIFO and validate actual producer with deferred MTE1 readers, MTE2, MMAD, original AIV/finalizer, host guards and fault controls. Cross-task B prefetch may delay A refresh; no performance claim until native. See [C9_B_PACKAGE_STREAM_AUDIT](C9_B_PACKAGE_STREAM_AUDIT.md).
-- No live tasks; no unchanged-best repeat pending. Do not repeat failed C8 tail balancing/resident swaps, C9 lane Max, C10 full-M/late-credit/direct-A2/FF-package scans or C6 already-removed queues. CPU/native/profile evidence separate. Overall goal incomplete.
+- Current branch experiment/c9-b-package-stream; candidate371544B/SHA8ebc3eaf, parentwholea2e6763. Exact C9 persistent two-slot Cube B FIFO/task-nt-k cursor, same packages/geometry/GM/AIV; 57added/4removed kernel lines. Details [C9_B_PACKAGE_STREAM](C9_B_PACKAGE_STREAM.md).
+- CPU204 producer configurations (new68/parent68/eagerDMA68),1452 unchanged actual AIV+FinalizeRows, production&TUNING2592plans/6hits each,8fault controls passed. Initial model epoch/fault fixtures corrected with failed logs preserved; not native proof. Next tile B issue916 versus0 parent in proxy suite; same bytes.
+- NEXT after commit/push ONE formal gate using /private/tmp/bmmms-c9-b-package-stream/project, dry kernel371544B/8ebc3eaf. No native ID/live jobs yet. Record ID immediately and poll same to terminal. Confirmation onlyPass15/C9<=57.375us; otherwise archive and restorewholea2e6763/no repeats or neighboring scans.
+- No unchanged-best repeat pending. Avoid failed C8 tail balancing/resident swaps, C9 lane Max, C10 fullM/late-credit/directA2/FF-package scans or C6 already-removed queues. Models/native/profile separate. Goal incomplete/main/tags unchanged.
 
 ## 先读与规则
 
