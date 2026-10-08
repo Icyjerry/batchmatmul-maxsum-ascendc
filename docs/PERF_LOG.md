@@ -925,3 +925,7 @@ Keep the passed phased-A code on experiment/c8-phased-a-ready as an *experimenta
 C10=97.06，相比单次父99.56看似下降2.51%，但旧 C10 未改路径的已保存实测是96.98/98.17/97.58/97.76/98.24/98.47/99.34/100.24，候选在该范围内。没有控制同设备 A/B、命中记录或 profiling，不能宣称速度突破，也不能仅据此判定 FF 路径未命中。未改的 C8=44.87 相比父44.09略差等不利样本全部保留；整次总和和得分变化不证明此分包方案有益。
 
 **归档，不保留这次 kernel 变化；整份恢复 af886e1/C8 phased-A**。不原样复测、不扫附近 B_PACKAGE。原始 JSON/log 在忽略的 artifacts/c10-ff-b-packages。下一步应核实正式 C10 的实际 storage/dtype/plan；不能再次用互相冲突的历史布局假设同时扩分支。
+
+## C10 balanced actual M ownership: CPU candidate
+
+Parentaf886e1;368782B/SHA16b51684,60additions/11removed. At4096/1280/1152/20coresmaxRows256→208, butCtiles160→200,MMAD/Bcopies2880→3600/Breads47185920→58982400(+25%). Same total math, complete N maxima andoriginal Plan/arena/credits. CPU13Cube/96 actualAIVownership-store+FinalizeRows/prod&TUNING192plans9hits/sixfaultcontrols pass. Arithmetic/sync outsideownership unchanged. NativePENDING,noID. PublicproblemAPI givesonlytestcaseIDs,noformalmeta;FF/TTconflictconditional. C10_BALANCED_M_SHARDS containsboundaries/nextgate.

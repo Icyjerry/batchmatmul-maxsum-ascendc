@@ -1,0 +1,107 @@
+// Executes actual AIV ownership/store projection and actual FinalizeRows.
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <deque>
+#include <functional>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <vector>
+#define __aicore__
+#define __gm__
+using GM_ADDR=float*;
+constexpr int PIPE_V=1;
+struct Schedule{int64_t b,m,n,k;uint32_t baseM,baseN,mTiles,nTiles,nSplit,workers,vectorTile=256;};
+std::vector<unsigned> writes;float* partsPointer=nullptr;float* outputPointer=nullptr;size_t partsSize=0;unsigned yWrites=0;
+namespace AscendC {
+enum class TPosition{VECIN,VECOUT,VECCALC};
+enum class HardEvent{V_S,S_V,S_MTE3};
+struct Storage{std::vector<float> data;bool pending=false;explicit Storage(size_t n):data(n,1e30f){}};
+std::deque<std::function<void()>> dma;
+void Flush(){while(!dma.empty()){auto f=dma.front();dma.pop_front();f();}}
+template<class T>struct LocalTensor{
+ std::shared_ptr<Storage> mem;size_t offset=0;
+ LocalTensor operator[](size_t i)const{assert(offset+i<mem->data.size());return {mem,offset+i};}
+ float& At(size_t i)const{assert(offset+i<mem->data.size());return mem->data.at(offset+i);}
+ float GetValue(size_t i)const{assert(!mem->pending);return At(i);}void SetValue(size_t i,float v){assert(!mem->pending);At(i)=v;}
+};
+template<class T>struct GlobalTensor{
+ T* ptr=nullptr;size_t size=0,offset=0;
+ void SetGlobalBuffer(T* p,size_t n=0){ptr=p;size=p==outputPointer?1:partsSize;if(n)assert(n<=size);}
+ GlobalTensor operator[](size_t i)const{assert(offset+i<size);auto v=*this;v.offset+=i;return v;}
+ float& At(size_t i)const{assert(offset+i<size);return ptr[offset+i];}
+};
+template<TPosition P,int N>struct TQue{
+ std::shared_ptr<Storage> mem;bool used=false;
+ template<class T>LocalTensor<T> AllocTensor(){assert(!used);used=true;return {mem,0};}
+ template<class T>void EnQue(LocalTensor<T> t){assert(used&&t.mem==mem);}
+ template<class T>LocalTensor<T> DeQue(){assert(used);if(mem->pending)Flush();return {mem,0};}
+ template<class T>void FreeTensor(LocalTensor<T> t){assert(used&&t.mem==mem);used=false;}
+ ~TQue(){Flush();assert(!used);}
+};
+template<TPosition P>struct TBuf{std::shared_ptr<Storage> mem;template<class T>LocalTensor<T> Get(){return {mem,0};}};
+struct TPipe{
+ size_t bytes=0;
+ template<TPosition P,int N>void InitBuffer(TQue<P,N>& q,int depth,size_t n){assert(depth==N);bytes+=n*depth;q.mem=std::make_shared<Storage>(n/4);assert(bytes<=192*1024);}
+ template<TPosition P>void InitBuffer(TBuf<P>& q,size_t n){bytes+=n;q.mem=std::make_shared<Storage>(n/4);assert(bytes<=192*1024);}
+};
+uint32_t GetBlockIdx(){return 0;}
+struct DataCopyExtParams{uint16_t blocks;uint32_t len,srcStride,dstStride,rsv;};
+template<class T>struct DataCopyPadExtParams{bool pad;uint8_t left,right;T value;};
+void DataCopyPad(LocalTensor<float> dst,GlobalTensor<float> src,DataCopyExtParams p,DataCopyPadExtParams<float> pad){
+ assert(!pad.pad&&p.blocks==1&&!dst.mem->pending);dst.mem->pending=true;
+ dma.push_back([=]{for(uint32_t i=0;i<p.len/4;++i)dst.At(i)=src.At(i);dst.mem->pending=false;});
+}
+void DataCopy(GlobalTensor<float> dst,LocalTensor<float> src,uint32_t count){
+ assert(dst.ptr==partsPointer&&count%8==0&&!src.mem->pending);
+ for(uint32_t i=0;i<count;++i){assert(++writes.at(dst.offset+i)==1);dst.At(i)=src.At(i);}
+}
+void DataCopyPad(GlobalTensor<float> dst,LocalTensor<float> src,DataCopyExtParams p){
+ assert(dst.ptr==outputPointer&&p.blocks==1&&p.len==4&&dst.offset==0&&!src.mem->pending);
+ dma.push_back([=]{assert(++yWrites==1);dst.At(0)=src.At(0);});
+}
+void Duplicate(LocalTensor<float> dst,float v,uint32_t n){assert(!dst.mem->pending);for(uint32_t i=0;i<n;++i)dst.At(i)=v;}
+struct BinaryRepeatParams{uint32_t d,s1,s2,dr,s1r,s2r;};
+void Max(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint64_t mask,uint32_t reps,BinaryRepeatParams p){
+ assert(!a.mem->pending&&!b.mem->pending&&mask<=64&&p.dr==8&&p.s1r==8&&p.s2r==8);
+ for(uint32_t r=0;r<reps;++r)for(uint32_t i=0;i<mask;++i)dst.At(r*64+i)=std::max(a.At(r*64+i),b.At(r*64+i));
+}
+template<class T,bool Reuse>void ReduceSum(LocalTensor<T> dst,LocalTensor<T> src,LocalTensor<T>,uint32_t n){
+ assert(!src.mem->pending);float total=0;for(uint32_t i=0;i<n;++i)total+=src.At(i);dst.At(0)=total;
+}
+template<int P>void PipeBarrier(){}
+}
+template<AscendC::HardEvent E>void Fence(){AscendC::Flush();}
+// SHARD_HELPER
+// FINALIZER
+float Value(int64_t row,bool neg){return neg?-float(1+(row*17)%61):float(int((row*17)%61)-30);}
+void StoreWorker(const Schedule& s,uint32_t worker,uint32_t sub,bool neg){
+ constexpr bool M_BALANCE=true,DIRECT_BATCH=false;
+ auto mShard=ManualBalancedMShard(s,worker);const int64_t tasks=(mShard.end-mShard.begin+s.baseM-1)/s.baseM;
+ const uint32_t rowStart=sub*(s.baseM/2);
+ AscendC::GlobalTensor<float> partials;partials.SetGlobalBuffer(partsPointer);
+ for(int64_t task=0;task<tasks;++task){
+// PROJECTION
+  auto mem=std::make_shared<AscendC::Storage>(s.baseM);AscendC::LocalTensor<float> maxima{mem,0};
+  for(uint32_t i=0;i<s.baseM;++i)maxima.At(i)=1e30f;
+  for(uint32_t i=0;i<rows;++i)maxima.At(i)=Value(m0+rowStart+i,neg);
+// STORE
+ }
+}
+void Run(int64_t M,uint32_t workers,bool neg){
+ Schedule s{1,M,1280,1152,128,256,uint32_t((M+127)/128),5,1,workers};
+ const size_t prefix=s.mTiles*s.baseM;std::vector<float> parts(prefix+16,1e30f),output(17,1e30f);
+ partsPointer=parts.data();outputPointer=output.data();partsSize=prefix;writes.assign(prefix,0);yWrites=0;
+ for(uint32_t w=0;w<workers;++w)for(uint32_t sub=0;sub<2;++sub)StoreWorker(s,w,sub,neg);
+ for(int64_t m=0;m<M;++m)assert(writes[m]==1&&parts[m]==Value(m,neg));
+ for(size_t m=M;m<parts.size();++m)assert(parts[m]==1e30f);
+ AscendC::TPipe pipe;pipe.bytes=128*256*4+5*128*4;
+ FinalizeRows(parts.data(),output.data(),s,pipe);AscendC::Flush();assert(AscendC::dma.empty());
+ float gold=0;for(int64_t m=0;m<M;++m)gold+=Value(m,neg);assert(output[0]==gold&&yWrites==1);
+ for(size_t i=1;i<output.size();++i)assert(output[i]==1e30f);
+}
+int main(){unsigned count=0;
+ for(int64_t m:{16,80,176,4096,4112,6144,8176,8192})for(uint32_t w:{1u,3u,8u,20u,24u,32u})for(bool neg:{false,true}){Run(m,w,neg);++count;}
+ std::cout<<count<<" actual AIV ownership/store+FinalizeRows: one writer/row, clipped tails/zero rows/poisoned padding, output bounds PASS\n";
+}

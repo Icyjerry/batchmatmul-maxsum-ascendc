@@ -1,0 +1,47 @@
+template<bool BAL>void Run(Schedule s,bool neg){
+ negativeInput=neg;s.mTiles=(s.m+s.baseM-1)/s.baseM;s.nTiles=(s.n+s.baseN-1)/s.baseN;
+ std::vector<int16_t> a(s.m*s.k),b(s.n*s.k);
+ for(int64_t m=0;m<s.m;++m)for(int64_t k=0;k<s.k;++k)a[m*s.k+k]=A(0,m,k);
+ for(int64_t k=0;k<s.k;++k)for(int64_t n=0;n<s.n;++n)b[k*s.n+n]=B(0,k,n);
+ auto oldA=a,oldB=b;std::vector<unsigned> owners(s.m,0);
+ std::vector<float> maxima(s.m,-std::numeric_limits<float>::infinity());
+ uint64_t mmads=0,breads=0,bcopies=0,maxRows=0,expectedRows=0,tiles=0;
+ for(uint32_t worker=0;worker<s.workers;++worker){
+  st=State{};st.s=s;st.tx1=false;st.tx2=false;
+  // Independent enumeration in 16-row units; never calls the source helper.
+  int64_t unitCount=(s.m+15)/16,first=unitCount*worker/s.workers*16,last=std::min(s.m,unitCount*(worker+1)/s.workers*16);
+  uint32_t sequence=0,rowsOwned=0;uint64_t expectedA=0,expectedB=0,ctiles=0;
+  int64_t begin=BAL?first:int64_t(worker)*s.baseM,step=BAL?s.baseM:int64_t(s.workers)*s.baseM,end=BAL?last:s.m;
+  for(int64_t m0=begin;m0<end;m0+=step){
+   uint32_t rows=std::min<int64_t>(s.baseM,end-m0);rowsOwned+=rows;expectedA+=uint64_t(rows)*s.k;
+   for(uint32_t m=0;m<rows;++m)assert(++owners[m0+m]==1);
+   for(uint32_t nt=0;nt<s.nTiles;++nt,++sequence){
+    uint32_t cols=std::min<int64_t>(s.baseN,s.n-int64_t(nt)*s.baseN);
+    st.expected.push_back({0,m0,int64_t(nt)*s.baseN,rows,cols,0,size_t((sequence&1)*s.baseM*s.baseN)});
+    expectedB+=uint64_t(cols)*s.k;++ctiles;
+   }
+  }
+  std::vector<float> ring(2*s.baseM*s.baseN+16,1e30f);AscendC::TPipe pipe;
+  RunCase9<int16_t,true,BAL?1:0>(pipe,{&a,0,true},{&b,0,false},{&ring},s,worker,64);
+  assert(AscendC::dma.empty()&&AscendC::mte1.empty()&&AscendC::mac.empty());
+  assert(st.aReads==expectedA&&st.bReads==expectedB&&st.fixes==ctiles);
+  assert(st.mmads==ctiles*((s.k+63)/64)&&st.bCopies==st.mmads);
+  for(auto e:st.events)assert(e.second==0);for(auto credit:st.cross)assert(!credit);
+  for(size_t i=2*s.baseM*s.baseN;i<ring.size();++i)assert(ring[i]==1e30f);
+  for(auto v:st.maxima){auto m=std::get<1>(v.first);assert(m>=begin&&m<end);maxima[m]=v.second;}
+  mmads+=st.mmads;breads+=st.bReads;bcopies+=st.bCopies;maxRows=std::max<uint64_t>(maxRows,rowsOwned);expectedRows+=rowsOwned;tiles+=ctiles;
+ }
+ assert(a==oldA&&b==oldB&&expectedRows==uint64_t(s.m));for(auto n:owners)assert(n==1);
+ float sum=0,gold=0;for(int64_t m=0;m<s.m;++m){float mx=-std::numeric_limits<float>::infinity();
+  for(int64_t n=0;n<s.n;++n){float v=0;for(int64_t k=0;k<s.k;++k)v+=float(A(0,m,k))*float(B(0,k,n));mx=std::max(mx,v);}
+  assert(maxima[m]==mx);if(neg)assert(mx<0);sum+=maxima[m];gold+=mx;
+ }assert(sum==gold);
+ std::cout<<"M="<<s.m<<" N="<<s.n<<" K="<<s.k<<" W="<<s.workers<<" balanced="<<BAL<<" maxRows="<<maxRows<<" Ctiles="<<tiles<<" Bcopies="<<bcopies<<" MMAD="<<mmads<<" Breads="<<breads<<"\n";
+}
+int main(){
+ Run<true>({1,4096,1280,1152,128,256,0,0,1,20,0,0},false);
+ for(uint32_t workers:{1u,3u,8u,20u,24u,32u}){
+  Schedule s{1,176,272,128,128,256,0,0,1,workers,0,0};Run<true>(s,true);Run<false>(s,true);
+ }
+ std::cout<<"13 actual manual FF producers: live operands, every complete-K C, disjoint shard/tail/full M Max-Sum/rings PASS\n";
+}

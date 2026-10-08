@@ -1,3 +1,11 @@
+# 当前候选：C10 balanced M shards · 2026-10-08
+
+- experiment/c10-balanced-m-shards，父af886e1。kernel368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94。60additions/11removed，只kernel算法。按16行划分真实M核区间，保持每行完整Nmax及原Plan/GM。
+- 完整形状20核maxRows256→208；Ctiles/B搬运+25%，收益未证实。CPU13真实Cube/96真实ownership-store-finalizer/生产和TUNING各192host9hit/六控制均通过；fake tiler/合成maxima/nativeTQue假设分开报告。详见 [C10_BALANCED_M_SHARDS](C10_BALANCED_M_SHARDS.md)。
+- 正式CANN编译/15精度/性能 PENDING，无ID。下一步commit/push/dry-run后只提交一次，立即保存唯一ID并查询同一任务至终态。无明显收益则整份恢复af886e1保留C8，不扫附近粒度。
+- get_problem公开API只给testcase_id，get_submission Pass无shape/layout/log；未请求隐藏测试端点。旧FF/TT冲突仍未证实，候选只走既有BF16/FF安全family；没有基于耗时宣称命中。
+- 无Web/新GM/受保护文件改动/main或历史标签移动，无在跑任务。用户CLI/GitHub授权持续有效。上一轮C10 B包已完整归档，无待复测请求。
+
 # 当前已通过版本与已归档 C10 实验 · 2026-10-08
 
 - 当前 experiment/c8-phased-a-ready，kernel 整份逐字节等于 af886e1，365948B/SHA b87ec00643094e19c3c0433113480791494f8e00771887982a1766276d13e08b。保留 C8 单次局部改善44.09及既有 C13 收益，未提升 main/历史标签。
