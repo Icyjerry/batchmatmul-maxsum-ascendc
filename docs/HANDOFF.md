@@ -1,3 +1,7 @@
+# Current C8 single-package experiment · 2026-10-08
+
+Current experiment/c8-full-inputs-frame, NOT retained best. Candidate SHA9f7eaa8449509b2efe686cb1bdf618023fa6497995eea2acb5413c3ee9e703b5/bytes365832. Sourcephysical models/hostcontrols passed, native gate PENDING/no task ID yet. See C8_FULL_INPUTS_FRAME. Prior requested best6ac77103694b590c3ccaa29e terminalPass15/all1, mean51.04336/C8=46.87/C13=13.44; no activejob. Nextcommit/push/dry-run, ONE native gate, saveID/querysameIDto terminal. N-majorstream archived268a802unsubmitted/nocallreduction; noWeb. Retainedbest7492776 onexperiment/c13-resident-frame, whole restore afterfailed/no-gain gate.
+
 # 最新接手状态 · 2026-10-08
 
 ## Current retained code and next executable action

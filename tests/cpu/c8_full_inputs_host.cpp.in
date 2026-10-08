@@ -1,0 +1,38 @@
+int main(){
+ auto* hw=platform_ascendc::PlatformAscendCManager::GetInstance();unsigned count=0,hits=0;
+ for(int cores:{1,3,8,20,32})for(int M:{1024,1025,1026})for(int N:{1030,1031,1032})
+ for(int K:{1024,1032,1040})for(int dt:{1,2})for(int lay=0;lay<4;++lay){
+  hw->aic=cores;hw->aiv=cores*2;Shape s{1,M,N,K,dt,lay/2,lay%2};auto p=MakePlan(s,cores),old=p;
+  auto q=MakeC8FullInputsFrame(s,p);++count;
+  assert(!memcmp(&p.schedule,&old.schedule,sizeof(Schedule))&&p.totalBytes==old.totalBytes&&p.cubeBlocks==old.cubeBlocks);
+  if(q.workers){++hits;assert(M==1025&&N==1031&&K==1032&&dt==2&&lay==3);
+   assert(q.bm==128&&q.bn==112&&q.packageK==1040&&q.nTiles==10&&q.workers==p.cubeBlocks);
+   assert(q.workers<=uint32_t(cores)&&uint64_t(q.bm+q.bn)*q.packageK*2+4096<=hw->l1);
+   assert(4ULL*q.bm*128<=hw->l0a&&4ULL*q.bn*128<=hw->l0b&&8ULL*q.bm*q.bn<=hw->l0);
+   uint64_t c=uint64_t(q.bm)*q.bn,prefix=uint64_t(q.nTiles)*9*q.bm*4;
+   assert(prefix==46080&&prefix+8*c*q.workers<=p.totalBytes-p.systemBytes);
+   assert(4*c+4*q.bm+4096<=hw->ub&&prefix+96+32+4096<=hw->ub);
+  }
+ }
+ assert(hits);hw->aic=20;hw->aiv=40;Shape s{1,1025,1031,1032,2,1,1};auto p=MakePlan(s,20);
+ assert(MakeC8FullInputsFrame(s,p).workers);
+ // One-byte failures of the candidate's complete physical budgets.
+ for(auto v:std::vector<std::pair<uint64_t*,uint64_t>>{{&hw->l1,503296},{&hw->l0a,65536},
+  {&hw->l0b,57344},{&hw->l0,114688},{&hw->ub,61952}}){
+  auto save=*v.first;*v.first=v.second-1;assert(!MakeC8FullInputsFrame(s,p).workers);*v.first=save;
+ }
+ auto saveBytes=p.totalBytes;p.totalBytes=p.systemBytes+46080+114688ULL*p.cubeBlocks-1;
+ assert(!MakeC8FullInputsFrame(s,p).workers);p.totalBytes=saveBytes;
+ auto saveAiv=hw->aiv;hw->aiv=2*(p.cubeBlocks-1);assert(!MakeC8FullInputsFrame(s,p).workers);hw->aiv=saveAiv;
+ for(auto field:{&p.schedule.baseM,&p.schedule.baseN,&p.schedule.kChunk,&p.schedule.nSplit,&p.schedule.workers}){
+  auto save=*field;*field=999;assert(!MakeC8FullInputsFrame(s,p).workers);*field=save;
+ }
+#ifdef BMMMS_TUNING
+ for(auto field:{&Tune().group,&Tune().rows,&Tune().dual,&Tune().early,&Tune().tree,
+  &Tune().bm,&Tune().bn,&Tune().window,&Tune().ns,&Tune().ks,&Tune().workers}){
+  Tune()=TuneConfig{};*field=1;assert(!MakeC8FullInputsFrame(s,p).workers);
+ }
+ Tune()=TuneConfig{};
+#endif
+ std::cout<<count<<" actual host plans/"<<hits<<" exact full-input selections: original plan/GM bytes, actual cores, six byte-boundary budgets, mismatched layouts/shapes/pins fallback PASS\n";
+}

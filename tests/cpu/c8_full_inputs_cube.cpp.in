@@ -1,0 +1,53 @@
+void Run(uint32_t M,uint32_t N,uint32_t K,uint32_t BM,uint32_t BN,uint32_t PK,uint32_t workers,bool neg,bool full){
+ assert(2ULL*BM*((K+15)/16*16)+(full?2ULL:4ULL)*BN*PK<=512*1024);
+ AscendC::fullB=full;negativeInput=neg;const uint32_t mt=(M+BM-1)/BM,nt=(N+BN-1)/BN,bk=128;
+ Schedule s{1,M,N,K,BM,BN,mt,nt,nt,workers,0,0};s.window=1;
+ TTFrameShape q{M,N,K,BM,BN,PK,nt,workers};
+ std::vector<int16_t>a(M*K),b(N*K);
+ for(uint32_t m=0;m<M;++m)for(uint32_t k=0;k<K;++k)a[k*M+m]=A(0,m,k);
+ for(uint32_t n=0;n<N;++n)for(uint32_t k=0;k<K;++k)b[n*K+k]=B(0,k,n);
+ auto oldA=a,oldB=b;uint64_t aa=0,bb=0,ar=0,br=0,mm=0;size_t prefix=(nt*mt*BM+127)/128*128;
+ for(uint32_t w=0;w<workers;++w){
+  st=State{};st.s=s;st.tx1=st.tx2=true;AscendC::block=w;AscendC::ranges.clear();
+  uint32_t begin=w*mt*nt/workers,end=(w+1)*mt*nt/workers,ac=0,bc=0;int64_t lastOuter=-1;
+  uint64_t aReads=0,bReads=0;size_t base=prefix+size_t(w)*2*BM*BN;
+  for(uint32_t t=begin;t<end;++t){
+   // Independent quotient/remainder ownership oracle, not the kernel helpers.
+   uint32_t mi=t/nt,ni=t%nt,m0=mi*BM,n0=ni*BN;
+   uint32_t rows=std::min(BM,M-m0),cols=std::min(BN,N-n0),outer=mi;
+   st.expected.push_back({0,m0,n0,rows,cols,ni,base+((t-begin)&1)*BM*BN});
+   bc+=(K+PK-1)/PK;bReads+=uint64_t(cols)*K;
+   if(lastOuter!=int64_t(outer)){++ac;aReads+=uint64_t(rows)*K;}
+   lastOuter=outer;
+  }
+  std::vector<float> scratch(prefix+size_t(workers)*2*BM*BN+16,1e30f);
+  AscendC::registry={{reinterpret_cast<uintptr_t>(a.data()),{a.size()*2,true}},
+   {reinterpret_cast<uintptr_t>(b.data()),{b.size()*2,false}},
+   {reinterpret_cast<uintptr_t>(scratch.data()),{scratch.size()*4,false}}};
+  if(full)bmmms_tt_manual_frame<int16_t,true>(a.data(),b.data(),scratch.data(),nullptr,q);
+  else bmmms_tt_manual_frame<int16_t>(a.data(),b.data(),scratch.data(),nullptr,q);
+  assert(AscendC::dma.empty()&&AscendC::mte1.empty()&&AscendC::mac.empty()&&AscendC::fix.empty()&&AscendC::targets.empty());
+  assert(st.fixes==end-begin&&st.mmads==uint64_t(end-begin)*((K+bk-1)/bk));
+  assert(st.aCopies==ac&&st.bCopies==bc&&st.aReads==aReads&&st.bReads==bReads);
+  assert(st.aLoads==st.mmads&&st.bLoads==st.mmads);
+  for(auto e:st.events)assert(e.second==0);assert(!st.cross[0]&&!st.cross[1]);
+  for(size_t i=0;i<scratch.size();++i)if(i<base||i>=base+2*BM*BN)assert(scratch[i]==1e30f);
+  aa+=st.aCopies;bb+=st.bCopies;ar+=st.aReads;br+=st.bReads;mm+=st.mmads;
+ }
+ assert(a==oldA&&b==oldB&&mm==uint64_t(mt)*nt*((K+bk-1)/bk));
+ if(M==1025)std::cout<<(full?"full-A/B single B":"parent B-packages")<<" exact C8 workers="<<workers
+  <<" A/B copies="<<aa<<"/"<<bb<<" input elements="<<ar<<"/"<<br<<" MMADs="<<mm<<" PASS\n";
+}
+int main(){unsigned count=0;
+ for(uint32_t workers:{1u,3u,20u})for(bool full:{false,true})for(bool neg:{false,true})for(bool eager:{false,true}){
+  AscendC::eagerFix=eager;Run(129,257,1032,128,full?112:128,full?1040:384,workers,neg,full);++count;
+ }
+ for(uint32_t workers:{3u,20u})for(bool full:{false,true})for(bool neg:{false,true}){
+  Run(129,129,136,128,full?112:128,full?144:256,workers,neg,full);++count;
+ }
+#ifndef NEGATIVE_CONTROL
+ AscendC::eagerFix=false;
+ for(bool full:{false,true}){Run(1025,1031,1032,128,full?112:128,full?1040:384,20,false,full);++count;}
+#endif
+ std::cout<<count<<" actual producers: full input/one B stream, independent full-K NZ/ZZ/ZN padded C, cached A and B/L0/C/ring lifetime, immutable inputs/GM guards PASS\n";
+}

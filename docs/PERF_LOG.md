@@ -891,3 +891,7 @@ Task6ac77103694b590c3ccaa29e **Pass15/15**, all precision_ratio=1. Timesus:
 `[1.92, 2.47, 3.09, 4.16, 5.25, 9.84, 8.36, 46.87, 68.33, 98.47, 88.61, 96.97, 13.44, 11.05, 9.22]`
 
 Total468.05us; latest user Tbest calculated mean **51.04335964** (not a live rank). C8=46.87, C13=13.44; prior retained C13=12.62/13.19. All observations retained, no overall speed gain established. Raw ignored artifacts/best-identical-repeat-1008/official.json. No active job or further unchanged request. Actual SoC/plan/profiling unavailable.
+
+## C8 full-input single-package candidate ready
+
+Parentretained7492776, candidate365832B/SHA9f7eaa8449509b2efe686cb1bdf618023fa6497995eea2acb5413c3ee9e703b5,35additions/7removedkernel lines. BothcompleteA/B L1 fits499200B atM128/N112/Kpad1040, onefullB insteadof3Kpackages. Sourceat20workers totalDMA269→117(-56.51%), input+0.0081%, MMAD729→810(+11.11%), same padded arithmetic. CostsnoB1double/moreCtiles/partials explicitlypreserved. CPUactualhost1080/5eachprod/TUNING,34producer/sevencontrols,60threadedAIV/eightcontrols; integer/syntheticonly. Whole-retainedinverse/protected7passed. N-majorpreviouscandidate268a802unsubmitteddoesnotreducecallsandisnotincluded. NativePENDING/noIDyet; oneisolatedgateafterdryrun, noWeb. FullC8_FULL_INPUTS_FRAME.
