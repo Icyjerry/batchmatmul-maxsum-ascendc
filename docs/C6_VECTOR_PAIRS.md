@@ -25,3 +25,13 @@ CPU inputs are integers, not encoded BF16; FIFO Vector model cannot expose inter
 Commit/push candidate, submit one unique gate, save ID immediately and poll same ID to real terminal. Preserve all15 times, C13/C7/C14 gains and adverse points. Only a clearly substantial C6 observation warrants one unchanged confirmation. Failure/no clear gain: archive and restore parent; no neighboring row-pair/chunk/padding scans.
 
 Implementationf4907c3 pushed; unique official task **6ac744ee694b590c3ca8ea6c** created after matching dry-run. Native gate PENDING; query this ID only to real terminal, no duplicate submission on observation timeout.
+
+## Terminal: 15 Pass, clear C6 regression; archive
+
+Task6ac744ee694b590c3ca8ea6c/implementationf4907c3/SHAa9aff3a8: Pass15/allprecision_ratio1. Full times us:
+
+`[1.88,2.49,3.25,3.97,5.36,24.24,8.11,46.32,68.17,98.59,88.49,97.11,13.15,10.89,9.35]`
+
+Total481.37us; mean49.474027063 with user1008 Tbest. C6=24.24 vs retained9.78/9.75 and broader9.46–9.85: clear regression. Pure Vector's extra arithmetic/reductions outweighed the hoped-for communication saving in this observation; no real profiling or route/SoC trace, so do not assert hardware counters or stable causal percentages. C3/C5/C12 adverse observations preserved. C13=13.15 is consistent with retained12.62/13.19, not a new A/B.
+
+Archive the implementation/models/terminal result; no confirmation or adjacent pair/chunk/padding scan. Restore entire retained7492776 source/SHA0794a2bf. RawJSON ignoredartifacts/c6-vector-pairs/official.json. No active C6 task. User requested pause after this terminal and prohibited further Web browsing; subsequent resume requests one unchanged best submission then continued local/source/teammate analysis.
