@@ -38,3 +38,13 @@ CPUrawignored artifacts/c8-full-inputs-frame/cpu.log, isolatedproject/private/tm
 ## Unique native task created
 
 Implementation9782c98pushed; **6ac77690694b590c3ccea247** createdonce afterisolatedprotected7/wholeSHA dry-run. Query same ID to realterminal; no retry submission. CANN/nativeprecision/latency PENDING.
+
+## Native terminal: Pass, C8 clearly regresses; archive
+
+Task **6ac77690694b590c3ccea247**, implementation9782c98/SHA9f7eaa84/365832B: Pass15/15, all precision_ratio=1. Timesus:
+
+`[1.96, 2.66, 3.18, 4.25, 5.42, 9.72, 7.78, 54.17, 67.96, 97.77, 87.28, 96.06, 12.82, 10.98, 9.02]`
+
+Total471.03us, newest user Tbest calculatedmean51.37585466. C8=54.17us vsretained46.50/46.23/latest46.87 (latest+15.57%). Clearlyworse thanretained recent46.18–46.87; no unchangedconfirmation ornearbyBN/BK/PK sweep. Otherpoints/negativeobservations preserved; no attributionofunchangedroutes to C8. C13=12.82 consistent withretained localgain, not anothercontrolledconfirmation. Noactualhiddenshape/plan/SoC/profile; no direct route-hit/counter/causalclaim. Rawignored artifacts/c8-full-inputs-frame/official.json (600).
+
+Source diagnosis: eliminatingB1double-buffer and issuing the next full-B onlyaftercurrentlastL1read reducesB-prefetch overlap opportunity even thoughDMAcalls269→117. MMADs729→810 andC/Fixpipe/Vectortiles81→90increase. These are code-level explanations/inferences, NOT measured hardware bottleneck/profile. Native result rejects the performance hypothesis; nativeprecision passed. Candidate remains archived onexperiment/c8-full-inputs-frame, whole-retained7492776 restored onexperiment/c13-resident-frame after recording. Noactiveformaljob; no further user repeat outstanding.

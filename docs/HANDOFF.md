@@ -1,6 +1,6 @@
-# Current C8 single-package experiment · 2026-10-08
+# Archived C8 full-input experiment · 2026-10-08
 
-Current experiment/c8-full-inputs-frame, NOT retained best. Candidate SHA9f7eaa8449509b2efe686cb1bdf618023fa6497995eea2acb5413c3ee9e703b5/bytes365832. Sourcephysical models/hostcontrols passed, native gate **6ac77690694b590c3ccea247** Running/PENDING, query same ID to terminal. See C8_FULL_INPUTS_FRAME. Prior requested best6ac77103694b590c3ccaa29e terminalPass15/all1, mean51.04336/C8=46.87/C13=13.44; one active native gate6ac77690694b590c3ccea247. Next querysameIDto terminal; no resubmit. N-majorstream archived268a802unsubmitted/nocallreduction; noWeb. Retainedbest7492776 onexperiment/c13-resident-frame, whole restore afterfailed/no-gain gate.
+Current experiment/c8-full-inputs-frame is archived, NOT retained best. Implementation9782c98/SHA9f7eaa84/365832B, native6ac77690694b590c3ccea247 terminalPass15/allprecision1, C8=54.17 vsretained46.18–46.87: clear regression despiteDMA269→117. No confirmation/nearbyBN/BK/PK scan. No activejob. See C8_FULL_INPUTS_FRAME. Whole retained7492776 must be restored onexperiment/c13-resident-frame for continuing work. N-major268a802unsubmittedlocalassessment hadno call/volume reduction. User noWeb. Latestrequestedunchangedbest6ac77103694b590c3ccaa29e terminalPass15/all1/mean51.04336; no further repeats outstanding.
 
 # 最新接手状态 · 2026-10-08
 

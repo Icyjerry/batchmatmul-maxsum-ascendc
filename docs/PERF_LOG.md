@@ -897,3 +897,13 @@ Total468.05us; latest user Tbest calculated mean **51.04335964** (not a live ran
 Parentretained7492776, candidate365832B/SHA9f7eaa8449509b2efe686cb1bdf618023fa6497995eea2acb5413c3ee9e703b5,35additions/7removedkernel lines. BothcompleteA/B L1 fits499200B atM128/N112/Kpad1040, onefullB insteadof3Kpackages. Sourceat20workers totalDMA269→117(-56.51%), input+0.0081%, MMAD729→810(+11.11%), same padded arithmetic. CostsnoB1double/moreCtiles/partials explicitlypreserved. CPUactualhost1080/5eachprod/TUNING,34producer/sevencontrols,60threadedAIV/eightcontrols; integer/syntheticonly. Whole-retainedinverse/protected7passed. N-majorpreviouscandidate268a802unsubmitteddoesnotreducecallsandisnotincluded. NativePENDING/noIDyet; oneisolatedgateafterdryrun, noWeb. FullC8_FULL_INPUTS_FRAME.
 
 C8 implementation9782c98pushed; unique native task **6ac77690694b590c3ccea247** created once. SameSHA9f7eaa84/365832B verifieddryrun. NativePENDING, querysameIDonly toterminal.
+
+## Native terminal: Pass, C8 clearly regresses; archive
+
+Task **6ac77690694b590c3ccea247**, implementation9782c98/SHA9f7eaa84/365832B: Pass15/15, all precision_ratio=1. Timesus:
+
+`[1.96, 2.66, 3.18, 4.25, 5.42, 9.72, 7.78, 54.17, 67.96, 97.77, 87.28, 96.06, 12.82, 10.98, 9.02]`
+
+Total471.03us, newest user Tbest calculatedmean51.37585466. C8=54.17us vsretained46.50/46.23/latest46.87 (latest+15.57%). Clearlyworse thanretained recent46.18–46.87; no unchangedconfirmation ornearbyBN/BK/PK sweep. Otherpoints/negativeobservations preserved; no attributionofunchangedroutes to C8. C13=12.82 consistent withretained localgain, not anothercontrolledconfirmation. Noactualhiddenshape/plan/SoC/profile; no direct route-hit/counter/causalclaim. Rawignored artifacts/c8-full-inputs-frame/official.json (600).
+
+Source diagnosis: eliminatingB1double-buffer and issuing the next full-B onlyaftercurrentlastL1read reducesB-prefetch overlap opportunity even thoughDMAcalls269→117. MMADs729→810 andC/Fixpipe/Vectortiles81→90increase. These are code-level explanations/inferences, NOT measured hardware bottleneck/profile. Native result rejects the performance hypothesis; nativeprecision passed. Candidate remains archived onexperiment/c8-full-inputs-frame, whole-retained7492776 restored onexperiment/c13-resident-frame after recording. Noactiveformaljob; no further user repeat outstanding.
