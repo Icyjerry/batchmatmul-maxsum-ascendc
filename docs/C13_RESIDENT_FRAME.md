@@ -35,3 +35,11 @@ Models use integer values, not encodedFP16 precision/latency. All API calls reus
 Commit/push then submit ONCE; saveID immediately and query sameID to realterminal. Retain all15results and score withSCORE_REFERENCE_1008. Only clearlylarge benefit warrants one identicalconfirmation. Otherwise archive without nearbyframe/package/tile scans, restorepassedparent. ActualSoC/shape/plan/profile unavailable; do not infer devicecounter or route trace from CPU/source alone. Overallcompetition goal incomplete.
 
 Implementation7492776 pushed; unique formal task **6ac73bd0694b590c3ca19b3d** created. Query sameID to realterminal, no resubmission; nativegatePENDING.
+
+## First formal terminal: Pass, substantial C13 observation
+
+Task6ac73bd0694b590c3ca19b3d /implementation7492776/SHA0794a2bf: Pass15/15, allprecision_ratio1. Timesus:
+
+[2.02, 2.48, 3.08, 4.16, 5.37, 9.78, 8.25, 46.5, 68.11, 100.24, 88.9, 96.47, 12.62, 11.14, 9.51]
+
+Total468.63us; latestTbest calculatedmean50.75856. C13=12.62 vsrecentfiveparent14.94-16.74/median15.13:16.59percent belowmedian,15.53percent belowfastestparent. Largerthan recentparent spread/median11.90percent, warrantsONE unchangedconfirmation. Noactualshape/plan/SoC/profile or interleavedA/B; cannotclaim stablecausalpercentage/devicecounter/route trace. C10=100.24 andC14=11.14 unfavorable observations retained; unmodifiedroutes notattributed. RawJSON ignoredartifacts/c13-resident-frame/official-one.json. Firsttask terminal, noactivejob beforeconfirmation.

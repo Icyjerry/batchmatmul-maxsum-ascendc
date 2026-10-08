@@ -833,3 +833,11 @@ Supplied15B/M/N/K and baseline times withoutdtype/layout/SoC/formalID/script; CS
 Parentwhole1734f16; 178lines/threeadditions,364169bytes/SHA0794a2bfc777ac48c373b3085cd96fd1224b0bf0a4f6a9351d290bb421dbad2d. New suppliedexactshape C13(1,8192,64,128), historicalFP16/FF, targetsoriginaldual3/tree16 notoldtaildual14. OneBload/L0Bresidence, fullK128, originalstridedM/doubleC/workerpartials/GM retained, explicitframes replaceTPipe/TQue andredundantMax. CPU96producer/sevencontrols,102threadedAIV/sevencontrols, production/TUNING each5120host/fourhits passed; SyncAllmodeldrainsMTE3 so removalofMTE3_Valone undetected, devicewaitretained/nofalsecontrolclaim. Whole-parent/protected7/CLI dry-runonlykernel/SHAverified. NoformalIDyet, nativegatePENDING. FullC13_RESIDENT_FRAME.
 
 Implementation7492776 pushed; unique formal task **6ac73bd0694b590c3ca19b3d** created. Query sameID to realterminal, no resubmission; nativegatePENDING.
+
+## First formal terminal: Pass, substantial C13 observation
+
+Task6ac73bd0694b590c3ca19b3d /implementation7492776/SHA0794a2bf: Pass15/15, allprecision_ratio1. Timesus:
+
+[2.02, 2.48, 3.08, 4.16, 5.37, 9.78, 8.25, 46.5, 68.11, 100.24, 88.9, 96.47, 12.62, 11.14, 9.51]
+
+Total468.63us; latestTbest calculatedmean50.75856. C13=12.62 vsrecentfiveparent14.94-16.74/median15.13:16.59percent belowmedian,15.53percent belowfastestparent. Largerthan recentparent spread/median11.90percent, warrantsONE unchangedconfirmation. Noactualshape/plan/SoC/profile or interleavedA/B; cannotclaim stablecausalpercentage/devicecounter/route trace. C10=100.24 andC14=11.14 unfavorable observations retained; unmodifiedroutes notattributed. RawJSON ignoredartifacts/c13-resident-frame/official-one.json. Firsttask terminal, noactivejob beforeconfirmation.
