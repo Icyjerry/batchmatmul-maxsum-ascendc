@@ -32,3 +32,7 @@ CANN9编译、正式FP16精度及latency **PENDING**。所有API均来自原正�
 ## 下一正式动作
 
 实现/模型/本文件commit/push，独立模板/private/tmp/bmmms-c13-frame-official/project只提交一次；取得ID立即保存，查询同ID至终态，不因观察超时重复创建。保存完整15点，并用SCORE_REFERENCE_1008的新Tbest计分。明显大收益才原样确认；否则归档，不扫附近BM/K分段/队列深度变体。原CPU日志忽略artifacts/c13-manual-frame/cpu.log。整体冲榜目标尚未完成。
+
+## 正式任务已创建
+
+实现59c59e2已push；dry-run核对SHA、protected7通过。唯一任务 **6ac733cd694b590c3c9b7892** 创建成功；下一只查询同ID至真实终态，不重交。编译/精度/性能PENDING。

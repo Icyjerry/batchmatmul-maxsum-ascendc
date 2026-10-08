@@ -798,3 +798,5 @@ NewestTbestus=[1.18,1.54,2.13,2.37,3.57,6.38,6.37,13.88,48.30,64.85,67.87,80.65,
 ## 2026-10-08: C13 manual physical frame candidate ready
 
 Parent1734f16/a5eef105; experiment/c13-manual-frame candidate365034bytes/SHA92c3654faef7db189c167846215a96ab0dcf937b0833ef36b90f8b35d3158d28. Three additions191lines restore whole parent. Removes TPipe/TQue from FF dual14 tails, retains128K panels/stridedM tasks/double C/ring/earlyslots, 64row completeN sum and deadUB final frame. No newGM/plan change. CPU324 producer configurations/six negative controls,768 threaded AIV configurations/nine controls; production/TUNING each4096actualhost/3968hits and exactmemory/core/workspace/adjacent fallback passed. CPUinteger/syntheticcredits, not nativeFP16/CANN. Independenttemplate protected7 equal1734f16; dry-run onlykernel/SHAconsistent. Native compile/precision/latency PENDING, no taskID yet. Full evidence C13_MANUAL_FRAME. NewestT priorities C4/C2/C3/C6/C1/C10, current C13 sole structuralgate completed first; no parameter scan.
+
+C13 implementation59c59e2 pushed; unique formal task6ac733cd694b590c3c9b7892 created. Query sameID to terminal, native gate PENDING. No resubmission.
