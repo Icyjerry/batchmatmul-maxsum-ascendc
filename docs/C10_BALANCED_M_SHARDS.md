@@ -29,3 +29,5 @@
 - Vector除ownership与写有效行外整个body逐字节等于父版本；去掉新增helper/selector/launch并恢复manual后全kernel等于af886e1，受保护七文件等于1734f16。
 
 CANN9编译/硬件TQue契约/BF16指令精度/正式15点/latency/真实route/profile：**PENDING**。无Web。只创建一个正式gate；失败或无明确收益则整份恢复af886e1并保留反例，不扫附近分区粒度。
+
+Implementationa2e6763 pushed; one unique native **6ac7b3c8694b590c3c0218c4**, sameSHA16b51684/368782B, createdonce. NativePENDING; querysameID toterminal, no resubmit.

@@ -929,3 +929,5 @@ C10=97.06，相比单次父99.56看似下降2.51%，但旧 C10 未改路径的�
 ## C10 balanced actual M ownership: CPU candidate
 
 Parentaf886e1;368782B/SHA16b51684,60additions/11removed. At4096/1280/1152/20coresmaxRows256→208, butCtiles160→200,MMAD/Bcopies2880→3600/Breads47185920→58982400(+25%). Same total math, complete N maxima andoriginal Plan/arena/credits. CPU13Cube/96 actualAIVownership-store+FinalizeRows/prod&TUNING192plans9hits/sixfaultcontrols pass. Arithmetic/sync outsideownership unchanged. NativePENDING,noID. PublicproblemAPI givesonlytestcaseIDs,noformalmeta;FF/TTconflictconditional. C10_BALANCED_M_SHARDS containsboundaries/nextgate.
+
+Implementationa2e6763 pushed; one unique native **6ac7b3c8694b590c3c0218c4**, sameSHA16b51684/368782B, createdonce. NativePENDING; querysameID toterminal, no resubmit.
