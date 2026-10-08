@@ -1,11 +1,9 @@
-# C8 balanced tail frame — CPU validated, native gate next
+# C8 balanced-tail experiment terminal — restore passed baseline next
 
-- 当前分支 `experiment/c8-balanced-tail-frame`。候选 kernel：372771 字节，SHA256 `aa2aabc1ab1cea9270173966aa93748762e3ce0514383b81512be4fa1d784bec`；父版本为正式 Pass15 的 `a2e6763`。
-- 实现了完整 C8 调度改动：M16 主块分片、缓存匹配的 N 尾块、分散 M 尾块、共享 Cube/AIV/B 预取任务描述、精确分片写回。原 A1 面板/三阶段发布、双 B/C/ring、GM arena、最终归约保留。
-- 简化原审计方案：A1 NZ 子视图 `a1[tile.row*kp]` 调用原 ManualTransposeFullM；没有改 Load3D 参数或 helper。两个 uint64 的尾块 owner 是 launch metadata，非 GM 表。其他 TT 模板默认关闭新算法，但增加了默认零值 16B 参数，原有 TT 入口 ABI 的变化是待正式 gate 检查的风险。
-- CPU 通过：生产/TUNING 各 3024 host plan /4 命中；8..32 核共 2393 任务与独立 Python 枚举一致；8 个真实 Cube producer（含精确 K1032 正负输入）；42 个真实异步 AIV；10 个故障对照拒绝。整数模型、假 tiler、合成跨核伙伴不能证明 CANN/BF16/性能。
-- 实现提交 `1cb15f9` 已推送；唯一正式任务 `6ac7d7af694b590c3c1a2cb8` 已创建，native PENDING。已完成隔离 protected7 /只 kernel dry-run，下一步仅查询这个 ID 到终态。通过 15 点且 C8 <=37.111 μs（比近期保留版最低43.66少15%）才复测，否则不原样重复、不扫附近 BM/BN/PK。
-- C1 literal 已归档 `2e10a23`，正式 Pass15 但 C1=1.93 无收益；失败 C10 fullM/late-credit/directA2 未带入。无其他活动任务，main/历史标签不动。详情 [C8_BALANCED_TAIL_FRAME](C8_BALANCED_TAIL_FRAME.md)。
+- 分支 `experiment/c8-balanced-tail-frame`，实现1cb15f9，候选372771B/SHAaa2aabc1。唯一正式任务 **6ac7d7af694b590c3c1a2cb8** 已结束：Pass15/allprecision1，C8 **56.78μs**，比保留版近期43.66–45.83明显慢。没有满足37.111复测门槛，不重复/扫附近分片。
+- CPU actual tasks/producer/AIV/pin/guards全部通过，但平衡 padded area、减少最慢核 small-MMAD barrier仍没有产生硬件收益。B+22.07%/Ctasks+19.75%是保留风险；真实原因没有profile不能定论。
+- NEXT 归档终态后换新实验分支，**恢复完整a2e6763**/368782B/SHA16b51684；不能保留新TT metadata/helper/ABI。下一条独立源码审计：C6小TT矩阵原DIRECT_BATCH TPipe/队列/同步与完整输入驻留frame；不重试已失败纯Vector二行乘积路径，不扫K/package参数。
+- 没有活动正式任务。全部15耗时和局限 [C8_BALANCED_TAIL_FRAME](C8_BALANCED_TAIL_FRAME.md)，raw忽略artifacts/c8-balanced-tail-frame/official.json。C1/C10失败已在父版排除，main/标签未动，目标未完成。
 
 ## 先读与规则
 

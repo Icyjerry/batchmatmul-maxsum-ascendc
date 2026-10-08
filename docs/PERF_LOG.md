@@ -1033,3 +1033,13 @@ Candidate372771B/SHAaa2aabc1ab1cea9270173966aa93748762e3ce0514383b81512be4fa1d78
 CPUactualproduction&TUNING3024plans/4hits each; all8..32cores2393tasks versusindependentPython;8actualCubeproducerpositiveK-varying/allnegative/tails/liveoperand tests;42queuedAIVpriorities/unique partial/padding poison/MaxN-SumM/yguard;10faultcontrols rejected. Exact20coreA/B DMA96/291/MMAD873/sourceelements3178560/11689464 matchmath. AddedBtraffic22.07%/Ctasks19.75%retained;notlatency claim. NativeCANN9/BF16/precision/timingPENDING,noID. Dryonlykernelverified. ONEgateafterpush;confirmationonlyPass15andC8<=37.111us,otherwisearchive/restorewithoutneighbor scans. DetailsC8_BALANCED_TAIL_FRAME.
 
 实现 **1cb15f9** 已推送；唯一正式任务 **6ac7d7af694b590c3c1a2cb8** 已创建。372771B/SHAaa2aabc1，native PENDING，只查询同一 ID。
+
+## 正式终态：15 点通过，C8 明显回退，归档
+
+唯一任务 **6ac7d7af694b590c3c1a2cb8**，实现 **1cb15f9** /372771B/SHAaa2aabc1。CANN编译和15点正式精度通过，所有 precision_ratio=1。耗时 μs：
+
+`[2.0, 2.54, 3.12, 4.23, 5.22, 9.6, 7.99, 56.78, 67.5, 89.53, 87.66, 95.22, 12.99, 10.85, 9.24]`
+
+总计 **464.47 μs**，按最新用户Tbest重算均分 **51.81580052**（非实时排名）。C8 **56.78 μs**，比父近期43.66–45.83明显慢；相对于父单次43.66增加30.05%。没有满足预先设定的37.111μs复测门槛。C10=89.53等未改算法分支的变化不归因于本实验；默认TT新增16B参数的影响也无法在缺少profile/受控同机A-B时分离。
+
+不原样复测、不扫邻近分片或核数。保留全部反例，恢复完整a2e6763（368782B/SHA16b51684），不带入新helper/metadata/launch。数学负载下降并未证明硬件收益；无法仅凭此次测评确定回退由B搬运、scalar mapping、MMAD或同步哪部分导致。原始结果忽略 artifacts/c8-balanced-tail-frame/official.json。无活动任务，main/标签不动，整体冲榜目标未完成。
