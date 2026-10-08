@@ -1,6 +1,11 @@
-# Current phased-A experiment · 2026-10-08
+# Current passed experimental baseline · 2026-10-08
 
-Current experiment/c8-phased-a-ready is a candidate, NOT retained best. See C8_PHASED_A_READY. Native task **6ac7a921694b590c3cf97c01** createdonce, PENDING. NextquerysameIDto realterminal; do not resubmit. Actual-source30Cube groups/ninecontrols and2160hostplans/fivehits eachproduction/TUNING pass withinCPUinteger/synthetic scope. AIV/Plan/GM/harness unchanged bywhole-parent proof. Three A1 K regions with ready events preserve B1 double buffering; no nearbyscan of rejected single-B frame. Retained7492776/SHA0794a2bf remains onexperiment/c13-resident-frame; restorewhole onfailed/no-gaingate. User noWeb. Previous goalturn producedverifiedC8 regression/currentturn progressingnewpipeline, notblocked.
+- Current experiment/c8-phased-a-ready, implementationaf886e1/kernel365948B/SHAb87ec00643094e19c3c0433113480791494f8e00771887982a1766276d13e08b. Whole-parentinverse7492776; AIV/Plan/GM/harness unchanged. PhasedresidentAready384/384/264 keepsoriginaldoubleB.
+- Native **6ac7a921694b590c3cf97c01** terminalPass15/allprecision1: C8=44.09 vsretained46.18–46.87; singlemodestlocalobservation(-5.93%vslatest), NOTlarge/stable/wholecompetitiongain. Total466.89/newestTmean50.38880654. AdverseC10/C11/C15 retained. See C8_PHASED_A_READY/PERF_LOG. Noactivejobs, no unchangedconfirmation or nearbyphase scans.
+- Keep this passed code as experimental forward baseline; main/tags/retainedcompetitionbranch NOTpromoted. Originalretained7492776/SHA0794a2bf remains onexperiment/c13-resident-frame.
+- Source/CubeCPU30groups/ninecontrols, host2160/fivehits eachproduction/TUNING, per-byte region readiness and live operands; onlyintegers/syntheticcredits, notBF16hardware/profileproof.
+- NEXT: [C10_EXACT_ROUTE_AUDIT](C10_EXACT_ROUTE_AUDIT.md), actual32hostconfigurations confirmconditional BF16/FFdual20 andFP16/TTdual29 (alreadymanual, NOTlibrary). Implement ONEexact FF B-package192 hypothesis throughexistinggenericCase9helpers/defaultTX2=truepreserved; verifyactualsource/physicalNZ→ZN/liveTQue/capacities/oldGM beforeonegate. Proposed18→6Bpackages notyetverified; noC10edit/taskyet. No broad TTguard/parameter sweep/newGM.
+- User noWeb. Fullmajoroptimizationgoal stillactive/incomplete. PreviousgoalturnmadeverifiedC8regressionprogress; thisturnmadepassedphasedAandC10sourcediagnosisprogress, notblocked.
 
 # 最新接手状态 · 2026-10-08
 

@@ -35,3 +35,13 @@ CANNcompile/native15precision/latency PENDING; noIDyet. Isolatedproject/private/
 ## Unique native task created
 
 Implementationaf886e1pushed; task **6ac7a921694b590c3cf97c01** submitted once afterwholeSHA/protected7/dry-run. QuerysameID toterminal, noresubmit. NativePENDING.
+
+## Native terminal: Pass, modest single C8 improvement
+
+Task **6ac7a921694b590c3cf97c01**, implementationaf886e1/SHA b87ec006/365948B, **Pass15/15**, allprecision_ratio1. Timesus:
+
+`[1.94, 2.58, 3.21, 4.0, 5.33, 9.8, 8.32, 44.09, 68.18, 99.56, 88.9, 97.09, 12.94, 11.1, 9.85]`
+
+Total466.89us, newestuserTbest calculatedmean **50.38880654**, notliverank. C8=44.09 vsretained latest46.87 (-5.93%), medianof46.50/46.23/46.87=46.50 (-5.18%), andfastestrecent46.18 (-4.53%). Outsideobservedretained46.18–46.87, modestsingle-localobservation; no controlledsameSoC A/B or directroute/profile evidence. C10=99.56/C11=88.90/C15=9.85 unfavorablepointsretained; otherunmodifiedroutechangesnotattributed. ThisdoesNOTprovewholecompetitiongain/largebreakthrough/stablecausalpercentage.
+
+Keep the passed phased-A code on experiment/c8-phased-a-ready as an *experimental* forward baseline, without promoting main or the retained best branch. No unchangedconfirmation or nearbyphase-size scans (userrequireslarge gainsbefore repeats). Nativeprecisiongatepassed; fullhardwarecoverage/SoC/profileunknown. Noactivejobs/furtherbestrepeatrequests. Rawignored artifacts/c8-phased-a-ready/official.json. Originalretained7492776/SHA0794a2bf remainsavailableon experiment/c13-resident-frame.

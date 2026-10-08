@@ -903,3 +903,13 @@ Wholekernelrestoredbyteequal7492776/364169B/SHA0794a2bf onexperiment/c13-residen
 Candidate365948B/SHAb87ec00643094e19c3c0433113480791494f8e00771887982a1766276d13e08b,42additions/10removedkernel lines; sameA1regionspublished384/384/264, fullNZ1040pitch, existingdoubleBinput preserved. NoPlan/GM/AIV/harness changes; whole7492776inversepass. CPU2160hostplans/fivehits eachproduction/TUNING,30actualproducer groups withper-byte pendingregions/fullK/paddedC/guards, ninecontrolsrejected. Exactobserved234deferredMAC snapshots withlaterAregionspending (parent0); onlysyntheticpermittedoverlap,nolatencyclaim. Input/MMADsame, DMA269→321(+19.33%), blockedfreshA1032→384rows; addedDMA/events maycostmore. NativePENDING/noIDyet, onegateaftercommit/dryrun, noWeb. FullC8_PHASED_A_READY.
 
 Implementationaf886e1pushed; unique native **6ac7a921694b590c3cf97c01** createdonce. SameSHAb87ec006/365948B, protected7/dry-run verified. NativePENDING; querysameIDto terminal, no resubmit.
+
+## Native terminal: Pass, modest single C8 improvement
+
+Task **6ac7a921694b590c3cf97c01**, implementationaf886e1/SHA b87ec006/365948B, **Pass15/15**, allprecision_ratio1. Timesus:
+
+`[1.94, 2.58, 3.21, 4.0, 5.33, 9.8, 8.32, 44.09, 68.18, 99.56, 88.9, 97.09, 12.94, 11.1, 9.85]`
+
+Total466.89us, newestuserTbest calculatedmean **50.38880654**, notliverank. C8=44.09 vsretained latest46.87 (-5.93%), medianof46.50/46.23/46.87=46.50 (-5.18%), andfastestrecent46.18 (-4.53%). Outsideobservedretained46.18–46.87, modestsingle-localobservation; no controlledsameSoC A/B or directroute/profile evidence. C10=99.56/C11=88.90/C15=9.85 unfavorablepointsretained; otherunmodifiedroutechangesnotattributed. ThisdoesNOTprovewholecompetitiongain/largebreakthrough/stablecausalpercentage.
+
+Keep the passed phased-A code on experiment/c8-phased-a-ready as an *experimental* forward baseline, without promoting main or the retained best branch. No unchangedconfirmation or nearbyphase-size scans (userrequireslarge gainsbefore repeats). Nativeprecisiongatepassed; fullhardwarecoverage/SoC/profileunknown. Noactivejobs/furtherbestrepeatrequests. Rawignored artifacts/c8-phased-a-ready/official.json. Originalretained7492776/SHA0794a2bf remainsavailableon experiment/c13-resident-frame.
