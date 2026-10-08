@@ -895,3 +895,5 @@ Total468.05us; latest user Tbest calculated mean **51.04335964** (not a live ran
 ## C8 full-input single-package candidate ready
 
 Parentretained7492776, candidate365832B/SHA9f7eaa8449509b2efe686cb1bdf618023fa6497995eea2acb5413c3ee9e703b5,35additions/7removedkernel lines. BothcompleteA/B L1 fits499200B atM128/N112/Kpad1040, onefullB insteadof3Kpackages. Sourceat20workers totalDMA269→117(-56.51%), input+0.0081%, MMAD729→810(+11.11%), same padded arithmetic. CostsnoB1double/moreCtiles/partials explicitlypreserved. CPUactualhost1080/5eachprod/TUNING,34producer/sevencontrols,60threadedAIV/eightcontrols; integer/syntheticonly. Whole-retainedinverse/protected7passed. N-majorpreviouscandidate268a802unsubmitteddoesnotreducecallsandisnotincluded. NativePENDING/noIDyet; oneisolatedgateafterdryrun, noWeb. FullC8_FULL_INPUTS_FRAME.
+
+C8 implementation9782c98pushed; unique native task **6ac77690694b590c3ccea247** created once. SameSHA9f7eaa84/365832B verifieddryrun. NativePENDING, querysameIDonly toterminal.

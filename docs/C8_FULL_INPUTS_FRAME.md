@@ -34,3 +34,7 @@ TotalDMAcalls -56.51%, Bcalls -62.96%. Totalinputelements +1032(+0.0081%), padde
 Candidate only, CANNcompile/nativeprecision/all15latency PENDING; no taskID yet. Submit ONE isolated gate aftercommit/push anddry-run; saveID immediately, querysameID to terminal, no timeout resubmission. Actual hidden dtype/layout/SoC/plan/profile unavailable; suppliedshapeimagehas no dtype/layout, source matching does not prove route hit. Preserve all15 results/adverse samples. Require clear C8 gain outside retained46.18–46.87 spread for further unchangedconfirmation; no gain/regression means archiveandwhole-retained restore, no nearbyBN/BK/PK sweep.
 
 CPUrawignored artifacts/c8-full-inputs-frame/cpu.log, isolatedproject/private/tmp/bmmms-c8-full-inputs-official/project; protected7from1734f16, onlykernel changed.
+
+## Unique native task created
+
+Implementation9782c98pushed; **6ac77690694b590c3ccea247** createdonce afterisolatedprotected7/wholeSHA dry-run. Query same ID to realterminal; no retry submission. CANN/nativeprecision/latency PENDING.
