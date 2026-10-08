@@ -987,3 +987,5 @@ Wholekernelrestored **a2e6763**/368782B/SHA16b51684 onexperiment/c10-a2-load-aud
 ## C10 direct A2 CPU candidate
 
 Kernel368813B/SHA526d7f94b8aef59e82a91556fa311695cd9d90f39893662f638a58e2c9733d35, experiment/c10-direct-a2, parenta2e6763. OnlyguardedFF A2selection changes3D->existingdirectstrided2D; geometry/tree8/GM/Plan/Vector/creditsunchanged. FullactualA2D14400/A3D0/A2elements23592960/C200/MMAD3600/Breads58982400; parentderived3D3600APIcalls nothardwareinstruction/timecounts. CPU31producer/parent30proxies/positiveK-varyingreference/96ownership+FinalizeRows/prod&TUNING192plans9hits/sixcontrols PASS. FirstnegativeKoffsetfaultescapedconstantKdata, fixedreferencevalidatesandcatchesfault; rawfailed/final logskeptignoredartifacts/c10-direct-a2. Wholeinversea2e6763/protected7pass. Finaldryrunonly368813B/526d7f94kernel. NativePENDING/noID,ONEgateafterpush. C10_DIRECT_A2_AUDIT recordslimits/risk.
+
+Implementation **3f58655** pushed; uniqueformaljob **6ac7c376694b590c3c0d4fab** createdonce. Same368813B/SHA526d7f94. NativePENDING, querysameIDtoterminal.

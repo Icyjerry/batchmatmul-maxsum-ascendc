@@ -2,7 +2,7 @@
 
 - Branch experiment/c10-direct-a2, kernel368813B/SHA526d7f94b8aef59e82a91556fa311695cd9d90f39893662f638a58e2c9733d35. Parenta2e6763/368782B/SHA16b51684; onlytwo M_BALANCEA2selection predicates, allgeometry/host/Plan/Vector/GM/creditorder unchanged.
 - FinalCPU31actualproducer(fulltarget/tails/defaultfalse), parent30proxy, K-varyingpositivefaultreference,96ownership+FinalizeRows,production&TUNINGeach192plans9hits/sixfaultcontrols PASS. FullactualA3D0/A2D14400 vsparentderived3600, sameA2elements23592960/C200/MMAD3600/Breads58982400; APIcallsnotnativeinstructions. InitialnegativeKoffsetcontrolmissedconstantKfixture; correctedreference/faults allpass. [C10_DIRECT_A2_AUDIT](C10_DIRECT_A2_AUDIT.md).
-- NativePENDING/noIDyet. NEXT commit/pushthenONEformaljob/private/tmp/bmmms-c10-direct-a2/project, immediatelysaveID/querysameIDtoterminal. Dry-runonly368813B/526d7f94kernel/protected7verified. Nativequeues/BF16/SoC/route/profile/latencyunproven.
+- Implementation3f58655pushed; uniqueformaljob **6ac7c376694b590c3c0d4fab** createdonce. NativePENDING; NEXT querysameIDtoterminal, neverresubmitforobservationtimeout. Dry-runonly368813B/526d7f94kernel/protected7verified. Nativequeues/BF16/SoC/route/profile/latencyunproven.
 - FailedfullM74f9937/C10178.32 andlatecredit44d25e2/C1092.84 excluded. No repeat/nearbytiling/credit scans. FaileddirectA2 restoreswholea2e6763; parentC1091.53singlelocalgain. Main/tagsuntouched,goalactive/incomplete.
 
 ## 先读与规则

@@ -38,3 +38,5 @@ Branch experiment/c10-direct-a2, kernel368813B/SHA256 `526d7f94b8aef59e82a91556f
 ExplicitTQueAlloc-waits-lastMTE1-reader assumption persists; integerlayout testsarenotCANN9/BF16precision/hardwarequeue or latency proof. NoactualSoC/route/profile. NativePENDING/noIDyet. Original/fulltargetcache geometry andtraffic unchanged, more APIcalls mayregress.
 
 Finalisolated/private/tmp/bmmms-c10-direct-a2/project protected7restored1734f16; dry-runonly368813B/SHA526d7f94 kernel. ONEformaljobaftercommit/push, saveIDbeforepolling, noidenticalrepeatformodestgain/noadjacentparameter scans. No gain/regression restoresa2e6763. Rawlogsignored artifacts/c10-direct-a2 dir700/file600.
+
+Implementation **3f58655** pushed; uniqueformaljob **6ac7c376694b590c3c0d4fab** createdonce. Same368813B/SHA526d7f94. NativePENDING, querysameIDtoterminal.
