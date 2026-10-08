@@ -1,11 +1,10 @@
-# Passed baseline restored; C9 streaming Max source audit next
+# C9 persistent lane Max — CPU verified, formal gate next
 
-- 当前分支 `experiment/c9-stream-max-audit`。**完整a2e6763 kernel已恢复**：368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94。C10balanced/C8phasedA/C13resident保留；全部失败实验不带入。
-- C8 balanced-tail已归档 `experiment/c8-balanced-tail-frame` /940ec4e（实现1cb15f9）。唯一6ac7d7af694b590c3c1a2cb8 Pass15/C8=56.78，明显慢于43.66–45.83。没有复测；新owner/helper/ABI全部撤回，raw忽略artifacts/c8-balanced-tail-frame/official.json。
-- C6源码核对否定queue-removal/fullK-frame假设：BF16/FT历史条件下已是DIRECT_BATCH=true，手动LocalTensor、完整KP单MMAD、单AIV直接输出。不是TT、不是BN96。勿重复已实现方向/失败纯Vector。
-- 新执行 `tools/audit_c9_stream_max.py` 四种核心actualhost/source算术；当前C9 packages AIV仍每64列chunk横向归约。20核现768次WholeReduceMax，streaming lane state预计96次，extraUB16KiB，旧67104B；新Max读写量更多，收益未知。仅源码/假tiler算术，无新kernel候选/任务。
-- NEXT [C9_STREAM_MAX_AUDIT](C9_STREAM_MAX_AUDIT.md)：只改C9 Vector任务内64lane持久Max/末尾横向fold，保留原Cube/输入/Plan/GM。执行真实FIFO AIV/c/padding/credit/partial/finalizer/pin模型，CPU过再ONE正式gate；Pass15且C9<=57.375us才复测。不要重新包装历史tinytranspose/Ktree/附近scan。
-- 无活动任务，main/历史标签未动，目标仍未完成。当前改动仅恢复kernel及独立审计/docs；下一次从上述可执行动作接续。
+- 当前分支experiment/c9-stream-max，kernel371179B/SHA8c23062f0f03f17cbd92f9813092f2f6d40fb876f4e77fdf68acac0f2f411aa8，父a2e6763。C9默认false模板接入分片内64lane持久Max/末尾一次horizontal；原Cube body/Plan/GM/ring/partial/finalizer逐字不变，旧failed C8/C1/C10未带入。
+- actual CPU production&TUNING各2592plan/6命中，1452actual AIV+父版+FinalizeRows，9fault controls全拒绝；精确20核横向APIs768->96。初次Nmask控制逃逸已加强UBpadding poison/跨任务M变化/两任务正负fixture，重跑通过。source Cube字节不变不等于执行了nativeCube，fake tiler/软件FIFO/syntheticcompleteK伙伴局限保留。
+- 隔离protected7/dryrun只kernel371179B/8c23062f通过。下一条动作commit/push后ONE正式gate，立即记录uniqueID，再同ID查至terminal。Pass15且C9<=57.375us才复测；否则无明确收益完整恢复a2e6763。不做原样小收益repeat/近邻lane/PK/tile扫描。
+- CANN9/15精度/耗时PENDING，无新ID/活动正式任务。详细 [C9_STREAM_MAX](C9_STREAM_MAX.md)，raw忽略artifacts/c9-stream-max/{cpu.log,cpu-initial-fault-miss.log}。main/历史标签不动，整体目标未完成。
+- C8 balanced-tail archived940ec4e/native6ac7d7afPass15但56.78明显回退；C6无TPipe/fullK frame已做，不重复；tiny transpose/storage/Ktree/staticFT/literal已失败，不复活。
 
 ## 先读与规则
 

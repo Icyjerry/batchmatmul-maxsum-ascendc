@@ -1,0 +1,195 @@
+// Runs actual C9 AIV control flow and actual finalizer with FIFO engines.
+// Synthetic complete-K Cube partner, float maxima, not Ascend/FP16 emulation.
+#include <algorithm>
+#include <array>
+#include <atomic>
+#include <cassert>
+#include <condition_variable>
+#include <cstdint>
+#include <deque>
+#include <functional>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <mutex>
+#include <thread>
+#include <vector>
+#define __aicore__
+#define __gm__
+using GM_ADDR=void*;
+using event_t=int;
+constexpr int PIPE_MTE2=0,PIPE_V=1,PIPE_MTE3=2,PIPE_ALL=3;
+struct Schedule {int64_t b,m,n,k;uint32_t baseM,baseN,mTiles,nTiles,nSplit,workers,vectorTile=128,window=1,earlySum=0;};
+float Value(uint32_t b,uint32_t m,uint32_t n,bool neg){
+ float x=1+(b*53+m*13+n*23+(n/64)*37)%251;x*=17-m%17+b;return neg?-x:(int(x)%3?-x:x);
+}
+struct RefWindow {uint32_t batch,m0,ns,nt,tiles;};
+struct Barrier {std::mutex lock;std::condition_variable cv;uint32_t count,arrived=0,gen=0;
+ explicit Barrier(uint32_t n):count(n){}void Wait(){std::unique_lock<std::mutex> l(lock);auto old=gen;
+ if(++arrived==count){arrived=0;++gen;cv.notify_all();}else cv.wait(l,[&]{return gen!=old;});}};
+struct Shared {Schedule s;bool neg;std::vector<float> scratch,output;std::unique_ptr<std::atomic<int>[]> written;
+ std::atomic<int> yWrites{0};Barrier barrier;
+ explicit Shared(Schedule q,bool negative):s(q),neg(negative),scratch((q.b*q.nSplit*q.mTiles*q.baseM+127)/128*128+2*q.workers*q.baseM*q.baseN*q.window+16,1e30f),output(q.b+16,1e30f),
+ written(new std::atomic<int>[q.b*q.nSplit*q.mTiles*q.baseM]),barrier(2*q.workers){
+ for(uint32_t i=0;i<q.b*q.nSplit*q.mTiles*q.baseM;++i)written[i]=0;}
+}*shared;
+struct Command {std::function<bool()> ready;std::function<void()> op;};
+struct State {uint32_t block=0,mode=0,issued=0,primes=0,releases=0;bool synced=false;
+ int credit[2]={};int ringGen[2]={-9,-9};std::array<std::array<int,2>,8> events{};
+ std::array<std::deque<Command>,3> queues;std::vector<float> ring;std::vector<RefWindow> ref;
+ uint64_t horizontal=0,laneOps=0;size_t ub=0;
+ void Push(int p,std::function<void()> f){queues[p].push_back({[]{return true;},f});}
+ bool Advance(){std::array<std::array<int,3>,3> orders={{{0,1,2},{1,2,0},{2,0,1}}};
+ for(int p:orders.at(mode))if(!queues[p].empty()&&queues[p].front().ready()){
+ auto f=queues[p].front().op;queues[p].pop_front();f();return true;}return false;}
+ void Until(std::function<bool()> done){while(!done())assert(Advance()&&"missing dependency/deadlock");}
+ void Drain(){Until([&]{return queues[0].empty()&&queues[1].empty()&&queues[2].empty();});}
+};thread_local State st;
+namespace AscendC {
+enum class TPosition {VECIN,VECOUT,VECCALC};
+enum class HardEvent {MTE2_V,V_MTE2,V_MTE3,MTE3_V,V_S,S_V,S_MTE3};
+enum class ReduceOrder {ORDER_ONLY_VALUE};
+struct Storage {std::vector<float> data;uint32_t gen=0;bool used=false,ready=false,pending=false;
+ explicit Storage(size_t n):data(n,1e30f){}};
+template<class T>struct LocalTensor {std::shared_ptr<Storage> mem;size_t offset=0;
+ LocalTensor operator[](size_t i)const{assert(mem&&offset+i<mem->data.size());auto t=*this;t.offset+=i;return t;}
+ float& At(size_t i)const{assert(mem&&!mem->pending&&offset+i<mem->data.size());return mem->data.at(offset+i);}
+ float GetValue(size_t i)const{assert(!mem->pending);return At(i);}void SetValue(size_t i,float v){assert(!mem->pending);At(i)=v;}
+};
+uint32_t GetBlockIdx(){return st.block;}
+template<class T>struct GlobalTensor {enum Kind{INPUT,PARTS,RING,OUT};Kind kind=INPUT;size_t offset=0;
+ void SetGlobalBuffer(T* p,size_t n=0){
+ if(!p){kind=INPUT;return;}if(reinterpret_cast<void*>(p)==shared->output.data()){kind=OUT;offset=0;if(n)assert(n<=uint64_t(shared->s.b));return;}
+ auto base=reinterpret_cast<uintptr_t>(shared->scratch.data()),ptr=reinterpret_cast<uintptr_t>(p);
+ assert(ptr>=base&&ptr<base+shared->scratch.size()*4);offset=(ptr-base)/4;
+ if(offset){auto s=shared->s;assert(offset==(s.b*s.nSplit*s.mTiles*s.baseM+127)/128*128+(st.block/2)*2*s.baseM*s.baseN*s.window);kind=RING;offset=0;}
+ else {kind=PARTS;if(n)assert(n<=sPrefix());}
+ }
+ static size_t sPrefix(){auto s=shared->s;return s.b*s.nSplit*s.mTiles*s.baseM;}
+ GlobalTensor operator[](size_t i)const{auto t=*this;t.offset+=i;return t;}
+ float& At(size_t i)const{if(kind==RING)return st.ring.at(offset+i);if(kind==OUT){assert(offset+i<uint64_t(shared->s.b));return shared->output.at(offset+i);}
+ assert(kind==PARTS&&offset+i<sPrefix());return shared->scratch.at(offset+i);}
+};
+template<TPosition P,int N>struct TQue {std::shared_ptr<Storage> buffers[N];std::deque<LocalTensor<float>> queued;
+ template<class T>LocalTensor<T> AllocTensor(){st.Until([&]{for(auto p:buffers)if(!p->used)return true;return false;});
+ for(auto p:buffers)if(!p->used){p->used=true;p->ready=false;++p->gen;std::fill(p->data.begin(),p->data.end(),1e30f);return {p,0};}assert(false);return {};}
+ template<class T>void EnQue(LocalTensor<T> x){assert(x.mem->used);queued.push_back({x.mem,x.offset});int p=P==TPosition::VECIN?PIPE_MTE2:PIPE_V;
+ auto gen=x.mem->gen;st.Push(p,[=]{assert(x.mem->gen==gen&&!x.mem->pending);x.mem->ready=true;});}
+ template<class T>LocalTensor<T> DeQue(){assert(!queued.empty());auto x=queued.front();queued.pop_front();st.Until([&]{return x.mem->ready;});return {x.mem,x.offset};}
+ template<class T>void FreeTensor(LocalTensor<T> x){auto gen=x.mem->gen;int p=P==TPosition::VECIN?PIPE_V:PIPE_MTE3;
+ st.Push(p,[=]{assert(x.mem->gen==gen&&x.mem->used);x.mem->used=false;x.mem->ready=false;});}
+ ~TQue(){st.Drain();assert(queued.empty());for(auto p:buffers)if(p)assert(!p->used);}
+};
+template<TPosition P>struct TBuf {std::shared_ptr<Storage> mem;template<class T>LocalTensor<T> Get(){assert(mem);return {mem,0};}};
+struct TPipe {TPipe()=default;~TPipe(){st.Drain();}
+ template<TPosition P,int N>void InitBuffer(TQue<P,N>& q,int depth,size_t bytes){assert(depth==N&&bytes%32==0);st.ub+=N*bytes;assert(st.ub<=192*1024);
+ for(auto& p:q.buffers)p=std::make_shared<Storage>(bytes/4);}
+ template<TPosition P>void InitBuffer(TBuf<P>& b,size_t bytes){assert(bytes%32==0);st.ub+=bytes;assert(st.ub<=192*1024);b.mem=std::make_shared<Storage>(bytes/4);}
+ template<class E>int FetchEventID(E){return 0;}
+};
+template<HardEvent E>void SetFlag(int id){assert(id>=0&&id<2);int p=E==HardEvent::MTE2_V?PIPE_MTE2:E==HardEvent::MTE3_V?PIPE_MTE3:PIPE_V;
+ st.Push(p,[=]{assert(st.events[int(E)][id]++==0);});}
+template<HardEvent E>void WaitFlag(int id){assert(id>=0&&id<2);int p=E==HardEvent::V_MTE2?PIPE_MTE2:E==HardEvent::V_MTE3||E==HardEvent::S_MTE3?PIPE_MTE3:PIPE_V;
+ if(E==HardEvent::V_S||E==HardEvent::S_V||E==HardEvent::S_MTE3){st.Until([=]{return st.events[int(E)][id]>0;});--st.events[int(E)][id];}
+ else st.queues[p].push_back({[=]{return st.events[int(E)][id]>0;},[=]{--st.events[int(E)][id];}});
+}
+template<int P>void PipeBarrier(){if(P==PIPE_ALL)st.Drain();else assert(P==PIPE_V);}
+template<int Mode,int P>void CrossCoreSetFlag(uint32_t id){assert(Mode==2&&P==PIPE_MTE2&&id>=2&&id<4);uint32_t slot=id-2;
+ bool prime=st.primes<2;if(prime){assert(!st.issued);++st.primes;}else ++st.releases;
+ st.Push(PIPE_MTE2,[=]{assert(st.credit[slot]++==0);if(!prime){auto s=shared->s;auto size=s.baseM*s.baseN*s.window;
+ std::fill(st.ring.begin()+slot*size,st.ring.begin()+(slot+1)*size,1e30f);st.ringGen[slot]=-7;}});
+}
+template<int Mode>void CrossCoreWaitFlag(uint32_t slot){assert(Mode==2&&slot<2&&slot==(st.issued&1));auto rw=st.ref.at(st.issued++);int gen=st.issued-1;
+ st.Push(PIPE_MTE2,[=]{assert(st.credit[slot]--==1);auto s=shared->s;size_t size=s.baseM*s.baseN*s.window;
+ std::fill(st.ring.begin()+slot*size,st.ring.begin()+(slot+1)*size,1e30f);st.ringGen[slot]=gen;
+ for(uint32_t r=0;r<std::min<int64_t>(s.baseM,s.m-rw.m0);++r)for(uint32_t j=0;j<std::min<int64_t>(rw.tiles*s.baseN,s.n-rw.nt*s.baseN);++j)
+ st.ring[slot*size+r*s.baseN*s.window+j]=Value(rw.batch,rw.m0+r,rw.nt*s.baseN+j,shared->neg);
+ });
+}
+struct DataCopyExtParams {uint16_t blocks;uint32_t len,srcStride,dstStride,rsv;};
+template<class T>struct DataCopyPadExtParams {bool pad;uint32_t left,right;T value;};
+void DataCopyPad(LocalTensor<float> dst,GlobalTensor<float> src,DataCopyExtParams p,DataCopyPadExtParams<float> pad){
+ assert(!dst.mem->pending);dst.mem->pending=true;auto token=dst.mem->gen;
+ if(src.kind==GlobalTensor<float>::PARTS){assert(st.synced&&p.blocks==1&&!pad.pad);
+ st.Push(PIPE_MTE2,[=]{assert(dst.mem->gen==token);for(uint32_t j=0;j<p.len/4;++j){assert(shared->written[src.offset+j].load(std::memory_order_acquire)==1);
+ dst.mem->data[dst.offset+j]=src.At(j);}dst.mem->pending=false;});return;}
+ auto s=shared->s;auto rw=st.ref.at(st.issued-1);uint32_t start=(st.block%2)*s.baseM/2;
+ uint32_t rows=rw.m0+start>=s.m?0:std::min<int64_t>(s.m-rw.m0-start,s.baseM/2),cols=p.len/4;
+ uint32_t slot=(st.issued-1)&1,width=s.baseN*s.window;int gen=st.issued-1;
+ assert(src.kind==GlobalTensor<float>::RING&&p.blocks==rows&&cols<=s.baseN&&pad.pad&&pad.value==-std::numeric_limits<float>::infinity());
+ assert(src.offset>=slot*s.baseM*width+start*width);auto tile=(src.offset-slot*s.baseM*width-start*width)/s.baseN;
+ assert(tile<rw.tiles&&cols==uint32_t(std::min<int64_t>(s.n-(rw.nt+tile)*s.baseN,s.baseN)));
+ assert(p.srcStride==(width-cols)*4&&p.dstStride==(s.baseN-(cols+7)/8*8)/8&&pad.left==0&&pad.right==(cols+7)/8*8-cols);
+ st.Push(PIPE_MTE2,[=]{assert(st.ringGen[slot]==gen&&dst.mem->gen==token&&"ring released before input DMA or UB reused");
+ for(uint32_t r=0;r<rows;++r){for(uint32_t j=0;j<cols;++j)dst.mem->data[dst.offset+r*s.baseN+j]=src.At(r*width+j);
+ for(uint32_t j=cols;j<cols+pad.right;++j)dst.mem->data[dst.offset+r*s.baseN+j]=pad.value;}dst.mem->pending=false;});
+}
+void DataCopy(GlobalTensor<float> dst,LocalTensor<float> src,uint32_t n){assert(dst.kind==GlobalTensor<float>::PARTS&&n==shared->s.baseM/2);auto token=src.mem->gen;
+ st.Push(PIPE_MTE3,[=]{assert(src.mem->gen==token&&"maxima reused before store");for(uint32_t i=0;i<n;++i){dst.At(i)=src.At(i);assert(shared->written[dst.offset+i].fetch_add(1,std::memory_order_release)==0);}});
+}
+void DataCopyPad(GlobalTensor<float> dst,LocalTensor<float> src,DataCopyExtParams p){assert(dst.kind==GlobalTensor<float>::OUT&&p.blocks==1&&p.len%4==0);auto token=src.mem->gen;
+ st.Push(PIPE_MTE3,[=]{assert(src.mem->gen==token);for(uint32_t i=0;i<p.len/4;++i){dst.At(i)=src.At(i);++shared->yWrites;}});
+}
+void Duplicate(LocalTensor<float> dst,float value,uint32_t n){assert(n>0);auto token=dst.mem->gen;
+ st.Push(PIPE_V,[=]{assert(dst.mem->gen==token);for(uint32_t i=0;i<n;++i)dst.At(i)=value;});}
+struct BinaryRepeatParams {uint32_t d,a,b,dr,ar,br;};
+void Max(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint64_t mask,uint32_t reps,BinaryRepeatParams p){
+ assert(mask>=1&&mask<=64&&reps>=1&&reps<=255&&p.d==1&&p.a==1&&p.b==1);auto dgen=dst.mem->gen,agen=a.mem->gen,bgen=b.mem->gen;
+ if(dst.mem==a.mem&&p.dr==8&&p.br==shared->s.baseN/8&&reps>1)++st.laneOps;
+ st.Push(PIPE_V,[=]{assert(dst.mem->gen==dgen&&a.mem->gen==agen&&b.mem->gen==bgen&&"live UB reused before Max");
+ for(uint32_t r=0;r<reps;++r)for(uint32_t j=0;j<mask;++j)dst.At(r*p.dr*8+j)=std::max(a.At(r*p.ar*8+j),b.At(r*p.br*8+j));});
+}
+void WholeReduceMax(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,uint32_t reps,uint32_t ds,uint32_t bs,uint32_t rs,ReduceOrder){
+ assert(mask>=1&&mask<=64&&reps>=1&&reps<=255&&ds==1&&bs==1);auto token=src.mem->gen;++st.horizontal;
+ st.Push(PIPE_V,[=]{assert(src.mem->gen==token);for(uint32_t r=0;r<reps;++r){float value=-std::numeric_limits<float>::infinity();
+ for(uint32_t j=0;j<mask;++j)value=std::max(value,src.At(r*rs*8+j));dst.At(r)=value;}});
+}
+template<class T,bool Reuse>void ReduceSum(LocalTensor<T> dst,LocalTensor<T> src,LocalTensor<T>,uint32_t n){auto token=src.mem->gen;
+ st.Push(PIPE_V,[=]{assert(src.mem->gen==token);float value=0;for(uint32_t i=0;i<n;++i)value+=src.At(i);dst.At(0)=value;});}
+template<bool V>void SyncAll(){assert(V);st.Drain();for(auto e:st.events)for(auto v:e)assert(!v);shared->barrier.Wait();st.synced=true;}
+}
+AscendC::TPipe* GetTPipePtr(){static thread_local AscendC::TPipe fake;return &fake;}
+// INSERT_ACTUAL_FENCE
+void FinalizeEarly(GM_ADDR,GM_ADDR,Schedule,AscendC::TPipe&){assert(false);}
+// INSERT_ACTUAL_FINALIZER
+// INSERT_ACTUAL_CONSUMER
+
+template<bool stream>uint64_t Run(Schedule s,bool neg,uint32_t mode){Shared data(s,neg);shared=&data;std::vector<std::thread> threads;
+ std::atomic<uint64_t> horizontal{0};
+ for(uint32_t id=0;id<2*s.workers;++id)threads.emplace_back([&,id]{
+ st=State{};st.block=id;st.mode=mode;st.ring.resize(2*s.baseM*s.baseN*s.window,1e30f);
+ for(uint32_t task=id/2;task<s.b*s.mTiles*s.nSplit;task+=s.workers){uint32_t ns=task%s.nSplit,mt=(task/s.nSplit)%s.mTiles,batch=task/(s.nSplit*s.mTiles);
+ uint32_t begin=ns*s.nTiles/s.nSplit,end=(ns+1)*s.nTiles/s.nSplit;
+ for(uint32_t nt=begin;nt<end;nt+=s.window)st.ref.push_back({batch,mt*s.baseM,ns,nt,std::min(s.window,end-nt)});}
+ RunC9AIV<int16_t,false,stream>(nullptr,nullptr,data.scratch.data(),data.output.data(),s,256,256);
+ st.Drain();assert(st.issued==st.ref.size()&&st.releases==st.ref.size()&&st.primes==2&&st.credit[0]==1&&st.credit[1]==1);
+ horizontal+=st.horizontal;for(auto e:st.events)for(auto v:e)assert(v==0);
+ });
+ for(auto& thread:threads)thread.join();assert(data.yWrites==s.b);
+ for(uint32_t b=0;b<s.b;++b){float gold=0;for(uint32_t m=0;m<s.m;++m){float mx=-std::numeric_limits<float>::infinity();
+ for(uint32_t n=0;n<s.n;++n)mx=std::max(mx,Value(b,m,n,neg));if(neg)assert(mx<0);gold+=mx;}assert(data.output[b]==gold);}
+ uint32_t paddedM=s.mTiles*s.baseM;
+ for(uint32_t b=0;b<s.b;++b)for(uint32_t ns=0;ns<s.nSplit;++ns)for(uint32_t m=0;m<paddedM;++m){float gold=-std::numeric_limits<float>::infinity();
+ if(m<s.m)for(uint32_t n=(ns*s.nTiles/s.nSplit)*s.baseN;n<std::min<int64_t>(s.n,((ns+1)*s.nTiles/s.nSplit)*s.baseN);++n)gold=std::max(gold,Value(b,m,n,neg));
+ auto offset=(b*s.nSplit+ns)*paddedM+m;assert(data.scratch[offset]==gold&&data.written[offset]==1);}
+ for(size_t i=s.b*s.nSplit*paddedM;i<data.scratch.size();++i)assert(data.scratch[i]==1e30f);
+ for(size_t i=s.b;i<data.output.size();++i)assert(data.output[i]==1e30f);return horizontal;
+}
+int main(){unsigned tests=0;
+#ifdef NEGATIVE_CONTROL
+ Run<true>({1,129,257,1280,128,128,2,3,1,1},false,2);++tests;
+ Run<true>({1,129,257,1280,128,128,2,3,1,1},true,2);++tests;
+#else
+ for(uint32_t bm:{32u,128u})for(uint32_t m:{1u,17u,129u})for(uint32_t n:{73u,257u,513u})
+ for(uint32_t workers:{3u,8u})for(uint32_t ns:{1u,3u})if(ns<=(n+127)/128)
+ for(uint32_t window:{1u,2u})for(bool neg:{false,true})for(uint32_t mode:{0u,1u,2u}){
+ Schedule s{1,m,n,1280,bm,128,(m+bm-1)/bm,(n+127)/128,ns,workers};s.window=window;
+ Run<true>(s,neg,mode);Run<false>(s,neg,mode);tests+=2;}
+ for(uint32_t workers:{8u,20u,32u})for(bool neg:{false,true}){
+ Schedule s{1,2048,1536,1280,128,128,16,12,workers==8?1u:workers==20?3u:12u,workers};
+ auto actual=Run<true>(s,neg,workers%3),parent=Run<false>(s,neg,workers%3);tests+=2;
+ assert(parent==768&&actual==(workers==8?32u:workers==20?96u:384u));
+ std::cout<<workers<<" cores exact C9 actual horizontal "<<parent<<" -> "<<actual<<" PASS\n";}
+#endif
+ std::cout<<tests<<" actual C9 AIV + parent + actual FinalizeRows: delayed DMA, destructive ring/UB reuse, poison-tail/all-negative, idle/zero rows, unique partial/y/guards PASS\n";
+}
