@@ -1,11 +1,12 @@
 # 最新接手状态 · 2026-10-08
 
-## 当前代码与正式任务
+## Current code, formal tasks and next executable action
 
-- 当前experiment/c4-tt-direct-cube候选已终态归档：任务6ac736e7694b590c3c9db696 Pass15/15、precision全1；C4=7.81μs，父最近3.94–4.12，明显退化，不保留、不重复/扫描。详情[C4_TT_DIRECT_CUBE](C4_TT_DIRECT_CUBE.md)。
-- 下一独立branch恢复整个通过1734f16/a5eef105/354602bytes，审查用户新提供的具体15shape图片。dtype/layout图中未给，历史条件仍标假设，C10尤其有冲突。先核实际MakePlan与Launch优先级，不能把case编号当路径命中。
-- C13手动frame6ac733cd已Pass但无收益，归档5be8af1。按新图C13=(1,8192,64,128)，若原dtype/layout成立，走原dual3/tree16，该尾块候选不命中；需要实际host验证后更新文档。
-- 当前无活动正式任务；整体目标未完成。
+- Branch experiment/exact-shape-audit-1008: kernel restored whole1734f16/a5eef105/354602bytes. C4/C13 failed candidates excluded. No active formal task.
+- User exact15shape image transcribed docs/teammate_probe/exact_shapes_user_1008.csv, no dtype/layout/SoC/script/formalID; baseline is not Tbest. Actualhost audit480configurations: cores1/8/20/32, all8dtype/layouts, CPUtiler stub. See [EXACT_SHAPE_AUDIT_1008](EXACT_SHAPE_AUDIT_1008.md).
+- Under20cores and historicaldtype/layout assumptions: C13(8192,64,128) is dual3/tree16/earlySum, excluded by previous dual14frame. C11(1536,2048,2048) is dual2/BM128BN256/Nsplit8, excluded by TTframe. C6(23,73,192) selects existing dynamicKP DIRECT_BATCH, not fullyconstantBN96. C10 historicallayout conflict preserved.
+- NEXT: inspect bmmms_manual RESIDENT_B/C13 earlySum. Independently replace framework/local reduction on the ACTUAL resident route; retain oneBload/L0residence/fullK/originalGM and prove actual physical operand/event lifetimes before unique formalgate. Do not repeat failed residence algorithms or dual14-only tail route. C11 is a later independent hypothesis, not a batch of unverified changes.
+- C4 DIRECT_BATCH Cube task6ac736e7694b590c3c9db696 Pass15, C4=7.81 vs parent3.94-4.12: clearregression archiveddcbb2ff. C13tailframe6ac733cd Pass/no gain archived5be8af1. No repeats/nearby scans; overallgoal incomplete.
 
 ## 最新计分参考与差距
 

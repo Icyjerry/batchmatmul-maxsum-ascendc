@@ -823,3 +823,7 @@ C4实现6bad2b4已push；唯一正式任务 **6ac736e7694b590c3c9db696** 已创�
 [1.85, 2.47, 3.28, 7.81, 5.29, 9.47, 7.71, 46.3, 67.93, 97.84, 88.56, 96.89, 15.98, 10.82, 9.19]
 
 总471.39μs，最新Tbest计算均分50.30139。C4=7.81μs，父最近五次3.94–4.12，中位4.08；明显退化，不能保留，不原样确认或附近参数扫描。所有其它点完整保留，未改路线变化不归因本轮。原JSON忽略artifacts/c4-tt-direct-cube/official.json。候选/测试/结果保存在本分支，后续恢复完整1734f16。用户此时提供具体shape图片；独立CPU审查并保留dtype/layout的缺失，不冒充正式metadata或profiling。当前无活动任务。
+
+## 2026-10-08: exact-shape image changes routing diagnosis
+
+Supplied15B/M/N/K and baseline times withoutdtype/layout/SoC/formalID/script; CSV exact_shapes_user_1008. Baseline notTbest. Whole1734f16 restored. Actualhost CPUstub480configurations across1/8/20/32cores/all8dtype/layouts: under20cores+historicaltype/layout C13(8192,64,128) dual3/tree16 excludedbydual14frame; C11(1536,2048,2048) dual2/BM128BN256/Nsplit8 excludedbyTTframe; C6(23,73,192) existingdynamicKP DIRECT_BATCH, notfullyconstantBN96. Notdevicepath/profile evidence, C10conflictpreserved. Fullsummary EXACT_SHAPE_AUDIT_1008. No newformaljob. NextactualC13resident-B framework retainingoneBload/L0residence/fullK/GM; requiresnewphysicalmodels. Initial documentation generation failed before writing due stdin encoding; retried ASCII source, no algorithm/model/result altered.
