@@ -891,3 +891,9 @@ Task6ac77103694b590c3ccaa29e **Pass15/15**, all precision_ratio=1. Timesus:
 `[1.92, 2.47, 3.09, 4.16, 5.25, 9.84, 8.36, 46.87, 68.33, 98.47, 88.61, 96.97, 13.44, 11.05, 9.22]`
 
 Total468.05us; latest user Tbest calculated mean **51.04335964** (not a live rank). C8=46.87, C13=13.44; prior retained C13=12.62/13.19. All observations retained, no overall speed gain established. Raw ignored artifacts/best-identical-repeat-1008/official.json. No active job or further unchanged request. Actual SoC/plan/profiling unavailable.
+
+## 2026-10-08: C8 assessments complete, retained best restored
+
+Unsubmitted N-major268a802 physicalmodels passed butDMA269both/input+0.34%, no volume/call gain; archived, noformalID. Full-A/full-B singlepackage9782c98 native6ac77690694b590c3ccea247 Pass15/allprecision1, C8=54.17us vsretained46.18–46.87, rejecteddespite sourceDMA269→117. Full15 [1.96,2.66,3.18,4.25,5.42,9.72,7.78,54.17,67.96,97.77,87.28,96.06,12.82,10.98,9.02], total471.03/newestTmean51.37585466. Otherroutefluctuations/adverse samples retained; computedmean doesn'toverrideclear C8regression. No unchangedconfirmation/nearbyscan. Archived748c4b7/experiment/c8-full-inputs-frame; noactivejobs. Bothdocs copiedhere; actualmodels remainarchivedbranches. NoactualSoC/route/profileclaims.
+
+Wholekernelrestoredbyteequal7492776/364169B/SHA0794a2bf onexperiment/c13-resident-frame, retainingC13localgain. User-requested ONE bestsubmission6ac77103694b590c3ccaa29e terminalPass15/all1/total468.05/newTmean51.04335964; no furtherrepeatrequests. NoWeb. Furtherindependenthypothesis must respect double-buffer overlap andactual API/state costs, not repeatresident-operand swap orsinglepackageparameter scan.
