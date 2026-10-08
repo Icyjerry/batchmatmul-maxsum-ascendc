@@ -831,3 +831,5 @@ Supplied15B/M/N/K and baseline times withoutdtype/layout/SoC/formalID/script; CS
 ## 2026-10-08: exact C13 resident-frame candidate ready
 
 Parentwhole1734f16; 178lines/threeadditions,364169bytes/SHA0794a2bfc777ac48c373b3085cd96fd1224b0bf0a4f6a9351d290bb421dbad2d. New suppliedexactshape C13(1,8192,64,128), historicalFP16/FF, targetsoriginaldual3/tree16 notoldtaildual14. OneBload/L0Bresidence, fullK128, originalstridedM/doubleC/workerpartials/GM retained, explicitframes replaceTPipe/TQue andredundantMax. CPU96producer/sevencontrols,102threadedAIV/sevencontrols, production/TUNING each5120host/fourhits passed; SyncAllmodeldrainsMTE3 so removalofMTE3_Valone undetected, devicewaitretained/nofalsecontrolclaim. Whole-parent/protected7/CLI dry-runonlykernel/SHAverified. NoformalIDyet, nativegatePENDING. FullC13_RESIDENT_FRAME.
+
+Implementation7492776 pushed; unique formal task **6ac73bd0694b590c3ca19b3d** created. Query sameID to realterminal, no resubmission; nativegatePENDING.
