@@ -971,3 +971,13 @@ Source audit complete: FF GMslot credit acquiredbeforeK MMAD thoughonlyFixpipe w
 Kernel368904B/SHAdcf715a21b2ec6fa8ec3ba27f13bd3b00216bbfdba88817103349174ee3b5337, branch experiment/c10-late-ring-credit, parenta2e6763. OnlyM_BALANCEGMcreditplacementdeferred untilallKissued/beforeFixpipe; nogeometry/Plan/Vector/allocator/GM/math changes. Actualproducer delayedtwo-AIVrelease sees164blockedacquisitions/2884Kworkissued-executedwhileoldGMowned (fulltarget160/2880); nothardwaretime. Parent12sameproxygroups fourblocked/0work. CPU13producer/96ownership+FinalizeRows/production&TUNING192plans9hits/fivecontrols PASS. Wholeinversea2e6763/protected7proof. Finaldryrunonly368904B/dcf715a2kernel. NativePENDING/noIDyet, ONEgateafterpush; seeC10_PIPELINE_CREDIT_AUDIT. Rawignoredartifacts/c10-late-ring-credit/cpu.log.
 
 Implementation **1a56211** pushed; uniqueformaljob **6ac7bfcb694b590c3c0ae962** createdonce, same368904B/SHAdcf715a2. NativePENDING, querysameIDtoterminal.
+
+## Formal terminal: Pass15, no target gain, archive
+
+Task **6ac7bfcb694b590c3c0ae962**, implementation **1a56211**, 368904B/SHAdcf715a2. Formalcompile/15precision passed, allprecision_ratio=1. Timesus:
+
+`[1.91, 2.83, 3.14, 4.1, 5.22, 9.97, 8.07, 44.08, 67.5, 92.84, 88.37, 96.05, 13.18, 10.7, 9.37]`
+
+Total **457.33us**, latestuserTbest calculatedmean **51.35378426**, notlive rank. C10 **92.84us** vsparentsingle91.53us (+1.43%) doesnotimprove thetarget. Noactualroute/SoC/profile/bounddevice A-B orGMwait frequency. Syntheticallowedoverlapdidnotestablish actualspeed. Allotherpoint fluctuations/adverseC6=9.97/C13=13.18/C15=9.37 retained; unrelatedroutes' improvements notattributed.
+
+Archiveandrestorewholepassed **a2e6763** /368782B/SHA16b51684; noidenticalrepeat/nearbywait variants. CPUmodels/rawnativeJSON remainarchivedbranch/ignored artifacts/c10-late-ring-credit/official.json. Main/tagsuntouched, noactiveformaljobs. Independentnextaudit: actualFF A2loadinstruction/data-layout conversion, preserving currenttilegeometry/GM/Plan.
