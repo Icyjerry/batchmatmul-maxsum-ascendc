@@ -941,3 +941,9 @@ Task **6ac7b3c8694b590c3c0218c4**, implementation a2e6763 / SHA16b51684 / 368782
 Total **457.04us**, newest user Tbest calculated mean **51.45446223**, not a live rank. C10=91.53, 5.62% below the prior unchanged-C10 range minimum96.98 (range96.98-100.24), and8.06% below the most recent parent99.56. Consistent with the ownership hypothesis but only a single observation: no bound-device A/B, route hit or profiling. Not stable causal proof or a large whole-competition breakthrough. Adverse C2=2.87 retained; its independent tiny route was unchanged. Extra C8=43.66 fluctuation is not attributed to this C10 edit.
 
 Keep this passed candidate as the experimental forward baseline; main/historical tags unchanged. User requires large gains before repeats, so no unchanged confirmation or neighboring ownership scans. Native15 precision passed, full A2/A3 coverage/SoC/all envelope/stable performance still unproven. No live tasks. Raw JSON ignored artifacts/c10-balanced-m-shards/official.json. Passed parentaf886e1 remains recoverable.
+
+## C10 full M shard: CPU-verified candidate
+
+Parenta2e6763，branch experiment/c10-full-m-shard，kernel370786B/SHA f2ea9e355ad98709a3c1c0a4cce72d1ccc6bb8c8067624e7236ffdddd13eef78，39additions/1removed。完整M分段复用B，条件4096/1280/1152/20cores在实际容量下选M208/N144/K64；oldPlan/arena/device/Vector/其余launch不变。实际抽取Cube Breads58982400→29491200，Ctiles200→180，MMAD3600→3240，A2元素23592960→42467328。速度PENDING，A2增加80%可能抵消收益。
+
+CPU8producer/160ownership+actualFinalizeRows/912actualManualCopyC+treeMax/生产&TUNING各1120hostplans31hits/四controls PASS。BF16精度/native队列契约/实际route/SoC/profile不由整数模型证明。完整逆向等于a2e6763，protected7等于1734f16。最终隔离dry-run只有370786B/f2ea9e35kernel。尚无正式ID；仅创建一个gate，无收益恢复a2e6763，不扫相邻N。完整说明C10_FULL_M_SHARD，rawCPU ignored artifacts/c10-full-m-shard/cpu.log。
