@@ -917,3 +917,5 @@ Keep the passed phased-A code on experiment/c8-phased-a-ready as an *experimenta
 ## C10 FF B-package candidate: CPU evidence only
 
 Exact BF16/FF 4096/1280/1152 dual20 retains original manual Vector/events/Plan/GM. B_PACKAGE192, kernel369094B/SHA31bc978f; 60 added/5 removed lines. Actual full-shape producer Bcopies960/MMAD2880/Breads47185920; default-K64 proxy144 vs package48 copies, identical input volume/results. Eight producers, production/TUNING each40hostplans/5hits, six fault controls rejected. Whole af886e1 outside scoped regions/Vector/protected7 byte unchanged. Live TQue model assumes last-reader wait on allocation; native CANN/precision/latency PENDING. Dry-run onlykernel; no task ID yet. Detailed C10_FF_B_PACKAGES. No Web/newGM/parameter scan; dtype/layout ambiguity remains.
+
+Implementation fd23d39 pushed; unique native **6ac7aefd694b590c3cfe44d9** created once, sameSHA31bc978f/369094B. NativePENDING; querysameID toterminal, no resubmit.

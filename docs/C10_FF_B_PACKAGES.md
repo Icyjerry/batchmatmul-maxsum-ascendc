@@ -25,3 +25,5 @@ CPU 模型延后 MTE2/MTE1/MMAD 并读取活跃操作数，但 **TQue Alloc 等�
 ## 正式入口
 
 隔离提交目录 `/private/tmp/bmmms-c10-ff-b-packages/project`，受保护七文件来自 1734f16。CLI dry-run 确认仅 kernel.asc、上述 SHA/369094B。实现提交并推送后创建一次正式任务；保存唯一 ID，查询同一任务至终态，不能因等待重交。无明显收益则归档并整份恢复 af886e1；不扫描附近包大小。
+
+实现 fd23d39 已推送，唯一正式任务 **6ac7aefd694b590c3cfe44d9** 已创建；编译/精度/性能 PENDING。查询同一 ID，不重新提交。
