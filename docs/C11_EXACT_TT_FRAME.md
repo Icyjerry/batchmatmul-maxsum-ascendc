@@ -25,3 +25,5 @@ Candidate365998bytes/SHA4ce9ab293b8a24b80a3741f8195ccee217856a5b9c0d330404fa7013
 CPU integers and synthetic cross-core companions, not native FP16 encoding, real tiling, timing or complete hardware co-simulation. Cube tests reduce M to control cost; full host/consumer dimensions are exercised. Native CANN compilation,15-case FP16/BF16 precision and timing PENDING. The existing TT entry's prior BF16 Pass does not establish this new FP16 route's result.
 
 Protected seven template files byte-identical to1734f16; separate official template `/private/tmp/bmmms-c11-exact-frame-official/project`. CPU log ignored `artifacts/c11-exact-tt-frame/cpu.log`. Submit one unique gate after dry-run; record ID before polling same ID to terminal. Only a clear substantial observation warrants one unchanged confirmation. Preserve all15 timings/adverse points and C13 gain; no failed nearby variant scans.
+
+Implementation9160eb2 pushed. Unique formal task **6ac73fd0694b590c3ca4be61** created after matching dry-run. Query this ID to terminal; native gate PENDING, do not submit again on observation timeout.
