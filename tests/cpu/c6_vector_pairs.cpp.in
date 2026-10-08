@@ -1,0 +1,163 @@
+// Integer arithmetic, actual extracted Vector entry, delayed byte-addressed UB.
+// Three FIFO engine priorities and real all-AIV barrier; not hardware timing/FP16.
+#include <algorithm>
+#include <array>
+#include <atomic>
+#include <cassert>
+#include <condition_variable>
+#include <cstdint>
+#include <cstring>
+#include <deque>
+#include <functional>
+#include <iostream>
+#include <limits>
+#include <mutex>
+#include <thread>
+#include <vector>
+#define __aicore__
+#define __global__
+#define __vector__
+#define __gm__
+#define __schedmode__(x)
+using GM_ADDR=void*;
+constexpr int PIPE_MTE2=0,PIPE_V=1,PIPE_MTE3=2,PIPE_ALL=3;
+struct Barrier {
+ std::mutex lock;std::condition_variable cv;unsigned arrived=0,generation=0,count;
+ explicit Barrier(unsigned n):count(n){}
+ void Wait(){std::unique_lock<std::mutex> l(lock);auto old=generation;
+  if(++arrived==count){arrived=0;++generation;cv.notify_all();}else cv.wait(l,[&]{return generation!=old;});}
+};
+struct Shared {
+ uint32_t b;std::vector<int16_t>a,x;std::vector<float> parts,y;
+ std::vector<std::atomic<int>> stored,writes;Barrier barrier;
+ explicit Shared(uint32_t batches):b(batches),a(b*23*192),x(b*73*192),parts(512+13*2*32*80+16,1e30f),
+  y(b+16,1e30f),stored(b*16),writes(b),barrier(2*b){for(auto& z:stored)z=0;for(auto& z:writes)z=0;}
+}*shared;
+struct Command {std::function<bool()> ready;std::function<void()> run;};
+struct State {
+ uint32_t block=0,mode=0;bool synced=false;size_t bytes=0,aReads=0,bReads=0,muls=0;
+ std::vector<uint8_t> ub=std::vector<uint8_t>(192*1024,0x7f),initialized=std::vector<uint8_t>(192*1024);
+ std::array<std::deque<Command>,3> queues;std::array<std::array<int,2>,2> events{};
+ void Push(int e,std::function<void()> f){queues[e].push_back({[]{return true;},f});}
+ void Drain(){std::array<std::array<int,3>,3> orders={{{0,1,2},{1,2,0},{2,0,1}}};
+  while(!queues[0].empty()||!queues[1].empty()||!queues[2].empty()){
+   bool advance=false;for(int e:orders.at(mode))if(!queues[e].empty()&&queues[e].front().ready()){
+    auto c=queues[e].front();queues[e].pop_front();c.run();advance=true;break;}
+   assert(advance&&"engine dependency deadlock");
+  }
+ }
+};
+thread_local State st;
+namespace AscendC {
+enum class TPosition {VECCALC,VECIN,VECOUT};
+enum class HardEvent {MTE2_V,V_MTE3};
+enum class RoundMode {CAST_NONE};enum class ReduceOrder {ORDER_ONLY_VALUE};
+uint32_t GetBlockIdx(){return st.block;}void SetAtomicNone(){}void SetMaskNorm(){}void ResetMask(){}
+template<class T>struct LocalTensor {
+ size_t offset=0,end=0;
+ LocalTensor(TPosition,size_t bytes,size_t count):offset(bytes),end(bytes+count*sizeof(T)){
+  assert(bytes%32==0&&end<=st.ub.size());st.bytes=std::max(st.bytes,end);
+ }
+ LocalTensor(size_t start,size_t stop):offset(start),end(stop){}
+ LocalTensor operator[](size_t i)const{assert(offset+i*sizeof(T)<end);return {offset+i*sizeof(T),end};}
+ T Read(size_t i)const{size_t off=offset+i*sizeof(T);assert(off+sizeof(T)<=end);
+  for(size_t j=0;j<sizeof(T);++j)assert(st.initialized.at(off+j)&&"UB read before producer completion");
+  T v;std::memcpy(&v,st.ub.data()+off,sizeof(T));return v;
+ }
+ void Write(size_t i,T v)const{size_t off=offset+i*sizeof(T);assert(off+sizeof(T)<=end);
+  std::memcpy(st.ub.data()+off,&v,sizeof(T));for(size_t j=0;j<sizeof(T);++j)st.initialized.at(off+j)=1;
+ }
+};
+template<class T>struct GlobalTensor {
+ T* ptr=nullptr;size_t count=0,offset=0;int kind=0;
+ void SetGlobalBuffer(T* p){
+  if constexpr(sizeof(T)==2){if(p==shared->a.data()){ptr=p;count=shared->a.size();kind=1;}
+   else {assert(p==shared->x.data());ptr=p;count=shared->x.size();kind=2;}}
+  else {if(p==shared->parts.data()){ptr=p;count=shared->b*32;kind=3;}
+   else {assert(p==shared->y.data());ptr=p;count=shared->b;kind=4;}}
+ }
+ GlobalTensor operator[](size_t i)const{assert(offset+i<count);auto t=*this;t.offset+=i;return t;}
+ T Read(size_t i)const{assert(offset+i<count);if(kind==1)++st.aReads;if(kind==2)++st.bReads;
+  if(kind==3)assert(shared->stored.at(offset+i).load(std::memory_order_acquire)==1&&"partial read before all writers");
+  return ptr[offset+i];}
+ void Write(size_t i,T v)const{assert(offset+i<count);ptr[offset+i]=v;
+  if(kind==3)assert(shared->stored.at(offset+i).fetch_add(1,std::memory_order_release)==0);
+  else {assert(kind==4);assert(shared->writes.at(offset+i).fetch_add(1)==0);}}
+};
+template<HardEvent E>void SetFlag(int id){assert(id==0);int from=E==HardEvent::MTE2_V?PIPE_MTE2:PIPE_V;
+ st.Push(from,[=]{assert(st.events[int(E)][id]++==0);});}
+template<HardEvent E>void WaitFlag(int id){assert(id==0);int to=E==HardEvent::MTE2_V?PIPE_V:PIPE_MTE3;
+ st.queues[to].push_back({[=]{return st.events[int(E)][id]>0;},[=]{--st.events[int(E)][id];}});}
+template<int P>void PipeBarrier(){if(P==PIPE_ALL)st.Drain();else assert(P==PIPE_V);}
+template<bool B>void SyncAll(){assert(B);st.Drain();shared->barrier.Wait();st.synced=true;}
+template<class T>void DataCopy(LocalTensor<T> dst,GlobalTensor<T> src,uint32_t count){
+ assert(dst.offset%32==0&&count*sizeof(T)%32==0);
+ st.Push(PIPE_MTE2,[=]{for(uint32_t i=0;i<count;++i)dst.Write(i,src.Read(i));});}
+void DataCopy(GlobalTensor<float> dst,LocalTensor<float> src,uint32_t count){
+ assert(!st.synced&&dst.kind==3&&dst.offset==(st.block/2)*16+(st.block%2)*8&&count==8);
+ st.Push(PIPE_MTE3,[=]{for(uint32_t i=0;i<count;++i)dst.Write(i,src.Read(i));});}
+struct DataCopyExtParams {uint16_t blockCount;uint32_t blockLen,srcStride,dstStride,reserved;};
+void DataCopyPad(GlobalTensor<float> dst,LocalTensor<float> src,DataCopyExtParams cp){
+ assert(st.synced&&st.block%2==0&&dst.kind==4&&dst.offset==st.block/2&&cp.blockCount==1&&cp.blockLen==4);
+ st.Push(PIPE_MTE3,[=]{dst.Write(0,src.Read(0));});}
+template<class T>void Cast(LocalTensor<float> dst,LocalTensor<T> src,RoundMode,uint32_t count){
+ assert(count%16==0&&dst.offset%32==0&&src.offset%32==0);
+ st.Push(PIPE_V,[=]{for(uint32_t i=0;i<count;++i)dst.Write(i,float(src.Read(i)));});}
+void Duplicate(LocalTensor<float> dst,float value,uint32_t count){
+ st.Push(PIPE_V,[=]{for(uint32_t i=0;i<count;++i)dst.Write(i,value);});}
+struct BinaryRepeatParams {uint32_t dstBlk,src0Blk,src1Blk,dstRep,src0Rep,src1Rep;};
+void Mul(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint64_t mask,uint32_t reps,BinaryRepeatParams p){
+ assert(mask==64&&reps==73&&p.dstRep==24&&p.src0Rep==0&&p.src1Rep==24);++st.muls;
+ st.Push(PIPE_V,[=]{for(uint32_t r=0;r<reps;++r)for(uint32_t i=0;i<mask;++i)
+  dst.Write(r*p.dstRep*8+i,a.Read(r*p.src0Rep*8+i)*b.Read(r*p.src1Rep*8+i));});}
+void Add(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint32_t count){
+ assert(count==160);st.Push(PIPE_V,[=]{for(uint32_t i=0;i<count;++i)dst.Write(i,a.Read(i)+b.Read(i));});}
+void Max(LocalTensor<float> dst,LocalTensor<float> a,LocalTensor<float> b,uint64_t mask,uint32_t reps,BinaryRepeatParams p){
+ assert(mask<=64&&reps<=2&&p.dstBlk==1&&p.src0Blk==1&&p.src1Blk==1);
+ st.Push(PIPE_V,[=]{for(uint32_t r=0;r<reps;++r)for(uint32_t i=0;i<mask;++i)
+  dst.Write(r*p.dstRep*8+i,std::max(a.Read(r*p.src0Rep*8+i),b.Read(r*p.src1Rep*8+i)));});}
+void WholeReduceSum(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,uint32_t reps,uint32_t ds,uint32_t bs,uint32_t rs){
+ assert(mask>0&&mask<=64&&reps<=255&&ds==1&&bs==1);
+ st.Push(PIPE_V,[=]{for(uint32_t r=0;r<reps;++r){float total=0;
+  for(uint32_t i=0;i<mask;++i)total+=src.Read(r*rs*8+i);dst.Write(r,total);}});}
+void WholeReduceMax(LocalTensor<float> dst,LocalTensor<float> src,uint64_t mask,uint32_t reps,uint32_t ds,uint32_t bs,uint32_t rs,ReduceOrder){
+ assert(mask>0&&mask<=64&&reps<=2&&dst.offset%8==0&&src.offset%32==0&&ds==1&&bs==1&&rs==10);
+ st.Push(PIPE_V,[=]{for(uint32_t r=0;r<reps;++r){float total=-std::numeric_limits<float>::infinity();
+  for(uint32_t i=0;i<mask;++i)total=std::max(total,src.Read(r*rs*8+i));dst.Write(r,total);}});}
+}
+template<AscendC::HardEvent E>void Fence(){assert(false);}
+// INSERT_KERNEL
+void Run(uint32_t b,uint32_t mode,uint32_t seed,bool neg){
+ Shared data(b);shared=&data;
+ for(uint32_t batch=0;batch<b;++batch){
+  for(uint32_t m=0;m<23;++m)for(uint32_t k=0;k<192;++k)
+   data.a[(batch*23+m)*192+k]=neg?1+(batch+m*3+k*5+seed)%5:int((batch*7+m*11+k*13+seed)%11)-5;
+  for(uint32_t n=0;n<73;++n)for(uint32_t k=0;k<192;++k)
+   data.x[(batch*73+n)*192+k]=neg?-int(1+(batch*3+n*7+k*11+seed)%5):int((batch*19+n*23+k*29+seed)%11)-5;
+ }
+ auto a=data.a,x=data.x;std::vector<std::thread> threads;
+ for(uint32_t id=0;id<2*b;++id)threads.emplace_back([&,id]{
+  st=State{};st.block=id;st.mode=mode;
+  bmmms_c6_vector_pairs<int16_t>(data.a.data(),data.x.data(),data.parts.data(),data.y.data(),b);
+  for(auto& q:st.queues)assert(q.empty());for(auto e:st.events)for(int v:e)assert(v==0);
+  unsigned rows=id%2?11:12;assert(st.aReads==rows*192&&st.bReads==73*192&&st.muls==3*rows&&st.bytes==190240);
+ });
+ for(auto& t:threads)t.join();assert(data.a==a&&data.x==x);
+ for(uint32_t batch=0;batch<b;++batch){float total=0;
+  for(uint32_t m=0;m<23;++m){float mx=-std::numeric_limits<float>::infinity();
+   for(uint32_t n=0;n<73;++n){float dot=0;for(uint32_t k=0;k<192;++k)
+    dot+=float(a[(batch*23+m)*192+k])*float(x[(batch*73+n)*192+k]);mx=std::max(mx,dot);}
+   if(neg)assert(mx<0);total+=mx;
+  }
+  assert(data.y[batch]==total&&data.writes[batch]==1);
+  for(uint32_t i=0;i<16;++i)assert(data.stored[batch*16+i]==1);
+ }
+ for(size_t i=b*16;i<data.parts.size();++i)assert(data.parts[i]==1e30f);
+ for(size_t i=b;i<data.y.size();++i)assert(data.y[i]==1e30f);
+}
+int main(){unsigned count=0;
+ for(uint32_t b:{1u,3u,13u,20u})for(uint32_t mode=0;mode<3;++mode)for(uint32_t seed:{0u,1u,7u})for(bool neg:{false,true}){
+  Run(b,mode,seed,neg);++count;
+ }
+ std::cout<<count<<" actual queued C6 Vector groups: exact192K/73N/23M, raw/product UB alias, three engine orders, 12/11 rows, distinct batch inputs, immutable prefixes, one writer per y/guards PASS\n";
+}

@@ -1,5 +1,14 @@
 # 最新接手状态 · 2026-10-08
 
+## Current C6 structural candidate
+
+- Branch experiment/c6-vector-pairs from retained53ab5ca/source7492776/C13 SHA0794a2bf. Candidate369131B/SHAa9aff3a8a4f9b0f81dd519d299e7fe213952b2016f79faca82b441c62397789a;90lines/three additions only, whole-parent inverse proven.
+- Exact supplied B13M23N73K192/historicalBF16FT, matching originaldual19 BM32BN80 plan, queryAIV/UB andpins fallback. Two AIVs cache B/halfA, two-row FP32 Vector dots/MaxN/SumM, originalpartialprefix for two scalars, singlebarrier andone4B y/batch; removesCube/C-ring on this point. No extra GM/allocator/planner changes, all oldpaths/C13 intact.
+- CPU production/TUNING3888actualhost plans each/threehits;72queued byte-UB threaded groups/six rejected controls. RawBF16/product alias guarded, full192K/73N/12-11rows, batchseparation/outputguards; integer FIFO model notnativeBF16/hardwarepipeline. Protected7/dry-run passed. [C6_VECTOR_PAIRS](C6_VECTOR_PAIRS.md).
+- NEXT commit/push then oneformal gate, saveID andpollsameIDto terminal; noIDyet/nativegatePENDING. Onlyclearmajor C6benefit warrantsoneconfirmation; otherwisearchive/restore retained7492776, no nearbyparameter scan. Noactivejobyet.
+
+## Previous retained baseline
+
 ## Current retained code and next executable action
 
 - Current experiment/c13-resident-frame, kernel364169bytes/SHA0794a2bfc777ac48c373b3085cd96fd1224b0bf0a4f6a9351d290bb421dbad2d, implementation7492776. Parent1734f16 +threeadditions178lines only; C4regression/oldC13tail excluded.
