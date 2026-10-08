@@ -1,9 +1,10 @@
-# Current passed baseline restored; next C10 pipeline audit
+# Current passed baseline restored; direct A2 instruction audit next
 
-- Branch experiment/c10-pipeline-audit, kernel wholebyteequal a2e6763, 368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94. C10balanced ownership/C8phased-A/C13resident frame retained.
-- Full-M candidate archived74f9937 onexperiment/c10-full-m-shard (implementationc1a52ef/SHAf2ea9e35). Unique6ac7bcb6694b590c3c08ce0e terminalPass15/allprecision1, C10=178.32 vsparent91.53us (+94.82%). Full15/CPU counts/limits in[C10_FULL_M_SHARD](C10_FULL_M_SHARD.md). Models stayarchivedbranch, no live tasks/no repeats.
-- Breads-50%/Ctiles-MMAD-10%/A2+80% didnot produce speed. NEXT independent hypothesis: defer M_BALANCE FF GM write-credit wait until before Fixpipe, as in retained C9. Preserve current block sizes/Plan/Vector and prove work can issue before blocked credit without early GM write. See[C10_PIPELINE_CREDIT_AUDIT](C10_PIPELINE_CREDIT_AUDIT.md); not implemented/submitted. Do not scan near failedwholeM/Nwidths ordeclare actualMTE1/L1 bottleneck from latency.
-- Parent6ac7b3c8694b590c3c0218c4 Pass15/C10=91.53 singlelocalimprovement remains experimentalforwardbaseline. Main/tags unchanged; wholecompetition goal incomplete.
+- Branch experiment/c10-a2-load-audit, kernelwholebyteequal **a2e6763**,368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94. C10balancedownership/C8phasedA/C13residentframe retained, main/tagsuntouched.
+- LateGMcredit archived **44d25e2** onexperiment/c10-late-ring-credit (implementation1a56211/SHAdcf715a2); unique6ac7bfcb694b590c3c0ae962 Pass15/allprecision1/C10=92.84 vsparent91.53. Full15in[C10_PIPELINE_CREDIT_AUDIT](C10_PIPELINE_CREDIT_AUDIT.md), modelsstayarchivedbranch. No livejobs/repeats/nearbywaitscans.
+- FullM178.32regression archived74f9937; do not revive/scan adjacentgeometry.
+- NEXT independenthypothesis actualFF A2LoadData3D->existingdirectNZ-to-ZZ LoadData2D underM_BALANCEonly, keepingoriginalgeometry/tree8/earlyGMcredit/Vector/Plan. [C10_DIRECT_A2_AUDIT](C10_DIRECT_A2_AUDIT.md) listsaddressalgebra/commands+300%risk/requiredmodels/onegate. Notimplemented/submitted; nativebenefitunknown. Historicaltree2pin alonedoesnotcoveritbecauseRESIDENT_PADstillselects3D.
+- Parent91.53singlelocalimprovement, notstablelargeoverallbreakthrough. ActualSoC/route/profileunknown, overallgoalactive/incomplete.
 
 ## 先读与规则
 
