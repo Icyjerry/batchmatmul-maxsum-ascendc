@@ -965,3 +965,7 @@ Archive this experiment, restore wholepassed **a2e6763** (368782B/SHA16b51684), 
 Restored wholea2e6763/368782B/SHA16b51684 onexperiment/c10-pipeline-audit. FailedfullM source/models retained74f9937 onexperiment/c10-full-m-shard; terminaldocs carriedforward. No activejob/repeat/nearby scans. Nextsource pipeline audit only; no newoptimization yet.
 
 Source audit complete: FF GMslot credit acquiredbeforeK MMAD thoughonlyFixpipe writesring; retained C9 useslateacquisition. Independent deferred-credit hypothesis documentedC10_PIPELINE_CREDIT_AUDIT, unimplemented/unsubmitted. Originalgeometry/Plan/Vector unchanged, no inputvolumeclaim. Requiredblocked-credit/readiness faultmodels beforeonegatednativeexperiment. No livejob; kernel remainswholea2e6763.
+
+## C10 late ring credit CPU candidate
+
+Kernel368904B/SHAdcf715a21b2ec6fa8ec3ba27f13bd3b00216bbfdba88817103349174ee3b5337, branch experiment/c10-late-ring-credit, parenta2e6763. OnlyM_BALANCEGMcreditplacementdeferred untilallKissued/beforeFixpipe; nogeometry/Plan/Vector/allocator/GM/math changes. Actualproducer delayedtwo-AIVrelease sees164blockedacquisitions/2884Kworkissued-executedwhileoldGMowned (fulltarget160/2880); nothardwaretime. Parent12sameproxygroups fourblocked/0work. CPU13producer/96ownership+FinalizeRows/production&TUNING192plans9hits/fivecontrols PASS. Wholeinversea2e6763/protected7proof. Finaldryrunonly368904B/dcf715a2kernel. NativePENDING/noIDyet, ONEgateafterpush; seeC10_PIPELINE_CREDIT_AUDIT. Rawignoredartifacts/c10-late-ring-credit/cpu.log.

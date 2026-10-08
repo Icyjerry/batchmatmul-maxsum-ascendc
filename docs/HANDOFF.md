@@ -1,9 +1,9 @@
-# Current passed baseline restored; next C10 pipeline audit
+# Current candidate: C10 late GM ring credit
 
-- Branch experiment/c10-pipeline-audit, kernel wholebyteequal a2e6763, 368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94. C10balanced ownership/C8phased-A/C13resident frame retained.
-- Full-M candidate archived74f9937 onexperiment/c10-full-m-shard (implementationc1a52ef/SHAf2ea9e35). Unique6ac7bcb6694b590c3c08ce0e terminalPass15/allprecision1, C10=178.32 vsparent91.53us (+94.82%). Full15/CPU counts/limits in[C10_FULL_M_SHARD](C10_FULL_M_SHARD.md). Models stayarchivedbranch, no live tasks/no repeats.
-- Breads-50%/Ctiles-MMAD-10%/A2+80% didnot produce speed. NEXT independent hypothesis: defer M_BALANCE FF GM write-credit wait until before Fixpipe, as in retained C9. Preserve current block sizes/Plan/Vector and prove work can issue before blocked credit without early GM write. See[C10_PIPELINE_CREDIT_AUDIT](C10_PIPELINE_CREDIT_AUDIT.md); not implemented/submitted. Do not scan near failedwholeM/Nwidths ordeclare actualMTE1/L1 bottleneck from latency.
-- Parent6ac7b3c8694b590c3c0218c4 Pass15/C10=91.53 singlelocalimprovement remains experimentalforwardbaseline. Main/tags unchanged; wholecompetition goal incomplete.
+- Branch experiment/c10-late-ring-credit, kernel368904B/SHAdcf715a21b2ec6fa8ec3ba27f13bd3b00216bbfdba88817103349174ee3b5337. Parenta2e6763/368782B/SHA16b51684 preserved; currentchangesonlyM_BALANCEGMwaitplacement beforeFixpipe. Geometry/Plan/allocator/Vector/math unchanged.
+- CPU13actualCubegroups/fulltarget/negative-tail/defaultfalse, delayedtwo-AIVrelease checks; 96ownership+FinalizeRows,prod&TUNINGeach192plans9hits/fivefaultcontrols PASS. Synthetic blocked164/issued2884work beforecredit versusparentproxy4/0; counts areordering only, nohardwarelatencyclaim. Details[C10_PIPELINE_CREDIT_AUDIT](C10_PIPELINE_CREDIT_AUDIT.md).
+- Native PENDING, noIDyet. NEXT commit/pushthenONEsubmit/private/tmp/bmmms-c10-late-ring-credit/project andsaveuniqueID, querysameIDtoterminal. Dry-runonlykernel368904B/dcf715a2; protected7verified. Nativequeues/precision/route/SoC/profileunknown.
+- Full-M failedcandidate74f9937 archived, C10=178.32vsparent91.53; no repeats/nearbyN/BMscans. Parent91.53issinglelocalgain, notstablelargeoverallbreakthrough. Failedlatecredit restoreswholea2e6763. Main/tags untouched,goalactive.
 
 ## 先读与规则
 

@@ -28,3 +28,19 @@ This reduces no mathematical work/inputbytes/launches; the hypothesis is overlap
 - Clear regression/no benefit: restorea2e6763, archive. No neighboringwait/parameter scans or unchangedconfirm for modestgain.
 
 No code change/nativecandidate exists for this hypothesis yet. The user prohibits Web; source audit uses retained teammate C9 and actual current source only.
+
+## Implemented and CPU verified, native PENDING
+
+Branch experiment/c10-late-ring-credit, kernel368904B/SHA256 `dcf715a21b2ec6fa8ec3ba27f13bd3b00216bbfdba88817103349174ee3b5337`. Threeadded/tworemovedlines: early GM wait excludesM_BALANCE; late wait includesM_BALANCE. Current guardedbalancedFF instance only; otherdefaultfalse/FULL_A instances retain their original predicates after constexpr evaluation. No geometry/host/Plan/allocator/Vector/math/inputvolume/newGM edits. Entire inversekernel byteequalsa2e6763, protected7 equals1734f16.
+
+`python3 tools/validate_c10_late_ring_credit.py` finalPASS:
+
+- 13actualproducer groups: full4096/1280/1152/20core plus1/3/8/20/24/32core negative-tail proxies, balancedanddefaultinstances. LiveMTE2/MTE1/MMAD physicalNZ/ZZ/ZN, all full-K C/negativeMax-Sum/input/ringbounds. Previousringgeneration remainsownedbybothAIVs until explicitmodelrelease, checkedbeforeeveryFixpipe. BothAIV release orders exercised, noFixpipeuntilbothcomplete.
+- Candidate164blockedGM acquisitions, 2884K workissued beforecredit and2884executed whilepreviousGMstillowned, 5817344validAIVreads. The fulltarget accountsfor160blocked/2880Kwork; proxy subsetfourblocked/fourKwork. These countpermittedordering in a synthetic scheduler, not elapsedtime or actualNPU stallfrequency.
+- Parentactualsource12proxy groups withsame release model: fourblockedacquisitions, zeroKworkissued/executedbeforecredit. Parentfulltarget notrerun; no claimedapples-to-applesfulltime comparison. Originalsource log's inherited13label is corrected to12inrunner; kernelSHA/validation unchanged.
+- 96actualownership/store+FinalizeRows groups andproduction/TUNINGeach192actualhostplans/ninehits passed. Syntheticcompletedmaxima/faketiler limits unchanged.
+- Fivefaultcontrols removedlateGMwait/Cwait/M_FIX/L0ready orreturnedcreditafteroneAIV; allrejected.
+
+CPU TQueAlloc-last-MTE1-reader contract remains an explicitassumption. SequentialsyntheticAIVrelease is not hardwareprotocol/concurrency orBF16precision proof. FormalCANN9compile/15precision/actualroute/SoC/profile/latency PENDING. Rawignoredartifacts/c10-late-ring-credit/cpu.log, directory700/file600.
+
+Isolated/private/tmp/bmmms-c10-late-ring-credit/project protected7 restored1734f16 andkernelSHAchecked. Dry-run only368904B/dcf715a2kernel. Next commit/pushthenonegate; saveuniqueIDimmediatelyandquerysameIDtoterminal. No repeatfor modestgain/noadjacentwaitscan.
