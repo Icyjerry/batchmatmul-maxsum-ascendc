@@ -788,3 +788,5 @@ CLI login restored; dry-run payload and protected-seven template equality passed
 ## 2026-10-08: C3 static-frame terminal, no clear gain
 
 Task6ac72eaa694b590c3c97d81d /implementationa3c6217/SHA515aa159… Pass15/15, allprecision1. Timesus `[2.01,2.71,3.10,3.92,5.48,9.83,8.31,46.51,68.55,98.23,88.84,97.73,16.50,11.40,9.07]`; total472.19us, newTbest calculatedmean55.19646. C3=3.10 within parent recent-five3.08–3.22/median3.16, earlier3.06; no clear gain. No actualshape/plan/SoC/profile, no route-hit evidence; unchanged-route timings not attributed. Archive candidate, no identical confirmation or nearby scans, restore1734f16. RawJSON ignored artifacts/tiny-ft-static-frame/official.json. No activejob; whole competition goal incomplete. C13 actualhost CPU-stub audit4096plans separately saved, not device/profile evidence.
+
+Restored whole kernel byte-equal1734f16/a5eef105…/354602bytes on experiment/c13-frame-audit-1008. Candidate/results remain pushed16ce102. C13 next frame hypothesis unimplemented; no activejob, login available, goal incomplete.

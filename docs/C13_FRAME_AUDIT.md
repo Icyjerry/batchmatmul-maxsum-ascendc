@@ -24,4 +24,4 @@
 
 保留dual14原task/grid、K panel大小与顺序、原partial/ring和有效N归约，只研究把该路径TPipe/TQue元数据替换为固定物理frame及显式ready/free事件。必须把MTE2→MTE1→MMAD→Fixpipe、两个AIV ring credit、跨M局部Sum及最终barrier全部建模；不能合并先前未获益的完整K/B驻留改动，不能以“减少queue”代替测量结论。
 
-下一先完成C3任务6ac72eaa694b590c3c97d81d的正式终态；此审查不构成再提交C13的依据，尚无可信新实现或本地生命周期模型。
+C3任务6ac72eaa694b590c3c97d81d已Pass15/15，但3.10μs在父波动范围内，归档无收益。当前分支experiment/c13-frame-audit-1008已逐字恢复1734f16。本审查工具可在恢复版执行；审查不构成再提交C13的依据，尚无新实现或本地生命周期模型。

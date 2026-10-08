@@ -1,5 +1,11 @@
 # 最新接手状态 · 2026-10-08
 
+## 当前工作区：通过版恢复，C13待实现
+
+分支 `experiment/c13-frame-audit-1008`，kernel逐字恢复通过算法1734f16，354602bytes/SHA `a5eef105ef83a805315b3fbccf8bbe755fd33ef1ff330cfa4384324c4bd8e742`。C3候选与模型/结果保留已推送 `experiment/tiny-ft-static-frame` /16ce102；在该历史分支复现其入口模型，恢复源码不包含新C3入口。当前无活动评测任务，CLI登录已恢复可复用，无需再次索要登录。
+
+C13审查工具 `python3 tools/audit_c13_plan.py` 可在恢复版执行；下一按 [C13_FRAME_AUDIT](C13_FRAME_AUDIT.md) 实现一个保持原K-panel和GM的独立frame，需实际源码生命周期模型与资源/精度验证后才交，不重复无收益完整K/B驻留结构。尚未实现C13新算法或声称提速，main/历史标签不动，整体目标未完成。
+
 ## 最新正式终态：C3候选归档
 
 任务 **6ac72eaa694b590c3c97d81d** 已Pass15/15、precision_ratio全1。C3=3.10μs，处于父最近五次3.08–3.22范围（中位3.16），未见明显收益；全部15点和局限见 [TINY_FT_STATIC_FRAME](TINY_FT_STATIC_FRAME.md)。总472.19μs，新Tbest换算均分55.19646。候选保留本分支，不合main、不重复提交、不扫附近参数。没有活动任务；下面PENDING/Running是历史状态。下一恢复通过1734f16并继续C13独立frame假设；整体目标未完成。
