@@ -35,3 +35,5 @@
 隔离 `/private/tmp/bmmms-c8-balanced-tail-frame/project`，protected7来自1734f16；dry-run仅372771B/上述SHA kernel。commit/push后只交一次，立刻保存ID并查询终态。CANN9编译、15点精度、实际耗时 PENDING，无ID。
 
 只有15点Pass且C8<=37.111μs（近期父最低43.66的85%）才原样复测确认明显收益。否则保留证据并恢复完整a2e6763；不扫描邻近tiles/package或重复失败方向。原始日志在忽略的 `artifacts/c8-balanced-tail-frame`，目录700/文件600。
+
+实现 **1cb15f9** 已推送；唯一正式任务 **6ac7d7af694b590c3c1a2cb8** 已创建。372771B/SHAaa2aabc1，native PENDING，只查询同一 ID。
