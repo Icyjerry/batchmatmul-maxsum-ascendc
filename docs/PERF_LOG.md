@@ -1059,3 +1059,13 @@ Branch experiment/c9-stream-max,parenta2e6763,kernel371179B/SHA8c23062f0f03f17cb
 CPUproduction&TUNING2592plans/6hits each;1452actualAIV+parent+actualFinalizeRowsgroups; exact8/20/32corehorizontal APIs768->32/96/384;9faultcontrolsrejected. InitialNmaskfaultmissedbecauseunwrittenUBtailcontainedpreviousvalidNsC; strengthenallocated-generationpositivepoisonandM-scaledvalues/two-taskmixed&negativefault fixture, rerunpassed. Initiallogkeptraw, no kernelchangesfortest. Integer/softwarefloatFIFO/faketiler/syntheticcompleteKCube notnativeprecision/internalhazard/timing. C9_STREAM_MAXdetail. Dryisolatedonly371179B/SHA8c23062f, nativePENDING/noID, ONEgateafterpush/confirmationonlyPass15andC9<=57.375us. Overallgoalincomplete.
 
 实现 **ec40e0e** 已推送；唯一正式任务 **6ac7e2f8694b590c3c2010c5** 已创建一次。371179B/SHA8c23062f，native PENDING；只查询同ID。
+
+## 正式终态：Pass15，C9没有明确收益，归档恢复
+
+唯一 **6ac7e2f8694b590c3c2010c5**，实现 **ec40e0e**，371179B/SHA8c23062f。正式编译/15精度通过/all precision_ratio1，times μs：
+
+`[1.9, 2.44, 3.22, 4.02, 5.22, 9.62, 7.94, 44.46, 67.62, 93.52, 87.61, 96.47, 13.01, 10.67, 8.89]`
+
+总计 **456.61μs**，最新用户Tbest重算均分 **52.50620586**（非实时排名）。C9 **67.62μs** 落在保留路径近期 **67.50–69.04μs**范围内；没有明确收益，未满足57.375μs复测门槛。其余变动含C10=93.52完整保留，不归因于此次Vector改动。
+
+源码CPU横向调用768->96并未建立实际速度改善；native API编译/精度通过不能证明该hidden case实际命中新guard。没有SoC/route/profile/同机A-B，不能断言Vector成本低或由哪个单元主导。无原样复测或邻近lane/package/tile扫描。下一步完整恢复a2e6763/368782B/SHA16b51684，将实现/CPU/原始反例留在本分支；main/标签不动，整体目标未完成。Raw忽略artifacts/c9-stream-max/official.json。
