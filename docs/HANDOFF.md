@@ -1,5 +1,13 @@
 # 最新接手状态 · 2026-10-08
 
+## Current C11 experiment
+
+- Branch experiment/c11-exact-tt-frame from retained60ba0d7/C13 source7492776. Candidate365998bytes/SHA4ce9ab293b8a24b80a3741f8195ccee217856a5b9c0d330404fa7013f5c7300d. Only34 host/Launch additions; device TT entry and C13 gain intact, whole-parent inverse proven. Exact supplied C11 shape with historical FP16/TT assumption; original workspace unchanged.
+- Actual source CPU models: production/TUNING2592plans each/four hits, six physical full-K Cube proxy groups/six rejected controls, sixty full-M/N threaded AIV groups/seven rejected controls. No native precision/performance claim; see [C11_EXACT_TT_FRAME](C11_EXACT_TT_FRAME.md).
+- NEXT: protected-template/dry-run and one formal gate, save ID then query same ID to terminal; clear substantial gain only warrants one confirmation. No C11 formal ID yet. Retained C13 remains fallback baseline, main/tags untouched.
+
+## Previous retained C13 baseline and assessment
+
 ## Current retained code and next executable action
 
 - Current experiment/c13-resident-frame, kernel364169bytes/SHA0794a2bfc777ac48c373b3085cd96fd1224b0bf0a4f6a9351d290bb421dbad2d, implementation7492776. Parent1734f16 +threeadditions178lines only; C4regression/oldC13tail excluded.
