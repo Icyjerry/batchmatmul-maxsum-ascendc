@@ -11,7 +11,7 @@
 - 本地模型通过1024次入口/512软件编码FP16、八项负控制；production/TUNING各4800 host配置与全部256条件shape、资源阈值/回退通过；去除三处逐字恢复整个父。CPU不是设备模型。CANN9编译、正式精度/性能 **PENDING**。
 - 当前**没有正式任务ID或活动任务**。旧临时模板/CLI被OS清理，已从Git通过快照/本机公开工具缓存恢复。用户回复已登录后，CLI再次dry-run仍报会话过期/损坏；仅stat显示默认会话文件10月3日更新，不读取其内容。已请求在本机运行 `python3 /private/tmp/cannjudge_cli.py login`，或提供另一个会话文件路径（不提供内容/凭据）。
 - 登录可用后：独立模板 `/private/tmp/bmmms-tiny-ft-static-official/project` dry-run，核对本候选SHA及其它七文件逐字1734f16；commit/push后只创建一次结构评测。取得ID立即存入交接并push，查询同ID至真实终态，记录完整15点。明显大收益才原样确认，否则归档，不扫描附近M/NP/K参数。父最近五次C3中位3.16μs、范围3.08–3.22；更早有3.06，不择优。
-- 计分用用户最新Tbest，[SCORE_REFERENCE_1003](SCORE_REFERENCE_1003.md)。新参考下相对用户历史第一名的差距优先C3/C13/C11/C9/C1，见 [SCORE_PRIORITIES_1008](SCORE_PRIORITIES_1008.md)；不是实时榜单。C13本轮尚无算法修改。原CPU日志忽略 `artifacts/tiny-ft-static-frame/cpu.log`。
+- 计分用用户最新Tbest，[SCORE_REFERENCE_1003](SCORE_REFERENCE_1003.md)。新参考下相对用户历史第一名的差距优先C3/C13/C11/C9/C1，见 [SCORE_PRIORITIES_1008](SCORE_PRIORITIES_1008.md)；不是实时榜单。C13本轮尚无算法修改；完整4096个CPU stub host计划审查见 [C13_FRAME_AUDIT](C13_FRAME_AUDIT.md)，已排除重复完整K/B驻留试交。原CPU日志忽略 `artifacts/tiny-ft-static-frame/cpu.log`。
 - 下方10月3日及更早的“当前分支”“下一动作”“会话可复用”均为历史记录，以本段为准。整体优化目标未完成；不将本地通过称为已提速。
 
 ## 当前计分参考更新
