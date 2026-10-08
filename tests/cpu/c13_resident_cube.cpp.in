@@ -1,0 +1,37 @@
+void Run(uint32_t M,uint32_t workers,bool neg){
+ const uint32_t N=64,K=128,BM=128,BN=64,bk=128,mt=M/BM;
+ assert(M%BM==0);negativeInput=neg;
+ Schedule s{1,M,N,K,BM,BN,mt,1,1,workers,0,0};s.window=1;
+ C13ResidentFrame q{M,workers};
+ std::vector<int16_t>a(M*K),b(N*K);
+ for(uint32_t m=0;m<M;++m)for(uint32_t k=0;k<K;++k)a[m*K+k]=A(0,m,k);
+ for(uint32_t n=0;n<N;++n)for(uint32_t k=0;k<K;++k)b[k*N+n]=B(0,k,n);
+ auto oldA=a,oldB=b;uint64_t fixes=0,mmads=0;
+ for(uint32_t w=0;w<workers;++w){
+  st=State{};st.s=s;st.tx1=st.tx2=false;AscendC::block=w;AscendC::ranges.clear();
+  size_t base=M+size_t(w)*2*BM*BN;uint32_t tasks=0;
+  for(uint32_t t=w;t<mt;t+=workers,++tasks)
+   st.expected.push_back({0,t*BM,0,BM,N,0,base+(tasks&1)*BM*BN});
+  std::vector<float> scratch(M+size_t(workers)*2*BM*BN+16,1e30f);
+  AscendC::registry={{reinterpret_cast<uintptr_t>(a.data()),{a.size()*2,true}},
+   {reinterpret_cast<uintptr_t>(b.data()),{b.size()*2,false}},
+   {reinterpret_cast<uintptr_t>(scratch.data()),{scratch.size()*4,false}}};
+  bmmms_c13_resident_frame<int16_t>(a.data(),b.data(),scratch.data(),nullptr,q);
+  assert(AscendC::dma.empty()&&AscendC::mte1.empty()&&AscendC::mac.empty()&&AscendC::fix.empty()&&AscendC::targets.empty());
+  assert(st.fixes==tasks&&st.mmads==uint64_t(tasks)*((K+bk-1)/bk));
+  assert(st.aCopies==tasks&&st.bCopies==unsigned(tasks>0));
+  assert(st.aLoads==st.mmads*8);uint64_t bLoads=tasks?8:0;
+  assert(st.bLoads==bLoads&&st.aReads==uint64_t(tasks)*BM*K&&st.bReads==(tasks?uint64_t(N)*K:0));
+  for(auto e:st.events)assert(e.second==0);assert(!st.cross[0]&&!st.cross[1]);
+  for(size_t i=0;i<scratch.size();++i)if(i<base||i>=base+2*BM*BN)assert(scratch[i]==1e30f);
+  fixes+=st.fixes;mmads+=st.mmads;
+ }
+ assert(a==oldA&&b==oldB&&fixes==mt&&mmads==uint64_t(mt)*((K+bk-1)/bk));
+}
+int main(){unsigned count=0;
+ for(uint32_t m:{128u,256u,640u,8192u})for(uint32_t workers:{1u,3u,8u,20u,32u,64u})
+ for(bool neg:{false,true})for(bool eager:{false,true}){
+  AscendC::eagerFix=eager;Run(m,workers,neg);++count;
+ }
+ std::cout<<count<<" actual resident Cube configurations: one B copy/load per active worker, live NZ/ZZ/ZN, completeK128, M stride, idle workers, A/C last readers and guards PASS\n";
+}

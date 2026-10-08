@@ -1,18 +1,18 @@
 # 最新接手状态 · 2026-10-08
 
-## Current code, formal tasks and next executable action
+## Current code, task and next action
 
-- Branch experiment/exact-shape-audit-1008: kernel restored whole1734f16/a5eef105/354602bytes. C4/C13 failed candidates excluded. No active formal task.
-- User exact15shape image transcribed docs/teammate_probe/exact_shapes_user_1008.csv, no dtype/layout/SoC/script/formalID; baseline is not Tbest. Actualhost audit480configurations: cores1/8/20/32, all8dtype/layouts, CPUtiler stub. See [EXACT_SHAPE_AUDIT_1008](EXACT_SHAPE_AUDIT_1008.md).
-- Under20cores and historicaldtype/layout assumptions: C13(8192,64,128) is dual3/tree16/earlySum, excluded by previous dual14frame. C11(1536,2048,2048) is dual2/BM128BN256/Nsplit8, excluded by TTframe. C6(23,73,192) selects existing dynamicKP DIRECT_BATCH, not fullyconstantBN96. C10 historicallayout conflict preserved.
-- NEXT: inspect bmmms_manual RESIDENT_B/C13 earlySum. Independently replace framework/local reduction on the ACTUAL resident route; retain oneBload/L0residence/fullK/originalGM and prove actual physical operand/event lifetimes before unique formalgate. Do not repeat failed residence algorithms or dual14-only tail route. C11 is a later independent hypothesis, not a batch of unverified changes.
-- C4 DIRECT_BATCH Cube task6ac736e7694b590c3c9db696 Pass15, C4=7.81 vs parent3.94-4.12: clearregression archiveddcbb2ff. C13tailframe6ac733cd Pass/no gain archived5be8af1. No repeats/nearby scans; overallgoal incomplete.
+- Current experiment/c13-resident-frame candidate364169bytes/SHA0794a2bfc777ac48c373b3085cd96fd1224b0bf0a4f6a9351d290bb421dbad2d. Parentwhole1734f16 restored beforethreeadditions178lines. Exact suppliedC13 geometry on originaldual3/tree16; no previousdual14tail or C4Cube candidate. See[C13_RESIDENT_FRAME](C13_RESIDENT_FRAME.md).
+- Existing oneBcopy/eightBloads peractiveworker andL0Bresidence retained. RemoveTPipe/TQue, originalfullK128/stridedM/doubleC/originalworkerpartialslots/GM kept. Actualresource/TUNINGguard; maximumworkers32 is originalresidencycondition, notfixedhardwarecorecount.
+- CPU96physicalCube configs/sevennegativecontrols,102threadedAIV configs/sevencontrols; production/TUNING each5120host/fourexacthits and exactcapacity/workspace/core/fallback passed. Modelsinteger/syntheticcredits, notnativeFP16. Whole-parent/protected7/CLI dry-run onlykernel/SHAverified.
+- NEXT commit/push, submit uniqueformalstructuralgate, saveID immediately, querysameID untilrealterminal, all15results/newTbestscore. Clearlylarge improvement only permitsoneunchangedconfirmation; otherwisearchive/no nearbyparameterscans. Currently no activeformaljob; nativecompile/precision/performancePENDING, overallgoal incomplete.
+- Exactshape evidence [EXACT_SHAPE_AUDIT_1008](EXACT_SHAPE_AUDIT_1008.md), baseline notTbest, dtype/layout absent. C13 assumedFP16/FF isactualresidentroute, C11 assumedFP16/TT isdual2 library path notTTframe. C10layoutconflict remains; C11laterindependentdirection.
 
 ## 最新计分参考与差距
 
 用户最新Tbest：`[1.18,1.54,2.13,2.37,3.57,6.38,6.37,13.88,48.30,64.85,67.87,80.65,7.31,7.59,7.84]`μs。用 [SCORE_REFERENCE_1008](SCORE_REFERENCE_1008.md)，100/(1+log_1.5(t/Tbest))后15点平均。用户榜首Young耗时重算82.15390，与82.15一致；通过版最新6ac0d57f重算50.99873。旧56.42050/50.x分数均属各自旧参考，耗时/精度未改。
 
-相对用户提供的最新榜首行，最近五次同SHA逐点中位差距排序C4/C2/C3/C6/C1/C10。C13唯一结构gate已结束无收益；当前按新优先级推进C4。用户最新前十快照见[LEADER_REFERENCE_1008](LEADER_REFERENCE_1008.md)，重算均吻合显示分。没有实时榜单/实际SoC/隐藏shape/plan/profile，不凭case号证明新路径命中。
+相对用户提供的最新榜首行，最近五次同SHA逐点中位差距排序C4/C2/C3/C6/C1/C10。C13 tail gate showed no gain but did not select the newly supplied aligned shape; current resident-frame gate targets its actual assumed route. C4 Cube gate regressed and is archived.用户最新前十快照见[LEADER_REFERENCE_1008](LEADER_REFERENCE_1008.md)，重算均吻合显示分。没有实时榜单/实际SoC/隐藏shape/plan/profile，不凭case号证明新路径命中。
 
 ## 最近结束、不能重复的实验
 

@@ -1,0 +1,38 @@
+int main(){
+ auto* hw=platform_ascendc::PlatformAscendCManager::GetInstance();unsigned count=0,hits=0;
+ for(int cores:{1,8,20,32,64})for(int n=64;n<128;++n)for(int k=128;k<256;k+=8){
+  hw->aic=cores;hw->aiv=2*cores;Shape s{1,8192,n,k,1,0,0};auto p=MakePlan(s,cores),old=p;++count;
+  auto q=MakeC13ResidentFrame(s,p);bool expected=n==64&&k==128&&cores<=32;
+  assert(bool(q.workers)==expected);
+  assert(!memcmp(&p.schedule,&old.schedule,sizeof(Schedule))&&p.cubeBlocks==old.cubeBlocks&&p.totalBytes==old.totalBytes);
+  if(q.workers){++hits;assert(q.m==8192&&q.workers==p.cubeBlocks&&(p.schedule.tree&16)&&p.schedule.earlySum);}
+ }
+ assert(count==5120&&hits==4);hw->aic=20;hw->aiv=40;Shape s{1,8192,64,128,1,0,0};auto p=MakePlan(s,20);
+ assert(MakeC13ResidentFrame(s,p).workers==20);
+ std::vector<std::pair<uint64_t*,uint64_t>> caps={{&hw->l1,81920+4096},{&hw->l0a,65536},
+  {&hw->l0b,16384},{&hw->l0,65536},{&hw->ub,33568+4096}};
+ for(auto v:caps){auto old=*v.first;*v.first=v.second;assert(MakeC13ResidentFrame(s,p).workers);
+  *v.first=v.second-1;assert(!MakeC13ResidentFrame(s,p).workers);*v.first=old;}
+ auto bytes=p.totalBytes,need=p.systemBytes+32768+65536ULL*p.schedule.workers;
+ p.totalBytes=need;assert(MakeC13ResidentFrame(s,p).workers);p.totalBytes=need-1;assert(!MakeC13ResidentFrame(s,p).workers);p.totalBytes=bytes;
+ hw->aic=20;hw->aiv=40;assert(MakeC13ResidentFrame(s,p).workers);hw->aic=19;assert(!MakeC13ResidentFrame(s,p).workers);
+ hw->aic=20;hw->aiv=39;assert(!MakeC13ResidentFrame(s,p).workers);hw->aiv=40;
+ for(auto field:{&p.schedule.dual,&p.schedule.baseM,&p.schedule.baseN,&p.schedule.mTiles,&p.schedule.nTiles,
+  &p.schedule.nSplit,&p.schedule.kSplit,&p.schedule.window,&p.schedule.workers}){
+  auto old=*field;*field=999;assert(!MakeC13ResidentFrame(s,p).workers);*field=old;}
+ auto tree=p.schedule.tree;p.schedule.tree=0;assert(!MakeC13ResidentFrame(s,p).workers);p.schedule.tree=tree;
+ auto early=p.schedule.earlySum;p.schedule.earlySum=0;assert(!MakeC13ResidentFrame(s,p).workers);p.schedule.earlySum=early;
+ for(auto field:{&p.schedule.b,&p.schedule.m,&p.schedule.n,&p.schedule.k}){
+  auto old=*field;*field=999;assert(!MakeC13ResidentFrame(s,p).workers);*field=old;}
+ for(Shape other:std::vector<Shape>{{2,8192,64,128,1,0,0},{1,8191,64,128,1,0,0},
+  {1,8192,65,128,1,0,0},{1,8192,64,136,1,0,0},{1,8192,64,128,2,0,0},
+  {1,8192,64,128,1,1,0},{1,8192,64,128,1,0,1}})assert(!MakeC13ResidentFrame(other,p).workers);
+#ifdef BMMMS_TUNING
+ for(auto field:{&Tune().group,&Tune().rows,&Tune().dual,&Tune().early,&Tune().tree,
+  &Tune().bm,&Tune().bn,&Tune().window,&Tune().ns,&Tune().ks,&Tune().workers}){
+  Tune()=TuneConfig{};*field=1;assert(!MakeC13ResidentFrame(s,p).workers);
+ }
+ Tune()=TuneConfig{};
+#endif
+ std::cout<<count<<" actual C13 range host plans / "<<hits<<" exact supplied shape selections: existing residentB, original schedule/grid/GM, capacity/core/workspace boundaries, 64core nonresident and tuning fallback PASS\n";
+}
