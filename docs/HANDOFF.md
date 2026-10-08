@@ -1,10 +1,10 @@
-# Current passed baseline restored; C1 literal-dot audit next
+# Current candidate: C1 literal K32 dot
 
-- Branch experiment/c1-literal-dot-audit, wholekernel **a2e6763**/368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94. C10balanced/C8phasedA/C13frame retained,main/tagsuntouched.
-- DirectA2 archived **35480f2** onexperiment/c10-direct-a2 (implementation3f58655/SHA526d7f94), unique6ac7c376694b590c3c0d4fab Pass15/allprecision1/C10=92.98vsparent91.53. Full15in[C10_DIRECT_A2_AUDIT](C10_DIRECT_A2_AUDIT.md), modelsstayarchivedbranch. No livejobs/repeats/instruction/tiling scans. FullM178.32/latecredit92.84alsoexcluded.
-- NEXT implementone-outputliteralK32VectorUBframe/threeGMargkernel, replacinggenericshortdotonlyforB=M=N=1/K32/dual15/finalBlocks1/alignedGM/noTune pins. Actuallayoutbitsirrelevantinthisgeometry; preserveT/FP32jointCast-Mul-WholeReduceSum/one4by/y/PIPE_ALL. [C1_LITERAL_DOT_AUDIT](C1_LITERAL_DOT_AUDIT.md) contains544Bphysicalframe/risk/model/gate. Notimplemented/submitted; don'tclaim1.18usachievablefromTbest alone.
-- ExistingtinyalreadymanualUB/noTPipe; don'trepackageitsremovalasnew. Source/proxytests mustcheckalias/positiveK-varyingdata anddelayedoutputcompletion beforeonegate. NoWeb/subagents/newGM/harnesschanges.
-- ParentC1091.53singlelocalgain, noactualSoC/route/profile; fullcompetitiongoalactive/incomplete.
+- Branch experiment/c1-literal-dot, kernel370984B/SHAb8ab2f9faa564a99d40fcbf93a6b4ee922c42d5cbf82c12ab679a3ff15e3d79c. Parentwholea2e6763 retained.47addedkernel lines: fixed544B/threeGMargkernel/exactshape-resource-pins guard/aligneddispatch, restsource/Plan/GMunchanged.
+- CPU512actualliteral/parentpairs, production&TUNING7776actualplans+launch/24hits, fivealias/overread/overwrite/readiness/completion controlsPASS. Integerencoding/synchronousVector/faketilerlimits; [C1_LITERAL_DOT_AUDIT](C1_LITERAL_DOT_AUDIT.md). Traffic/FLOPs/launch unchanged, onlysetup/prologue hypothesis.
+- NativePENDING/noID. NEXTcommit/pushthenONEformaljob/private/tmp/bmmms-c1-literal-dot/project,saveuniqueID/querysameIDtoterminal. Dry-runonly370984B/b8ab2f9fkernel,protected7verified.
+- Predeclaredlarge-localconfirmation: all15Pass/C1<=1.6065us (15%belowrecentfastest1.89) permitsONEunchangedconfirmation; modestgain no repeat. Notoverallgoalcompletion/guaranteedTbestfloor. Nogain/regressionrestorewholea2e6763/noadjacentK/batch/UBscans.
+- FailedC10fullM74f9937/178.32,latecredit44d25e2/92.84,directA235480f2/92.98excluded. CurrentC10balanced/C8phasedA/C13framepreserved. NoWeb/subagents/newGM/main/tagschanges,goalactive/incomplete.
 
 ## 先读与规则
 

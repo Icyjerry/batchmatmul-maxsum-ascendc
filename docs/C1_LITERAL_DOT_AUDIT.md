@@ -31,3 +31,19 @@ Host onlys.b=s.m=s.n=1/k32, originaldual15/finalBlocks1, actualinputGM32-byteali
 - Commit/push/dryrun, ONEformaljob, immediatelysaveIDandquerysameIDto terminal; all15precisionrequired. CompareC1againstobservedrange, notrandomotherrouteimprovements. Largegainonlywarrantsoneunchangedconfirmation; modest/no gainarchivewholechangewithoutnearbyvariants.
 
 No C1 code/nativecandidate yet. The bodycanonlybenefitsetup/prologue/argumentoverhead; globalinputbytes/FLOPs/launchcountunchanged. Nativecompiler mayalreadyremoveequivalentwork orlaunchfloor maydominate. NoWeb/subagents/newGM.
+
+## Implemented / CPU PASS / native PENDING
+
+Branch experiment/c1-literal-dot, kernel370984B/SHA256 `b8ab2f9faa564a99d40fcbf93a6b4ee922c42d5cbf82c12ab679a3ff15e3d79c`,47addedkernel lines. Three-GM-argument bmmms_dot_one_k32 hasliteral544BUBslices andnoGetBlockIdx/pitch/batchgroup/countargs. Same two64-byteinputDMA/oneCast64/oneMul32/oneWholeReduceSum32/4-byteoutput/flagpairs/PIPE_ALL. Source-declaredUBspan8256->544, notinputtraffic/launch/FLOP reduction or native compilerinstruction count.
+
+UseLiteralDot queriesactualUB/AIV andrequiresUB>=544/AIV>0, originaldual15/finalBlocks1/exactshape/consistentcachedschedule; callerrequiresactual32-byteGMinputalignment. All11Tune pinsfallback. Existingshortdotandallotheralgorithms/MakePlan/GMbyteunchanged. Wholeinverseparenta2e6763 andprotected7=1734f16 proof.
+
+`python3 tools/validate_c1_literal_dot.py` finalexit0:
+
+- 512actualliteral/parentpairs: 64K-varyinginputseeds, fourUBpoisons, mixed/all-negative. RootUBexact544vs8256, typedtensorbounds, jointcast/FP32Mul/treeSum, delayedinput/outputDMA, exactoneoutputwrite/guards/inputimmutability. No floating-point inputencoding simulation; arithmetic usesint16valuesexactlyrepresentable inFP32. Storageflags do notalterunitM/N addressing, and hosttestscoverallfour.
+- Production/TUNINGeach7776actualMakePlan+extractedlaunchconfigurations/24literalhits: twohostdtypevalues/fourlayouts/1-20-32cores/shape-neighbors/GMoffset0-2-16, fallbackaligned/Pad calls, UB543/544 andAIV0 rejection, cache-shape/grid/dual boundaries, allTune pinsoldlaunchpreserved. Fakecube tiler is notnativeCANN plan; targetVectorplanselection/control are actual source.
+- Fivefaultcontrols removedPIPE_ALL/inputready orcreated FP/rawalias/overlongywrite/inputoverread; allrejected afterunmodifiedreference passed. Vectorops synchronous; V_MTE3/PIPE_V timingnotverified bymodel.
+
+FormalCANN9compile/FP16-BF16precision/actualroute/SoC/profile/latencyPENDING. No guarantee1.18us referencefloor; compiler mayalreadyeliminateequivalentsetup andphysicalUBreservation not proven. Rawignoredartifacts/c1-literal-dot/cpu.log dir700/file600.
+
+Finalisolated/private/tmp/bmmms-c1-literal-dot/project protected7restored1734f16; dry-runonly370984B/b8ab2f9fkernel. Nextcommit/pushthenONEgate,saveIDbeforepolling. Large-localconfirmationcriterion beforeseeingresults: all15Pass andC1atleast15%belowfastestrecent1.89us (<=1.6065us) justifiesONEunchangedconfirmation; modestgain no repeat/nearbyvariants. Thiscriterion isnotcompletionoftheoverallcompetitiongoal or proof ofstablecausalperformance. No benefit/regressionrestorea2e6763.
