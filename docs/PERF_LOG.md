@@ -784,3 +784,7 @@ Temporary publicCLI/template files were purged byOS. Restored source template ot
 User replied logged in; retry still fails before native task creation. Default session metadata (stat only, no content read) last modified October3; requested login via restored CLI or alternate session file path. Native gate still PENDING, no task ID.
 
 CLI login restored; dry-run payload and protected-seven template equality passed. a3c6217 pushed; task6ac72eaa694b590c3c97d81d created once, native result PENDING. Query same ID to terminal; no resubmission.
+
+## 2026-10-08: C3 static-frame terminal, no clear gain
+
+Task6ac72eaa694b590c3c97d81d /implementationa3c6217/SHA515aa159… Pass15/15, allprecision1. Timesus `[2.01,2.71,3.10,3.92,5.48,9.83,8.31,46.51,68.55,98.23,88.84,97.73,16.50,11.40,9.07]`; total472.19us, newTbest calculatedmean55.19646. C3=3.10 within parent recent-five3.08–3.22/median3.16, earlier3.06; no clear gain. No actualshape/plan/SoC/profile, no route-hit evidence; unchanged-route timings not attributed. Archive candidate, no identical confirmation or nearby scans, restore1734f16. RawJSON ignored artifacts/tiny-ft-static-frame/official.json. No activejob; whole competition goal incomplete. C13 actualhost CPU-stub audit4096plans separately saved, not device/profile evidence.

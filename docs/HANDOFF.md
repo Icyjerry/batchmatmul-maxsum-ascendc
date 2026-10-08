@@ -1,6 +1,10 @@
 # 最新接手状态 · 2026-10-08
 
-## 当前正式任务：只查询同一 ID
+## 最新正式终态：C3候选归档
+
+任务 **6ac72eaa694b590c3c97d81d** 已Pass15/15、precision_ratio全1。C3=3.10μs，处于父最近五次3.08–3.22范围（中位3.16），未见明显收益；全部15点和局限见 [TINY_FT_STATIC_FRAME](TINY_FT_STATIC_FRAME.md)。总472.19μs，新Tbest换算均分55.19646。候选保留本分支，不合main、不重复提交、不扫附近参数。没有活动任务；下面PENDING/Running是历史状态。下一恢复通过1734f16并继续C13独立frame假设；整体目标未完成。
+
+## 历史：正式任务创建与查询
 
 用户重新登录后CLI dry-run成功，仅kernel.asc /359206bytes /SHA515aa159…，其它七模板源码逐字1734f16。候选代码 `a3c6217` 已推送。正式任务 **`6ac72eaa694b590c3c97d81d`** 已创建；下一执行 `python3 /private/tmp/query_bmmms_submission.py 6ac72eaa694b590c3c97d81d` 查询同ID至真实终态，不重交。终态/精度/性能PENDING。下面“没有任务/登录阻碍”是创建任务前历史状态，已解除。
 
