@@ -1,4 +1,8 @@
-# 最新接手状态 · 2026-10-08
+# Latest experimental assessment · 2026-10-08
+
+Current experiment/c8-resident-b-stream is an unsubmitted CPU-only candidate, NOT retained best. Models pass within documented scope; totalDMA269both/no volume benefit. See C8_RESIDENT_B_STREAM. No native task. Switch retained experiment/c13-resident-frame/7492776 before production. Next independent full-A/full-B L1 single-package hypothesis; user no Web.
+
+# Retained handoff · 2026-10-08
 
 ## Current retained code and next executable action
 
