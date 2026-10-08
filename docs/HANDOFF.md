@@ -1,10 +1,10 @@
 # 最新接手状态 · 2026-10-08
 
-## Current C11 experiment
+## C11 experiment terminal: archive, restore C13 baseline
 
 - Branch experiment/c11-exact-tt-frame from retained60ba0d7/C13 source7492776. Candidate365998bytes/SHA4ce9ab293b8a24b80a3741f8195ccee217856a5b9c0d330404fa7013f5c7300d. Only34 host/Launch additions; device TT entry and C13 gain intact, whole-parent inverse proven. Exact supplied C11 shape with historical FP16/TT assumption; original workspace unchanged.
 - Actual source CPU models: production/TUNING2592plans each/four hits, six physical full-K Cube proxy groups/six rejected controls, sixty full-M/N threaded AIV groups/seven rejected controls. No native precision/performance claim; see [C11_EXACT_TT_FRAME](C11_EXACT_TT_FRAME.md).
-- Implementation9160eb2 pushed; protected-template/dry-run passed. Unique formal task **6ac73fd0694b590c3ca4be61** created. NEXT: query SAME ID to real terminal and record all15; clear substantial gain only warrants one unchanged confirmation. Native gate PENDING; no resubmit on observation timeout. Retained C13 remains fallback baseline, main/tags untouched.
+- Implementation9160eb2 pushed; formal6ac73fd0694b590c3ca4be61 terminalPass15/allprecision1. C11=87.16 within same-source historical86.97–88.91; no clear gain. Total460.96us/latestT calculatedmean52.14848, all15 preserved inC11_EXACT_TT_FRAME. No active task, no confirmation/nearby parameter scan. Archive branch/models/candidate; NEXT restore entire retained7492776/C13 SHA0794a2bf and assess exact-C8 tails or selected-C6 entry independently, not another C11 tile/package trial. Main/tags untouched.
 
 ## Previous retained C13 baseline and assessment
 

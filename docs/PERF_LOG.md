@@ -877,3 +877,7 @@ Parent retained7492776/C13 gain.34 host/Launch additions only,365998bytes/SHA4ce
 CPU production/TUNING each2592actual hostplans/fourhits; six physical queued Cube proxygroups atfullK2048/BK64/PK256/N8, six rejected controls; sixty actual threaded AIV groups atfullM1536/N2048 andtailproxy, seven rejected controls. Integer/synthetic models, no nativeFP16 orhardwaretiming claim. Protected7 unchanged; nativegatePENDING/noIDyet. Detailed evidence C11_EXACT_TT_FRAME. Currentbranch experiment/c11-exact-tt-frame; C13 retained byteforbyte.
 
 Implementation9160eb2 pushed; CLI dry-run SHA/files matched. Unique formal task **6ac73fd0694b590c3ca4be61** created; query same ID to terminal, no resubmission. Native CANN/15precision/timing PENDING.
+
+## C11 formal terminal: Pass, no substantial gain
+
+6ac73fd0694b590c3ca4be61 /9160eb2/SHA4ce9ab29: Pass15/15/allprecision1. Timesus [1.90,2.56,3.19,4.01,5.29,9.56,7.95,46.18,67.15,97.08,87.16,96.47,12.85,10.59,9.02]. Total460.96/latest1008Tbest calculatedmean52.148476871. C11=87.16 vs retainedparent88.90/88.78 but within historical same-C11-source86.97–88.91, no clear/stable structural gain. Archive, no repeat/nearby BM/BN/PK scan; restore retained7492776/SHA0794a2bf wholekernel. C13=12.85 consistent with retainedtwo samples but notcontrolledA/B; otherchanges/adverseC2/C3/C12 retained without causal attribution. ActualSoC/route/profile unknown, native15samplegate passed only. JSON ignoredartifacts/c11-exact-tt-frame/official.json. No activeformaljob. Fulltable C11_EXACT_TT_FRAME.

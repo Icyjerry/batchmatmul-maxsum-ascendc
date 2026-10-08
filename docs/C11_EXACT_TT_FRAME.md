@@ -27,3 +27,29 @@ CPU integers and synthetic cross-core companions, not native FP16 encoding, real
 Protected seven template files byte-identical to1734f16; separate official template `/private/tmp/bmmms-c11-exact-frame-official/project`. CPU log ignored `artifacts/c11-exact-tt-frame/cpu.log`. Submit one unique gate after dry-run; record ID before polling same ID to terminal. Only a clear substantial observation warrants one unchanged confirmation. Preserve all15 timings/adverse points and C13 gain; no failed nearby variant scans.
 
 Implementation9160eb2 pushed. Unique formal task **6ac73fd0694b590c3ca4be61** created after matching dry-run. Query this ID to terminal; native gate PENDING, do not submit again on observation timeout.
+
+## Formal terminal: Pass, no clear C11 improvement; archive
+
+Task6ac73fd0694b590c3ca4be61 / implementation9160eb2 / SHA4ce9ab29: terminal Pass15/15, precision_ratio all1. Native compile and those precision samples passed; real SoC/shape/layout/route/profiling still unavailable. Full timings us:
+
+|Case|Time us|
+|---|---:|
+|C1|1.90|
+|C2|2.56|
+|C3|3.19|
+|C4|4.01|
+|C5|5.29|
+|C6|9.56|
+|C7|7.95|
+|C8|46.18|
+|C9|67.15|
+|C10|97.08|
+|C11|87.16|
+|C12|96.47|
+|C13|12.85|
+|C14|10.59|
+|C15|9.02|
+
+Total460.96us, calculated mean52.148476871 with user1008 Tbest. This is not a reported live leaderboard position. C11=87.16 below the two C13-parent samples88.90/88.78, but within broader same-C11-source historical range86.97–88.91 (BEST_IDENTICAL_REPEATS_1002/1003); no substantial or stable benefit. Do not repeat or scan nearby BM/BN/package values. Other unchanged points and adverse C2/C3/C12 observations retained, not attributed to the C11 route. C13=12.85 remains consistent with retained12.62/13.19 but is not another C13 A/B test.
+
+Archive this branch with implementation/models/results; restore entire retained7492776 kernel/SHA0794a2bf for future independent experiments. No active task, no confirmation. Raw JSON ignored artifacts/c11-exact-tt-frame/official.json. Next assessment should use the exact C8 K1032/N1031/M1025 tails and selected C6 BM32/BN80/KP192 entry; previously failed TT pairedN/swapped/NZ and tiny packed structures remain rejected.
