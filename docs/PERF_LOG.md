@@ -877,3 +877,9 @@ Experimentbranch experiment/c11-exact-tt-frame terminal3c916aa/implementation916
 Formal6ac73fd0694b590c3ca4be61 Pass15/allprecision1, timesus [1.90,2.56,3.19,4.01,5.29,9.56,7.95,46.18,67.15,97.08,87.16,96.47,12.85,10.59,9.02]. Total460.96/latestuserTbest calculatedmean52.148476871. C11=87.16 within historicalunchangedroute86.97–88.91: no substantial/stable benefit, no confirmation/nearbyscan. C13=12.85 consistent withretained12.62/13.19 butnotcontrolledA/B. All adverse samples preserved, no attributionofunchangedroutes/profile/actualSoC claims. Fullresults C11_EXACT_TT_FRAME, rawignoredartifacts/c11-exact-tt-frame/official.json; models stayarchivedbranch.
 
 Switched backexperiment/c13-resident-frame; wholekernel verifiedbyte-equal7492776/364169B/SHA0794a2bf. Noactiveformaljob/main/tag change. Nextconcrete assessment exact-C8 tails andselected C6BM32BN80KP192, respectingfailedstructures, missingdtype/layout and C10conflict. Overallgoal incomplete.
+
+## C6 regression archived, user requests one retained-best submission
+
+C6 archived a45ef9d/implementationf4907c3; terminal6ac744ee694b590c3ca8ea6c Pass15/allprecision1, C6=24.24us vsretained9.78/9.75. Pure Vector two-row product/reduction structure clearly regressed; no repeat/nearby scan. Full15 in C6_VECTOR_PAIRS, raw ignored archived branch artifacts. Returned whole7492776/364169B/SHA0794a2bf.
+
+User requested one unchanged best submission plus continuing optimization, no Web. Task **6ac77103694b590c3ccaa29e** submitted once after whole-kernel/protected7/template byte checks and dry-run. Native result PENDING; query same ID to terminal. No further repeat request. C8 exact tails/local structure next; do not revive failed C6/C11/TT swaps.
