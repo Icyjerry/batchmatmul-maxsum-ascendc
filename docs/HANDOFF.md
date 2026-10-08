@@ -1,10 +1,9 @@
-# Current passed baseline restored; direct A2 instruction audit next
+# Current candidate: C10 direct NZ-to-ZZ A2
 
-- Branch experiment/c10-a2-load-audit, kernelwholebyteequal **a2e6763**,368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94. C10balancedownership/C8phasedA/C13residentframe retained, main/tagsuntouched.
-- LateGMcredit archived **44d25e2** onexperiment/c10-late-ring-credit (implementation1a56211/SHAdcf715a2); unique6ac7bfcb694b590c3c0ae962 Pass15/allprecision1/C10=92.84 vsparent91.53. Full15in[C10_PIPELINE_CREDIT_AUDIT](C10_PIPELINE_CREDIT_AUDIT.md), modelsstayarchivedbranch. No livejobs/repeats/nearbywaitscans.
-- FullM178.32regression archived74f9937; do not revive/scan adjacentgeometry.
-- NEXT independenthypothesis actualFF A2LoadData3D->existingdirectNZ-to-ZZ LoadData2D underM_BALANCEonly, keepingoriginalgeometry/tree8/earlyGMcredit/Vector/Plan. [C10_DIRECT_A2_AUDIT](C10_DIRECT_A2_AUDIT.md) listsaddressalgebra/commands+300%risk/requiredmodels/onegate. Notimplemented/submitted; nativebenefitunknown. Historicaltree2pin alonedoesnotcoveritbecauseRESIDENT_PADstillselects3D.
-- Parent91.53singlelocalimprovement, notstablelargeoverallbreakthrough. ActualSoC/route/profileunknown, overallgoalactive/incomplete.
+- Branch experiment/c10-direct-a2, kernel368813B/SHA526d7f94b8aef59e82a91556fa311695cd9d90f39893662f638a58e2c9733d35. Parenta2e6763/368782B/SHA16b51684; onlytwo M_BALANCEA2selection predicates, allgeometry/host/Plan/Vector/GM/creditorder unchanged.
+- FinalCPU31actualproducer(fulltarget/tails/defaultfalse), parent30proxy, K-varyingpositivefaultreference,96ownership+FinalizeRows,production&TUNINGeach192plans9hits/sixfaultcontrols PASS. FullactualA3D0/A2D14400 vsparentderived3600, sameA2elements23592960/C200/MMAD3600/Breads58982400; APIcallsnotnativeinstructions. InitialnegativeKoffsetcontrolmissedconstantKfixture; correctedreference/faults allpass. [C10_DIRECT_A2_AUDIT](C10_DIRECT_A2_AUDIT.md).
+- NativePENDING/noIDyet. NEXT commit/pushthenONEformaljob/private/tmp/bmmms-c10-direct-a2/project, immediatelysaveID/querysameIDtoterminal. Dry-runonly368813B/526d7f94kernel/protected7verified. Nativequeues/BF16/SoC/route/profile/latencyunproven.
+- FailedfullM74f9937/C10178.32 andlatecredit44d25e2/C1092.84 excluded. No repeat/nearbytiling/credit scans. FaileddirectA2 restoreswholea2e6763; parentC1091.53singlelocalgain. Main/tagsuntouched,goalactive/incomplete.
 
 ## 先读与规则
 
