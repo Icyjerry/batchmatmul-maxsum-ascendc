@@ -2,10 +2,10 @@
 
 ## 当前代码与正式任务
 
-- 当前experiment/c4-tt-direct-cube；先恢复完整通过1734f16后仅新增C4 host/routing40行，kernel356697bytes/SHA e30524ac5ffa748457f3e0c10712251366083c1ff8349341bf0d0c0c38d69664。复用现有TT DIRECT_BATCH Cube，不增加device/API/GM，完整核数/内存/原计划及TUNING准入。详情[C4_TT_DIRECT_CUBE](C4_TT_DIRECT_CUBE.md)。
-- CPU768producer配置/11264AIVentries/production与TUNING各32768host计划、18432命中；whole-parent和保护7通过。整数模型不是nativeBF16；CANN/精度/性能PENDING。独立模板/private/tmp/bmmms-c4-tt-cube-official/project dry-run仅kernel/SHA一致。
-- 下一commit/push，唯一正式结构gate；取得ID立即记录，查询同ID至终态，全部15点/新Tbest计分。明显大收益才原样确认，不能因观察超时重复创建；无收益归档、不扫附近参数。当前唯一正式任务 **6ac736e7694b590c3c9db696** 已创建，下一查询同ID至真实终态。
-- C13手动frame任务6ac733cd694b590c3c9b7892已Pass15/15，但C13=16.00在父波动内，无明显收益，已归档5be8af1。当前不带该候选。整体目标仍未完成。
+- 当前experiment/c4-tt-direct-cube候选已终态归档：任务6ac736e7694b590c3c9db696 Pass15/15、precision全1；C4=7.81μs，父最近3.94–4.12，明显退化，不保留、不重复/扫描。详情[C4_TT_DIRECT_CUBE](C4_TT_DIRECT_CUBE.md)。
+- 下一独立branch恢复整个通过1734f16/a5eef105/354602bytes，审查用户新提供的具体15shape图片。dtype/layout图中未给，历史条件仍标假设，C10尤其有冲突。先核实际MakePlan与Launch优先级，不能把case编号当路径命中。
+- C13手动frame6ac733cd已Pass但无收益，归档5be8af1。按新图C13=(1,8192,64,128)，若原dtype/layout成立，走原dual3/tree16，该尾块候选不命中；需要实际host验证后更新文档。
+- 当前无活动正式任务；整体目标未完成。
 
 ## 最新计分参考与差距
 

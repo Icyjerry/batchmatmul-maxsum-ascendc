@@ -815,3 +815,11 @@ C13 implementation59c59e2 pushed; unique formal task6ac733cd694b590c3c9b7892 cre
 Parent restored whole1734f16; candidate356697bytes/SHAe30524ac5ffa748457f3e0c10712251366083c1ff8349341bf0d0c0c38d69664, only40lines/twoadditions. Existing TT DIRECT_BATCH function reused ahead of SmallVector, full actualcore/capacity/originalworkspace/plan/TUNING guard; no device/API/GM changes. CPU768physicalCube configurations,11264AIVentries, production/TUNING each32768actualhost plans/18432hits, six negative controls rejected (A/B inputready and M/N mask/inputDMA/terminal). Vector model is synchronous and cannot detect missing V_MTE3; no such claim. Protected7 byteequal1734f16, dry-run onlykernel/SHAverified. Native CANN/BF16 precision/latency PENDING, no taskIDyet. Full evidence C4_TT_DIRECT_CUBE.
 
 C4实现6bad2b4已push；唯一正式任务 **6ac736e7694b590c3c9db696** 已创建。只查询同ID至终态，不重交；native gate PENDING。
+
+## 正式终态：通过但明显退化，归档
+
+任务6ac736e7694b590c3c9db696，实现6bad2b4，SHA e30524ac…：Pass15/15、precision_ratio全部1。耗时μs：
+
+[1.85, 2.47, 3.28, 7.81, 5.29, 9.47, 7.71, 46.3, 67.93, 97.84, 88.56, 96.89, 15.98, 10.82, 9.19]
+
+总471.39μs，最新Tbest计算均分50.30139。C4=7.81μs，父最近五次3.94–4.12，中位4.08；明显退化，不能保留，不原样确认或附近参数扫描。所有其它点完整保留，未改路线变化不归因本轮。原JSON忽略artifacts/c4-tt-direct-cube/official.json。候选/测试/结果保存在本分支，后续恢复完整1734f16。用户此时提供具体shape图片；独立CPU审查并保留dtype/layout的缺失，不冒充正式metadata或profiling。当前无活动任务。

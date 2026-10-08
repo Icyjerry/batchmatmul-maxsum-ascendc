@@ -29,3 +29,11 @@ experiment/c4-tt-direct-cube，kernel356697bytes，SHA256 `e30524ac5ffa748457f3e
 先commit/push实现及摘要，提交一次结构候选；获得ID立即保存/推送，只查询同ID到终态。完整15点均过才能考虑计分，用SCORE_REFERENCE_1008最新Tbest。明显大收益才原样确认，不因波动或观察超时重交；否则归档恢复parent。没有实际SoC/shape/plan/profile前不冒充路径命中或profiling结论。CANN/BF16精度/性能目前PENDING。
 
 C4实现6bad2b4已push；唯一正式任务 **6ac736e7694b590c3c9db696** 已创建。只查询同ID至终态，不重交；native gate PENDING。
+
+## 正式终态：通过但明显退化，归档
+
+任务6ac736e7694b590c3c9db696，实现6bad2b4，SHA e30524ac…：Pass15/15、precision_ratio全部1。耗时μs：
+
+[1.85, 2.47, 3.28, 7.81, 5.29, 9.47, 7.71, 46.3, 67.93, 97.84, 88.56, 96.89, 15.98, 10.82, 9.19]
+
+总471.39μs，最新Tbest计算均分50.30139。C4=7.81μs，父最近五次3.94–4.12，中位4.08；明显退化，不能保留，不原样确认或附近参数扫描。所有其它点完整保留，未改路线变化不归因本轮。原JSON忽略artifacts/c4-tt-direct-cube/official.json。候选/测试/结果保存在本分支，后续恢复完整1734f16。用户此时提供具体shape图片；独立CPU审查并保留dtype/layout的缺失，不冒充正式metadata或profiling。当前无活动任务。
