@@ -1,9 +1,9 @@
-# Current candidate: C10 direct NZ-to-ZZ A2
+# C10 direct A2 terminal: no gain, restore baseline next
 
-- Branch experiment/c10-direct-a2, kernel368813B/SHA526d7f94b8aef59e82a91556fa311695cd9d90f39893662f638a58e2c9733d35. Parenta2e6763/368782B/SHA16b51684; onlytwo M_BALANCEA2selection predicates, allgeometry/host/Plan/Vector/GM/creditorder unchanged.
-- FinalCPU31actualproducer(fulltarget/tails/defaultfalse), parent30proxy, K-varyingpositivefaultreference,96ownership+FinalizeRows,production&TUNINGeach192plans9hits/sixfaultcontrols PASS. FullactualA3D0/A2D14400 vsparentderived3600, sameA2elements23592960/C200/MMAD3600/Breads58982400; APIcallsnotnativeinstructions. InitialnegativeKoffsetcontrolmissedconstantKfixture; correctedreference/faults allpass. [C10_DIRECT_A2_AUDIT](C10_DIRECT_A2_AUDIT.md).
-- Implementation3f58655pushed; uniqueformaljob **6ac7c376694b590c3c0d4fab** createdonce. NativePENDING; NEXT querysameIDtoterminal, neverresubmitforobservationtimeout. Dry-runonly368813B/526d7f94kernel/protected7verified. Nativequeues/BF16/SoC/route/profile/latencyunproven.
-- FailedfullM74f9937/C10178.32 andlatecredit44d25e2/C1092.84 excluded. No repeat/nearbytiling/credit scans. FaileddirectA2 restoreswholea2e6763; parentC1091.53singlelocalgain. Main/tagsuntouched,goalactive/incomplete.
+- Branch experiment/c10-direct-a2, implementation3f58655/SHA526d7f94 archived. Unique6ac7c376694b590c3c0d4fab Pass15/allprecision1, C10=92.98vsparent91.53us. Full15/costs/limits in[C10_DIRECT_A2_AUDIT](C10_DIRECT_A2_AUDIT.md). No livejobs/repeats/nearbyinstruction/tiling scans.
+- NEXT restorewholea2e6763/368782B/SHA16b51684 onnewexperiment/c1-literal-dot-audit, carryterminaldocs/commit/push, inspectliteralone-outputK32frame. FullM178.32/latecredit92.84/directA2 92.98 excluded; retainbalancedownership/C8phasedA/C13frame.
+- C1newhypothesis notimplemented/submitted: removegenericgroup8runtimegeometry andtilingargs withliteralK32single-dot kernel, preserveCastFP32/MulFP32/WholeReduceSum/PIPE_ALL, exactoneoutput. Bothlayoutbits irrelevant atM=N=1; actualC1metadata/SoC/route/profilestillnotclaimed. CheckallTune pins/GM alignment/fallback/UBalias beforeonegate.
+- ParentC1091.53singlelocalgain; main/tagsuntouched, overallgoalactive/incomplete.
 
 ## 先读与规则
 

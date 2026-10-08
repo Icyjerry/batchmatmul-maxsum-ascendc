@@ -40,3 +40,15 @@ ExplicitTQueAlloc-waits-lastMTE1-reader assumption persists; integerlayout tests
 Finalisolated/private/tmp/bmmms-c10-direct-a2/project protected7restored1734f16; dry-runonly368813B/SHA526d7f94 kernel. ONEformaljobaftercommit/push, saveIDbeforepolling, noidenticalrepeatformodestgain/noadjacentparameter scans. No gain/regression restoresa2e6763. Rawlogsignored artifacts/c10-direct-a2 dir700/file600.
 
 Implementation **3f58655** pushed; uniqueformaljob **6ac7c376694b590c3c0d4fab** createdonce. Same368813B/SHA526d7f94. NativePENDING, querysameIDtoterminal.
+
+## Formal terminal: Pass15, no C10 gain, archive
+
+Unique **6ac7c376694b590c3c0d4fab**, implementation **3f58655**,368813B/SHA526d7f94. Formalcompile and15/15precision passed, allprecision_ratio=1. Timesus:
+
+`[2.04, 2.56, 3.25, 4.12, 5.2, 9.6, 8.08, 44.08, 68.39, 92.98, 88.59, 97.2, 13.15, 10.83, 9.19]`
+
+Total **459.26us**, latestuserTbest calculatedmean **51.36499667**, notlive rank. C10 **92.98us** vsparentsingle91.53us (+1.58%) doesnotimprove target. Otheradverse C1=2.04/C3=3.25/C11=88.59/C12=97.20 etc retained, unrelatedroute improvements notattributed. Noactualroute/SoC/profile/bounddeviceA-B; APIcall/layout proofdidnotestablish latency benefit.
+
+Archivewholechange, restorepassed **a2e6763**/368782B/SHA16b51684. No unchangedrepeat/neighboringLoad2D/3D ortiling scans. Failedmodels/source retainedarchivedbranch, rawignoredartifacts/c10-direct-a2/official.json. FullM178.32/latecredit92.84/directA2 92.98 now all excluded. Noactivejob, main/tagsuntouched, overallgoalincomplete.
+
+NEXT independenttarget C1 singleK32 dot: literal one-output UBframe/three-GM-argumentkernel versusgeneric grouped8shortdot runtimeparameters. Itslayout ambiguityvanishes atM=N=1, dtype stillsameT. Audit scope/pins/alias/actualCast-Mul-Reduce/outputcompletion first; no nativecandidate existsyet.
