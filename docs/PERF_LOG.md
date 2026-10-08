@@ -919,3 +919,15 @@ Keep the passed phased-A code on experiment/c8-phased-a-ready as an *experimenta
 Exact BF16/FF 4096/1280/1152 dual20 retains original manual Vector/events/Plan/GM. B_PACKAGE192, kernel369094B/SHA31bc978f; 60 added/5 removed lines. Actual full-shape producer Bcopies960/MMAD2880/Breads47185920; default-K64 proxy144 vs package48 copies, identical input volume/results. Eight producers, production/TUNING each40hostplans/5hits, six fault controls rejected. Whole af886e1 outside scoped regions/Vector/protected7 byte unchanged. Live TQue model assumes last-reader wait on allocation; native CANN/precision/latency PENDING. Dry-run onlykernel; no task ID yet. Detailed C10_FF_B_PACKAGES. No Web/newGM/parameter scan; dtype/layout ambiguity remains.
 
 Implementation fd23d39 pushed; unique native **6ac7aefd694b590c3cfe44d9** created once, sameSHA31bc978f/369094B. NativePENDING; querysameID toterminal, no resubmit.
+
+## C10 FF B-package 正式终态：精度通过，无明确性能收益，归档
+
+唯一任务 **6ac7aefd694b590c3cfe44d9**，实现 fd23d39/SHA31bc978f，CANN 正式编译和 **15/15 精度通过**，全部 precision_ratio=1。耗时 μs：
+
+`[1.94,2.48,3.22,4.00,5.34,9.71,8.36,44.87,68.14,97.06,88.47,97.39,13.00,10.86,9.33]`
+
+总和 **464.17 μs**，用户最新 Tbest 换算平均 **51.08302483**，不是实时排名。
+
+C10=97.06，相比单次父99.56看似下降2.51%，但旧 C10 未改路径的已保存实测是96.98/98.17/97.58/97.76/98.24/98.47/99.34/100.24，候选在该范围内。没有控制同设备 A/B、命中记录或 profiling，不能宣称速度突破，也不能仅据此判定 FF 路径未命中。未改的 C8=44.87 相比父44.09略差等不利样本全部保留；整次总和和得分变化不证明此分包方案有益。
+
+**归档，不保留这次 kernel 变化；整份恢复 af886e1/C8 phased-A**。不原样复测、不扫附近 B_PACKAGE。原始 JSON/log 在忽略的 artifacts/c10-ff-b-packages。下一步应核实正式 C10 的实际 storage/dtype/plan；不能再次用互相冲突的历史布局假设同时扩分支。

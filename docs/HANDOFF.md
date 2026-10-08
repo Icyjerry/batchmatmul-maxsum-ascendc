@@ -1,3 +1,10 @@
+# C10 FF B-package 实验已结束：归档 · 2026-10-08
+
+- 实现 fd23d39/SHA31bc978f，唯一任务6ac7aefd694b590c3cfe44d9，正式 Pass15/全部precision1。
+- C10=97.06在原路径历史96.98–100.24内，没有明确性能收益；总464.17/latestTmean51.08302483，不是排名。全15与不利样本见 [C10_FF_B_PACKAGES](C10_FF_B_PACKAGES.md)。不重交/不扫附近B包。
+- 此分支归档候选；下一条可执行动作：切回 experiment/c8-phased-a-ready，确认 kernel 逐字节等于 af886e1，再复制结果交接文档。不得退回更早7492776，保留已通过的 C8 phased-A。
+- 无在跑任务。下一独立方向先核实 C10 正式 storage/dtype/plan，历史 BF16/FF vs FP16/TT 冲突尚未解决。无 Web，不新增 GM，不修改受保护七文件/main/tags。
+
 # 当前执行状态：C10 FF B 分包候选 · 2026-10-08
 
 - 分支 experiment/c10-ff-b-packages；以已 Pass 的 af886e1/C8 phased-A 为父。
