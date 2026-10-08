@@ -1,3 +1,11 @@
+# 当前执行状态：C10 FF B 分包候选 · 2026-10-08
+
+- 分支 experiment/c10-ff-b-packages；以已 Pass 的 af886e1/C8 phased-A 为父。
+- 实际实现改为原 manual 的 B_PACKAGE=192，保留原 Vector/事件/Plan/GM；没有改用 C9 消费流程。kernel369094B/SHA31bc978fbf8555a8ff8dd5dafa76b0df5c5fb06f3b4b5245dfbff9ae379b5ff1。
+- 完整 FF 源码 CPU/地址模型通过：960 B DMA/2880 MMAD/输入量不变；8 producer、生产和 TUNING 各40 host/5命中、六故障控制通过。native TQue 最后读者契约仍建模假设；实际正式 dtype/layout 冲突未消除。
+- 正式编译/精度/性能 PENDING，无任务 ID。已 dry-run，只提交 kernel；下一步提交一次、立即记录 ID，然后查询同一任务终态。详见 [C10_FF_B_PACKAGES](C10_FF_B_PACKAGES.md)。有回退需要时整份恢复 af886e1，保留 C8；不恢复更早版本。
+- 用户无 Web；main/历史标签不动；没有未完成原样复测请求。CPU原始日志 artifacts/c10-ff-b-packages/cpu.log 不入 Git。
+
 # Current passed experimental baseline · 2026-10-08
 
 - Current experiment/c8-phased-a-ready, implementationaf886e1/kernel365948B/SHAb87ec00643094e19c3c0433113480791494f8e00771887982a1766276d13e08b. Whole-parentinverse7492776; AIV/Plan/GM/harness unchanged. PhasedresidentAready384/384/264 keepsoriginaldoubleB.
