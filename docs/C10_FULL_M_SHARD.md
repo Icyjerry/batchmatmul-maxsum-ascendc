@@ -37,3 +37,5 @@
 - 完整逆向移除本次helper/launch后kernel逐字节等于a2e6763，受保护七文件逐字节等于1734f16。
 
 队列Alloc等待最后MTE1读者是模型显式契约假设，不是CANN/NPU证据。整数模型不验证BF16精度或速度。正式CANN9编译/15点精度/实际route/SoC/profile/latency均PENDING。隔离提交目录/private/tmp/bmmms-c10-full-m-shard/project已核对SHA及七文件，dry-run只含kernel。仅提交一个正式gate；无收益/回退则恢复a2e6763，保留反例，不扫相邻N宽。
+
+Implementation **c1a52ef** 已push；唯一正式任务 **6ac7bcb6694b590c3c08ce0e** 创建成功，同370786B/SHA f2ea9e35。Native PENDING；仅查询该ID，不重交。
