@@ -1,12 +1,12 @@
 # 最新接手状态 · 2026-10-08
 
-## Current code, task and next action
+## Current retained code and next executable action
 
-- Current experiment/c13-resident-frame candidate364169bytes/SHA0794a2bfc777ac48c373b3085cd96fd1224b0bf0a4f6a9351d290bb421dbad2d. Parentwhole1734f16 restored beforethreeadditions178lines. Exact suppliedC13 geometry on originaldual3/tree16; no previousdual14tail or C4Cube candidate. See[C13_RESIDENT_FRAME](C13_RESIDENT_FRAME.md).
-- Existing oneBcopy/eightBloads peractiveworker andL0Bresidence retained. RemoveTPipe/TQue, originalfullK128/stridedM/doubleC/originalworkerpartialslots/GM kept. Actualresource/TUNINGguard; maximumworkers32 is originalresidencycondition, notfixedhardwarecorecount.
-- CPU96physicalCube configs/sevennegativecontrols,102threadedAIV configs/sevencontrols; production/TUNING each5120host/fourexacthits and exactcapacity/workspace/core/fallback passed. Modelsinteger/syntheticcredits, notnativeFP16. Whole-parent/protected7/CLI dry-run onlykernel/SHAverified.
-- NEXT commit/push, submit uniqueformalstructuralgate, saveID immediately, querysameID untilrealterminal, all15results/newTbestscore. Clearlylarge improvement only permitsoneunchangedconfirmation; otherwisearchive/no nearbyparameterscans. Firstformaljob **6ac73bd0694b590c3ca19b3d** terminal Pass15/allprecision1. C13=12.62 belowparent14.94-16.74/median15.13 by15.53percent vsfastest; ONE unchangedconfirmation now warranted. Savefirstfull15results; ONE unchangedconfirmation **6ac73c8b694b590c3ca2153b** now running/PENDING, sameSHA0794a2bf. NEXT querythissameID toterminal; no extra repeats. Overallgoal incomplete.
-- Exactshape evidence [EXACT_SHAPE_AUDIT_1008](EXACT_SHAPE_AUDIT_1008.md), baseline notTbest, dtype/layout absent. C13 assumedFP16/FF isactualresidentroute, C11 assumedFP16/TT isdual2 library path notTTframe. C10layoutconflict remains; C11laterindependentdirection.
+- Current experiment/c13-resident-frame, kernel364169bytes/SHA0794a2bfc777ac48c373b3085cd96fd1224b0bf0a4f6a9351d290bb421dbad2d, implementation7492776. Parent1734f16 +threeadditions178lines only; C4regression/oldC13tail excluded.
+- Formalfirst6ac73bd0694b590c3ca19b3d andoneunchangedconfirmation6ac73c8b694b590c3ca2153b bothterminalPass15/allprecision1. C13=12.62/13.19, bothbelowparentrecent14.94-16.74/median15.13; pairmidpoint12.905 (-14.71percent vsparentmedian), sloweststill11.71percent belowfastestparent. Retainlocalizedgain, notwholecompetitionbreakthrough orstablecausal A/B. Full15/totals/scores in[C13_RESIDENT_FRAME](C13_RESIDENT_FRAME.md).
+- Noactiveformaljob, nofurtherrepeatrequests. OriginaloneBload/L0residence/fullK128/stridedM/doubleC/workerpartials/originalGM retained, frameworkandVectorredundancyremoved. Nativecompile/15precision passed; allshape/profile/SoC coverage notclaimed.
+- NEXT independentbranchfromthisretainedhead: C11 exact(1,1536,2048,2048), historicalFP16/TT, originaldual2/BM128BN256/Nsplit8. ExistingTTframecanuseBM64BN256/BK64, existingpartialprefixidentical49152B/ringhalfsize withinoldallocation. Add onlynarrowactualhost/Launch route, retaindevicecodebyteforbyte; verifyresources/plan/pins andactualsourcephysicalmodelsbeforeoneformalgate. Detailedmemoryarithmetic/risks/steps[C11_EXACT_FRAME_AUDIT](C11_EXACT_FRAME_AUDIT.md). Unimplemented, noC11jobyet. Do notblindlywidenthegeneralTTguard.
+- Userexactshapeimage andbaseline [EXACT_SHAPE_AUDIT_1008](EXACT_SHAPE_AUDIT_1008.md), dtype/layoutmissing andC10conflictremain. Baseline notTbest. Overallmajoroptimizationgoal incomplete.
 
 ## 最新计分参考与差距
 

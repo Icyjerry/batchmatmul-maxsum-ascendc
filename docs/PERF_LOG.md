@@ -843,3 +843,29 @@ Task6ac73bd0694b590c3ca19b3d /implementation7492776/SHA0794a2bf: Pass15/15, allp
 Total468.63us; latestTbest calculatedmean50.75856. C13=12.62 vsrecentfiveparent14.94-16.74/median15.13:16.59percent belowmedian,15.53percent belowfastestparent. Largerthan recentparent spread/median11.90percent, warrantsONE unchangedconfirmation. Noactualshape/plan/SoC/profile or interleavedA/B; cannotclaim stablecausalpercentage/devicecounter/route trace. C10=100.24 andC14=11.14 unfavorable observations retained; unmodifiedroutes notattributed. RawJSON ignoredartifacts/c13-resident-frame/official-one.json. Firsttask terminal, noactivejob beforeconfirmation.
 
 One unchangedconfirmation task **6ac73c8b694b590c3ca2153b** created after kernel/template equality check. SameSHA0794a2bf. Save/querythisID toterminal; no further repeats requested.
+
+## Unchanged confirmation terminal: keep the local C13 gain
+
+Confirmation6ac73c8b694b590c3ca2153b, sameSHA0794a2bf/364169bytes; protected7/template byte checks passed. Pass15/15, allprecision_ratio1. No more repeats outstanding; no activejob.
+
+|Case|First us|Confirmation us|
+|---|---:|---:|
+|C1|2.02|1.92|
+|C2|2.48|2.67|
+|C3|3.08|3.18|
+|C4|4.16|4.07|
+|C5|5.37|5.29|
+|C6|9.78|9.75|
+|C7|8.25|8.02|
+|C8|46.50|46.23|
+|C9|68.11|68.48|
+|C10|100.24|99.34|
+|C11|88.90|88.78|
+|C12|96.47|97.11|
+|C13|12.62|13.19|
+|C14|11.14|10.93|
+|C15|9.51|9.62|
+
+Totals468.63/468.58us; newestTbest calculatedmeans50.75856/50.71136. C13 pair12.62/13.19, midpoint12.905us, 14.71percent belowparentrecentfive median15.13. Slowestcandidate13.19 remains 11.71percent belowfastestparent14.94. Both belowparent14.94-16.74 range: retain this localized structural observation. These are two samples, not controlledsameSoC A/B or proof ofstablecausalpercent/route trace. Otherpoint fluctuations andadverseC2/C10/C11/C14 samples retained; scores/totals do NOT establish wholecompetition breakthrough. Noidenticalthirdrepeat or nearbyparameter scan.
+
+New working baseline implementation7492776/SHA0794a2bf, onexperiment/c13-resident-frame; main/historicaltags unchanged. All other algorithms parent1734f16 intact bywhole-parent inverse proof. Native15precision gate passes, fullhardware/allshape/profile coverage stillnotclaimed. Next independent C11 library-to-existingTT-frame hypothesis, seeC11_EXACT_FRAME_AUDIT. Overallgoal active/incomplete.
