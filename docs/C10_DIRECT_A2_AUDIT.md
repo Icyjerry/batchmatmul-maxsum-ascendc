@@ -22,3 +22,33 @@ At targetK1152 all18Kchunks are64. EachA2 conversion usesfourLoad2D calls versus
 4. Clearregression/no usefulgain: archivewholechange/restorea2e6763. Main/tagsuntouched,goalremainsfullcompetition improvement.
 
 No code/nativecandidate fordirectA2existsyet. NoWeb needed; usesactualretainedsourceandindependentphysical-layoutmodels.
+
+## Implemented / final CPU PASS / native PENDING
+
+Branch experiment/c10-direct-a2, kernel368813B/SHA256 `526d7f94b8aef59e82a91556fa311695cd9d90f39893662f638a58e2c9733d35`. Twoadded/tworemovedpredicate lines, no newdevicebody/API: M_BALANCE guardedFF bypasses3D andactivatesexisting strided2D onlyforA2. Tree8/defaultfalseinstances, M128/N256/K64, originalcreditordering/Vector/host/Plan/allocator/GM untouched. Wholeinverse equalsa2e6763; protected7 equals1734f16.
+
+`python3 tools/validate_c10_direct_a2.py` finalexit0:
+
+- 31actualproducer groups: full4096/1280/1152/20core;1/3/8/20/24/32core negative-tail/defaultfalse proxies; actualM16/32/48/64/80/128 andK1104/1120/1136 (lastK16/32/48). PhysicalNZ/ZZ/ZN, liveMTE2/MTE1/MMAD, everyfull-K C/paddedC, disjointowners/negativeMax-Sum/input/ringguards. Smallerproxygeometry is not a claim it passes the host selector.
+- Fulltarget actualcounts: Ctiles200/MMAD3600/Bcopies3600/Binput58982400 unchanged; A3D0/A2D14400/A2elements23592960/B2commands14400. Parent3DAPI calls3600 are source-derived fromoneperMMAD; parentfulltarget notrerun. APIcallcounts do NOT identify lowered hardware instruction counts or time.
+- Parentactualsource30sameproxygroups validatesold3D andsameelementvolumes; allother/defaultfalseinstance behavior preserved byconstexpr predicates, wholeoutside-changebyteproof.
+- 96actualAIVownership/store+FinalizeRows andproduction/TUNINGeach192hostplans/ninehits PASS, syntheticmaxima/faketiler limitations explicit.
+- FirstnegativeKoffsetcontrol wasnotrejected becausenegativeAfixtureisconstantalongK; no kernel failure. Added positiveK-varyingM80/N272/K256 actualreference, verifiedunmutated passes, thenNZpitch/ZZgap/Koffset/lastreader/L0ready/M_FIX sixcontrols allrejected. Initialfailedrunner logpreservedignored cpu-initial-failed.log; final cpu.logis authoritativeforgate.
+
+ExplicitTQueAlloc-waits-lastMTE1-reader assumption persists; integerlayout testsarenotCANN9/BF16precision/hardwarequeue or latency proof. NoactualSoC/route/profile. NativePENDING/noIDyet. Original/fulltargetcache geometry andtraffic unchanged, more APIcalls mayregress.
+
+Finalisolated/private/tmp/bmmms-c10-direct-a2/project protected7restored1734f16; dry-runonly368813B/SHA526d7f94 kernel. ONEformaljobaftercommit/push, saveIDbeforepolling, noidenticalrepeatformodestgain/noadjacentparameter scans. No gain/regression restoresa2e6763. Rawlogsignored artifacts/c10-direct-a2 dir700/file600.
+
+Implementation **3f58655** pushed; uniqueformaljob **6ac7c376694b590c3c0d4fab** createdonce. Same368813B/SHA526d7f94. NativePENDING, querysameIDtoterminal.
+
+## Formal terminal: Pass15, no C10 gain, archive
+
+Unique **6ac7c376694b590c3c0d4fab**, implementation **3f58655**,368813B/SHA526d7f94. Formalcompile and15/15precision passed, allprecision_ratio=1. Timesus:
+
+`[2.04, 2.56, 3.25, 4.12, 5.2, 9.6, 8.08, 44.08, 68.39, 92.98, 88.59, 97.2, 13.15, 10.83, 9.19]`
+
+Total **459.26us**, latestuserTbest calculatedmean **51.36499667**, notlive rank. C10 **92.98us** vsparentsingle91.53us (+1.58%) doesnotimprove target. Otheradverse C1=2.04/C3=3.25/C11=88.59/C12=97.20 etc retained, unrelatedroute improvements notattributed. Noactualroute/SoC/profile/bounddeviceA-B; APIcall/layout proofdidnotestablish latency benefit.
+
+Archivewholechange, restorepassed **a2e6763**/368782B/SHA16b51684. No unchangedrepeat/neighboringLoad2D/3D ortiling scans. Failedmodels/source retainedarchivedbranch, rawignoredartifacts/c10-direct-a2/official.json. FullM178.32/latecredit92.84/directA2 92.98 now all excluded. Noactivejob, main/tagsuntouched, overallgoalincomplete.
+
+NEXT independenttarget C1 singleK32 dot: literal one-output UBframe/three-GM-argumentkernel versusgeneric grouped8shortdot runtimeparameters. Itslayout ambiguityvanishes atM=N=1, dtype stillsameT. Audit scope/pins/alias/actualCast-Mul-Reduce/outputcompletion first; no nativecandidate existsyet.

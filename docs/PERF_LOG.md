@@ -983,3 +983,23 @@ Total **457.33us**, latestuserTbest calculatedmean **51.35378426**, notlive rank
 Archiveandrestorewholepassed **a2e6763** /368782B/SHA16b51684; noidenticalrepeat/nearbywait variants. CPUmodels/rawnativeJSON remainarchivedbranch/ignored artifacts/c10-late-ring-credit/official.json. Main/tagsuntouched, noactiveformaljobs. Independentnextaudit: actualFF A2loadinstruction/data-layout conversion, preserving currenttilegeometry/GM/Plan.
 
 Wholekernelrestored **a2e6763**/368782B/SHA16b51684 onexperiment/c10-a2-load-audit; lateGMcredit source/models archived44d25e2, nativePass15/C1092.84notretained. IndependentdirectA2audit: actualRESIDENT_PAD selects3Dregardless tree2; existingstridedLoad2D NZ->ZZ couldbeactivated M_BALANCEonly withsamegeometry/volume, estimatedAcommands4x (risk). Addressalgebra documentedC10_DIRECT_A2_AUDIT; notimplemented/submitted, noactivejobs. Nextactualsourcephysicalmodelbeforeonegate.
+
+## C10 direct A2 CPU candidate
+
+Kernel368813B/SHA526d7f94b8aef59e82a91556fa311695cd9d90f39893662f638a58e2c9733d35, experiment/c10-direct-a2, parenta2e6763. OnlyguardedFF A2selection changes3D->existingdirectstrided2D; geometry/tree8/GM/Plan/Vector/creditsunchanged. FullactualA2D14400/A3D0/A2elements23592960/C200/MMAD3600/Breads58982400; parentderived3D3600APIcalls nothardwareinstruction/timecounts. CPU31producer/parent30proxies/positiveK-varyingreference/96ownership+FinalizeRows/prod&TUNING192plans9hits/sixcontrols PASS. FirstnegativeKoffsetfaultescapedconstantKdata, fixedreferencevalidatesandcatchesfault; rawfailed/final logskeptignoredartifacts/c10-direct-a2. Wholeinversea2e6763/protected7pass. Finaldryrunonly368813B/526d7f94kernel. NativePENDING/noID,ONEgateafterpush. C10_DIRECT_A2_AUDIT recordslimits/risk.
+
+Implementation **3f58655** pushed; uniqueformaljob **6ac7c376694b590c3c0d4fab** createdonce. Same368813B/SHA526d7f94. NativePENDING, querysameIDtoterminal.
+
+## Formal terminal: Pass15, no C10 gain, archive
+
+Unique **6ac7c376694b590c3c0d4fab**, implementation **3f58655**,368813B/SHA526d7f94. Formalcompile and15/15precision passed, allprecision_ratio=1. Timesus:
+
+`[2.04, 2.56, 3.25, 4.12, 5.2, 9.6, 8.08, 44.08, 68.39, 92.98, 88.59, 97.2, 13.15, 10.83, 9.19]`
+
+Total **459.26us**, latestuserTbest calculatedmean **51.36499667**, notlive rank. C10 **92.98us** vsparentsingle91.53us (+1.58%) doesnotimprove target. Otheradverse C1=2.04/C3=3.25/C11=88.59/C12=97.20 etc retained, unrelatedroute improvements notattributed. Noactualroute/SoC/profile/bounddeviceA-B; APIcall/layout proofdidnotestablish latency benefit.
+
+Archivewholechange, restorepassed **a2e6763**/368782B/SHA16b51684. No unchangedrepeat/neighboringLoad2D/3D ortiling scans. Failedmodels/source retainedarchivedbranch, rawignoredartifacts/c10-direct-a2/official.json. FullM178.32/latecredit92.84/directA2 92.98 now all excluded. Noactivejob, main/tagsuntouched, overallgoalincomplete.
+
+NEXT independenttarget C1 singleK32 dot: literal one-output UBframe/three-GM-argumentkernel versusgeneric grouped8shortdot runtimeparameters. Itslayout ambiguityvanishes atM=N=1, dtype stillsameT. Audit scope/pins/alias/actualCast-Mul-Reduce/outputcompletion first; no nativecandidate existsyet.
+
+Restoredwholea2e6763/368782B/SHA16b51684 onexperiment/c1-literal-dot-audit. DirectA2source/models/native15PassbutC1092.98 archived35480f2; nolivejobs. IndependentC1literalone-outputK32auditdocumentedC1_LITERAL_DOT_AUDIT, actualshortdotstillruntimegroup8. Fixed544Bframe/threeGMargswouldremovegeometryprologuebutnotbytes/FLOPs/launch; compiler/launchfloorbenefitunknown. NoC1implementation/submissionyet; actualtensor/DMA/alias/output/pinmodelsrequiredbeforeonegatedjob.
