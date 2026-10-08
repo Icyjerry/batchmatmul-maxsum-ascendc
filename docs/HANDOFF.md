@@ -2,11 +2,9 @@
 
 ## 当前代码与正式任务
 
-- 当前分支 `experiment/c13-manual-frame`；父算法为正式通过组合1734f16/a5eef105/354602bytes。C13候选kernel365034bytes/SHA `92c3654faef7db189c167846215a96ab0dcf937b0833ef36b90f8b35d3158d28`，191行/三处新增，仅算法kernel.asc。
-- 固定物理frame/事件替换dual14 FF尾块的TPipe/TQue，保留128深双K panels、原M任务与双C/ring/early partial。简化完整N后的64行sum和barrier后末级frame。不是再次完整K/B驻留。详情 [C13_MANUAL_FRAME](C13_MANUAL_FRAME.md)。
-- CPU324组producer/六项负控制、768组Vector/九项负控制、production/TUNING各4096host/3968准入与容量/core/workspace/回退通过。whole-parent scope和七个保护工程文件通过。CPU不是FP16/CANN/硬件时序模型。
-- CLI登录已恢复；独立模板 `/private/tmp/bmmms-c13-frame-official/project` dry-run确认仅kernel/SHA一致。**正式任务 `6ac733cd694b590c3c9b7892` 已创建**；实现59c59e2已push，CANN9/正式精度/性能PENDING。
-- 下一：`python3 /private/tmp/query_bmmms_submission.py 6ac733cd694b590c3c9b7892` 只查询同ID至真实终态，不重交，完整15点及新参考计分；明显大收益才原样确认，否则归档，不扫描附近参数。整体冲榜目标未完成。
+- 当前experiment/c13-manual-frame候选92c3654f/365034bytes已终态，任务6ac733cd694b590c3c9b7892 Pass15/15、precision全1。C13=16.00μs，没有明显收益（父最近五次14.94–16.74，中位15.13），归档、不重复/扫描。详情[C13_MANUAL_FRAME](C13_MANUAL_FRAME.md)。
+- 总468.56μs、最新Tbest计算均分50.61753；无实际隐藏shape/plan/SoC/profile，未改动路径耗时变化不归因于本轮。没有活动任务。
+- 下一从正式通过1734f16/a5eef105/354602bytes恢复，新独立C4 TT路由复用现有single_tile_direct_batch<...,true>，置于SmallVector前；仅在原GM/capacity/core/tuning范围内。先actual-host与TT物理模型，再正式唯一结构gate。尚未实现C4。
 
 ## 最新计分参考与差距
 

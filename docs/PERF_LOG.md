@@ -800,3 +800,12 @@ NewestTbestus=[1.18,1.54,2.13,2.37,3.57,6.38,6.37,13.88,48.30,64.85,67.87,80.65,
 Parent1734f16/a5eef105; experiment/c13-manual-frame candidate365034bytes/SHA92c3654faef7db189c167846215a96ab0dcf937b0833ef36b90f8b35d3158d28. Three additions191lines restore whole parent. Removes TPipe/TQue from FF dual14 tails, retains128K panels/stridedM tasks/double C/ring/earlyslots, 64row completeN sum and deadUB final frame. No newGM/plan change. CPU324 producer configurations/six negative controls,768 threaded AIV configurations/nine controls; production/TUNING each4096actualhost/3968hits and exactmemory/core/workspace/adjacent fallback passed. CPUinteger/syntheticcredits, not nativeFP16/CANN. Independenttemplate protected7 equal1734f16; dry-run onlykernel/SHAconsistent. Native compile/precision/latency PENDING, no taskID yet. Full evidence C13_MANUAL_FRAME. NewestT priorities C4/C2/C3/C6/C1/C10, current C13 sole structuralgate completed first; no parameter scan.
 
 C13 implementation59c59e2 pushed; unique formal task6ac733cd694b590c3c9b7892 created. Query sameID to terminal, native gate PENDING. No resubmission.
+
+## 2026-10-08: C13 manual-frame terminal
+
+
+任务 `6ac733cd694b590c3c9b7892`：Pass15/15，precision_ratio全部1。耗时μs：
+
+[2.02, 2.54, 3.1, 4.14, 5.09, 9.72, 8.16, 45.99, 67.71, 98.7, 88.42, 96.59, 16.0, 10.76, 9.62]
+
+总耗时468.56μs；最新10月8日Tbest重算均分50.61753。C13=16.00μs，父最近五次14.94–16.74、中位15.13；没有明显收益，不原样确认或附近参数扫描。其它点变化不归因于C13路径。没有实际隐藏shape/plan/SoC/profile，不能证明路径命中或硬件全shape安全。原JSON在忽略artifacts/c13-manual-frame/official.json，摘要保留。候选及模型留在experiment/c13-manual-frame，后续从通过1734f16恢复独立C4方向。
