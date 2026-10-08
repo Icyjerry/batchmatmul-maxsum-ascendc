@@ -1,0 +1,43 @@
+void Run(uint32_t workers,bool neg,bool eager,uint32_t K){
+ negativeInput=neg;AscendC::eagerFix=eager;constexpr uint32_t M=1025,N=1031,BM=128,BN=128,PK=384;
+ Schedule s{1,M,N,K,BM,BN,9,9,9,workers,0,0};s.window=1;
+ TTFrameShape q{M,N,K,BM,BN,PK,9,workers};auto owners=MakeTTWorkOwners(q);
+ std::vector<int16_t>a(M*K),b(N*K);
+ for(uint32_t m=0;m<M;++m)for(uint32_t k=0;k<K;++k)a[k*M+m]=A(0,m,k);
+ for(uint32_t n=0;n<N;++n)for(uint32_t k=0;k<K;++k)b[n*K+k]=B(0,k,n);
+ auto oldA=a,oldB=b;uint64_t ac=0,bc=0,mm=0,ar=0,br=0;size_t prefix=9*1152;
+ for(uint32_t w=0;w<workers;++w){
+  st=State{};st.s=s;st.tx1=st.tx2=true;AscendC::block=w;AscendC::ranges.clear();
+  auto group=refs.at(workers).at(w);uint32_t copies=0;int last=-1;uint64_t aRead=0,bRead=0;
+  size_t base=prefix+size_t(w)*2*BM*BN;
+  for(size_t t=0;t<group.size();++t){auto r=group[t];uint32_t cols=r.nt==8?7:128;
+   st.expected.push_back({0,r.mt*BM+r.row,r.nt*BN,r.rows,cols,r.nt,base+(t&1)*BM*BN});
+   if(last!=int(r.mt)){++copies;aRead+=uint64_t(r.mt==8?1:128)*K;last=r.mt;}
+   bRead+=uint64_t(cols)*K;
+  }
+  std::vector<float> scratch(prefix+size_t(workers)*2*BM*BN+16,1e30f);
+  AscendC::registry={{reinterpret_cast<uintptr_t>(a.data()),{a.size()*2,true}},
+   {reinterpret_cast<uintptr_t>(b.data()),{b.size()*2,false}},
+   {reinterpret_cast<uintptr_t>(scratch.data()),{scratch.size()*4,false}}};
+  bmmms_tt_manual_frame<int16_t,true,true>(a.data(),b.data(),scratch.data(),nullptr,q,owners);
+  assert(AscendC::dma.empty()&&AscendC::mte1.empty()&&AscendC::mac.empty()&&AscendC::fix.empty());
+  assert(st.fixes==group.size()&&st.mmads==group.size()*((K+127)/128));
+  assert(st.aCopies==copies*3&&st.bCopies==group.size()*((K+PK-1)/PK));
+  assert(st.aLoads==st.mmads&&st.bLoads==st.mmads&&st.aReads==aRead&&st.bReads==bRead);
+  for(auto e:st.events)assert(e.second==0);assert(!st.cross[0]&&!st.cross[1]);
+  for(size_t i=0;i<scratch.size();++i)if(i<base||i>=base+2*BM*BN)assert(scratch[i]==1e30f);
+  ac+=st.aCopies;bc+=st.bCopies;mm+=st.mmads;ar+=aRead;br+=bRead;
+ }
+ assert(a==oldA&&b==oldB);
+ if(workers==20&&K==1032){assert(ac==96&&bc==291&&mm==873&&ar==3178560&&br==11689464);}
+ std::cout<<workers<<" cores K="<<K<<" neg="<<neg<<" eager="<<eager<<" actual C8 Cube full-K/NZ-subview: A/B copies "<<ac<<"/"<<bc<<" MMAD "<<mm<<" A/B elements "<<ar<<"/"<<br<<" PASS\n";
+}
+int main(){unsigned n=0;
+#ifdef NEGATIVE_CONTROL
+ Run(20,false,false,1032);++n;
+#else
+ for(uint32_t w:{8u,20u,32u})for(bool neg:{false,true}){Run(w,neg,neg,776);++n;}
+ Run(20,false,false,1032);++n;Run(20,true,true,1032);++n;
+#endif
+ std::cout<<n<<" actual producers: fragment addresses/cache shape/full K/tails/readiness/live operands/C/ring guards PASS\n";
+}

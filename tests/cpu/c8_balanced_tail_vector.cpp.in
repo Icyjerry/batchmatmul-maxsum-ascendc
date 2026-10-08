@@ -1,0 +1,34 @@
+void Run(uint32_t workers,bool neg,uint32_t mode){
+ constexpr uint32_t M=1025,N=1031,BM=128,BN=128,MP=1152,NT=9;
+ Shape q{M,N,1032,MP,BN,NT,NT,BM,workers};Shared data(q,neg);shared=&data;
+ TTFrameShape s{M,N,1032,BM,BN,384,NT,workers};auto owners=MakeTTWorkOwners(s);
+ std::vector<std::thread> threads;
+ for(uint32_t id=0;id<2*workers;++id)threads.emplace_back([&,id]{
+  st=State{};st.block=id;st.mode=mode;st.ring.resize(2*BM*BN,1e30f);
+  bmmms_tt_manual_frame<int16_t,true,true>(nullptr,nullptr,data.scratch.data(),data.output.data(),s,owners);
+  for(auto& engine:st.queues)assert(engine.empty());for(auto e:st.events)for(int v:e)assert(v==0);
+  auto group=refs.at(workers).at(id/2);unsigned copies=0;
+  for(auto t:group)copies+=((id%2)*BM/2<t.rows);
+  assert(st.issued==group.size()&&st.copies==copies&&st.primes==2&&st.releases==group.size());
+  assert(st.credit[0]==1&&st.credit[1]==1&&st.allocs==(id==0?5u:2u));
+ });
+ for(auto& t:threads)t.join();assert(data.yWrites.load()==1);float total=0;
+ for(uint32_t m=0;m<M;++m){float mx=-std::numeric_limits<float>::infinity();
+  for(uint32_t n=0;n<N;++n)mx=std::max(mx,Value(m,n,neg));if(neg)assert(mx<0);total+=mx;
+ }
+ assert(data.output[0]==total);
+ for(uint32_t ns=0;ns<NT;++ns)for(uint32_t m=0;m<MP;++m){float mx=-std::numeric_limits<float>::infinity();
+  if(m<M)for(uint32_t n=ns*BN;n<std::min(N,(ns+1)*BN);++n)mx=std::max(mx,Value(m,n,neg));
+  assert(data.scratch[ns*MP+m]==mx&&data.written[ns*MP+m]==1);
+ }
+ for(size_t i=NT*MP;i<data.scratch.size();++i)assert(data.scratch[i]==1e30f);
+ for(size_t i=1;i<data.output.size();++i)assert(data.output[i]==1e30f);
+}
+int main(){unsigned n=0;
+#ifdef NEGATIVE_CONTROL
+ Run(20,true,2);++n;
+#else
+ for(uint32_t w:{8u,9u,13u,20u,24u,31u,32u})for(bool neg:{false,true})for(uint32_t mode=0;mode<3;++mode){Run(w,neg,mode);++n;}
+#endif
+ std::cout<<n<<" actual queued AIV entries: split-row disjoint stores, poison padding, destructive double-ring credits, all-worker barrier, exact MaxN/SumM/output guards PASS\n";
+}
