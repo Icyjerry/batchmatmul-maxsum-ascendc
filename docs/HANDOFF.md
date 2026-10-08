@@ -1,10 +1,9 @@
-# Current passed baseline restored; C1 literal-dot audit next
+# Current passed baseline restored; C8 cache-tail workload audit next
 
-- Branch experiment/c1-literal-dot-audit, wholekernel **a2e6763**/368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94. C10balanced/C8phasedA/C13frame retained,main/tagsuntouched.
-- DirectA2 archived **35480f2** onexperiment/c10-direct-a2 (implementation3f58655/SHA526d7f94), unique6ac7c376694b590c3c0d4fab Pass15/allprecision1/C10=92.98vsparent91.53. Full15in[C10_DIRECT_A2_AUDIT](C10_DIRECT_A2_AUDIT.md), modelsstayarchivedbranch. No livejobs/repeats/instruction/tiling scans. FullM178.32/latecredit92.84alsoexcluded.
-- NEXT implementone-outputliteralK32VectorUBframe/threeGMargkernel, replacinggenericshortdotonlyforB=M=N=1/K32/dual15/finalBlocks1/alignedGM/noTune pins. Actuallayoutbitsirrelevantinthisgeometry; preserveT/FP32jointCast-Mul-WholeReduceSum/one4by/y/PIPE_ALL. [C1_LITERAL_DOT_AUDIT](C1_LITERAL_DOT_AUDIT.md) contains544Bphysicalframe/risk/model/gate. Notimplemented/submitted; don'tclaim1.18usachievablefromTbest alone.
-- ExistingtinyalreadymanualUB/noTPipe; don'trepackageitsremovalasnew. Source/proxytests mustcheckalias/positiveK-varyingdata anddelayedoutputcompletion beforeonegate. NoWeb/subagents/newGM/harnesschanges.
-- ParentC1091.53singlelocalgain, noactualSoC/route/profile; fullcompetitiongoalactive/incomplete.
+- Branch experiment/c8-workload-audit, wholekernel **a2e6763**/368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94. C10balanced/C8phasedA/C13frame retained. C1literal archived2e10a23/7925ee2; unique6ac7ce8e694b590c3c14baa6 Pass15/C1=1.93withinold1.89-2.04, no confirmation/variants/livejobs.
+- Newexecutedpurepartitionaudit tools/audit_c8_area_partition.py: 6area/4cache-tail comparisons, exactvalidrowcoverage/paddedwork. Naivearea lastcore13C/90barriers vsold5/45: rejectedbeforekernel/native. Cache-aware full-cellM16splits+distributedwhole tails at20coresmaxarea65536->55552,maxC6,barriers18; B+22.07%,A+0.195%,C81->97 retainedasrisks. ThisisnotactualAscend/latencyproof.
+- NEXT actualsharedtask descriptor/Cube-subrow/AIVpartial/Bprefetch models, then implementdefaultfalseexact-C8 template. Hostprecomputespackedtailowner metadata(two64-bitlaunchargs), noGM/allocator/Plan change; originalM128/N128/PK384/Aphase/buffers/merge retained. [C8_WORKLOAD_PARTITION_AUDIT](C8_WORKLOAD_PARTITION_AUDIT.md) detailssupported3Dchannelstart/nativePENDING andtailpadding store hazard. NoC8candidate/submissionyet.
+- No newC1variants/failedC10micro variants, residentB/full-input/N-major orneighboringtiling/phase scans. Main/tagsuntouched,actualSoC/route/profileunknown, overallgoalactive/incomplete.
 
 ## 先读与规则
 

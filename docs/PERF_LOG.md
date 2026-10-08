@@ -1003,3 +1003,25 @@ Archivewholechange, restorepassed **a2e6763**/368782B/SHA16b51684. No unchangedr
 NEXT independenttarget C1 singleK32 dot: literal one-output UBframe/three-GM-argumentkernel versusgeneric grouped8shortdot runtimeparameters. Itslayout ambiguityvanishes atM=N=1, dtype stillsameT. Audit scope/pins/alias/actualCast-Mul-Reduce/outputcompletion first; no nativecandidate existsyet.
 
 Restoredwholea2e6763/368782B/SHA16b51684 onexperiment/c1-literal-dot-audit. DirectA2source/models/native15PassbutC1092.98 archived35480f2; nolivejobs. IndependentC1literalone-outputK32auditdocumentedC1_LITERAL_DOT_AUDIT, actualshortdotstillruntimegroup8. Fixed544Bframe/threeGMargswouldremovegeometryprologuebutnotbytes/FLOPs/launch; compiler/launchfloorbenefitunknown. NoC1implementation/submissionyet; actualtensor/DMA/alias/output/pinmodelsrequiredbeforeonegatedjob.
+
+## C1 literal K32 CPU candidate
+
+Branch experiment/c1-literal-dot,370984B/SHAb8ab2f9faa564a99d40fcbf93a6b4ee922c42d5cbf82c12ab679a3ff15e3d79c,parenta2e6763.47addedkernel lines: literal544B/threeGMarg/singleoutputkernel; exactB=M=N1/K32/dual15/grid1/alignedGM/actualUB-AIV/noPinsguard. OriginalPlan/GM/allotheralgorithms/shortdot unchangedbywholeinverseproof/protected7. CPU512literal-parentpairs/production&TUNING7776plans+launch24hits/fivefaultcontrols PASS. NativePENDING/noID, finaldryrunonly370984B/b8ab2f9f. SourceUBspanlessnottraffic/launch/FLOP/hardwareinstructionclaim. Nativeonegateafterpush; predeclaredconfirmationonlyall15Pass/C1<=1.6065us, otherwise no unchangedrepeat/nearbyscans. DetailsC1_LITERAL_DOT_AUDIT, rawignoredartifacts/c1-literal-dot/cpu.log.
+
+Implementation **7925ee2** pushed; uniqueformaljob **6ac7ce8e694b590c3c14baa6** createdonce. Same370984B/SHAb8ab2f9f. NativePENDING, querysameIDtoterminal.
+
+## Formal terminal: Pass15, C1 within old range, archive
+
+Unique **6ac7ce8e694b590c3c14baa6**, implementation **7925ee2**,370984B/SHAb8ab2f9f. Formalcompile/15precision passed, allprecision_ratio=1. Timesus:
+
+`[1.93, 2.48, 3.05, 4.05, 5.24, 9.89, 8.09, 45.83, 68.81, 93.21, 89.16, 96.88, 13.1, 10.93, 9.32]`
+
+Total **461.97us**, latestuserTbest calculatedmean **51.56738723**, notlive rank. C1 **1.93us** lieswithinrecentold1.89-2.04; neither clearbenefit norpredeclared15%confirmationcriterion(<=1.6065) met. No unchangedconfirmation/neighboringK/batch/UBoffset/epiloguevariants. OtheradverseC8=45.83/C9=68.81/C10=93.21/C11=89.16 etc retained, tinyC2/C3 fluctuationsnotattributed tosourceunchangedroutes.
+
+NoactualSoC/route/profile/bounddeviceA-B, no conclusionthatlaunchfloor orPIPE_ALL dominates. Source-declaredUBspan/ABI improvementdidnotestablish latencygain. Archiveandrestorewholepassed **a2e6763**/368782B/SHA16b51684, retainingC10balanced/C8phasedA/C13frame. Rawignoredartifacts/c1-literal-dot/official.json, noactivejobs/main/tagsuntouched, goalincomplete.
+
+NEXT C8 actual-workweighted ownership audit: existing81M-majorCtiles include8Mtail/8Ntail pluscorner; twocores receivealmostonlyMtail whilemaxworkerhasfourfull128x128tiles. RespectfailedresidentB/fullinput/PK/BNexperiments; investigate splittingonlyboundaryCtiles at16-row granularity byactualvalidarea, retainingcurrentCdimensions/Bpackages/Aphase/GM andcountingextraBrefreshes. Notimplemented/submitted.
+
+Wholekernelrestoreda2e6763/368782B/SHA16b51684 onexperiment/c8-workload-audit. C1literalnativePass15/C1=1.93no clearbenefit archived2e10a23, no confirmation/livejobs.
+
+ExecutedpureC8partition arithmetic: sixarea/fourcache-awaretailcomparisons, exactvalidrowcoverage/unchangedpaddedwork. At20coresnaivearea max13C/90small-MMADbarriers rejectedbeforeimplementation. Full-cellM16boundarysplits+cache-awareNt-tail/distributedMt-tail projectsmaxarea65536->55552/maxC5->6/barriers45->18,globalC81->97/Binput9575928->11689464(+22.07%)/Ainput3172368->3178560(+0.195%). At32coresmax49152->35072/sameglobalC81/Bvolume. Counts aremathematicalprojections, NOTactualkernel/CANN/NPU tests. C8_WORKLOAD_PARTITION_AUDIT specifiespackedhosttailmetadata/sharedtask mapping/nonzeroLoad3Dchannel-start legality/nativePENDING/partialstore hazards. NoC8kernelcandidate/jobyet; actualprotocol/layout/hostmodel requirednext. Rawignoredartifacts/c8-workload-audit/partition.log.
