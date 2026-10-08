@@ -813,3 +813,5 @@ C13 implementation59c59e2 pushed; unique formal task6ac733cd694b590c3c9b7892 cre
 ## 2026-10-08: C4 TT direct Cube routing ready
 
 Parent restored whole1734f16; candidate356697bytes/SHAe30524ac5ffa748457f3e0c10712251366083c1ff8349341bf0d0c0c38d69664, only40lines/twoadditions. Existing TT DIRECT_BATCH function reused ahead of SmallVector, full actualcore/capacity/originalworkspace/plan/TUNING guard; no device/API/GM changes. CPU768physicalCube configurations,11264AIVentries, production/TUNING each32768actualhost plans/18432hits, six negative controls rejected (A/B inputready and M/N mask/inputDMA/terminal). Vector model is synchronous and cannot detect missing V_MTE3; no such claim. Protected7 byteequal1734f16, dry-run onlykernel/SHAverified. Native CANN/BF16 precision/latency PENDING, no taskIDyet. Full evidence C4_TT_DIRECT_CUBE.
+
+C4实现6bad2b4已push；唯一正式任务 **6ac736e7694b590c3c9db696** 已创建。只查询同ID至终态，不重交；native gate PENDING。

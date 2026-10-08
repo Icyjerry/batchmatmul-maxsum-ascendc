@@ -27,3 +27,5 @@ experiment/c4-tt-direct-cube，kernel356697bytes，SHA256 `e30524ac5ffa748457f3e
 ## 正式gate PENDING
 
 先commit/push实现及摘要，提交一次结构候选；获得ID立即保存/推送，只查询同ID到终态。完整15点均过才能考虑计分，用SCORE_REFERENCE_1008最新Tbest。明显大收益才原样确认，不因波动或观察超时重交；否则归档恢复parent。没有实际SoC/shape/plan/profile前不冒充路径命中或profiling结论。CANN/BF16精度/性能目前PENDING。
+
+C4实现6bad2b4已push；唯一正式任务 **6ac736e7694b590c3c9db696** 已创建。只查询同ID至终态，不重交；native gate PENDING。
