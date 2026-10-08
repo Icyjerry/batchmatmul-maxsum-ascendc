@@ -1,0 +1,61 @@
+unsigned runs=0,encoded=0;double worstAbs=0,worstRel=0;
+template<uint32_t M,uint32_t NP,uint32_t K>
+void Run(uint32_t B,uint32_t N,int encoding,bool neg){
+ constexpr uint32_t kp=(K+15)/16*16;
+ constexpr uint32_t bytes=6*(M+NP)*kp+4*M*NP*kp+4*M*NP+64;
+ std::vector<int16_t>a(B*M*K),b(B*N*K);std::vector<float> y(B+16,1e30f);
+ AscendC::encoding=encoding;
+ auto value=[&](uint32_t v,bool positive){
+  if(!encoding)return int16_t(positive?1+v%5:int(v%9)-4);
+  uint16_t bits=uint16_t(((7+v%4)<<10)|(v*13%1024));
+  return int16_t(bits|(!positive&&v%3==0?32768:0));
+ };
+ for(uint32_t z=0;z<B;++z)for(uint32_t m=0;m<M;++m)for(uint32_t k=0;k<K;++k)
+  a[(z*M+m)*K+k]=value(z*23+m*11+k*7,neg);
+ for(uint32_t z=0;z<B;++z)for(uint32_t n=0;n<N;++n)for(uint32_t k=0;k<K;++k){
+  auto v=value(z*17+n*19+k*3,neg);
+  if(neg)v=encoding?int16_t(uint16_t(v)|32768):int16_t(-v);
+  b[(z*N+n)*K+k]=v;
+ }
+ const auto aa=a,bb=b;AscendC::globals={
+  {reinterpret_cast<uintptr_t>(a.data()),a.size()*2},
+  {reinterpret_cast<uintptr_t>(b.data()),b.size()*2},
+  {reinterpret_cast<uintptr_t>(y.data()+8),B*4}};
+ AscendC::writes.clear();AscendC::flags.clear();
+ for(uint32_t z=0;z<B;++z){
+  assert(AscendC::dma.empty()&&AscendC::outDma.empty()&&AscendC::vec.empty());
+  AscendC::ub=std::make_shared<std::vector<uint8_t>>(192*1024,0x7f);
+  AscendC::defined.assign(192*1024,0);
+  AscendC::manualBytes=0;AscendC::block=z;
+  bmmms_tiny_ft_static<int16_t,M,NP,K>(a.data(),b.data(),y.data()+8,{N});
+  assert(AscendC::manualBytes==bytes&&AscendC::dma.empty()&&AscendC::outDma.empty()&&AscendC::vec.empty());
+  for(auto flag:AscendC::flags)assert(flag.second==0);
+ }
+ for(uint32_t z=0;z<B;++z){
+  double sum=0;
+  for(uint32_t m=0;m<M;++m){double mx=-INFINITY;
+   for(uint32_t n=0;n<N;++n){double dot=0;for(uint32_t k=0;k<K;++k)
+    dot+=double(AscendC::Decode(a[(z*M+m)*K+k]))*AscendC::Decode(b[(z*N+n)*K+k]);
+    mx=std::max(mx,dot);
+   }if(neg)assert(mx<0);sum+=mx;
+  }
+  const float golden=float(sum);const double abs=std::abs(double(y[8+z])-golden);
+  const double rel=abs/std::max(std::abs(double(golden)),1e-30);
+  assert(std::isfinite(y[8+z])&&abs<1e-4&&(rel<1e-4||std::abs(golden)<1e-4));
+  if(!encoding)assert(y[8+z]==golden);
+  worstAbs=std::max(worstAbs,abs);if(std::abs(golden)>=1e-4)worstRel=std::max(worstRel,rel);
+  assert(AscendC::writes.at(reinterpret_cast<uintptr_t>(&y[8+z]))==1);
+ }
+ assert(a==aa&&b==bb);for(uint32_t i=0;i<8;++i)assert(y[i]==1e30f&&y[8+B+i]==1e30f);
+ ++runs;encoded+=encoding!=0;
+}
+template<uint32_t M,uint32_t K>void Sweep(){
+ for(uint32_t B:{2u,3u})for(int enc:{0,1})for(bool neg:{false,true}){
+  Run<M,8,K>(B,8,enc,neg);
+  for(uint32_t N=9;N<=15;++N)Run<M,16,K>(B,N,enc,neg);
+ }
+}
+template<uint32_t M>void SweepK(){Sweep<M,32>();Sweep<M,40>();Sweep<M,48>();Sweep<M,56>();}
+int main(){SweepK<4>();SweepK<5>();SweepK<6>();SweepK<7>();
+ std::cout<<runs<<" actual FT entries / "<<encoded<<" encoded FP16: full conditional range, completeK/MaxN/SumM, allnegative, unique writer/input/output guards, typed UB bounds/delayedDMA PASS; maxAbs="<<worstAbs<<" maxRel="<<worstRel<<"\n";
+}

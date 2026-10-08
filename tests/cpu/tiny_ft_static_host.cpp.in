@@ -1,0 +1,30 @@
+int main(){auto* hw=platform_ascendc::PlatformAscendCManager::GetInstance();unsigned count=0,hits=0;
+ hw->ub=196608;hw->aic=20;hw->aiv=40;
+ for(int B:{1,2,3,4})for(int M:{3,4,5,6,7,8})for(int N:{7,8,9,15,16})
+ for(int K:{32,40,48,56,64})for(int dt:{1,2})for(int layout=0;layout<4;++layout){
+  Shape s{B,M,N,K,dt,layout/2,layout%2};auto p=MakePlan(s,20);auto old=p;
+  const bool yes=TinyFTStaticFits(s,p);++count;
+  assert(yes==(dt==1&&layout==1&&B>=2&&B<=3&&M>=4&&M<=7&&N>=8&&N<=15&&K<=56));
+  assert(!memcmp(&p.schedule,&old.schedule,sizeof(Schedule))&&p.totalBytes==old.totalBytes);
+  if(yes)++hits;
+ }
+ unsigned probe=0;
+ for(int B=2;B<=3;++B)for(int M=4;M<=7;++M)for(int N=8;N<=15;++N)for(int K=32;K<=56;K+=8){
+  Shape s{B,M,N,K,1,0,1};auto p=MakePlan(s,20);assert(TinyFTStaticFits(s,p));++probe;
+  const uint64_t kp=Ceil(K,16)*16,np=Ceil(N,8)*8;
+  const uint64_t need=6*(M+np)*kp+4*M*np*kp+4*M*np+64+1024;
+  hw->ub=need;assert(TinyFTStaticFits(s,p));hw->ub=need-1;assert(!TinyFTStaticFits(s,p));hw->ub=196608;
+  hw->aiv=B;assert(TinyFTStaticFits(s,p));hw->aiv=B-1;assert(!TinyFTStaticFits(s,p));hw->aiv=40;
+ }
+ Shape s{3,7,15,56,1,0,1};auto p=MakePlan(s,20);auto bad=p;
+ bad.schedule.batchGroup=2;assert(!TinyFTStaticFits(s,bad));bad=p;
+ bad.finalBlocks=2;assert(!TinyFTStaticFits(s,bad));bad=p;
+ bad.cubeBlocks=1;assert(!TinyFTStaticFits(s,bad));
+#ifdef BMMMS_TUNING
+ for(auto field:{&Tune().group,&Tune().rows,&Tune().dual,&Tune().early,&Tune().tree,
+ &Tune().bm,&Tune().bn,&Tune().window,&Tune().ns,&Tune().ks,&Tune().workers}){
+  Tune()=TuneConfig{};*field=1;assert(!TinyFTStaticFits(s,p));
+ }Tune()=TuneConfig{};
+#endif
+ std::cout<<count<<" actual host configurations/"<<hits<<" selected; "<<probe<<" complete conditional-C3 shapes, exactUB/core limits, plan/GM unchanged and pin fallback PASS\n";
+}

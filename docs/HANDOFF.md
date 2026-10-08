@@ -1,4 +1,14 @@
-# 最新接手状态 · 2026-10-03
+# 最新接手状态 · 2026-10-08
+
+## 当前候选与下一动作（优先于下方历史条目）
+
+- 分支 `experiment/tiny-ft-static-frame`，父 `bfd5d0a` / 通过算法 `1734f16`。候选仅 kernel 三处新增92行，SHA256 `515aa1592edbb26252b06b0ec610fc96d7c1353f69347a9e3b92327f39f5e024`，359206 bytes。main/历史标签不动。
+- 小FT路径将M/K/NP和UB地址编译期确定，只算有效N点积，紧凑写M个最大值。保留原batch/grid/plan/workspace；仅FP16 FT历史C3条件及实际UB/AIV、原dual24、无显式调参pins准入。父已经有共享Cast和独立batch，不重复声称新增这些。详情 [TINY_FT_STATIC_FRAME](TINY_FT_STATIC_FRAME.md)。
+- 本地模型通过1024次入口/512软件编码FP16、八项负控制；production/TUNING各4800 host配置与全部256条件shape、资源阈值/回退通过；去除三处逐字恢复整个父。CPU不是设备模型。CANN9编译、正式精度/性能 **PENDING**。
+- 当前**没有正式任务ID或活动任务**。旧临时模板/CLI被OS清理，已从Git通过快照/本机公开工具缓存恢复。用户回复已登录后，CLI再次dry-run仍报会话过期/损坏；仅stat显示默认会话文件10月3日更新，不读取其内容。已请求在本机运行 `python3 /private/tmp/cannjudge_cli.py login`，或提供另一个会话文件路径（不提供内容/凭据）。
+- 登录可用后：独立模板 `/private/tmp/bmmms-tiny-ft-static-official/project` dry-run，核对本候选SHA及其它七文件逐字1734f16；commit/push后只创建一次结构评测。取得ID立即存入交接并push，查询同ID至真实终态，记录完整15点。明显大收益才原样确认，否则归档，不扫描附近M/NP/K参数。父最近五次C3中位3.16μs、范围3.08–3.22；更早有3.06，不择优。
+- 计分用用户最新Tbest，[SCORE_REFERENCE_1003](SCORE_REFERENCE_1003.md)。新参考下相对用户历史第一名的差距优先C3/C13/C11/C9/C1，见 [SCORE_PRIORITIES_1008](SCORE_PRIORITIES_1008.md)；不是实时榜单。C13本轮尚无算法修改。原CPU日志忽略 `artifacts/tiny-ft-static-frame/cpu.log`。
+- 下方10月3日及更早的“当前分支”“下一动作”“会话可复用”均为历史记录，以本段为准。整体优化目标未完成；不将本地通过称为已提速。
 
 ## 当前计分参考更新
 

@@ -773,3 +773,12 @@ Task 6ac0d57f694b590c3c252456 Pass15/15, all precision_ratio=1, CANN compile suc
 ## 2026-10-03: user supplies corrected Tbest
 
 NewTbest(us)=[1.23,1.73,2.34,2.76,3.92,6.46,6.40,17.32,50.10,68.52,70.09,81.09,9.04,9.52,8.11]. Latest task6ac0d57f still468.89us, now56.42050 calculated mean instead of old-reference50.58201. Prior two October3 runs57.00705 /55.29167. Full latest per-case and recent-five recalculation in SCORE_REFERENCE_1003. All native results/source unchanged; no new task. Historical oldT results preserved, do not mix scoring references or infer optimization/rank from recalculation.
+
+
+## 2026-10-08: C3 static frame / validN-only dot reductions
+
+Branch experiment/tiny-ft-static-frame, parentbfd5d0a/algorithm1734f16. New userTbest priorities from five same-SHA medians and the historical supplied leader: C3/C13/C11/C9/C1; see SCORE_PRIORITIES_1008. New candidate only three additions92lines, SHA515aa1592edbb26252b06b0ec610fc96d7c1353f69347a9e3b92327f39f5e024. StaticM/K/NP UB map,4B actualN, validN-only dots, compactM Max/Sum; no newGM or plan/grid changes. CPU1024entries/512 encodedFP16/eight queued negative controls; production andTUNING each4800host/96hits+256 complete conditional range/exactUB/core checks passed. Models are not native timing/precision. Full evidence TINY_FT_STATIC_FRAME.
+
+Temporary publicCLI/template files were purged byOS. Restored source template other7 files from1734f16, publicCLI from ignored local tooling cache, no credential read/copy. CLI dry-run failed because saved session expired/damaged; requested user relogin. No native submission created, compile/precision/performance PENDING. Candidate code ready for review/continuation; whole goal incomplete.
+
+User replied logged in; retry still fails before native task creation. Default session metadata (stat only, no content read) last modified October3; requested login via restored CLI or alternate session file path. Native gate still PENDING, no task ID.
