@@ -883,3 +883,11 @@ Switched backexperiment/c13-resident-frame; wholekernel verifiedbyte-equal749277
 C6 archived a45ef9d/implementationf4907c3; terminal6ac744ee694b590c3ca8ea6c Pass15/allprecision1, C6=24.24us vsretained9.78/9.75. Pure Vector two-row product/reduction structure clearly regressed; no repeat/nearby scan. Full15 in C6_VECTOR_PAIRS, raw ignored archived branch artifacts. Returned whole7492776/364169B/SHA0794a2bf.
 
 User requested one unchanged best submission plus continuing optimization, no Web. Task **6ac77103694b590c3ccaa29e** submitted once after whole-kernel/protected7/template byte checks and dry-run. Native result PENDING; query same ID to terminal. No further repeat request. C8 exact tails/local structure next; do not revive failed C6/C11/TT swaps.
+
+## Terminal result
+
+Task6ac77103694b590c3ccaa29e **Pass15/15**, all precision_ratio=1. Timesus:
+
+`[1.92, 2.47, 3.09, 4.16, 5.25, 9.84, 8.36, 46.87, 68.33, 98.47, 88.61, 96.97, 13.44, 11.05, 9.22]`
+
+Total468.05us; latest user Tbest calculated mean **51.04335964** (not a live rank). C8=46.87, C13=13.44; prior retained C13=12.62/13.19. All observations retained, no overall speed gain established. Raw ignored artifacts/best-identical-repeat-1008/official.json. No active job or further unchanged request. Actual SoC/plan/profiling unavailable.
