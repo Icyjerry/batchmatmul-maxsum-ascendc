@@ -2,8 +2,8 @@
 
 - 当前分支experiment/c9-stream-max，kernel371179B/SHA8c23062f0f03f17cbd92f9813092f2f6d40fb876f4e77fdf68acac0f2f411aa8，父a2e6763。C9默认false模板接入分片内64lane持久Max/末尾一次horizontal；原Cube body/Plan/GM/ring/partial/finalizer逐字不变，旧failed C8/C1/C10未带入。
 - actual CPU production&TUNING各2592plan/6命中，1452actual AIV+父版+FinalizeRows，9fault controls全拒绝；精确20核横向APIs768->96。初次Nmask控制逃逸已加强UBpadding poison/跨任务M变化/两任务正负fixture，重跑通过。source Cube字节不变不等于执行了nativeCube，fake tiler/软件FIFO/syntheticcompleteK伙伴局限保留。
-- 隔离protected7/dryrun只kernel371179B/8c23062f通过。下一条动作commit/push后ONE正式gate，立即记录uniqueID，再同ID查至terminal。Pass15且C9<=57.375us才复测；否则无明确收益完整恢复a2e6763。不做原样小收益repeat/近邻lane/PK/tile扫描。
-- CANN9/15精度/耗时PENDING，无新ID/活动正式任务。详细 [C9_STREAM_MAX](C9_STREAM_MAX.md)，raw忽略artifacts/c9-stream-max/{cpu.log,cpu-initial-fault-miss.log}。main/历史标签不动，整体目标未完成。
+- 隔离protected7/dryrun只kernel371179B/8c23062f通过。实现ec40e0e已推送，唯一正式任务 **6ac7e2f8694b590c3c2010c5** 已创建；下一条动作仅查同ID至terminal。Pass15且C9<=57.375us才复测；否则无明确收益完整恢复a2e6763。不做原样小收益repeat/近邻lane/PK/tile扫描。
+- CANN9/15精度/耗时PENDING，当前唯一活动任务为上述ID。详细 [C9_STREAM_MAX](C9_STREAM_MAX.md)，raw忽略artifacts/c9-stream-max/{cpu.log,cpu-initial-fault-miss.log}。main/历史标签不动，整体目标未完成。
 - C8 balanced-tail archived940ec4e/native6ac7d7afPass15但56.78明显回退；C6无TPipe/fullK frame已做，不重复；tiny transpose/storage/Ktree/staticFT/literal已失败，不复活。
 
 ## 先读与规则

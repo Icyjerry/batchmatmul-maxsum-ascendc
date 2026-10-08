@@ -35,3 +35,5 @@
 只在Pass15且C9<=57.375μs（近期未改最低67.50的85%）时原样复测确认，否则不原样复测、不扫邻近lane/PK/tile；若无明确收益恢复完整a2e6763。真实dtype/layout/SoC/route/profile没由API提供，不能由耗时推断。整体冲榜目标未完成。
 
 Raw忽略artifacts/c9-stream-max/cpu.log、cpu-initial-fault-miss.log，目录700/文件600。
+
+实现 **ec40e0e** 已推送；唯一正式任务 **6ac7e2f8694b590c3c2010c5** 已创建一次。371179B/SHA8c23062f，native PENDING；只查询同ID。
