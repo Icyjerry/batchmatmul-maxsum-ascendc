@@ -2,7 +2,7 @@
 
 - Branch experiment/c1-literal-dot, kernel370984B/SHAb8ab2f9faa564a99d40fcbf93a6b4ee922c42d5cbf82c12ab679a3ff15e3d79c. Parentwholea2e6763 retained.47addedkernel lines: fixed544B/threeGMargkernel/exactshape-resource-pins guard/aligneddispatch, restsource/Plan/GMunchanged.
 - CPU512actualliteral/parentpairs, production&TUNING7776actualplans+launch/24hits, fivealias/overread/overwrite/readiness/completion controlsPASS. Integerencoding/synchronousVector/faketilerlimits; [C1_LITERAL_DOT_AUDIT](C1_LITERAL_DOT_AUDIT.md). Traffic/FLOPs/launch unchanged, onlysetup/prologue hypothesis.
-- NativePENDING/noID. NEXTcommit/pushthenONEformaljob/private/tmp/bmmms-c1-literal-dot/project,saveuniqueID/querysameIDtoterminal. Dry-runonly370984B/b8ab2f9fkernel,protected7verified.
+- Implementation7925ee2pushed; uniqueformaljob **6ac7ce8e694b590c3c14baa6** createdonce. NativePENDING; NEXTquerysameIDtoterminal, neverresubmitonobservationtimeout. Dry-runonly370984B/b8ab2f9fkernel,protected7verified.
 - Predeclaredlarge-localconfirmation: all15Pass/C1<=1.6065us (15%belowrecentfastest1.89) permitsONEunchangedconfirmation; modestgain no repeat. Notoverallgoalcompletion/guaranteedTbestfloor. Nogain/regressionrestorewholea2e6763/noadjacentK/batch/UBscans.
 - FailedC10fullM74f9937/178.32,latecredit44d25e2/92.84,directA235480f2/92.98excluded. CurrentC10balanced/C8phasedA/C13framepreserved. NoWeb/subagents/newGM/main/tagschanges,goalactive/incomplete.
 

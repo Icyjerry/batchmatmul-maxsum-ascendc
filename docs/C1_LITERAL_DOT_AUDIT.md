@@ -47,3 +47,5 @@ UseLiteralDot queriesactualUB/AIV andrequiresUB>=544/AIV>0, originaldual15/final
 FormalCANN9compile/FP16-BF16precision/actualroute/SoC/profile/latencyPENDING. No guarantee1.18us referencefloor; compiler mayalreadyeliminateequivalentsetup andphysicalUBreservation not proven. Rawignoredartifacts/c1-literal-dot/cpu.log dir700/file600.
 
 Finalisolated/private/tmp/bmmms-c1-literal-dot/project protected7restored1734f16; dry-runonly370984B/b8ab2f9fkernel. Nextcommit/pushthenONEgate,saveIDbeforepolling. Large-localconfirmationcriterion beforeseeingresults: all15Pass andC1atleast15%belowfastestrecent1.89us (<=1.6065us) justifiesONEunchangedconfirmation; modestgain no repeat/nearbyvariants. Thiscriterion isnotcompletionoftheoverallcompetitiongoal or proof ofstablecausalperformance. No benefit/regressionrestorea2e6763.
+
+Implementation **7925ee2** pushed; uniqueformaljob **6ac7ce8e694b590c3c14baa6** createdonce. Same370984B/SHAb8ab2f9f. NativePENDING, querysameIDtoterminal.
