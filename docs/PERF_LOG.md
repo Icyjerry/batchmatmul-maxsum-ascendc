@@ -1069,3 +1069,6 @@ CPUproduction&TUNING2592plans/6hits each;1452actualAIV+parent+actualFinalizeRows
 总计 **456.61μs**，最新用户Tbest重算均分 **52.50620586**（非实时排名）。C9 **67.62μs** 落在保留路径近期 **67.50–69.04μs**范围内；没有明确收益，未满足57.375μs复测门槛。其余变动含C10=93.52完整保留，不归因于此次Vector改动。
 
 源码CPU横向调用768->96并未建立实际速度改善；native API编译/精度通过不能证明该hidden case实际命中新guard。没有SoC/route/profile/同机A-B，不能断言Vector成本低或由哪个单元主导。无原样复测或邻近lane/package/tile扫描。下一步完整恢复a2e6763/368782B/SHA16b51684，将实现/CPU/原始反例留在本分支；main/标签不动，整体目标未完成。Raw忽略artifacts/c9-stream-max/official.json。
+
+
+Whole a2e6763 restored on experiment/c9-b-package-stream-audit. New Cube B cross-tile FIFO arithmetic audit: 15120 worker sequences/83328 packets exact old ordering; conditional20cores C9 same960DMA/31457280sourceelements, startup384->40 (344 moved earlier, not eliminated). Different from historical Vector consumer prefetch and archived lane Max. Actual changed producer/protocol/native compile/timing PENDING, no job. Next deferred-MTE1 reader model before exact-guard implementation gate; details C9_B_PACKAGE_STREAM_AUDIT. Main/tags untouched.

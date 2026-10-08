@@ -1,9 +1,9 @@
-# C9 streaming Max terminal — archive, restore passed baseline next
+# C9 B package stream audit — passed kernel restored
 
-- Branch experiment/c9-stream-max，implementationec40e0e，kernel371179B/SHA8c23062f。唯一 **6ac7e2f8694b590c3c2010c5** 已结束：Pass15/allprecision1，C9 **67.62μs** 在父路径近期67.50–69.04范围内，无明确收益/无复测。
-- actualCPU 1452new/parent AIV+FinalizeRows、host2592plans/6hits、9faultcontrol通过；第一次Nmask漏检已加强模型并保留raw初始log。横向API减少未产生已证明的速度收益；real SoC/route/profile缺失，不能由这个结果推断Vector瓶颈。
-- NEXT 归档终态commit/push后新分支恢复完整a2e6763/368782B/SHA16b51684，不保留新STREAM_MAX guard/state/template。后续选择一次真正结构性的数据准备/核心负载假设，先查PERF_LOG历史反例，禁止重做C8 tailbalancing/输入resident swaps、C9 persistentlane/附近scan、C12 packedNZ/doublepack或已做的C6 queue removal。
-- 无活动任务。详情 [C9_STREAM_MAX](C9_STREAM_MAX.md)，raw忽略artifacts/c9-stream-max/{cpu.log,cpu-initial-fault-miss.log,official.json}。main/标签未动，整体目标未完成。
+- Current branch experiment/c9-b-package-stream-audit; whole kernel restored a2e6763 /368782B/SHA16b51684, retaining C10 balanced ownership, C8 phased A and C13 frame. C9 lane Max implementation/source/result archived a07150f/ec40e0e (Pass15/C9=67.62us/no gain).
+- New executed arithmetic audit: 15120 sequences/83328 packets exact FIFO/tail/task/batch ordering. Conditional20-core C9 old startup384 -> one-time40, 344 existing DMA calls moved earlier, NOT removed; same960packets/31457280elements. No new kernel implementation/native job yet.
+- NEXT implement exact C9 persistent two-slot Cube B FIFO and validate actual producer with deferred MTE1 readers, MTE2, MMAD, original AIV/finalizer, host guards and fault controls. Cross-task B prefetch may delay A refresh; no performance claim until native. See [C9_B_PACKAGE_STREAM_AUDIT](C9_B_PACKAGE_STREAM_AUDIT.md).
+- No live tasks; no unchanged-best repeat pending. Do not repeat failed C8 tail balancing/resident swaps, C9 lane Max, C10 full-M/late-credit/direct-A2/FF-package scans or C6 already-removed queues. CPU/native/profile evidence separate. Overall goal incomplete.
 
 ## 先读与规则
 
@@ -14,7 +14,7 @@
 
 ## 保留版本与已结束实验
 
-- 当前实验父 af886e1：kernel365948B/SHA b87ec006，正式6ac7a921694b590c3cf97c01 Pass15，C8=44.09（单次 modest local gain）。保留 C13 resident frame（7492776），正式12.62/13.19；main/历史标签未推广。
+- 较早父 af886e1：kernel365948B/SHA b87ec006，正式6ac7a921694b590c3cf97c01 Pass15，C8=44.09（单次 modest local gain）。保留 C13 resident frame（7492776），正式12.62/13.19；main/历史标签未推广。
 - 用户要求一次原样最佳提交6ac77103694b590c3ccaa29e已完成Pass15，没有待复测请求。较早5次重复也全部完成。
 - FF B_PACKAGE192：experiment/c10-ff-b-packages/3a0e9c1，实现fd23d39，任务6ac7aefd694b590c3cfe44d9 Pass15/C10=97.06在旧96.98–100.24范围内，无明确收益，已全部移出当前kernel。不扫描附近B包。
 - C8 full-input单B包任务6ac77690694b590c3ccea247 Pass15但54.17回退，已归档；C6纯Vector24.24回退；C4Cube7.81回退；C11 exact TT gate87.16无明确收益。都不原样重交或邻近扫参。
