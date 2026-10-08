@@ -1043,3 +1043,11 @@ CPUactualproduction&TUNING3024plans/4hits each; all8..32cores2393tasks versusind
 总计 **464.47 μs**，按最新用户Tbest重算均分 **51.81580052**（非实时排名）。C8 **56.78 μs**，比父近期43.66–45.83明显慢；相对于父单次43.66增加30.05%。没有满足预先设定的37.111μs复测门槛。C10=89.53等未改算法分支的变化不归因于本实验；默认TT新增16B参数的影响也无法在缺少profile/受控同机A-B时分离。
 
 不原样复测、不扫邻近分片或核数。保留全部反例，恢复完整a2e6763（368782B/SHA16b51684），不带入新helper/metadata/launch。数学负载下降并未证明硬件收益；无法仅凭此次测评确定回退由B搬运、scalar mapping、MMAD或同步哪部分导致。原始结果忽略 artifacts/c8-balanced-tail-frame/official.json。无活动任务，main/标签不动，整体冲榜目标未完成。
+
+## Baseline restored; independent C9 streaming Max assessment
+
+Wholea2e6763 restored368782B/SHA16b51684 onexperiment/c9-stream-max-audit; C8balanced-tailarchived940ec4e/1cb15f9/native6ac7d7afPass15but56.78clearregression, no confirmation/variants. Itsnewmetadata/helper/ABIremoved.
+
+CurrentC6historicalBF16/FTdirect pathalreadyLocalTensor/noTPipe/fullKPoneMMAD/directsingleAIV: proposedqueue/frame deletionisalreadyimplemented andthereforerejectedbeforecoding/submitting;sourcecorrectsTT assumption. Historicaltinyrawtranspose/storage/Brcb/Ktree/staticFT/literal failuresremainexcluded.
+
+ExecutedactualcurrentMakePlan/MakeCase9PackagePlan +sourceVectorgeometry arithmeticfor8/20/24/32cores, fake tiler. C9 B1/M2048/N1536/K1280FP16/FTconditional: BM/BN/BK128/128/128/Bpackage256, Nsplit1/3/1/12. OriginalwholeMaxAPIs768each, persistent64laneswould32/96/32/384. OldUB67104B +newlanes16384 +reserve4096 fitsfake192KiB. New768lane-MaxAPIs process64xmoreelementsthantheoldrow-Max; extraUBstate/trafficrisknotlatency claim. NoC9kernel/nativecandidate yet. C9_STREAM_MAX_AUDIT givesactualFIFO/tail/credit/finalizer/pinmodel workbeforeonegate;confirmationonlyPass15/C9<=57.375us. Rawignoredartifacts/c9-stream-max-audit/host.log. No livejob/main/tagchanges, goalincomplete.

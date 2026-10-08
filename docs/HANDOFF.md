@@ -1,9 +1,11 @@
-# C8 balanced-tail experiment terminal — restore passed baseline next
+# Passed baseline restored; C9 streaming Max source audit next
 
-- 分支 `experiment/c8-balanced-tail-frame`，实现1cb15f9，候选372771B/SHAaa2aabc1。唯一正式任务 **6ac7d7af694b590c3c1a2cb8** 已结束：Pass15/allprecision1，C8 **56.78μs**，比保留版近期43.66–45.83明显慢。没有满足37.111复测门槛，不重复/扫附近分片。
-- CPU actual tasks/producer/AIV/pin/guards全部通过，但平衡 padded area、减少最慢核 small-MMAD barrier仍没有产生硬件收益。B+22.07%/Ctasks+19.75%是保留风险；真实原因没有profile不能定论。
-- NEXT 归档终态后换新实验分支，**恢复完整a2e6763**/368782B/SHA16b51684；不能保留新TT metadata/helper/ABI。下一条独立源码审计：C6小TT矩阵原DIRECT_BATCH TPipe/队列/同步与完整输入驻留frame；不重试已失败纯Vector二行乘积路径，不扫K/package参数。
-- 没有活动正式任务。全部15耗时和局限 [C8_BALANCED_TAIL_FRAME](C8_BALANCED_TAIL_FRAME.md)，raw忽略artifacts/c8-balanced-tail-frame/official.json。C1/C10失败已在父版排除，main/标签未动，目标未完成。
+- 当前分支 `experiment/c9-stream-max-audit`。**完整a2e6763 kernel已恢复**：368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94。C10balanced/C8phasedA/C13resident保留；全部失败实验不带入。
+- C8 balanced-tail已归档 `experiment/c8-balanced-tail-frame` /940ec4e（实现1cb15f9）。唯一6ac7d7af694b590c3c1a2cb8 Pass15/C8=56.78，明显慢于43.66–45.83。没有复测；新owner/helper/ABI全部撤回，raw忽略artifacts/c8-balanced-tail-frame/official.json。
+- C6源码核对否定queue-removal/fullK-frame假设：BF16/FT历史条件下已是DIRECT_BATCH=true，手动LocalTensor、完整KP单MMAD、单AIV直接输出。不是TT、不是BN96。勿重复已实现方向/失败纯Vector。
+- 新执行 `tools/audit_c9_stream_max.py` 四种核心actualhost/source算术；当前C9 packages AIV仍每64列chunk横向归约。20核现768次WholeReduceMax，streaming lane state预计96次，extraUB16KiB，旧67104B；新Max读写量更多，收益未知。仅源码/假tiler算术，无新kernel候选/任务。
+- NEXT [C9_STREAM_MAX_AUDIT](C9_STREAM_MAX_AUDIT.md)：只改C9 Vector任务内64lane持久Max/末尾横向fold，保留原Cube/输入/Plan/GM。执行真实FIFO AIV/c/padding/credit/partial/finalizer/pin模型，CPU过再ONE正式gate；Pass15且C9<=57.375us才复测。不要重新包装历史tinytranspose/Ktree/附近scan。
+- 无活动任务，main/历史标签未动，目标仍未完成。当前改动仅恢复kernel及独立审计/docs；下一次从上述可执行动作接续。
 
 ## 先读与规则
 
