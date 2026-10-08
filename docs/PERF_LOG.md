@@ -941,3 +941,25 @@ Task **6ac7b3c8694b590c3c0218c4**, implementation a2e6763 / SHA16b51684 / 368782
 Total **457.04us**, newest user Tbest calculated mean **51.45446223**, not a live rank. C10=91.53, 5.62% below the prior unchanged-C10 range minimum96.98 (range96.98-100.24), and8.06% below the most recent parent99.56. Consistent with the ownership hypothesis but only a single observation: no bound-device A/B, route hit or profiling. Not stable causal proof or a large whole-competition breakthrough. Adverse C2=2.87 retained; its independent tiny route was unchanged. Extra C8=43.66 fluctuation is not attributed to this C10 edit.
 
 Keep this passed candidate as the experimental forward baseline; main/historical tags unchanged. User requires large gains before repeats, so no unchanged confirmation or neighboring ownership scans. Native15 precision passed, full A2/A3 coverage/SoC/all envelope/stable performance still unproven. No live tasks. Raw JSON ignored artifacts/c10-balanced-m-shards/official.json. Passed parentaf886e1 remains recoverable.
+
+## C10 full M shard: CPU-verified candidate
+
+Parenta2e6763，branch experiment/c10-full-m-shard，kernel370786B/SHA f2ea9e355ad98709a3c1c0a4cce72d1ccc6bb8c8067624e7236ffdddd13eef78，39additions/1removed。完整M分段复用B，条件4096/1280/1152/20cores在实际容量下选M208/N144/K64；oldPlan/arena/device/Vector/其余launch不变。实际抽取Cube Breads58982400→29491200，Ctiles200→180，MMAD3600→3240，A2元素23592960→42467328。速度PENDING，A2增加80%可能抵消收益。
+
+CPU8producer/160ownership+actualFinalizeRows/912actualManualCopyC+treeMax/生产&TUNING各1120hostplans31hits/四controls PASS。BF16精度/native队列契约/实际route/SoC/profile不由整数模型证明。完整逆向等于a2e6763，protected7等于1734f16。最终隔离dry-run只有370786B/f2ea9e35kernel。尚无正式ID；仅创建一个gate，无收益恢复a2e6763，不扫相邻N。完整说明C10_FULL_M_SHARD，rawCPU ignored artifacts/c10-full-m-shard/cpu.log。
+
+Implementation **c1a52ef** 已push；唯一正式任务 **6ac7bcb6694b590c3c08ce0e** 创建成功，同370786B/SHA f2ea9e35。Native PENDING；仅查询该ID，不重交。
+
+## Native terminal: Pass15, clear regression, archived
+
+Unique task **6ac7bcb6694b590c3c08ce0e**, implementation **c1a52ef**, kernel370786B/SHA f2ea9e35. Formal compile and15/15 precision passed, allprecision_ratio=1. Timesus:
+
+`[1.89, 2.9, 3.28, 3.97, 5.42, 9.86, 8.0, 44.43, 67.96, 178.32, 88.39, 97.17, 13.14, 11.03, 9.57]`
+
+Total **545.33us**, latestuserTbest calculatedmean **49.13404004**, notlive rank. C10 **178.32us** vsparent91.53us is **94.82% slower**, also clearly aboveolder96.98-100.24 range. Do not retain this candidate. No identicalrepeat or nearbyN/BM scans. All adverse C2=2.90/C3=3.28/C8=44.43 etc retained; unmodifiedroute changes notattributed.
+
+CPU Breads-50%/Ctiles-MMAD-10%/totalL0elements-12.857% didnot establish hardware speed. A2+80%, largerM/nearlyfullL1/consumer andpipeline costs are diagnostic clues only, not measured bottlenecks. Actualroute/SoC/profile/bounddevice A-B unavailable. Raw ignored artifacts/c10-full-m-shard/official.json.
+
+Archive this experiment, restore wholepassed **a2e6763** (368782B/SHA16b51684), retaining balanced ownership/C8phasedA. Main/historicaltags untouched, overallgoal remains incomplete.
+
+Restored wholea2e6763/368782B/SHA16b51684 onexperiment/c10-pipeline-audit. FailedfullM source/models retained74f9937 onexperiment/c10-full-m-shard; terminaldocs carriedforward. No activejob/repeat/nearby scans. Nextsource pipeline audit only; no newoptimization yet.

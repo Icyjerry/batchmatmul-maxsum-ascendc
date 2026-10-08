@@ -1,10 +1,9 @@
-# Current passed experimental baseline: C10 balanced M shards
+# Current passed baseline restored; next C10 pipeline audit
 
-- Branch experiment/c10-balanced-m-shards, implementationa2e6763, kernel368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94. Parentaf886e1/C8 phased-A retained.
-- Native6ac7b3c8694b590c3c0218c4 terminalPass15/allprecision1, C10=91.53 vs prior96.98-100.24: single local improvement, not stable/causal/large overall breakthrough. Full15 including adverseC2 in [C10_BALANCED_M_SHARDS](C10_BALANCED_M_SHARDS.md). Total457.04/latestTmean51.45446223, not live rank.
-- Keep forward experimental baseline; main/tags untouched. No live tasks, no unchanged confirmation or nearby partition scans. Complete-N maxima/oldPlan/GM/Vector arithmetic preserved.
-- CPU13Cube/96ownership-store+actualFinalizeRows/production&TUNING192host9hits/sixcontrols pass. Fake tiler/synthetic maxima/native queue limits explicit; native route/SoC/profile remain unknown.
-- NEXT independent hypothesis: when whole owned M fits one L0C, remove the second M microtile's duplicate B input. At supplied4096/1280/1152/20cores, max208rows: fullM208/N128/K64 predicts L1A479232+doubleB32768+aq1024=513024, L0A53248/B32768/C106496. Original arena has space. Same200C/3600MMAD as current two-M-microtile/N256, expectedBreads half, A2reads double, totalL0operand reads slightly lower. Must execute actual resource/address/C/halfM104rowAIV stores/GMprefix/finalizer models first; NOT implemented or submitted. This removes repeated B input through whole-M ownership, no neighboring partition scan/newGM allocation.
+- Branch experiment/c10-pipeline-audit, kernel wholebyteequal a2e6763, 368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94. C10balanced ownership/C8phased-A/C13resident frame retained.
+- Full-M candidate archived74f9937 onexperiment/c10-full-m-shard (implementationc1a52ef/SHAf2ea9e35). Unique6ac7bcb6694b590c3c08ce0e terminalPass15/allprecision1, C10=178.32 vsparent91.53us (+94.82%). Full15/CPU counts/limits in[C10_FULL_M_SHARD](C10_FULL_M_SHARD.md). Models stayarchivedbranch, no live tasks/no repeats.
+- Breads-50%/Ctiles-MMAD-10%/A2+80% didnot produce speed. NEXT independent source audit: original FF actualA2 loads/event waits; identify reuse/protocol changes with definite source work reduction before editing/submitting. Do not scan near failedwholeM/Nwidths ordeclare actualMTE1/L1 bottleneck from latency.
+- Parent6ac7b3c8694b590c3c0218c4 Pass15/C10=91.53 singlelocalimprovement remains experimentalforwardbaseline. Main/tags unchanged; wholecompetition goal incomplete.
 
 ## 先读与规则
 
@@ -25,6 +24,6 @@
 
 - 题目6a9aa054bf41025d6014f3ef。CLI `/private/tmp/cannjudge_cli.py`，查询 `/private/tmp/query_bmmms_submission.py ID`；同一live ID轮询至终态，等待超时不可重交。
 - CLI消失时公开源码可由忽略artifacts/tooling/cannjudge-submit恢复；受保护七文件从1734f16恢复，候选kernel隔离提交，dry-run核对SHA/只kernel。
-- 当前实现a2e6763，任务记录17e4eec已push。每次记录uniqueID/终态、更新本文件/PERF_LOG，push当前分支。
+- 当前候选实现和uniqueID每次分别commit/push。每次记录终态、更新本文件/PERF_LOG，push当前分支。
 - CPU/native/profile分开报告；正式case命中、SoC/profile未知时不能从耗时反推。原始logs/JSON放忽略artifacts目录700/file600。
 - 最新用户Tbest=[1.18,1.54,2.13,2.37,3.57,6.38,6.37,13.88,48.30,64.85,67.87,80.65,7.31,7.59,7.84]μs；100/(1+log1.5(t/T))逐点平均，不代表实时排名，不拼接不同job最小值。
