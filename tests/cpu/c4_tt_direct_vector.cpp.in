@@ -1,0 +1,33 @@
+unsigned consumers=0;
+void Run(Schedule s,bool neg){
+ const uint32_t mp=s.baseM,np=s.baseN;const uint32_t prefix=(s.b*mp+127)/128*128;
+ std::vector<float> gm(prefix+s.b*2*mp*np,1e30f),y(s.b+16,1e30f);
+ for(int64_t z=0;z<s.b;++z)for(uint32_t m=0;m<mp;++m)for(uint32_t n=0;n<np;++n){
+  float v=(m<s.m&&n<s.n)?(neg?-float(1+(z*13+m*3+n*5)%29):float(int((z*13+m*3+n*5)%59)-29)):1e30f;
+  gm[prefix+z*2*mp*np+m*np+n]=v;
+ }
+ auto before=gm;AscendC::globals.clear();AscendC::globals[reinterpret_cast<uintptr_t>(gm.data())]=gm.size()*4;
+ AscendC::globals[reinterpret_cast<uintptr_t>(y.data()+8)]=s.b*4;AscendC::writes.clear();
+ for(int64_t z=0;z<s.b;++z)for(uint32_t sub:{1u,0u}){
+  AscendC::block=z*2+sub;AscendC::ready=1;AscendC::manualBytes=0;AscendC::lastBytes=0;
+  AscendC::ub=std::make_shared<std::vector<uint8_t>>(192*1024,0x7f);
+  if(s.n==16)bmmms_single_tile_direct_batch<int16_t,true,true,16,16,0,true>(nullptr,nullptr,gm.data(),y.data()+8,s);
+  else bmmms_single_tile_direct_batch<int16_t,true,true,16,32,0,true>(nullptr,nullptr,gm.data(),y.data()+8,s);
+  assert(AscendC::ready==0&&AscendC::dma.empty()&&AscendC::outDma.empty());
+  if(sub)assert(AscendC::manualBytes==0&&AscendC::lastBytes==0);
+  for(auto f:AscendC::flags)assert(f.second==0);++consumers;
+ }
+ for(int64_t z=0;z<s.b;++z){float gold=0;
+  for(uint32_t m=0;m<s.m;++m){float mx=-INFINITY;
+   for(uint32_t n=0;n<s.n;++n)mx=std::max(mx,before[prefix+z*2*mp*np+m*np+n]);gold+=mx;
+  }
+  assert(y[8+z]==gold&&AscendC::writes.at(reinterpret_cast<uintptr_t>(y.data()+8+z))==1);
+ }
+ assert(gm==before);for(int i=0;i<8;++i)assert(y[i]==1e30f&&y[8+s.b+i]==1e30f);
+}
+int main(){
+ for(int B=4;B<=7;++B)for(int M=8;M<16;++M)for(int N=16;N<32;++N)for(bool neg:{false,true}){
+  Schedule s{B,M,N,184,16,(uint32_t)((N+15)/16*16)};Run(s,neg);
+ }
+ std::cout<<consumers<<" actual C4 AIV entries: whole M/N range, negative maxima, padded poison, idle companion, unique exact4B y and guards, terminal DMA PASS\n";
+}

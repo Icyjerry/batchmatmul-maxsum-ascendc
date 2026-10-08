@@ -2,15 +2,16 @@
 
 ## 当前代码与正式任务
 
-- 当前experiment/c13-manual-frame候选92c3654f/365034bytes已终态，任务6ac733cd694b590c3c9b7892 Pass15/15、precision全1。C13=16.00μs，没有明显收益（父最近五次14.94–16.74，中位15.13），归档、不重复/扫描。详情[C13_MANUAL_FRAME](C13_MANUAL_FRAME.md)。
-- 总468.56μs、最新Tbest计算均分50.61753；无实际隐藏shape/plan/SoC/profile，未改动路径耗时变化不归因于本轮。没有活动任务。
-- 下一从正式通过1734f16/a5eef105/354602bytes恢复，新独立C4 TT路由复用现有single_tile_direct_batch<...,true>，置于SmallVector前；仅在原GM/capacity/core/tuning范围内。先actual-host与TT物理模型，再正式唯一结构gate。尚未实现C4。
+- 当前experiment/c4-tt-direct-cube；先恢复完整通过1734f16后仅新增C4 host/routing40行，kernel356697bytes/SHA e30524ac5ffa748457f3e0c10712251366083c1ff8349341bf0d0c0c38d69664。复用现有TT DIRECT_BATCH Cube，不增加device/API/GM，完整核数/内存/原计划及TUNING准入。详情[C4_TT_DIRECT_CUBE](C4_TT_DIRECT_CUBE.md)。
+- CPU768producer配置/11264AIVentries/production与TUNING各32768host计划、18432命中；whole-parent和保护7通过。整数模型不是nativeBF16；CANN/精度/性能PENDING。独立模板/private/tmp/bmmms-c4-tt-cube-official/project dry-run仅kernel/SHA一致。
+- 下一commit/push，唯一正式结构gate；取得ID立即记录，查询同ID至终态，全部15点/新Tbest计分。明显大收益才原样确认，不能因观察超时重复创建；无收益归档、不扫附近参数。当前无活动任务。
+- C13手动frame任务6ac733cd694b590c3c9b7892已Pass15/15，但C13=16.00在父波动内，无明显收益，已归档5be8af1。当前不带该候选。整体目标仍未完成。
 
 ## 最新计分参考与差距
 
 用户最新Tbest：`[1.18,1.54,2.13,2.37,3.57,6.38,6.37,13.88,48.30,64.85,67.87,80.65,7.31,7.59,7.84]`μs。用 [SCORE_REFERENCE_1008](SCORE_REFERENCE_1008.md)，100/(1+log_1.5(t/Tbest))后15点平均。用户榜首Young耗时重算82.15390，与82.15一致；通过版最新6ac0d57f重算50.99873。旧56.42050/50.x分数均属各自旧参考，耗时/精度未改。
 
-相对用户提供的最新榜首行，最近五次同SHA逐点中位差距排序C4/C2/C3/C6/C1/C10。C13候选已进入可验证阶段，本次完成其唯一结构 gate；后续按新优先级。没有实时榜单/实际SoC/隐藏shape/plan/profile，不凭case号证明新路径命中。
+相对用户提供的最新榜首行，最近五次同SHA逐点中位差距排序C4/C2/C3/C6/C1/C10。C13唯一结构gate已结束无收益；当前按新优先级推进C4。用户最新前十快照见[LEADER_REFERENCE_1008](LEADER_REFERENCE_1008.md)，重算均吻合显示分。没有实时榜单/实际SoC/隐藏shape/plan/profile，不凭case号证明新路径命中。
 
 ## 最近结束、不能重复的实验
 

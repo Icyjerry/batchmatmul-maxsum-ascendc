@@ -1,0 +1,28 @@
+unsigned producers=0;
+template<bool X,bool Y>void RunCube(uint32_t batches,uint32_t M,uint32_t N,uint32_t K,bool neg){
+ Schedule s{batches,M,N,K,(M+15)/16*16,(N+15)/16*16,1,1,1,2,0,0};
+ negativeInput=neg;st={};st.s=s;st.tx1=X;st.tx2=Y;
+ std::vector<int16_t> a(s.b*M*K),b(s.b*N*K);uint32_t prefix=(s.b*s.baseM+127)/128*128;
+ std::vector<float> scratch(prefix+s.b*2*s.baseM*s.baseN,1e30f),out(16,1e30f);
+ for(int64_t z=0;z<s.b;++z)for(uint32_t k=0;k<K;++k){
+  for(uint32_t m=0;m<M;++m)a[z*M*K+(X?k*M+m:m*K+k)]=A(z,m,k);
+  for(uint32_t n=0;n<N;++n)b[z*N*K+(Y?n*K+k:k*N+n)]=B(z,k,n);
+ }
+ auto oldA=a,oldB=b;AscendC::registry.clear();
+ AscendC::registry[reinterpret_cast<uintptr_t>(a.data())]={a.size()*2,true};
+ AscendC::registry[reinterpret_cast<uintptr_t>(b.data())]={b.size()*2,false};
+ AscendC::registry[reinterpret_cast<uintptr_t>(scratch.data())]={scratch.size()*4,false};
+ for(int64_t z=0;z<s.b;++z){
+  AscendC::block=z;AscendC::ranges.clear();AscendC::targets.clear();
+  st.expected.push_back({z,0,0,M,N,0,size_t(prefix+z*2*s.baseM*s.baseN)});
+  if(N==16)bmmms_single_tile_direct_batch<int16_t,true,true,16,16,0,true>(a.data(),b.data(),scratch.data(),out.data(),s);
+  else bmmms_single_tile_direct_batch<int16_t,true,true,16,32,0,true>(a.data(),b.data(),scratch.data(),out.data(),s);
+  assert(AscendC::dma.empty());for(auto e:st.events)assert(e.second==0);
+ }
+ assert(a==oldA&&b==oldB);for(auto y:out)assert(y==1e30f);assert(st.fixes==s.b);++producers;
+}
+int main(){
+ for(uint32_t B:{4u,7u})for(uint32_t M:{8u,11u,15u})for(uint32_t N:{16u,17u,23u,31u})
+ for(uint32_t K=128;K<256;K+=8)for(bool neg:{false,true})RunCube<true,true>(B,M,N,K,neg);
+ std::cout<<producers<<" actual C4 TT Cube configurations: all K8, M/N tails, input immutability, every valid C, physical NZ/ZZ/ZN and L1/L0 limits PASS\n";
+}

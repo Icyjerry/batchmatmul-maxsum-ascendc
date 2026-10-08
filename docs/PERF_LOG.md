@@ -809,3 +809,7 @@ C13 implementation59c59e2 pushed; unique formal task6ac733cd694b590c3c9b7892 cre
 [2.02, 2.54, 3.1, 4.14, 5.09, 9.72, 8.16, 45.99, 67.71, 98.7, 88.42, 96.59, 16.0, 10.76, 9.62]
 
 总耗时468.56μs；最新10月8日Tbest重算均分50.61753。C13=16.00μs，父最近五次14.94–16.74、中位15.13；没有明显收益，不原样确认或附近参数扫描。其它点变化不归因于C13路径。没有实际隐藏shape/plan/SoC/profile，不能证明路径命中或硬件全shape安全。原JSON在忽略artifacts/c13-manual-frame/official.json，摘要保留。候选及模型留在experiment/c13-manual-frame，后续从通过1734f16恢复独立C4方向。
+
+## 2026-10-08: C4 TT direct Cube routing ready
+
+Parent restored whole1734f16; candidate356697bytes/SHAe30524ac5ffa748457f3e0c10712251366083c1ff8349341bf0d0c0c38d69664, only40lines/twoadditions. Existing TT DIRECT_BATCH function reused ahead of SmallVector, full actualcore/capacity/originalworkspace/plan/TUNING guard; no device/API/GM changes. CPU768physicalCube configurations,11264AIVentries, production/TUNING each32768actualhost plans/18432hits, six negative controls rejected (A/B inputready and M/N mask/inputDMA/terminal). Vector model is synchronous and cannot detect missing V_MTE3; no such claim. Protected7 byteequal1734f16, dry-run onlykernel/SHAverified. Native CANN/BF16 precision/latency PENDING, no taskIDyet. Full evidence C4_TT_DIRECT_CUBE.
