@@ -1,8 +1,8 @@
-# C9 B stream candidate — CPU passed, one native gate next
+# C9 B stream native gate running — query same ID
 
 - Current branch experiment/c9-b-package-stream; candidate371544B/SHA8ebc3eaf, parentwholea2e6763. Exact C9 persistent two-slot Cube B FIFO/task-nt-k cursor, same packages/geometry/GM/AIV; 57added/4removed kernel lines. Details [C9_B_PACKAGE_STREAM](C9_B_PACKAGE_STREAM.md).
 - CPU204 producer configurations (new68/parent68/eagerDMA68),1452 unchanged actual AIV+FinalizeRows, production&TUNING2592plans/6hits each,8fault controls passed. Initial model epoch/fault fixtures corrected with failed logs preserved; not native proof. Next tile B issue916 versus0 parent in proxy suite; same bytes.
-- NEXT after commit/push ONE formal gate using /private/tmp/bmmms-c9-b-package-stream/project, dry kernel371544B/8ebc3eaf. No native ID/live jobs yet. Record ID immediately and poll same to terminal. Confirmation onlyPass15/C9<=57.375us; otherwise archive and restorewholea2e6763/no repeats or neighboring scans.
+- 唯一正式任务 **6ac7e87d694b590c3c22f9f2** 已创建一次，implementation **af7fd63** /kernel371544B/SHA8ebc3eaf。CANN/15精度/timing PENDING。NEXT `python3 /private/tmp/query_bmmms_submission.py 6ac7e87d694b590c3c22f9f2`，同ID查至终态，超时不重交。Confirmation onlyPass15/C9<=57.375us；否则归档恢复wholea2e6763，不重复或扫附近参数。
 - No unchanged-best repeat pending. Avoid failed C8 tail balancing/resident swaps, C9 lane Max, C10 fullM/late-credit/directA2/FF-package scans or C6 already-removed queues. Models/native/profile separate. Goal incomplete/main/tags unchanged.
 
 ## 先读与规则

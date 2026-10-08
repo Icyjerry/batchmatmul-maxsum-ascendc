@@ -1077,3 +1077,6 @@ Whole a2e6763 restored on experiment/c9-b-package-stream-audit. New Cube B cross
 ## C9 cross-tile Cube B FIFO CPU candidate
 
 Kernel371544B/SHA8ebc3eafd391c48c3f7242107c7fdd7ee2db2fea85ddfc454227340c68ed7724, experiment/c9-b-package-stream. ExactC9guard/defaultfalse B_STREAM, existing2B1TQue slots and task/nt/k cursor; noGM/ABI/geometry/Plan/AIV changes. CPU68new/68parent/68eagerDMA actualproducer configurations,1452unchangedactualAIV+FinalizeRows, production&TUNING2592plans/6hits each,8fault controls PASS. Initial whole-L0 epoch false alarm and batch/M_FIX fault misses fixed in model/data, failedlogs preserved. B-before-current-Fix proxycounts916new/0parent; same packets/traffic, not time. Implicitqueue protection modeled/Fixpipe synchronous, nativePENDING/noID, dryonlykernel371544B/8ebc3eaf. ONEgateafterpush;confirmationonlyPass15/C9<=57.375us. C9_B_PACKAGE_STREAM gives boundaries/risks.
+
+
+Implementation **af7fd63** pushed; unique formal submission **6ac7e87d694b590c3c22f9f2** created once,371544B/SHA8ebc3eaf. NativePENDING; poll sameID to terminal, no duplicate submit.
