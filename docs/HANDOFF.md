@@ -1,3 +1,7 @@
+# Current phased-A experiment · 2026-10-08
+
+Current experiment/c8-phased-a-ready is a candidate, NOT retained best. See C8_PHASED_A_READY. Native PENDING/noIDyet; nextcommit/push/dry-run thenONE isolatedgate, saveID/querysameIDto realterminal. Actual-source30Cube groups/ninecontrols and2160hostplans/fivehits eachproduction/TUNING pass withinCPUinteger/synthetic scope. AIV/Plan/GM/harness unchanged bywhole-parent proof. Three A1 K regions with ready events preserve B1 double buffering; no nearbyscan of rejected single-B frame. Retained7492776/SHA0794a2bf remains onexperiment/c13-resident-frame; restorewhole onfailed/no-gaingate. User noWeb. Previous goalturn producedverifiedC8 regression/currentturn progressingnewpipeline, notblocked.
+
 # 最新接手状态 · 2026-10-08
 
 ## Current retained code and next executable action

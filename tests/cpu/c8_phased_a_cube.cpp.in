@@ -1,0 +1,48 @@
+void Run(uint32_t M,uint32_t N,uint32_t K,uint32_t BM,uint32_t BN,uint32_t PK,uint32_t workers,bool neg,bool phased){
+ assert(2ULL*BM*((K+15)/16*16)+4ULL*BN*PK<=512*1024);
+ negativeInput=neg;const uint32_t mt=(M+BM-1)/BM,nt=(N+BN-1)/BN,bk=BN==256?64:128;
+ Schedule s{1,M,N,K,BM,BN,mt,nt,nt,workers,0,0};s.window=1;
+ TTFrameShape q{M,N,K,BM,BN,PK,nt,workers};
+ std::vector<int16_t>a(M*K),b(N*K);
+ for(uint32_t m=0;m<M;++m)for(uint32_t k=0;k<K;++k)a[k*M+m]=A(0,m,k);
+ for(uint32_t n=0;n<N;++n)for(uint32_t k=0;k<K;++k)b[n*K+k]=B(0,k,n);
+ auto oldA=a,oldB=b;uint64_t copies=0,mmads=0,as=0,overlap=0;size_t prefix=(nt*mt*BM+127)/128*128;
+ for(uint32_t w=0;w<workers;++w){
+  st=State{};st.s=s;st.tx1=st.tx2=true;AscendC::block=w;AscendC::ranges.clear();
+  uint32_t begin=w*mt*nt/workers,end=(w+1)*mt*nt/workers,acopies=0;int64_t lastM=-1;
+  uint64_t aReads=0,bReads=0;size_t base=prefix+size_t(w)*2*BM*BN;
+  for(uint32_t t=begin;t<end;++t){uint32_t m0=(t/nt)*BM,n0=(t%nt)*BN;
+   uint32_t rows=std::min(BM,M-m0),cols=std::min(BN,N-n0);
+   st.expected.push_back({0,m0,n0,rows,cols,t%nt,base+((t-begin)&1)*BM*BN});
+   if(lastM!=int64_t(t/nt)){++acopies;aReads+=uint64_t(rows)*K;lastM=t/nt;}
+   bReads+=uint64_t(cols)*K;
+  }
+  std::vector<float> scratch(prefix+size_t(workers)*2*BM*BN+16,1e30f);
+  AscendC::registry={{reinterpret_cast<uintptr_t>(a.data()),{a.size()*2,true}},
+   {reinterpret_cast<uintptr_t>(b.data()),{b.size()*2,false}},
+   {reinterpret_cast<uintptr_t>(scratch.data()),{scratch.size()*4,false}}};
+  if(phased)bmmms_tt_manual_frame<int16_t,true>(a.data(),b.data(),scratch.data(),nullptr,q);
+  else bmmms_tt_manual_frame<int16_t>(a.data(),b.data(),scratch.data(),nullptr,q);
+  assert(AscendC::dma.empty()&&AscendC::mte1.empty()&&AscendC::mac.empty()&&AscendC::fix.empty()&&AscendC::targets.empty());
+  assert(st.fixes==end-begin&&st.mmads==uint64_t(end-begin)*((K+bk-1)/bk));
+  assert(st.aCopies==acopies*(phased?3u:1u)&&st.bCopies==uint64_t(end-begin)*((K+PK-1)/PK));
+  assert(st.aLoads==st.mmads&&st.bLoads==st.mmads&&st.aReads==aReads&&st.bReads==bReads);
+  for(auto e:st.events)assert(e.second==0);assert(!st.cross[0]&&!st.cross[1]);
+  for(size_t i=0;i<scratch.size();++i)if(i<base||i>=base+2*BM*BN)assert(scratch[i]==1e30f);
+  copies+=st.bCopies;mmads+=st.mmads;as+=st.aCopies;overlap+=st.overlap;
+ }
+ if(phased&&M>=129&&workers<mt*nt)assert(overlap>0);
+ if(M==1025)std::cout<<(phased?"phased A":"whole A")<<" A/B DMA="<<as<<"/"<<copies<<" MMAD="<<mmads<<" live-A-pending observations="<<overlap<<" PASS\n";
+ assert(a==oldA&&b==oldB&&copies==uint64_t(mt)*nt*((K+PK-1)/PK)&&mmads==uint64_t(mt)*nt*((K+bk-1)/bk));
+}
+int main(){unsigned count=0;
+ for(uint32_t workers:{1u,3u,20u})for(bool phased:{false,true})for(bool neg:{false,true})for(bool eager:{false,true}){
+  AscendC::eagerFix=eager;Run(129,257,1032,128,128,384,workers,neg,phased);++count;
+ }
+ for(uint32_t workers:{3u,20u})for(bool neg:{false,true}){Run(129,129,136,128,128,256,workers,neg,false);++count;}
+#ifndef NEGATIVE_CONTROL
+ AscendC::eagerFix=false;
+ for(bool phased:{false,true}){Run(1025,1031,1032,128,128,384,20,false,phased);++count;}
+#endif
+ std::cout<<count<<" actual producers: disjoint A-region ready, full-K/padded C, live L1/L0/C last reader, cached A and double B/C/ring, immutable inputs/GM/event guards PASS\n";
+}
