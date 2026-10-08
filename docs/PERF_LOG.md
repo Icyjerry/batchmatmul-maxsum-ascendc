@@ -949,3 +949,15 @@ Parenta2e6763，branch experiment/c10-full-m-shard，kernel370786B/SHA f2ea9e355
 CPU8producer/160ownership+actualFinalizeRows/912actualManualCopyC+treeMax/生产&TUNING各1120hostplans31hits/四controls PASS。BF16精度/native队列契约/实际route/SoC/profile不由整数模型证明。完整逆向等于a2e6763，protected7等于1734f16。最终隔离dry-run只有370786B/f2ea9e35kernel。尚无正式ID；仅创建一个gate，无收益恢复a2e6763，不扫相邻N。完整说明C10_FULL_M_SHARD，rawCPU ignored artifacts/c10-full-m-shard/cpu.log。
 
 Implementation **c1a52ef** 已push；唯一正式任务 **6ac7bcb6694b590c3c08ce0e** 创建成功，同370786B/SHA f2ea9e35。Native PENDING；仅查询该ID，不重交。
+
+## Native terminal: Pass15, clear regression, archived
+
+Unique task **6ac7bcb6694b590c3c08ce0e**, implementation **c1a52ef**, kernel370786B/SHA f2ea9e35. Formal compile and15/15 precision passed, allprecision_ratio=1. Timesus:
+
+`[1.89, 2.9, 3.28, 3.97, 5.42, 9.86, 8.0, 44.43, 67.96, 178.32, 88.39, 97.17, 13.14, 11.03, 9.57]`
+
+Total **545.33us**, latestuserTbest calculatedmean **49.13404004**, notlive rank. C10 **178.32us** vsparent91.53us is **94.82% slower**, also clearly aboveolder96.98-100.24 range. Do not retain this candidate. No identicalrepeat or nearbyN/BM scans. All adverse C2=2.90/C3=3.28/C8=44.43 etc retained; unmodifiedroute changes notattributed.
+
+CPU Breads-50%/Ctiles-MMAD-10%/totalL0elements-12.857% didnot establish hardware speed. A2+80%, largerM/nearlyfullL1/consumer andpipeline costs are diagnostic clues only, not measured bottlenecks. Actualroute/SoC/profile/bounddevice A-B unavailable. Raw ignored artifacts/c10-full-m-shard/official.json.
+
+Archive this experiment, restore wholepassed **a2e6763** (368782B/SHA16b51684), retaining balanced ownership/C8phasedA. Main/historicaltags untouched, overallgoal remains incomplete.

@@ -1,10 +1,9 @@
-# Current candidate: C10 full M shard B reuse
+# C10 full-M experiment terminal: regression, restore baseline next
 
-- Branch experiment/c10-full-m-shard，父passed a2e6763/d23ed2e；当前kernel370786B/SHA f2ea9e355ad98709a3c1c0a4cce72d1ccc6bb8c8067624e7236ffdddd13eef78。
-- 原balanced负载划分保留，容量允许时一块C容纳整核M，减少重复B输入。实际容量选择M208/N144/K64（条件目标20核），不固定核数/不新增GM/不改device与Plan。详见[C10_FULL_M_SHARD](C10_FULL_M_SHARD.md)。
-- 最终CPU模型全通过：8实际Cube/160 ownership+FinalizeRows/912实际Max消费者/生产&TUNING各1120host配置31命中/四故障控制。B读取−50%、C块/MMAD−10%、A2+80%；不等于硬件加速。真实dtype/layout/route仍未确认。
-- 实现c1a52ef已push；唯一正式任务 **6ac7bcb6694b590c3c08ce0e** 已创建。Native PENDING，下一条动作：查询这个ID到终态，禁止因等待超时重交。隔离提交370786B/SHA f2ea9e35且只有kernel。
-- 父任务6ac7b3c8694b590c3c0218c4 Pass15，C10=91.53单次局部改善，完整15/不利样本在[C10_BALANCED_M_SHARDS](C10_BALANCED_M_SHARDS.md)。无收益时整份恢复a2e6763。不原样复测小收益，不附近扫参，main/tags未动。
+- Branch experiment/c10-full-m-shard, implementationc1a52ef/SHAf2ea9e35 archived; unique6ac7bcb6694b590c3c08ce0e terminalPass15/allprecision1 butC10=178.32 vsparent91.53us (+94.82%). Full15/CPU counts/evidence limits in[C10_FULL_M_SHARD](C10_FULL_M_SHARD.md). No live tasks.
+- NEXT: createexperiment/c10-pipeline-audit, restorewholekernel a2e6763 (368782B/SHA16b51684), preserve terminaldocs, commit/push. Do not scan near this failedN/BM orrepeatit.
+- CPU Breads half/A2+80% didnot yield hardwaregain; independently audit actualA2 loads/event waits. NoactualSoC/route/profile, no measuredMTE1/L1 bottleneck claim.
+- Parent6ac7b3c8694b590c3c0218c4 Pass15/C10=91.53 singlelocalimprovement remains experimentalforwardbaseline. Main/tags unchanged.
 
 ## 先读与规则
 
