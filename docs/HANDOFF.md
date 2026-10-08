@@ -1,10 +1,10 @@
-# 当前候选：C10 balanced M shards · 2026-10-08
+# Current passed experimental baseline: C10 balanced M shards
 
-- experiment/c10-balanced-m-shards，父af886e1。kernel368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94。60additions/11removed，只kernel算法。按16行划分真实M核区间，保持每行完整Nmax及原Plan/GM。
-- 完整形状20核maxRows256→208；Ctiles/B搬运+25%，收益未证实。CPU13真实Cube/96真实ownership-store-finalizer/生产和TUNING各192host9hit/六控制均通过；fake tiler/合成maxima/nativeTQue假设分开报告。详见 [C10_BALANCED_M_SHARDS](C10_BALANCED_M_SHARDS.md)。
-- 实现a2e6763已push/dry-run；唯一正式任务 **6ac7b3c8694b590c3c0218c4** 已创建。CANN编译/15精度/性能 PENDING，查询同一ID至终态，不能重交。无明显收益则整份恢复af886e1保留C8，不扫附近粒度。
-- get_problem公开API只给testcase_id，get_submission Pass无shape/layout/log；未请求隐藏测试端点。旧FF/TT冲突仍未证实，候选只走既有BF16/FF安全family；没有基于耗时宣称命中。
-- 无Web/新GM/受保护文件改动/main或历史标签移动，一个正式任务在跑。用户CLI/GitHub授权持续有效。上一轮C10 B包已完整归档，无待复测请求。
+- Branch experiment/c10-balanced-m-shards, implementationa2e6763, kernel368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94. Parentaf886e1/C8 phased-A retained.
+- Native6ac7b3c8694b590c3c0218c4 terminalPass15/allprecision1, C10=91.53 vs prior96.98-100.24: single local improvement, not stable/causal/large overall breakthrough. Full15 including adverseC2 in [C10_BALANCED_M_SHARDS](C10_BALANCED_M_SHARDS.md). Total457.04/latestTmean51.45446223, not live rank.
+- Keep forward experimental baseline; main/tags untouched. No live tasks, no unchanged confirmation or nearby partition scans. Complete-N maxima/oldPlan/GM/Vector arithmetic preserved.
+- CPU13Cube/96ownership-store+actualFinalizeRows/production&TUNING192host9hits/sixcontrols pass. Fake tiler/synthetic maxima/native queue limits explicit; native route/SoC/profile remain unknown.
+- NEXT independent hypothesis: when whole owned M fits one L0C, remove the second M microtile's duplicate B input. At supplied4096/1280/1152/20cores, max208rows: fullM208/N128/K64 predicts L1A479232+doubleB32768+aq1024=513024, L0A53248/B32768/C106496. Original arena has space. Same200C/3600MMAD as current two-M-microtile/N256, expectedBreads half, A2reads double, totalL0operand reads slightly lower. Must execute actual resource/address/C/halfM104rowAIV stores/GMprefix/finalizer models first; NOT implemented or submitted. This removes repeated B input through whole-M ownership, no neighboring partition scan/newGM allocation.
 
 ## 先读与规则
 

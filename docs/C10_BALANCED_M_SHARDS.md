@@ -31,3 +31,13 @@
 CANN9编译/硬件TQue契约/BF16指令精度/正式15点/latency/真实route/profile：**PENDING**。无Web。只创建一个正式gate；失败或无明确收益则整份恢复af886e1并保留反例，不扫附近分区粒度。
 
 Implementationa2e6763 pushed; one unique native **6ac7b3c8694b590c3c0218c4**, sameSHA16b51684/368782B, createdonce. NativePENDING; querysameID toterminal, no resubmit.
+
+## Native terminal: Pass15, single local improvement
+
+Task **6ac7b3c8694b590c3c0218c4**, implementation a2e6763 / SHA16b51684 / 368782B. Formal compile and 15/15 precision passed, all precision_ratio=1. Times us:
+
+`[1.9, 2.87, 3.1, 4.13, 5.37, 9.66, 8.02, 43.66, 68.75, 91.53, 88.38, 96.57, 13.02, 10.86, 9.22]`
+
+Total **457.04us**, newest user Tbest calculated mean **51.45446223**, not a live rank. C10=91.53, 5.62% below the prior unchanged-C10 range minimum96.98 (range96.98-100.24), and8.06% below the most recent parent99.56. Consistent with the ownership hypothesis but only a single observation: no bound-device A/B, route hit or profiling. Not stable causal proof or a large whole-competition breakthrough. Adverse C2=2.87 retained; its independent tiny route was unchanged. Extra C8=43.66 fluctuation is not attributed to this C10 edit.
+
+Keep this passed candidate as the experimental forward baseline; main/historical tags unchanged. User requires large gains before repeats, so no unchanged confirmation or neighboring ownership scans. Native15 precision passed, full A2/A3 coverage/SoC/all envelope/stable performance still unproven. No live tasks. Raw JSON ignored artifacts/c10-balanced-m-shards/official.json. Passed parentaf886e1 remains recoverable.
