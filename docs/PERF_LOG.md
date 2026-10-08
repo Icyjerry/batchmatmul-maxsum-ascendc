@@ -901,3 +901,5 @@ Wholekernelrestoredbyteequal7492776/364169B/SHA0794a2bf onexperiment/c13-residen
 ## C8 phased resident-A input ready candidate
 
 Candidate365948B/SHAb87ec00643094e19c3c0433113480791494f8e00771887982a1766276d13e08b,42additions/10removedkernel lines; sameA1regionspublished384/384/264, fullNZ1040pitch, existingdoubleBinput preserved. NoPlan/GM/AIV/harness changes; whole7492776inversepass. CPU2160hostplans/fivehits eachproduction/TUNING,30actualproducer groups withper-byte pendingregions/fullK/paddedC/guards, ninecontrolsrejected. Exactobserved234deferredMAC snapshots withlaterAregionspending (parent0); onlysyntheticpermittedoverlap,nolatencyclaim. Input/MMADsame, DMA269→321(+19.33%), blockedfreshA1032→384rows; addedDMA/events maycostmore. NativePENDING/noIDyet, onegateaftercommit/dryrun, noWeb. FullC8_PHASED_A_READY.
+
+Implementationaf886e1pushed; unique native **6ac7a921694b590c3cf97c01** createdonce. SameSHAb87ec006/365948B, protected7/dry-run verified. NativePENDING; querysameIDto terminal, no resubmit.

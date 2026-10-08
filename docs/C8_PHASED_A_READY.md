@@ -31,3 +31,7 @@ First local harness compile lost existing CrossCore helper declarations while re
 ## Native gate
 
 CANNcompile/native15precision/latency PENDING; noIDyet. Isolatedproject/private/tmp/bmmms-c8-phased-a-official/project, protected7byte-equal1734f16, onlykernel changed. Commit/push/dryrun then ONE native gate; immediatelysaveID andquerysameID to terminal, no timeoutresubmission. Require all15Pass; preserve adverse observations and original C13 gain. OnlyclearlargeC8 observation outside parent range warrants ONE unchanged confirmation. No gain/regression: archiveandrestorewhole7492776, no nearbyphase-size or delaywait scans. SoC/actualhiddenplan/msprof unavailable; report these limits.
+
+## Unique native task created
+
+Implementationaf886e1pushed; task **6ac7a921694b590c3cf97c01** submitted once afterwholeSHA/protected7/dry-run. QuerysameID toterminal, noresubmit. NativePENDING.
