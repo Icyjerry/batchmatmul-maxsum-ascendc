@@ -2,7 +2,7 @@
 
 - Branch experiment/c10-late-ring-credit, kernel368904B/SHAdcf715a21b2ec6fa8ec3ba27f13bd3b00216bbfdba88817103349174ee3b5337. Parenta2e6763/368782B/SHA16b51684 preserved; currentchangesonlyM_BALANCEGMwaitplacement beforeFixpipe. Geometry/Plan/allocator/Vector/math unchanged.
 - CPU13actualCubegroups/fulltarget/negative-tail/defaultfalse, delayedtwo-AIVrelease checks; 96ownership+FinalizeRows,prod&TUNINGeach192plans9hits/fivefaultcontrols PASS. Synthetic blocked164/issued2884work beforecredit versusparentproxy4/0; counts areordering only, nohardwarelatencyclaim. Details[C10_PIPELINE_CREDIT_AUDIT](C10_PIPELINE_CREDIT_AUDIT.md).
-- Native PENDING, noIDyet. NEXT commit/pushthenONEsubmit/private/tmp/bmmms-c10-late-ring-credit/project andsaveuniqueID, querysameIDtoterminal. Dry-runonlykernel368904B/dcf715a2; protected7verified. Nativequeues/precision/route/SoC/profileunknown.
+- Implementation1a56211pushed; uniqueformaljob **6ac7bfcb694b590c3c0ae962** createdonce. NativePENDING; NEXT querysameIDtoterminal, neverresubmitonobservationtimeout. Dry-runonlykernel368904B/dcf715a2; protected7verified. Nativequeues/precision/route/SoC/profileunknown.
 - Full-M failedcandidate74f9937 archived, C10=178.32vsparent91.53; no repeats/nearbyN/BMscans. Parent91.53issinglelocalgain, notstablelargeoverallbreakthrough. Failedlatecredit restoreswholea2e6763. Main/tags untouched,goalactive.
 
 ## 先读与规则

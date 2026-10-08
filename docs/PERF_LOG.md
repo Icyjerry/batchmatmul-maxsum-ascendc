@@ -969,3 +969,5 @@ Source audit complete: FF GMslot credit acquiredbeforeK MMAD thoughonlyFixpipe w
 ## C10 late ring credit CPU candidate
 
 Kernel368904B/SHAdcf715a21b2ec6fa8ec3ba27f13bd3b00216bbfdba88817103349174ee3b5337, branch experiment/c10-late-ring-credit, parenta2e6763. OnlyM_BALANCEGMcreditplacementdeferred untilallKissued/beforeFixpipe; nogeometry/Plan/Vector/allocator/GM/math changes. Actualproducer delayedtwo-AIVrelease sees164blockedacquisitions/2884Kworkissued-executedwhileoldGMowned (fulltarget160/2880); nothardwaretime. Parent12sameproxygroups fourblocked/0work. CPU13producer/96ownership+FinalizeRows/production&TUNING192plans9hits/fivecontrols PASS. Wholeinversea2e6763/protected7proof. Finaldryrunonly368904B/dcf715a2kernel. NativePENDING/noIDyet, ONEgateafterpush; seeC10_PIPELINE_CREDIT_AUDIT. Rawignoredartifacts/c10-late-ring-credit/cpu.log.
+
+Implementation **1a56211** pushed; uniqueformaljob **6ac7bfcb694b590c3c0ae962** createdonce, same368904B/SHAdcf715a2. NativePENDING, querysameIDtoterminal.
