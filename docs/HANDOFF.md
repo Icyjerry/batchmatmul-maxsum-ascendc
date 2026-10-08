@@ -1,5 +1,9 @@
 # 最新接手状态 · 2026-10-08
 
+## 当前正式任务：只查询同一 ID
+
+用户重新登录后CLI dry-run成功，仅kernel.asc /359206bytes /SHA515aa159…，其它七模板源码逐字1734f16。候选代码 `a3c6217` 已推送。正式任务 **`6ac72eaa694b590c3c97d81d`** 已创建；下一执行 `python3 /private/tmp/query_bmmms_submission.py 6ac72eaa694b590c3c97d81d` 查询同ID至真实终态，不重交。终态/精度/性能PENDING。下面“没有任务/登录阻碍”是创建任务前历史状态，已解除。
+
 ## 当前候选与下一动作（优先于下方历史条目）
 
 - 分支 `experiment/tiny-ft-static-frame`，父 `bfd5d0a` / 通过算法 `1734f16`。候选仅 kernel 三处新增92行，SHA256 `515aa1592edbb26252b06b0ec610fc96d7c1353f69347a9e3b92327f39f5e024`，359206 bytes。main/历史标签不动。

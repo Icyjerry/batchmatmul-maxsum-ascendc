@@ -782,3 +782,5 @@ Branch experiment/tiny-ft-static-frame, parentbfd5d0a/algorithm1734f16. New user
 Temporary publicCLI/template files were purged byOS. Restored source template other7 files from1734f16, publicCLI from ignored local tooling cache, no credential read/copy. CLI dry-run failed because saved session expired/damaged; requested user relogin. No native submission created, compile/precision/performance PENDING. Candidate code ready for review/continuation; whole goal incomplete.
 
 User replied logged in; retry still fails before native task creation. Default session metadata (stat only, no content read) last modified October3; requested login via restored CLI or alternate session file path. Native gate still PENDING, no task ID.
+
+CLI login restored; dry-run payload and protected-seven template equality passed. a3c6217 pushed; task6ac72eaa694b590c3c97d81d created once, native result PENDING. Query same ID to terminal; no resubmission.
