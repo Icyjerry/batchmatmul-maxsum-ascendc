@@ -1,3 +1,10 @@
+# 当前已通过版本与已归档 C10 实验 · 2026-10-08
+
+- 当前 experiment/c8-phased-a-ready，kernel 整份逐字节等于 af886e1，365948B/SHA b87ec00643094e19c3c0433113480791494f8e00771887982a1766276d13e08b。保留 C8 单次局部改善44.09及既有 C13 收益，未提升 main/历史标签。
+- C10 FF B 分包实验归档 experiment/c10-ff-b-packages/3a0e9c1，实现 fd23d39。正式6ac7aefd694b590c3cfe44d9 Pass15/全部precision1，但C10=97.06在原路径96.98–100.24内，无明确性能收益，分包代码全部恢复出当前 kernel。完整结果 [C10_FF_B_PACKAGES](C10_FF_B_PACKAGES.md)，CPU模型仅在归档候选上运行，当前源不含其guard。未改路由的波动保留，不因总耗时更低宣称获益。
+- 无在跑任务，不重交/不扫附近 B_PACKAGE。下一条独立行动：从已有正式探针/本地 CANNJudge公开客户端能力核实 C10 storage/dtype/plan；若无合法可见元数据，明确限制，不把 FF/TT 历史冲突当已解决，不再同时堆两个分支。
+- 用户无 Web；仅 kernel算法，保护七文件/Plan/GM，不新增GM。不需要用户重新授权 CLI/GitHub。整体大幅冲榜优化尚未完成；本次完成了一个正式验证的结构假设并排除无明确收益版本。
+
 # Current passed experimental baseline · 2026-10-08
 
 - Current experiment/c8-phased-a-ready, implementationaf886e1/kernel365948B/SHAb87ec00643094e19c3c0433113480791494f8e00771887982a1766276d13e08b. Whole-parentinverse7492776; AIV/Plan/GM/harness unchanged. PhasedresidentAready384/384/264 keepsoriginaldoubleB.
