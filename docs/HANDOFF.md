@@ -5,7 +5,7 @@
 - Branch experiment/c6-vector-pairs from retained53ab5ca/source7492776/C13 SHA0794a2bf. Candidate369131B/SHAa9aff3a8a4f9b0f81dd519d299e7fe213952b2016f79faca82b441c62397789a;90lines/three additions only, whole-parent inverse proven.
 - Exact supplied B13M23N73K192/historicalBF16FT, matching originaldual19 BM32BN80 plan, queryAIV/UB andpins fallback. Two AIVs cache B/halfA, two-row FP32 Vector dots/MaxN/SumM, originalpartialprefix for two scalars, singlebarrier andone4B y/batch; removesCube/C-ring on this point. No extra GM/allocator/planner changes, all oldpaths/C13 intact.
 - CPU production/TUNING3888actualhost plans each/threehits;72queued byte-UB threaded groups/six rejected controls. RawBF16/product alias guarded, full192K/73N/12-11rows, batchseparation/outputguards; integer FIFO model notnativeBF16/hardwarepipeline. Protected7/dry-run passed. [C6_VECTOR_PAIRS](C6_VECTOR_PAIRS.md).
-- NEXT commit/push then oneformal gate, saveID andpollsameIDto terminal; noIDyet/nativegatePENDING. Onlyclearmajor C6benefit warrantsoneconfirmation; otherwisearchive/restore retained7492776, no nearbyparameter scan. Noactivejobyet.
+- Implementationf4907c3 pushed; uniqueformal task **6ac744ee694b590c3ca8ea6c** created. NEXT query SAME ID to realterminal; nativegatePENDING, no duplicate ontimeout. Onlyclearmajor C6benefit warrantsoneconfirmation; otherwisearchive/restore retained7492776, no nearbyparameter scan.
 
 ## Previous retained baseline
 

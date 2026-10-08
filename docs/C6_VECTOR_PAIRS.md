@@ -23,3 +23,5 @@ Reduction constraints checked against official CANN9 [WholeReduceMax](https://ww
 CPU inputs are integers, not encoded BF16; FIFO Vector model cannot expose internal instruction pipeline hazards (all device barriers retained). Barrier drains engines in the model; not a complete native SyncAll proof or timing model. Native BF16 precision15cases and latency PENDING. Protected seven template files byte-identical to1734f16; CLI dry-run only kernel matches SHA. Separate template `/private/tmp/bmmms-c6-vector-pairs-official/project`, raw log ignoredartifacts/c6-vector-pairs/cpu.log.
 
 Commit/push candidate, submit one unique gate, save ID immediately and poll same ID to real terminal. Preserve all15 times, C13/C7/C14 gains and adverse points. Only a clearly substantial C6 observation warrants one unchanged confirmation. Failure/no clear gain: archive and restore parent; no neighboring row-pair/chunk/padding scans.
+
+Implementationf4907c3 pushed; unique official task **6ac744ee694b590c3ca8ea6c** created after matching dry-run. Native gate PENDING; query this ID only to real terminal, no duplicate submission on observation timeout.
