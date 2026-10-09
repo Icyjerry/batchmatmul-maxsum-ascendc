@@ -1113,3 +1113,12 @@ Total **462.62μs** (0.00046262s), latestuserTbest calculatedmean **50.57723382*
 ## Additional explicit user-requested identical repeat
 
 User“可能是提交误差，再次提交” authorizes ONE more unchanged currentretainedbest. Unique **6ac84b6a694b590c3c4ccef4** created once. Same368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94, byteequal a2e6763; currentf0b5df0 has only docs since restore. Dry isolated /private/tmp/bmmms-retained-best-repeat-20261009b/project submitsonlykernel/protected7unchanged. NativePENDING; querysameIDtoterminal. No code changes or causal fluctuation claim.
+
+
+### Additional identical repeat terminal — Pass15
+
+Unique **6ac84b6a694b590c3c4ccef4** finished CANNcompile/15precisionPass/allprecision_ratio1, samea2e6763/kernel368782B/SHA16b51684. Times μs:
+
+`[2.01, 2.8, 3.16, 4.07, 5.3, 9.97, 7.72, 44.78, 67.93, 93.01, 88.37, 96.71, 13.2, 10.98, 9.01]`
+
+Total **459.02μs**, latestuserTbest calculatedmean **51.55575755** (notlive rank). Prior identical6ac8459c total462.62μs/mean50.57723382; thisrepeat total-3.60μs (-0.778%), mean+0.9785. Codeunchanged; timings differ, no claim thatcause isjudger/device/input/cachewithoutprofile/SoC. No cross-jobpercaseminimum mixing. Latest ONErepeat request fulfilled, no livejob/furtherrepeatpending. Rawignoredartifacts/retained-best-repeat-20261009b/official.json.
