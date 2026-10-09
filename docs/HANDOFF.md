@@ -1,9 +1,9 @@
-# C9 B stream native gate running — query same ID
+# C9 B stream terminal — archive, restore passed kernel next
 
-- Current branch experiment/c9-b-package-stream; candidate371544B/SHA8ebc3eaf, parentwholea2e6763. Exact C9 persistent two-slot Cube B FIFO/task-nt-k cursor, same packages/geometry/GM/AIV; 57added/4removed kernel lines. Details [C9_B_PACKAGE_STREAM](C9_B_PACKAGE_STREAM.md).
-- CPU204 producer configurations (new68/parent68/eagerDMA68),1452 unchanged actual AIV+FinalizeRows, production&TUNING2592plans/6hits each,8fault controls passed. Initial model epoch/fault fixtures corrected with failed logs preserved; not native proof. Next tile B issue916 versus0 parent in proxy suite; same bytes.
-- 唯一正式任务 **6ac7e87d694b590c3c22f9f2** 已创建一次，implementation **af7fd63** /kernel371544B/SHA8ebc3eaf。CANN/15精度/timing PENDING。NEXT `python3 /private/tmp/query_bmmms_submission.py 6ac7e87d694b590c3c22f9f2`，同ID查至终态，超时不重交。Confirmation onlyPass15/C9<=57.375us；否则归档恢复wholea2e6763，不重复或扫附近参数。
-- No unchanged-best repeat pending. Avoid failed C8 tail balancing/resident swaps, C9 lane Max, C10 fullM/late-credit/directA2/FF-package scans or C6 already-removed queues. Models/native/profile separate. Goal incomplete/main/tags unchanged.
+- Current experiment/c9-b-package-stream, implementationaf7fd63/kernel371544B/SHA8ebc3eaf. Unique **6ac7e87d694b590c3c22f9f2** terminal **Pass15**, C9 **67.96us** within old67.50–69.04, no gain/confirmation. Latest whole-vector reference mean52.0380, not live ranking or causal gain. Details [C9_B_PACKAGE_STREAM](C9_B_PACKAGE_STREAM.md).
+- CPU204actualproducer configurations/1452unchangedAIV+FinalizeRows/production&TUNING2592plans6hits/8fault controls passed. Earlier model corrections and nativecounterexample retained. Native compile/accuracy pass; actual route/SoC/profile absent.
+- NEXT archive commit/push then restore wholea2e6763/368782B/SHA16b51684 on fresh experiment branch. Subsequent structural target requires reducing actual work/conversion or fixing measured imbalance, not repeated C9 prefetch/lane-Max or neighboring scans. Existing C8 balanced tails/full input/resident swaps and C10 fullM/late-credit/directA2/FF-package counterexamples must be read before implementation.
+- No live task, no unchanged-best repeat pending. User asks ~4h progress report: C10 balanced ownership91.53 versus96.98–100.24 modestsingle improvement retained; latest7other experiments no improvement or regressions. No major leaderboard breakthrough, main/tags unchanged, goal incomplete.
 
 ## 先读与规则
 

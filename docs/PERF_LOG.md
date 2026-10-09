@@ -1080,3 +1080,14 @@ Kernel371544B/SHA8ebc3eafd391c48c3f7242107c7fdd7ee2db2fea85ddfc454227340c68ed772
 
 
 Implementation **af7fd63** pushed; unique formal submission **6ac7e87d694b590c3c22f9f2** created once,371544B/SHA8ebc3eaf. NativePENDING; poll sameID to terminal, no duplicate submit.
+
+
+## Formal terminal: Pass15, no C9 gain, archive
+
+Unique **6ac7e87d694b590c3c22f9f2**, implementation **af7fd63**,371544B/SHA8ebc3eaf. Native compile/15precision passed/allprecision_ratio1. Timesus:
+
+`[1.91,2.53,3.22,4.06,5.28,9.90,7.92,43.99,67.96,93.90,88.19,96.76,13.15,10.75,8.88]`
+
+Total **458.40us**, latestuserTbest calculatedmean **52.03803336** (not live rank). C9 **67.96us** lies in retained recent67.50–69.04 range; no clear benefit, below neither old latency nor the57.375us confirmation threshold. Do not attribute unrelated C2/C8/C10/etc changes to this Cube edit. Native compile/accuracy does not disclose actual shape/route/SoC/profile and cannot establish why overlap failed to improve timing.
+
+Archive implementation/model/result and restore whole **a2e6763**/368782B/SHA16b51684. No unchanged confirmation or neighboring package/Nsplit/BN scans. Model next-B-before-Fix916 versus0 did not establish hardware improvement. Rawignoredartifacts/c9-b-package-stream/official.json. No live task, main/tags unchanged, overall goal incomplete.
