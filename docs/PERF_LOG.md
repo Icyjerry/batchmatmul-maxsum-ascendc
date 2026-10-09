@@ -1099,3 +1099,12 @@ Whole a2e6763 restored byte-identical368782B/SHA16b51684 on experiment/post-c9-w
 ## User-requested retained-best identical repeat
 
 Unique **6ac8459c694b590c3c493c00** created once following explicit request“再交一次目前最优”. Current0705902/kernel byte-equal a2e6763,368782B/SHA25616b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94. Isolated /private/tmp/bmmms-retained-best-repeat-20261009/project/dry onlykernel. No algorithm/protected7 changes. NativePENDING; querysameIDtoterminal, no further duplicate authorized by this request.
+
+
+### Requested repeat terminal — Pass15
+
+Unique **6ac8459c694b590c3c493c00** completed CANNcompile/15precision Pass/allprecision_ratio1. Kernel unchanged a2e6763/368782B/SHA16b51684. Times μs:
+
+`[1.86, 2.78, 3.27, 3.98, 5.27, 10.01, 8.1, 44.55, 68.5, 92.88, 89.37, 98.06, 13.07, 11.22, 9.7]`
+
+Total **462.62μs** (0.00046262s), latestuserTbest calculatedmean **50.57723382** (notlive ranking). Compared earlier samekernel457.04μs/mean51.45446223, thisrepeat total+5.58μs; individualmovements/score differences are notcodechanges or measuredcausal improvements. No actualSoC/route/profile. UserrequestedONE repeat fulfilled, no more pending. Rawignoredartifacts/retained-best-repeat-20261009/official.json. No algorithm changes/main/tags unchanged.
