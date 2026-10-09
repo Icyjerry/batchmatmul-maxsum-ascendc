@@ -1094,3 +1094,8 @@ Archive implementation/model/result and restore whole **a2e6763**/368782B/SHA16b
 
 
 Whole a2e6763 restored byte-identical368782B/SHA16b51684 on experiment/post-c9-work-audit after terminalarchivea1c945d. No live tasks. Complete retainedvector/userYoung/latestT scoring-gap audit POST_C9_WORK_AUDIT: tiny C2/C4/C3/C1/C6 gaps matter more to average than raw C8 elapsed deficit; not matched-device/timing evidence. Next actual shared tiny synchronization/conversion audit must respect prior native counterexamples. No new candidate yet/main/tags unchanged.
+
+
+## User-requested retained-best identical repeat
+
+Unique **6ac8459c694b590c3c493c00** created once following explicit request“再交一次目前最优”. Current0705902/kernel byte-equal a2e6763,368782B/SHA25616b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94. Isolated /private/tmp/bmmms-retained-best-repeat-20261009/project/dry onlykernel. No algorithm/protected7 changes. NativePENDING; querysameIDtoterminal, no further duplicate authorized by this request.
