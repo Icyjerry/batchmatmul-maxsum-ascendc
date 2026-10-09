@@ -1091,3 +1091,6 @@ Unique **6ac7e87d694b590c3c22f9f2**, implementation **af7fd63**,371544B/SHA8ebc3
 Total **458.40us**, latestuserTbest calculatedmean **52.03803336** (not live rank). C9 **67.96us** lies in retained recent67.50–69.04 range; no clear benefit, below neither old latency nor the57.375us confirmation threshold. Do not attribute unrelated C2/C8/C10/etc changes to this Cube edit. Native compile/accuracy does not disclose actual shape/route/SoC/profile and cannot establish why overlap failed to improve timing.
 
 Archive implementation/model/result and restore whole **a2e6763**/368782B/SHA16b51684. No unchanged confirmation or neighboring package/Nsplit/BN scans. Model next-B-before-Fix916 versus0 did not establish hardware improvement. Rawignoredartifacts/c9-b-package-stream/official.json. No live task, main/tags unchanged, overall goal incomplete.
+
+
+Whole a2e6763 restored byte-identical368782B/SHA16b51684 on experiment/post-c9-work-audit after terminalarchivea1c945d. No live tasks. Complete retainedvector/userYoung/latestT scoring-gap audit POST_C9_WORK_AUDIT: tiny C2/C4/C3/C1/C6 gaps matter more to average than raw C8 elapsed deficit; not matched-device/timing evidence. Next actual shared tiny synchronization/conversion audit must respect prior native counterexamples. No new candidate yet/main/tags unchanged.
