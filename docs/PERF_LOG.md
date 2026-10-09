@@ -1108,3 +1108,8 @@ Unique **6ac8459c694b590c3c493c00** completed CANNcompile/15precision Pass/allpr
 `[1.86, 2.78, 3.27, 3.98, 5.27, 10.01, 8.1, 44.55, 68.5, 92.88, 89.37, 98.06, 13.07, 11.22, 9.7]`
 
 Total **462.62μs** (0.00046262s), latestuserTbest calculatedmean **50.57723382** (notlive ranking). Compared earlier samekernel457.04μs/mean51.45446223, thisrepeat total+5.58μs; individualmovements/score differences are notcodechanges or measuredcausal improvements. No actualSoC/route/profile. UserrequestedONE repeat fulfilled, no more pending. Rawignoredartifacts/retained-best-repeat-20261009/official.json. No algorithm changes/main/tags unchanged.
+
+
+## Additional explicit user-requested identical repeat
+
+User“可能是提交误差，再次提交” authorizes ONE more unchanged currentretainedbest. Unique **6ac84b6a694b590c3c4ccef4** created once. Same368782B/SHA16b51684cc8628121d7e359c89561c248d04b449b6ecb449f0b4f2da2ffa3a94, byteequal a2e6763; currentf0b5df0 has only docs since restore. Dry isolated /private/tmp/bmmms-retained-best-repeat-20261009b/project submitsonlykernel/protected7unchanged. NativePENDING; querysameIDtoterminal. No code changes or causal fluctuation claim.

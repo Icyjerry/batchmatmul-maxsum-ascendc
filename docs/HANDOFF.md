@@ -1,9 +1,10 @@
-# Requested retained-best repeat complete — no live task
+# Additional user-requested identical repeat running
 
 - Current branch experiment/post-c9-work-audit; whole kernel byte-equal **a2e6763** /368782B/SHA16b51684. Retains earlier C8 phased A, C10 balanced ownership, C13 frame. C9 stream implementations removed entirely.
-- Latest archive **a1c945d**/implementationaf7fd63, unique6ac7e87d694b590c3c22f9f2 **Pass15/C9=67.96us**, no targetgain; previouslane-Maxarchivea07150f/C9=67.62 also no gain. All models/native JSON retained. 用户要求的一次原样复测 **6ac8459c694b590c3c493c00** 已结束 **Pass15**，总计462.62μs/最新Tbest参考均分50.5772。No live task/repeat pending.
+- Latest archive **a1c945d**/implementationaf7fd63, unique6ac7e87d694b590c3c22f9f2 **Pass15/C9=67.96us**, no targetgain; previouslane-Maxarchivea07150f/C9=67.62 also no gain. All models/native JSON retained. 用户要求的一次原样复测 **6ac8459c694b590c3c493c00** 已结束 **Pass15**，总计462.62μs/最新Tbest参考均分50.5772。最新用户明确要求再次提交；唯一新任务 **6ac84b6a694b590c3c4ccef4** 已创建，nativePENDING。
 - User asks ~4h report: modest C10 balanced ownership91.53 vs96.98–100.24 retained; C8 phasedA44.09 vs46.18–46.87 earlier boundary retained. FullM178.32, latecredit92.84, directA2 92.98, literalC1 1.93, C8tail56.78, C9lane67.62/Bstream67.96 no gains/regressions archived. No major leaderboard breakthrough.
-- Requested ONE repeat fulfilled; samekernel368782B/SHA16b51684, result archived rawignoredartifacts/retained-best-repeat-20261009/official.json/PERF_LOG. No new algorithm/runtime profile/SoC/route evidence; fluctuations not attributed to optimization.
+- FIRST `python3 /private/tmp/query_bmmms_submission.py 6ac84b6a694b590c3c4ccef4`，同ID查询至终态。本次授权的一次再次提交已创建，不能因超时重复创建。
+- Prior requested ONE repeat fulfilled; samekernel368782B/SHA16b51684, result archived rawignoredartifacts/retained-best-repeat-20261009/official.json/PERF_LOG. No new algorithm/runtime profile/SoC/route evidence; fluctuations not attributed to optimization.
 - NEXT [POST_C9_WORK_AUDIT](POST_C9_WORK_AUDIT.md) quantifies scoring gaps using complete retained submission/userleader/latestTbest. Tiny C2/C4/C3/C1/C6 gaps dominate C8 in average-score terms. Inspect actual shared tiny synchronization/conversion/teammate differences and prior literal/static/rawtranspose/Ktree/pureVector failures before a distinct structural candidate. No candidate currently exists. No repeats/nearby scans of archived hypotheses.
 - Models/native/profile separate; noWeb/newGM/protected7 edits. Main/tags unchanged, overall goal incomplete.
 
