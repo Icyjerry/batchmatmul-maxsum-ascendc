@@ -1122,3 +1122,8 @@ Unique **6ac84b6a694b590c3c4ccef4** finished CANNcompile/15precisionPass/allprec
 `[2.01, 2.8, 3.16, 4.07, 5.3, 9.97, 7.72, 44.78, 67.93, 93.01, 88.37, 96.71, 13.2, 10.98, 9.01]`
 
 Total **459.02μs**, latestuserTbest calculatedmean **51.55575755** (notlive rank). Prior identical6ac8459c total462.62μs/mean50.57723382; thisrepeat total-3.60μs (-0.778%), mean+0.9785. Codeunchanged; timings differ, no claim thatcause isjudger/device/input/cachewithoutprofile/SoC. No cross-jobpercaseminimum mixing. Latest ONErepeat request fulfilled, no livejob/furtherrepeatpending. Rawignoredartifacts/retained-best-repeat-20261009b/official.json.
+
+
+## 2026-10-13 teammate 777734 review and first independently available NPU
+
+Imported DISPATCH/LOCAL_TEST and ZIP078635 (353179B/5600lines). Newdocumented bestb881/OJ6acdd94d differs fromZIP; documentwhole15total401.13us/reference60.2591 is NOT our measurement/ZIPPass15. Sevenprotectedfiles unchanged; activekernelstill a2e6763. Newserver userauthorized/refreshedSSH: nativeACLSoCAscend910_9382/24AIC48AIV/logical0physical14card7chip0, CANN9 installed /usr/local/Ascend/cann-9.0.0. OriginalZIPASCcompile PASS/exeSHAb1caf714; C1FP16NN fullFP64storagegolden allnegative -5.40625 matchesexactly. Readinessonly/no latency/full15/profile/route capture. Actual tools absent: adopt new5fullcalls/TaskDuration median/sourceDSOinputnormalPlanidentity standard, import or rebuild independent runner beforecandidate ranking. No new OJ submitted or algorithm edits. TEAMMATE_777734_REVIEW/HANDOFF record identities, newscope/knownfailedhypotheses and nextaction. Rawignored importedkernel/diff/native logs protected. SSHtransport13910 remains; no activeNPUjob.
