@@ -41,6 +41,7 @@ def main():
   identity=out/'application/identity.json'
   assert identity.exists(),'collector returned0 without application identity'
   record=json.loads(identity.read_text());assert record['calls']==5 and len(record['validation'])==5
-  assert len(list((out/'profiler').rglob('*.csv')))>0,'no exported reports'
+  from analyze import analyze
+  analyze(out)
  print('Completed',a.mode,'reports at',out,flush=True)
 if __name__=='__main__':main()

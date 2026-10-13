@@ -1,8 +1,9 @@
-# Native C13 baseline and oj_like bootstrap in progress
+# C13 full K halves candidate — native validation running
 
-- Experimental kernel imported exactuserZIP078635/353179B on experiment/native-oj-like-c13; notb881/officialPass15. Protectedsevenfiles unchanged. Read NATIVE_OJ_LIKE_BOOTSTRAP.
-- ActualnormalC13frame/nativefullFP64storagegolden passed (1689.454833984375 exact), DSO0357587a. v2 defaultmsprof5fullcalls capture running afterinitial CLI argument error/exit0 was rejected. No latency claim yet.
-- NEXT poll current v2 profiler SSH exechandle; build/refine parser requiring5complete source-boundTaskDuration reports. Then actualC13fullK128-per-M256-half candidate + physicalmodel +sameinputnative comparison. Never treatfirst collector exit0/no reports as success.
+- Branch experiment/c13-full-k-halves; kernel592ce308/355193B, parente2f1b63 exactimportedZIP078635 (notdocumentb881). 4K64 MMAD→2K128, sameGM/vector/math/resources/guardedfamily. CANN9DSO and independentphysicalcoordinate/scope model PASS. Read C13_FULL_K_HALVES.
+- Parent trueC13normalplan+wholeFP64golden+all5complete reports passed; parentmedian9.100364us, allsamples preserved,4Cubeinstructions/core/actualhalf symbol. Initial msprof argumenterror+exit0/noapp explicitlyFAILED, v2valid. Tools require5fullvalidations/defaultall8tables/realplan-device-sourceDSOinputs, app0warmup/defaultmsprofwarmup5/limit5000/kernelreplay.
+- Candidate correctness/profile remotejob is running. NEXT poll exactSSH nativejobhandle, inspectsamejoblogs/results (neverrestart onobservationtimeout). Gateonlyfullgolden+median<=7.7353094us warrantsONEformal afternegative/familycoverage. Nativefull15/OJnoneyet, noLatencyclaimcandidate.
+- Newserver9382/24AIC48AIV/logic0physical14/card7chip0; explicitcallerbudget20, notfakehardware. SSHtransport13910 persists. PrivateNumPy2.2.6CP310ARMvenv bootstrapwithoutsystempip, noformaldependencychanges. Queue actualflock/activependingJSON. Original7files/main/tagsunchanged.
 
 ## Current source and identities
 
