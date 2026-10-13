@@ -1,4 +1,4 @@
-# 当前工作：C6 raw row候选已建，设备入口待恢复
+# 当前工作：C6 raw row候选已建，因设备授权受阻
 
 ## 当前源码
 
@@ -18,7 +18,7 @@
 ## C4 候选终态及下一条动作
 
 - C4 compact实现7f76eed/c6bde889/353918B，CANN9编译+一次精度+五报告通过，actual true符号确认；所有输出与parent逐位一致，maxabs1.1920929e-7/maxrel1.0804517e-7。五时长3.180127/3.100124/3.080123/3.120125/3.060122，中位3.100124us，比3.060122慢1.31%。已在3b6a05d归档，无OJ/重复/参数扫描；32KiB产品状态不代表加速。
-- SSH长连接随后断开，新入口转发报platform authorization denied（跳板认证通过）。已请求新入口，当前无NPU任务；不虚构设备编译失败或将goal标为完成。C4原版全部raw已下载，候选raw仍在remote结果目录，下载PENDING；已读取真实summary并完整记入文档。
+- SSH长连接随后断开，新入口转发报platform authorization denied（跳板认证通过）。已请求新入口，我们创建的设备任务已终态；不虚构设备编译失败或将goal标为完成。C4原版全部raw已下载，候选raw仍在remote结果目录，下载PENDING；已读取真实summary并完整记入文档。
 - NEXT见C6_RAW_ROW_INPUT：恢复访问先补C4候选raw两个目录，再baseline真实C6 normalPlan/全FP64golden/一次精度+五default报告。检查实际CANN9 filter12/stride12/channel16组合、ZZ/ZN与限值；candidate独立编译/同输入五报告，actual RAW true符号确认。采前20%性能门槛，过了才扩展精度和正式15/OJ；失败归档，不扫相邻filter/stride。
 - C6已实现一个raw输入候选：连续GM→原L1，显式清零尾行；featureWidth为32*12/80*12，以已出现的Load3D字段装成原ZZ/ZN。没有使用未知padList字段，没有新GM。Mmad/UnitFlag/Fix/AIV/arena/其它kernel逐字保留；RAW默认false、准确frame+resource/align/SDKworkspace guard。只有CPU模型，native API组合与实际速度仍PENDING。
 - 实际producer输入分支/helpers CPU78batch pairs/fullK/负值/zero-tail/bounds/ready顺序通过，7故障反例被拒绝；真实guard production/TUNING46/57反例与资源边界通过，但frame为人工构造，不能代替实际MakePlan或BF16。三个独立工具和忽略日志可复现。
@@ -33,3 +33,11 @@
 ## 接受源身份查询补充
 
 通过已授权的归档CLI读取DISPATCH提交6acdd94de76989292739d40b：本机会话成功加载，HTTP403，未取到源码或结果。不能把它解释成明确401/登录过期，未创建任务，也未绕过权限。ZIP078635→接受b881身份仍PENDING。原始只读状态摘要在忽略目录artifacts/c6-input-layout-audit/accepted-identity-read.json。
+
+## 阻塞审查与恢复条件
+
+相同的云平台转发授权问题在原始用户触发的工作轮与随后两次goal continuation中连续出现。最新实查：control master/socket不存在；干净SSH跳板认证通过，转发再次报platform authorization denied/exit255。不是观察超时或仍运行的NPU任务。脱敏最新日志/private/tmp/bmmms-remote-access/revalidate-sanitized.log。
+
+先前两轮已完成候选、实际源码CPU/入口检查、GitHub推送以及CANNJudge接受源只读403诊断。现在缺少可访问的CANN9 header/编译/NPU正常计划与性能门槛；不能用更多CPU模型替代它们，也不能叠加尚未设备验证的新kernel优化。冲榜目标未完成，按连续三轮同一阻塞的规则标记blocked，等待外部授权恢复。
+
+用户提供新的有效SSH入口或设备Agent在同分支返回验证日志后，重新按C6_RAW_ROW_INPUT的具体步骤推进；先复核设备和队列并补C4候选raw，再测C6冻结parent与candidate。无需重复root密码，不将凭据写入仓库。当前源/文档/CPU证据完整保留，main和历史标签不动。
