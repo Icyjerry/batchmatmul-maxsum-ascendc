@@ -1,0 +1,1 @@
+{"shape":[1,8192,64,128],"dtype":1,"transpose":[0,0],"core_limit":20,"device":0,"expected_soc":"Ascend910_9382","expected_physical":14,"smi_card":7,"smi_chip":0,"provenance":"user shape record; teammate confirmed FP16 NN family, exact M not directly traced; core_limit20 is explicit caller budget on actual24core hardware"}

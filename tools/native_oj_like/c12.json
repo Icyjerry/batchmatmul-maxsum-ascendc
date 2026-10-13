@@ -1,0 +1,1 @@
+{"shape":[1,1280,4096,1536],"dtype":2,"transpose":[1,0],"core_limit":20,"device":0,"expected_soc":"Ascend910_9382","expected_physical":14,"smi_card":7,"smi_chip":0,"provenance":"teammate recorded full local frame, strong BF16 TN family evidence; core_limit20 is explicit caller budget on actual24core hardware"}

@@ -1,8 +1,12 @@
-# 2026-10-13 teammate import + native server ready
+# Native C13 baseline and oj_like bootstrap in progress
+
+- Experimental kernel imported exactuserZIP078635/353179B on experiment/native-oj-like-c13; notb881/officialPass15. Protectedsevenfiles unchanged. Read NATIVE_OJ_LIKE_BOOTSTRAP.
+- ActualnormalC13frame/nativefullFP64storagegolden passed (1689.454833984375 exact), DSO0357587a. v2 defaultmsprof5fullcalls capture running afterinitial CLI argument error/exit0 was rejected. No latency claim yet.
+- NEXT poll current v2 profiler SSH exechandle; build/refine parser requiring5complete source-boundTaskDuration reports. Then actualC13fullK128-per-M256-half candidate + physicalmodel +sameinputnative comparison. Never treatfirst collector exit0/no reports as success.
 
 ## Current source and identities
 
-- Current branch experiment/teammate-777734-review. Worktree kernel still historicala2e6763/368782B/SHA16b51684; no algorithm/protectedseven changes or new OJ submission.
+- Current branch experiment/teammate-777734-review. Worktree now experimental importedZIP078635, with source identity distinction below retained. No protectedseven changes or new OJ submission.
 - New ZIP kernel **0786352034e77506894d4094083960f4f6af82782bf7cee6a0386148437ca436** /353179B/5600lines, while imported DISPATCH latest accepted source is **b8817327…** /350604B/OJ6acdd94de76989292739d40b. Do not attribute b881's Pass15/times toZIP078635. Newdocumented wholevector401.13us/reference60.2591 is teammate evidence, not our newserver measurement.
 - Read [TEAMMATE_777734_REVIEW](TEAMMATE_777734_REVIEW.md), imported [DISPATCH](teammate_20261013/DISPATCH.md), [LOCAL_TEST](teammate_20261013/LOCAL_TEST.md). Prior fullstate archived HANDOFF_HISTORY_20261013_PRE_TEAMMATE.md. Older NEXT tiny-priority does not override newer teammate successes/constraints.
 
