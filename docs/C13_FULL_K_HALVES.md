@@ -9,3 +9,12 @@ Parent5complete defaultmsprof report times=[9.140366,8.740350,9.160366,9.100364,
 Candidateonecorrectness and5defaultprofiler samples currentlyPENDING. No OJ submitted. PredeclaredONEformal gate onlyifnativefullgoldenpasses andcandidate median<=7.7353094us (15% belowparent); otherwise archive no unchangedrepeat/nearbyparameter scan. Need extraallnegative/familyboundary correctness beforeanyformal job. Full15 native/OJ/source078635-to-documentb881 mappingstillunproven.
 
 Remoteparent+candidate under/workspace/bmmms-codex/native_oj_like/results; binary/sourceidentitystoredinDSOsidecars, outputcanary/fullinputcompare/referenceallK/N/M. Default PMU counters overlap, neveraddthem asTaskDuration. UnsupportedSDK FixpipeL0CtoUB220 stubs rejectedbeforeanykernelchange. Overallbigoptimizationgoal unfinished.
+
+
+## Native terminal: fullK captured, no clear latency gain; no OJ
+
+Candidate4d63b2f/592ce308/355193B true fullK mangled symbol captured ondevice0physical14/9382. Onecorrectness + allfiveperformance outputs matchfullFP64golden exactly, guards intact/inputsunchanged. Defaultfive completeTaskDuration samples **[9.020361,9.100364,9.820393,8.700348,9.040361]**, median **9.040361us**, parent9.100364us, -0.6593%. Retain outlier9.820393. Doesnotmeet<=7.7353094us15%gate anddoesnotestablish stableimprovement; no repeatedsame-source/adjacentKscan/OJsubmit. Actual16Cube+16AIV/all8defaulttables andsourceDSOinputPlan identitiesconfirmed. Cubeinstructions **4→2** onall16cores/all5samples.
+
+Per-samplecore-mean PMUmedianparent→candidate: MAC0.620278→0.616667us, MTE10.682986→0.704861, MTE21.828160→1.778437, FIX0.929410→0.937292; AIVflag0 wait2.288021→2.450625, Sync14wait0.859965→0.913750. Overlappingcounters, nottimebudgetsum orcontrolled causal proof. FewerrealMACinstructionsdidnotyieldacomparablelatencyimprovement. Additionalnegative/familytests notperformed becauseperformancegatefailed; nativefull15/unseenprops remainunproven.
+
+Archive entirecandidate and restore exactexperimentalZIP078635 baseline/e2f1b63 fornext C12analysis. Independentharness improvements kept: actualprivatequeue+normalPlan review+guard/fullstoragegolden/all5complete defaultreports gate. Raw40CSVsets/identities/outputsalso remote and protectedignored artifacts/c13-full-k-halves/*.tgz/*.json; neither source payloads norlarge logs inGit. Overallgoalnotcomplete.

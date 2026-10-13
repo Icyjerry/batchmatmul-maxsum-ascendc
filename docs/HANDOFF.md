@@ -1,9 +1,8 @@
-# C13 full K halves candidate — native validation running
+# C13 fullK archived — exact ZIP baseline restore next
 
-- Branch experiment/c13-full-k-halves; kernel592ce308/355193B, parente2f1b63 exactimportedZIP078635 (notdocumentb881). 4K64 MMAD→2K128, sameGM/vector/math/resources/guardedfamily. CANN9DSO and independentphysicalcoordinate/scope model PASS. Read C13_FULL_K_HALVES.
-- Parent trueC13normalplan+wholeFP64golden+all5complete reports passed; parentmedian9.100364us, allsamples preserved,4Cubeinstructions/core/actualhalf symbol. Initial msprof argumenterror+exit0/noapp explicitlyFAILED, v2valid. Tools require5fullvalidations/defaultall8tables/realplan-device-sourceDSOinputs, app0warmup/defaultmsprofwarmup5/limit5000/kernelreplay.
-- Candidate correctness/profile remotejob is running. NEXT poll exactSSH nativejobhandle, inspectsamejoblogs/results (neverrestart onobservationtimeout). Gateonlyfullgolden+median<=7.7353094us warrantsONEformal afternegative/familycoverage. Nativefull15/OJnoneyet, noLatencyclaimcandidate.
-- Newserver9382/24AIC48AIV/logic0physical14/card7chip0; explicitcallerbudget20, notfakehardware. SSHtransport13910 persists. PrivateNumPy2.2.6CP310ARMvenv bootstrapwithoutsystempip, noformaldependencychanges. Queue actualflock/activependingJSON. Original7files/main/tagsunchanged.
+- Branch experiment/c13-full-k-halves/candidate4d63b2f/592ce308. Actualnative onecorrectness+5outputs/defaultall8reports/sourceDSOinputnormalPlan/16Cube16AIV identity passed. Cubeinstructions4→2 verified, median9.040361 vsparent9.100364 (-0.66%), no cleargain/noOJ/repeat. Outlier9.820393 retained. Details C13_FULL_K_HALVES/PERF_LOG; no activeNPUjob.
+- NEXT afterarchivecommit/push freshbranch restore exactZIP078635/e2f1b63 kernel, KEEP independent native_oj_like tools. Read actualC12BF16TNnormalPlan with callerlimit20/newhardware24, review completeframe; fullFP64storagegolden/default5reports/nativeexistingphasedB path baseline. Use actualprep/compute exposure forone distinct larger structural hypothesis, respect teammate rawB/B3D/PairA/3round failures. Do not renameC13fullK/rawnormal/normalC/BM416.
+- SSHtransport13910 remains/livecheck socket. PrivateNumPy2.2.6CP310ARM available; freshserver9382 logical0physical14/card7chip0/24AIC48AIV. Budget20 is callerlimit, neverhardware assumption. Original7/main/tags unchanged, overallgoalunfinished.
 
 ## Current source and identities
 
