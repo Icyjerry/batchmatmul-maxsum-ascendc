@@ -1,8 +1,9 @@
-# C13 fullK archived — exact ZIP baseline restore next
+# C12 strided Bprep store — baseline measured
 
-- Branch experiment/c13-full-k-halves/candidate4d63b2f/592ce308. Actualnative onecorrectness+5outputs/defaultall8reports/sourceDSOinputnormalPlan/16Cube16AIV identity passed. Cubeinstructions4→2 verified, median9.040361 vsparent9.100364 (-0.66%), no cleargain/noOJ/repeat. Outlier9.820393 retained. Details C13_FULL_K_HALVES/PERF_LOG; no activeNPUjob.
-- NEXT afterarchivecommit/push freshbranch restore exactZIP078635/e2f1b63 kernel, KEEP independent native_oj_like tools. Read actualC12BF16TNnormalPlan with callerlimit20/newhardware24, review completeframe; fullFP64storagegolden/default5reports/nativeexistingphasedB path baseline. Use actualprep/compute exposure forone distinct larger structural hypothesis, respect teammate rawB/B3D/PairA/3round failures. Do not renameC13fullK/rawnormal/normalC/BM416.
-- SSHtransport13910 remains/livecheck socket. PrivateNumPy2.2.6CP310ARM available; freshserver9382 logical0physical14/card7chip0/24AIC48AIV. Budget20 is callerlimit, neverhardware assumption. Original7/main/tags unchanged, overallgoalunfinished.
+- Branch experiment/c12-strided-prep-store restores exact e2f1b63 / ZIP078635 kernel (353179B); C13 fullK archived without gain at520f27d. Keep native tools.
+- Actual C12 BF16 TN normal plan dual6/BM128/BN128/Ns2/W20, case12Zn/phased/directrawA; source-bound one correctness +five default complete reports all outputs exact full FP64-storage golden118.35807037353516, inputs/yguards intact. Native five TaskDuration83.123322/83.063324/83.403336/83.323334/82.023277 us, median83.123322, on9382 logical0physical14 / callerbudget20 / actual24AIC48AIV.
+- NEXT one distinct Bprep output issue compression: each K16N1024 group has8 contiguous UB N128 blocks destined to equally spaced packedGM panels; public DataCopyParams one strided 8-burst call can preserve byte layout while reducing3072 stores to384. Audit SDK byte units/address coverage/events, then native full golden+five reports; only >=10% native gain qualifies for formal submission and further family correctness. Not a 3phase/barrier scan.
+- Raw ignored artifacts/c12-strided-prep-store and remote native_oj_like/results. SSH13910/master23895 verified; no active NPU job. Overall goal remains incomplete.
 
 ## Current source and identities
 
