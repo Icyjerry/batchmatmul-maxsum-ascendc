@@ -1151,3 +1151,9 @@ Parent e2f1b63/ZIP078635/353179B；candidate0628877/e00469b5/353524B，仅phased
 ZIP078635父源正常Launch先选SmallVectorK256Rows8，dual28 late入口未运行。BF16TT `(4,8,16,128)` 同9382/device0/callerlimit20；实际纯Vector4/0Cube/8默认表，完整FP64storagegolden+一次精度+五性能输出通过。Parent times2.980119/2.940118/3.120125/3.060122/3.360134，中位3.060122us。首次parser错误把MixBlockDim NA转int，实际5调用和报告完整；只修schema并重解析同五份，保留exit1，不重新采集。
 
 Candidate7f76eed/c6bde889/353918B，产品状态K128→64lane，Mul低64再公开MulAddDst累加高64，保持完整K后maxN再sumM/input/Gather/Plan/GM。CPU实际parent/default/new72组216执行集、负值/完整数学/guards/输入/错Khalf反例/逆补丁/七文件PASS，CANN9编译通过。native新true符号/完整五报告/精度输出全部通过，与parent输出逐位相同，maxabs1.1920929e-7/maxrel1.0804517e-7。Times3.180127/3.100124/3.080123/3.120125/3.060122，中位3.100124us，比parent慢1.307%；未达20%gate，未OJ/重测/邻近扫描。AIV V1.46→1.493333而scalar0.721806→0.538750，不能相加/作因果解释。全负/邻界native与正式15点仍未验证，模型不当设备证据。档案C4_COMPACT_K128，raw忽略artifacts/c4-compact-k128，恢复ZIP后向C6供应链探索，目标未完成。
+
+## 2026-10-14 C6 raw row输入：源码候选，非设备结果
+
+实验branch experiment/c6-raw-row-input，parentZIP078635/e2f1b63。Candidate356750B/SHA639fa38edd6adba6d4ed4869f8042d329001fbe4a7a94b6ecd7dd42bf0cf465e，kernel65增5删。仅BF16NT确认frame(13,23,73,192)原dual19 static32/80/192 MIX11完整准入开启RAW_ROWS；普通GM→原L1，加显式tail zero，以现有Load3D fields filter12/stride12/channel16映射完整行到ZZ/ZN。未用新padding API/新GM；fullK MMAD/UnitFlag/Fix/原AIV/arena/七文件不变。新API参数组合限值、实际normalPlan和性能待设备，不能据CPU宣称可用/加速。
+
+CPU实际新增producer分支/helpers78batch pairs/完整K/负值/零尾/输入bounds/ready顺序通过，7故意错字段/ready/offset/batch反例被拒绝，whole inverse恢复parent。实际guard production/TUNING分别46/57反例和资源边界通过，正例是人工frame，不证明MakePlan命中。独立几何模型升级显式L1补零，避免padList未知字段。操作数L1写入总字节与原pad体量相同，MTE2新增2次InitConst，不按指令数估计速度。源码只在实验分支，nativePlan/CANNcompile/BF16precision/5report latency/OJ15均PENDING，无新OJ请求。SSH长连接断开后跳板转发platform authorization denied，已请求新入口；旧设备任务已终态，不虚构live等待。C6_RAW_ROW_INPUT给出可执行验证，采前20%中位gate，不盲重测/扫参数。Raw ignored artifacts/c6-input-layout-audit；总体目标未达成。

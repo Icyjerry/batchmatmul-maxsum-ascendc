@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 """Coordinate oracle for proposed raw row im2col; DOES NOT execute SDK Load3D."""
-from pathlib import Path
-import subprocess
-ROOT=Path(__file__).resolve().parents[1]
 def panel(rows,padded,K,role,batch):
  # Interpret row-major [R,K] as [C1=1,H=1,W=R*K/16,C0=16].
- group=K//16;width=rows*group;right=(padded-rows)*group
- assert K%16==0 and padded%16==0 and 0<=right<=255
- assert (width+right-group)//group+1==padded
- raw=[(batch,r,k) for r in range(rows) for k in range(K)]
+ group=K//16;width=padded*group;missing=(padded-rows)*group
+ assert K%16==0 and padded%16==0
+ assert (width-group)//group+1==padded
+ valid=[(batch,r,k) for r in range(rows) for k in range(K)]
+ raw=valid+[None]*((padded-rows)*K)
  out=[None]*(padded*K)
  for r in range(padded):
   for k in range(K):
    x=r*group+k//16;channel=k%16
-   value=raw[x*16+channel] if x<width else None
+   assert x<width
+   value=raw[x*16+channel]
    pos=((r//16*(K//16)+k//16)*256+(r%16)*16+k%16 if role=='ZZ' else
         (k//16*(padded//16)+r//16)*256+(r%16)*16+k%16)
    assert out[pos] is None
@@ -24,10 +23,9 @@ def panel(rows,padded,K,role,batch):
    pos=((r//16*(K//16)+k//16)*256+(r%16)*16+k%16 if role=='ZZ' else
         (k//16*(padded//16)+r//16)*256+(r%16)*16+k%16)
    assert out[pos]==((batch,r,k) if r<rows else ('pad',r,k))
- return raw,out,right
+ return valid,out,missing
 
 def main():
- assert (ROOT/'kernel.asc').read_bytes()==subprocess.check_output(['git','show','e2f1b63:kernel.asc'],cwd=ROOT),'no speculative kernel API changes'
  for b in range(13):
   ar,a,padA=panel(23,32,192,'ZZ',b);br,z,padB=panel(73,80,192,'ZN',b)
   assert padA==108 and padB==84
@@ -42,6 +40,6 @@ def main():
  # Wrong pixel-vs-row stride consumes mixed query rows; reject independently.
  wrong=[(r*1+k//16)*16+k%16 for r in range(23) for k in range(192)]
  assert wrong!=list(range(23*192))
- print('Raw-im2col coordinate model PASS:13 batches/full M23 N73 K192/read addresses/nativeZZ+ZN/padding108+84/capacity')
- print('SDK field names, filter/stride/padding support, native load layout, timings ALL PENDING; not production code evidence.')
+ print('Raw-im2col coordinate model PASS:13 batches/full M23 N73 K192/read addresses/nativeZZ+ZN/explicit L1 zero tails / missing feature pixels108+84 / capacity')
+ print('SDK field names, filter/stride support, native load layout, timings ALL PENDING; not production code evidence.')
 if __name__=='__main__':main()
