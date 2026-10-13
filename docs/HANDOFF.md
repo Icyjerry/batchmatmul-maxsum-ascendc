@@ -22,3 +22,6 @@
 ## NEXT
 
 Resolve ZIP078635 vsacceptedb881 mapping/result beforeusingreportedOJ. Import complete oj_like runner dependencies or implement independent equivalent harness without modifying protectedseven. Frozenbaseline fullgolden/normalPlan/capture/5reports on C12/C13/newdevice0 first; calibrate againstsame-source OJ rather than olddevice timings. Then use a distinct larger-benefit hypothesis. No automatic codeoverwrite/newsubmission in this review. No pendingunchanged-best repeat; overall performancegoal incomplete/main/tags untouched.
+
+
+CLI readiness: earlier /private/tmp/cannjudge_cli.py and query_bmmms_submission.py are now absent (2026-10-13). The attempted authorized documented-submission identity query could not load its local client; no source/OJ data fetched. Restore local archived tooling before any future CLI action; do not ask for login merely because the script is missing. ZIP078635-to-b881 binding remains PENDING.

@@ -68,3 +68,6 @@ SSH connected after user refreshed short-lived jump authorization; credentials r
 ## Next executable action
 
 Before optimization: resolve ZIP078635 versus documentedb881 identity/results; import teammate's complete runner dependencies or build a separate equivalent harness without modifying protected seven files. Use newdevice0→physical14/card7chip0, actual24/48/resources andnormalhostPlan. Start frozen baseline fullgolden/capture/5-report validation on C12/C13; calibrate same-source behavior on this server before trusting local ranking. Keep fullscope math/resource fallbacks. Do not automatically overwrite current kernel or submit ZIP as already validated15Pass.
+
+
+CLI readiness: earlier /private/tmp/cannjudge_cli.py and query_bmmms_submission.py are now absent (2026-10-13). The attempted authorized documented-submission identity query could not load its local client; no source/OJ data fetched. Restore local archived tooling before any future CLI action; do not ask for login merely because the script is missing. ZIP078635-to-b881 binding remains PENDING.
