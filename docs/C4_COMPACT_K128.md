@@ -41,3 +41,5 @@ CANN候选编译、原生精度/性能 PENDING。正式15点和其它设备 PEND
 候选五次 TaskDuration(us) `[3.180127,3.100124,3.080123,3.120125,3.060122]`，中位 **3.100124us**，较原3.060122慢约 **1.307%**。保留全部五次/default八报告/4Vector0Cube/source-DSO-input-Plan-device绑定。各核均值五次中位AIV V1.46→1.493333/Scalar0.721806→0.538750/ScalarVectorStall0.307917→0.405972/MTE20.419028→0.419861us；不能相加或解释成因果。
 
 没有达到预设20%门槛，不提交OJ、不重采此版/扫描附近lane或chunk。32KiB少于64KiB没有建立加速。归档候选/实际源模型/完整原始报告，下一恢复整份ZIP078635，转C6输入供应结构分析。未继续全负/邻界native用例，因为性能门槛未通过；正式15点与另一机型未验证。
+
+归档传输说明：SSH在下载候选raw时断开；原版raw已完整在本机，候选summary已实际读取，但候选原始CSV/identity/output仍在server results/c4-compact-correctness和c4-compact-profile，尚未下载。待恢复后补齐，不能说本机已有这些原始表。
