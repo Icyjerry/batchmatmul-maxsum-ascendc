@@ -1145,3 +1145,9 @@ Archive entirecandidate and restore exactexperimentalZIP078635 baseline/e2f1b63 
 ## 2026-10-14 C12 strided Bprep store：本机终态，未提交OJ
 
 Parent e2f1b63/ZIP078635/353179B；candidate0628877/e00469b5/353524B，仅phased helper八独立store→一次八burst strided store，原数学/phase/Plan/GM原样。实际CANN9编译、实际helper CPU完整6291456元素/guard/错stride反例/七文件检查PASS。新server9382/actual24AIC48AIV/dev0physical14/明确callerlimit20，BF16TN `(1,1280,4096,1536)` normaldual6/BM128BN128/Ns2W20。Parent一次精度+完整五输出精确fullFP64golden118.35807037353516；五报告times83.123322/83.063324/83.403336/83.323334/82.023277，中位83.123322。Candidate一次精度+五输出也精确，times83.063324/82.683304/83.123322/82.563301/82.683304，中位82.683304，仅-0.52936%。八类默认PMU/实际20Cube40AIV/sourceDSOinputPlan同机身份全保留；五报告MTE3总指令每次确实减少2688，各AIV56或70，符合3072→384模型。Scalar MTE3stall降到0不代表整op同幅度加速，其他重叠计数见C12_STRIDED_PREP_STORE。未过采集前10%门槛，无OJ/重复/临近参数扫描；归档恢复ZIP，整体目标未达成。全负/family扩展及正式15待验证，不能以本case全精度代替。Raw忽略目录artifacts/c12-strided-prep-store及remote results。
+
+## 2026-10-14 C4 compact K128：正常纯Vector捕获，没有本机收益
+
+ZIP078635父源正常Launch先选SmallVectorK256Rows8，dual28 late入口未运行。BF16TT `(4,8,16,128)` 同9382/device0/callerlimit20；实际纯Vector4/0Cube/8默认表，完整FP64storagegolden+一次精度+五性能输出通过。Parent times2.980119/2.940118/3.120125/3.060122/3.360134，中位3.060122us。首次parser错误把MixBlockDim NA转int，实际5调用和报告完整；只修schema并重解析同五份，保留exit1，不重新采集。
+
+Candidate7f76eed/c6bde889/353918B，产品状态K128→64lane，Mul低64再公开MulAddDst累加高64，保持完整K后maxN再sumM/input/Gather/Plan/GM。CPU实际parent/default/new72组216执行集、负值/完整数学/guards/输入/错Khalf反例/逆补丁/七文件PASS，CANN9编译通过。native新true符号/完整五报告/精度输出全部通过，与parent输出逐位相同，maxabs1.1920929e-7/maxrel1.0804517e-7。Times3.180127/3.100124/3.080123/3.120125/3.060122，中位3.100124us，比parent慢1.307%；未达20%gate，未OJ/重测/邻近扫描。AIV V1.46→1.493333而scalar0.721806→0.538750，不能相加/作因果解释。全负/邻界native与正式15点仍未验证，模型不当设备证据。档案C4_COMPACT_K128，raw忽略artifacts/c4-compact-k128，恢复ZIP后向C6供应链探索，目标未完成。
