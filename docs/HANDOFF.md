@@ -2,7 +2,7 @@
 
 ## 当前源码
 
-- 分支 experiment/c6-raw-row-input。parent e2f1b63 / ZIP078635；当前未上板候选356750B / SHA639fa38edd6adba6d4ed4869f8042d329001fbe4a7a94b6ecd7dd42bf0cf465e，七个受保护文件未动；未并main/未OJ。
+- 分支 experiment/c6-raw-row-input。parent e2f1b63 / ZIP078635；当前未上板候选实现140080d/356750B / SHA639fa38edd6adba6d4ed4869f8042d329001fbe4a7a94b6ecd7dd42bf0cf465e，七个受保护文件未动；未并main/未OJ。
 - C13 fullK（520f27d）和 C12 strided store（b159f99）均未获明显收益，保留历史分支，不并入 main、不提交 OJ、不重复采样。
 - ZIP078635 与 DISPATCH 接受源 b8817327 不同，不得把后者正式 Pass15/401.13us成绩借给当前源。
 
@@ -29,3 +29,7 @@
 - native工具/DSO/完整frame/inputs/reports在 /workspace/bmmms-codex/native_oj_like 和inputs；private NumPy2.2.6 Python test-venv/bin/python。
 - 真实NPU文件锁及active/pending队列；我们创建的设备任务已终态，整个服务器状态重连后复核。GitHub已授权私有仓库；push当前实验分支，不改标签/main。
 - 未验证：当前源正式15点、另一SoC、ZIP与接受源绑定。无新OJ请求。整体冲榜目标未完成。
+
+## 接受源身份查询补充
+
+通过已授权的归档CLI读取DISPATCH提交6acdd94de76989292739d40b：本机会话成功加载，HTTP403，未取到源码或结果。不能把它解释成明确401/登录过期，未创建任务，也未绕过权限。ZIP078635→接受b881身份仍PENDING。原始只读状态摘要在忽略目录artifacts/c6-input-layout-audit/accepted-identity-read.json。

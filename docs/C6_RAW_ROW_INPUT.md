@@ -10,7 +10,7 @@
 
 ## 源码与准入
 
-- 分支 `experiment/c6-raw-row-input`；候选356750B，SHA256 `639fa38edd6adba6d4ed4869f8042d329001fbe4a7a94b6ecd7dd42bf0cf465e`。
+- 分支 `experiment/c6-raw-row-input`，实现 `140080d`；候选356750B，SHA256 `639fa38edd6adba6d4ed4869f8042d329001fbe4a7a94b6ecd7dd42bf0cf465e`。
 - 算法仅修改kernel.asc，65增/5删；`RAW_ROWS`默认false，仅已有MP32/NP80/KP192 early入口通过`UseSmallC6RawRows`时开启。
 - 精确公开shape/BF16/NT、原Schedule/worker/Cube grid、输入32B对齐、actual平台core和UB/L1/L0、原system workspace/partial/ring容量全部检查；显式TUNING关闭该入口。资源或plan不符回退原函数。这里不声称已采到C6实际normalPlan。
 - 静态约束限定DIRECT_BATCH/SINGLE_AIV/NT/32×80×192/2字节；其它实例输入分支逐字保留。七个受保护文件与1734f16一致。
