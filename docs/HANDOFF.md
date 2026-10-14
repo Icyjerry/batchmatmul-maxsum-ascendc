@@ -1,43 +1,39 @@
-# 当前工作：C6 raw row候选已建，因设备授权受阻
+# 当前工作：C6 raw row，SSH恢复后正在 CANN9 编译
 
-## 当前源码
+## 当前源码与边界
 
-- 分支 experiment/c6-raw-row-input。parent e2f1b63 / ZIP078635；当前未上板候选实现140080d/356750B / SHA639fa38edd6adba6d4ed4869f8042d329001fbe4a7a94b6ecd7dd42bf0cf465e，七个受保护文件未动；未并main/未OJ。
-- C13 fullK（520f27d）和 C12 strided store（b159f99）均未获明显收益，保留历史分支，不并入 main、不提交 OJ、不重复采样。
-- ZIP078635 与 DISPATCH 接受源 b8817327 不同，不得把后者正式 Pass15/401.13us成绩借给当前源。
+- 分支 `experiment/c6-raw-row-input`；parent e2f1b63 / ZIP078635，当前 kernel357100B / SHA `fa315ae8072a5a128b4e57a6e9528064b9d63d2c0c1a0ad7f27a433248cce71e`。
+- 初始140080d/639fa38未经设备编译；本轮核对实际SDK发现默认LoadData只配置LEFT，不能自动配置B的RIGHT。当前修正显式SetFmatrix RIGHT + public no-reset LoadData，与保留C10写法一致。CPU新增register模型和第8个故障反例。没有新增GM，原MMAD/Fix/AIV/Plan/其它路径保留。
+- 算法仅改kernel.asc，七个受保护文件与1734f16相同；未并main/未新OJ。ZIP078635与DISPATCH接受源b881不同，后者Pass15/401.13us不是当前源的结果。
 
-## 已完成的设备证据
+## 本轮已完成：真实 C6 baseline
 
-- 服务器9382，实际24AIC48AIV，CANN9.0.0/driver26.1.1，logical0→physical14/card7chip0，core_limit20是明确调用者预算。
-- 独立 native_oj_like 工具在私有可写 /workspace/bmmms-codex；完整实际storage FP64参考、normalPlan复核、五应用调用/全部默认报告/source-DSO-input-device绑定。原main/CMake/tests/shared_assets未修改。
-- C12 BF16TN(1,1280,4096,1536) 原版83.123322us，strided store82.683304us，仅-0.53%；实际写回指令减少2688条仍不提速。详见 C12_STRIDED_PREP_STORE / PERF_LOG，raw artifacts/c12-strided-prep-store。
-- C4 BF16TT(4,8,16,128)，实际 Launch先选 SmallVectorK256Rows=8，跳过较晚dual28入口。原版完整精度+五性能输出通过，原normalPlan dual28/workers4/finalBlocks4/cubeBlocks0。
-- 五报告 actual纯Vector4、0Cube、符号small_vector_k256<BF16,true,true>，TaskDuration[2.980119,2.940118,3.120125,3.060122,3.360134]us，median3.060122；AIV各核均值五次中位V1.46/MTE20.419028/MTE30.149167/Scalar0.721806us，重叠不可相加。
-- C4首次parser因纯Vector的MixBlockDim=NA退出1；修正只读schema后对同一组五报告重解析，完整性通过，保留原错误和全部样本，没有重新跑或挑选数据。
+- 2026-10-15新入口成功，hostname2ef29bca0f61，9382/24AIC48AIV/CANN9/driver26.1.1/dev0→physical14/card7chip0；core_limit20是caller budget。
+- C6 BF16NT13/23/73/192，实际normalPlan原dual19/BM32BN80/K192/workers13/cubeBlocks13/finalBlocks2。完整reviewed frame保存在remote native_oj_like/c6.complete_frame.json。
+- baseline DSO0357587a绑定ZIP078635；全storage FP64golden，一次精度+五性能输出通过，maxabs2.3841858e-7/maxrel6.52273e-8，输入不变/y后guard完整。
+- default全部8表×5，实际single_tile_direct_batch_mix11 baseline符号/13AIC13AIV/每core一次MMAD。TaskDuration `[8.260330,9.000360,8.780352,8.860354,9.240370]`μs，中位8.860354。候选预设20%门槛<=7.0882832μs，不挑样本、不重复未改源码。
+- CPU实际raw helper+producer78batch pairs/fullK/正负/显式尾零/ready/bounds、8个反例PASS；guard production46/TUNING57反例PASS；不是实际Load3D布局或BF16设备精度证据。
+- C4 compact旧候选raw两个包已补回 `artifacts/c4-compact-k128`，没有重测。C6baseline完整plan/correctness/profile包在 `artifacts/c6-input-layout-audit`，权限700/600。
 
-## C4 候选终态及下一条动作
+## 正在进行与下一条动作
 
-- C4 compact实现7f76eed/c6bde889/353918B，CANN9编译+一次精度+五报告通过，actual true符号确认；所有输出与parent逐位一致，maxabs1.1920929e-7/maxrel1.0804517e-7。五时长3.180127/3.100124/3.080123/3.120125/3.060122，中位3.100124us，比3.060122慢1.31%。已在3b6a05d归档，无OJ/重复/参数扫描；32KiB产品状态不代表加速。
-- SSH长连接随后断开，新入口转发报platform authorization denied（跳板认证通过）。已请求新入口，我们创建的设备任务已终态；不虚构设备编译失败或将goal标为完成。C4原版全部raw已下载，候选raw仍在remote结果目录，下载PENDING；已读取真实summary并完整记入文档。
-- NEXT见C6_RAW_ROW_INPUT：恢复访问先补C4候选raw两个目录，再baseline真实C6 normalPlan/全FP64golden/一次精度+五default报告。检查实际CANN9 filter12/stride12/channel16组合、ZZ/ZN与限值；candidate独立编译/同输入五报告，actual RAW true符号确认。采前20%性能门槛，过了才扩展精度和正式15/OJ；失败归档，不扫相邻filter/stride。
-- C6已实现一个raw输入候选：连续GM→原L1，显式清零尾行；featureWidth为32*12/80*12，以已出现的Load3D字段装成原ZZ/ZN。没有使用未知padList字段，没有新GM。Mmad/UnitFlag/Fix/AIV/arena/其它kernel逐字保留；RAW默认false、准确frame+resource/align/SDKworkspace guard。只有CPU模型，native API组合与实际速度仍PENDING。
-- 实际producer输入分支/helpers CPU78batch pairs/fullK/负值/zero-tail/bounds/ready顺序通过，7故障反例被拒绝；真实guard production/TUNING46/57反例与资源边界通过，但frame为人工构造，不能代替实际MakePlan或BF16。三个独立工具和忽略日志可复现。
+- fixed candidate冻结 `/workspace/bmmms-codex/imports/c6-raw-rows-fa315ae8072a/kernel.asc`，独立CMake build-c6-raw正在编译，日志 `native_oj_like/build-c6-raw.log`。旧639fa38冻结目录保留但不编译/不把结果借给新源。
+- 编译成功后生成真实source/DSO/wrapper SHA manifest；同fixture/frame/input运行一次correctness，再五默认完整profile。actual符号须含RAW true，正常计划应一致，输出全部fullgolden通过才比较中位。
+- 20%门槛失败：保存原始证据，归档候选、恢复整份ZIP，不扫相邻filter/stride/不重复采集/不OJ；达到门槛：补全负与相关边界、正式15点后才谈冲榜成果。
+- 新filter12/stride12/channel16组合，字段及后台调用已核对真实9SDK，但真实支持/目的ZZ-ZN/速度未验证。不要以CPU模型或字段宽度代替设备证据。
 
-## 工具与交接
+## 既有失败结论与交接
 
-- SSH私有配置/private/tmp/bmmms-remote-access/config；旧master23895/exec13910已断开，无凭据入Git。实际状态用ssh -O check检查，需新有效入口。
-- native工具/DSO/完整frame/inputs/reports在 /workspace/bmmms-codex/native_oj_like 和inputs；private NumPy2.2.6 Python test-venv/bin/python。
-- 真实NPU文件锁及active/pending队列；我们创建的设备任务已终态，整个服务器状态重连后复核。GitHub已授权私有仓库；push当前实验分支，不改标签/main。
-- 未验证：当前源正式15点、另一SoC、ZIP与接受源绑定。无新OJ请求。整体冲榜目标未完成。
+- C13 fullK MMAD4→2，native仅9.100364→9.040361us，未15%门槛；archive experiment/c13-full-k-halves/520f27d，无OJ/重测。
+- C12 strided Bprep MTE3指令实降2688，83.123322→82.683304us仅0.53%，未10%门槛；archive b159f99，无OJ/重测。
+- C4 compact K128产品64KiB→32KiB，3.060122→3.100124us慢1.31%，未20%门槛；archive3b6a05d。parser纯Vector MixBlockDim NA仅重解析原五报告，未重采。
+- 尊重队友C8已完五轮/C7 parked/C9常量Schedule paused，历史失败方向详见 TEAMMATE_777734_REVIEW 和独立档案，不重命名复做。
+- 接受源readonly CLI查询6acdd94d本机会话加载成功但HTTP403，未取到source/result；不是明确401，不据此要求重新登录。原始脱敏摘要ignored accepted-identity-read.json。无新OJ任务。
 
-## 接受源身份查询补充
+## 环境与资源
 
-通过已授权的归档CLI读取DISPATCH提交6acdd94de76989292739d40b：本机会话成功加载，HTTP403，未取到源码或结果。不能把它解释成明确401/登录过期，未创建任务，也未绕过权限。ZIP078635→接受b881身份仍PENDING。原始只读状态摘要在忽略目录artifacts/c6-input-layout-audit/accepted-identity-read.json。
-
-## 阻塞审查与恢复条件
-
-相同的云平台转发授权问题在原始用户触发的工作轮与随后两次goal continuation中连续出现。最新实查：control master/socket不存在；干净SSH跳板认证通过，转发再次报platform authorization denied/exit255。不是观察超时或仍运行的NPU任务。脱敏最新日志/private/tmp/bmmms-remote-access/revalidate-sanitized.log。
-
-先前两轮已完成候选、实际源码CPU/入口检查、GitHub推送以及CANNJudge接受源只读403诊断。现在缺少可访问的CANN9 header/编译/NPU正常计划与性能门槛；不能用更多CPU模型替代它们，也不能叠加尚未设备验证的新kernel优化。冲榜目标未完成，按连续三轮同一阻塞的规则标记blocked，等待外部授权恢复。
-
-用户提供新的有效SSH入口或设备Agent在同分支返回验证日志后，重新按C6_RAW_ROW_INPUT的具体步骤推进；先复核设备和队列并补C4候选raw，再测C6冻结parent与candidate。无需重复root密码，不将凭据写入仓库。当前源/文档/CPU证据完整保留，main和历史标签不动。
+- 私有SSH config `/private/tmp/bmmms-remote-access/config`，前台master98210 / exec75384 / ControlPersist=no；用 `ssh -O check` 复核，不保证长期存活。凭据/askpass不入Git，askpass已删除。
+- 设备工具 `/workspace/bmmms-codex/native_oj_like`；私有NumPy2.2.6 Python `/workspace/bmmms-codex/test-venv/bin/python`。source CANN set_env，runtime driver/lib64/common和driver/lib64/driver加入LD_LIBRARY_PATH。
+- 真globalfilelock+active/pending queue序列化设备，编译可以并行。baseline任务已终态，最新是否有活动任务以真实queue/ps为准。shared_assets只读未改。
+- GitHub私有 `Icyjerry/batchmatmul-maxsum-ascendc` 已授权，push当前实验分支；不移动历史tag/不重写已推送历史。
+- 当前目标active，历史三轮platform-denied已因新入口解除；仍未验证candidate编译/native/full15/另一SoC/ZIP-accepted绑定，整体冲榜未完成。

@@ -1,4 +1,4 @@
-# C6 raw row 输入候选：生产源码已建，设备验证待恢复
+# C6 raw row 输入候选：连接恢复，实际 SDK 配置修正与 native 验证
 
 ## 假设
 
@@ -10,9 +10,9 @@
 
 ## 源码与准入
 
-- 分支 `experiment/c6-raw-row-input`，实现 `140080d`；候选356750B，SHA256 `639fa38edd6adba6d4ed4869f8042d329001fbe4a7a94b6ecd7dd42bf0cf465e`。
+- 分支 `experiment/c6-raw-row-input`，初始实现 `140080d` / 639fa38 / 356750B 未编译；核对真实 SDK 后修正 RIGHT FMatrix，当前357100B，SHA256 `fa315ae8072a5a128b4e57a6e9528064b9d63d2c0c1a0ad7f27a433248cce71e`。旧冻结源码保留，不与新结果混用。
 - 算法仅修改kernel.asc，65增/5删；`RAW_ROWS`默认false，仅已有MP32/NP80/KP192 early入口通过`UseSmallC6RawRows`时开启。
-- 精确公开shape/BF16/NT、原Schedule/worker/Cube grid、输入32B对齐、actual平台core和UB/L1/L0、原system workspace/partial/ring容量全部检查；显式TUNING关闭该入口。资源或plan不符回退原函数。这里不声称已采到C6实际normalPlan。
+- 精确公开shape/BF16/NT、原Schedule/worker/Cube grid、输入32B对齐、actual平台core和UB/L1/L0、原system workspace/partial/ring容量全部检查；显式TUNING关闭该入口。资源或plan不符回退原函数。已实查本机正常 MakePlan 命中原13 Cube/13 Vector计划，完整frame见下。
 - 静态约束限定DIRECT_BATCH/SINGLE_AIV/NT/32×80×192/2字节；其它实例输入分支逐字保留。七个受保护文件与1734f16一致。
 - 现有GM分区、分配、输入只读和输出B个FP32没有改变。没有新GM通路或CPU替代输出。
 
@@ -32,25 +32,25 @@ L0A12288B/L0B30720B/L0C10240B与原分配相同。**直接copy加清零的L1写�
 
 ## API依据与尚未验证项
 
-所有调用及参数字段都已在这份CANN9编译过的源码中出现：InitConstValueParams/InitConstValue、普通GM→L1 DataCopy、LoadData3DParamsV2、filter/stride/dilation/extension、fMatrixCtrl与LoadData。模型不新增padList或SDK内部缓存操作。LEFT/RIGHT使用公共参数，自动reset规则沿用公共LoadData默认行为。
+所有调用及参数字段都已在这份CANN9编译过的源码中出现：InitConstValueParams/InitConstValue、普通GM→L1 DataCopy、LoadData3DParamsV2、filter/stride/dilation/extension、fMatrixCtrl与LoadData。模型不新增padList或SDK内部缓存操作。真实 CANN9 `kernel_operator_mm_base_impl.h` / dav_c220 `kernel_operator_mm_impl.h` 表明：默认 LoadData 的 Load3DSetFMatrixCal 只写 LEFT，不随 fMatrixCtrl 自动写 RIGHT。因此旧639fa38的 B 配置不完整；当前 A沿用默认 LEFT，B 显式 SetFmatrix(...FMATRIX_RIGHT) 并使用 `{false,false}` no-reset LoadData，沿用保留 C10 的公开 API 写法。CPU模型新增两个独立 FMatrix register 状态，缺 RIGHT setter 的反例必须失败。
 
-**新filterW12/strideW12/channel16组合、实际目的ZZ/ZN与后台限值尚未核对设备header或编译结果**。因此它是隔离的未上板候选，不是已确认可运行API组合。连接恢复后先查实际CANN9 header并编译；若限值不支持，停止该方案并归档，不改SDK或假装可用。
+实际 SDK 声明 filter/stride 为 uint8、channel/extension 为 uint16，dav_c220 后台直接传入 img2colv2_cbuf_to_ca/cb；这些只能证实字段和调用存在。filter12/stride12/channel16 的真实布局与限制仍须 CANN 编译和设备精度验证，不能由字段宽度推断支持。当前独立编译中，尚不声称候选可运行。
 
 ## 事件与CPU证据
 
 输入实际代码先issue A清零/copy/ready0，再issue B清零/copy/ready1。等ready0才load A；B仍可在MTE2途中。等ready1才load B。后续原MTE1_M保护MMAD，原UnitFlag3保护Fix，原FIX0保护Vector，终末原PIPE_ALL保留。每core只处理一个batch，无L1/L0跨task复用新增风险。
 
-`tools/validate_c6_raw_row_input.py`抽取实际两helper与实际producer raw分支，延迟MTE2/ready前缀模型执行78batch pairs（3seed×mixed/全负×13），逐元素验证padded L1、native标签ZZ/ZN、完整M23N73K192点积及Max→Sum、输入不变与bounds。7个反例：缺tail fill、错stride、错RIGHT、错GMoffset、漏A ready、漏B ready、错batchstride，全部被拒绝。
+`tools/validate_c6_raw_row_input.py`抽取实际两helper与实际producer raw分支，延迟MTE2/ready前缀模型执行78batch pairs（3seed×mixed/全负×13），逐元素验证padded L1、native标签ZZ/ZN、完整M23N73K192点积及Max→Sum、输入不变与bounds。8个反例：缺tail fill、错stride、错RIGHT、错GMoffset、漏A ready、漏B ready、错batchstride、缺 RIGHT FMatrix 设置，全部被拒绝。
 
 整份逆补丁恢复e2f1b63；证明原数学/归约/GM/默认输入路径/其它kernel未改。CPU坐标与整数点积不是BF16舍入、真实Load3D或硬件流水证据。
 
-`tools/validate_c6_raw_guard.py`抽取真实guard，production/TUNING各接受一个精确**人工构造**frame、拒绝46/57个反例，并检查内存容量的临界值。它不执行SDK MakePlan，不证明实际C6会命中；真实MakePlan复核仍是设备门槛。
+`tools/validate_c6_raw_guard.py`抽取真实guard，production/TUNING各接受一个精确**人工构造**frame、拒绝46/57个反例，并检查内存容量的临界值。它不执行SDK MakePlan；本轮另行读取设备实际 MakePlan，不能把 CPU guard 正例当设备证据。
 
 原独立几何工具已改成显式L1 zero-tail构造并通过；不再依赖外部padList假设。Raw日志在忽略目录artifacts/c6-input-layout-audit，权限700/600。
 
 ## 下一条可执行设备验证
 
-服务器入口当前转发被平台拒绝；前轮创建的设备任务均已终态，未创建新任务。已请求新入口，整个服务器的活动状态需重连后检查。
+2026-10-15 用户新入口已连通；先复核队列空闲，9382实际24AIC48AIV/CANN9.0.0/logical0→physical14/card7chip0。C4旧候选 raw 两包已补回，不重测 C4。SSH需前台 ControlPersist=no master；凭据仅在私有临时配置。
 
 1. 验证SoC/CANN/物理映射/真实核数及队列，再补下载C4候选原始报告（旧结果路径见HANDOFF）。不重新跑同候选。
 2. 冻结parent e2f1b63与当前candidate各一份source；普通baseline DSO已在`native_oj_like/build-baseline`，核对实际SHA再使用。
@@ -60,4 +60,14 @@ L0A12288B/L0B30720B/L0C10240B与原分配相同。**直接copy加清零的L1写�
 6. 相同输入/device/normalPlan，candidate一次完整精度+五默认报告，实际符号必须含RAW true；保持0应用warmup/5calls、msprof op warm-up5/launch-count5000/replay-mode kernel/default全八表。所有输出/guards/input/报告完整性通过才比较五次TaskDuration median。
 7. 采候选前固定：**至少20%中位改善**才补全负/重复/正式15点验证并准备OJ提交；否则归档恢复ZIP，不扫描filter/stride或原样重复。未达到门槛不称突破。
 
-CPU模型PASS；实际normalPlan、CANN编译、设备BF16精度/时间/完整五报告、正式15点均 **PENDING**。没有新OJ任务、没有并main、没有移动历史标签。整体冲榜目标未达成。
+CPU模型PASS；parent 实际normalPlan/完整BF16精度/五默认完整报告PASS；candidate CANN编译、设备BF16精度/五报告、正式15点 **PENDING**。没有新OJ任务、没有并main、没有移动历史标签。整体冲榜目标未达成。
+
+## 2026-10-15 parent 实际设备结果
+
+ZIP078635 source / DSO0357587a。BF16 NT `(13,23,73,192)`，caller core_limit20；actual hardware24/48。
+完整实际normalPlan：cubeBlocks13/finalBlocks2/systemBytes16777216/totalBytes17045504；Schedule baseM32/baseN80/mTiles1/nTiles1/nSplit1/workers13/window1/kSplit1/kChunk192/microRows23/batchGroup0/dual19/earlySum0/tree0/balance1/vectorTile1024。Cube usedCoreNum13/baseM32/baseN80/baseK192/stepM=N=Ka=Kb=1/depthA1=B1=1/dbL0A=B=2/dbL0C1/shareL1Size43008。
+
+一次完整精度与五性能调用通过，maxabs2.384185791015625e-7，maxrel6.522730018203635e-8，输入不变/y后16word guard完整。Full-storage FP64 reference，不采样；seed1746实际BF16。
+五 TaskDuration `[8.260330,9.000360,8.780352,8.860354,9.240370]` μs，中位 **8.860354μs**。实际符号 baseline single_tile_direct_batch_mix11 BF16/NT/32/80/192/DIRECT true，13AIC13AIV，每核一次Cube instruction；默认全部8表×5报告。20%候选门槛 **<=7.0882832μs**，不重测/筛样本。
+
+私有原始完整包、summary在 `artifacts/c6-input-layout-audit/c6-baseline-{plan,correctness,profile}.tgz` 和 remote `native_oj_like/results/c6-baseline-*`，source/DSO/input/SoC/完整frame绑定。不是正式15/OJ结果。

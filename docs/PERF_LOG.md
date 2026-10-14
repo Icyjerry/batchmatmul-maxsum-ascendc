@@ -1157,3 +1157,10 @@ Candidate7f76eed/c6bde889/353918B，产品状态K128→64lane，Mul低64再公�
 实验branch experiment/c6-raw-row-input，parentZIP078635/e2f1b63。Candidate356750B/SHA639fa38edd6adba6d4ed4869f8042d329001fbe4a7a94b6ecd7dd42bf0cf465e，kernel65增5删。仅BF16NT确认frame(13,23,73,192)原dual19 static32/80/192 MIX11完整准入开启RAW_ROWS；普通GM→原L1，加显式tail zero，以现有Load3D fields filter12/stride12/channel16映射完整行到ZZ/ZN。未用新padding API/新GM；fullK MMAD/UnitFlag/Fix/原AIV/arena/七文件不变。新API参数组合限值、实际normalPlan和性能待设备，不能据CPU宣称可用/加速。
 
 CPU实际新增producer分支/helpers78batch pairs/完整K/负值/零尾/输入bounds/ready顺序通过，7故意错字段/ready/offset/batch反例被拒绝，whole inverse恢复parent。实际guard production/TUNING分别46/57反例和资源边界通过，正例是人工frame，不证明MakePlan命中。独立几何模型升级显式L1补零，避免padList未知字段。操作数L1写入总字节与原pad体量相同，MTE2新增2次InitConst，不按指令数估计速度。源码只在实验分支，nativePlan/CANNcompile/BF16precision/5report latency/OJ15均PENDING，无新OJ请求。SSH长连接断开后跳板转发platform authorization denied，已请求新入口；旧设备任务已终态，不虚构live等待。C6_RAW_ROW_INPUT给出可执行验证，采前20%中位gate，不盲重测/扫参数。Raw ignored artifacts/c6-input-layout-audit；总体目标未达成。
+
+
+## 2026-10-15 恢复设备访问，真实 C6 baseline 与 RIGHT 配置修正
+
+新入口已连通，9382/actual24AIC48AIV/dev0physical14/CANN9，队列复核后串行运行。C4候选raw两包补回，不重采。C6 BF16NT13/23/73/192 actual normalPlan dual19/BM32BN80/K192/workers13/cube13/final2，完整frame冻结。ZIP078635/DSO0357587a完整storage FP64golden，一次精度+五profile输出通过，maxabs2.384185791015625e-7/maxrel6.522730018203635e-8，inputs/yguard不变。默认全部8表×5，实际baseline MIX11/13AIC13AIV/每核一次Cube，TaskDuration[8.260330,9.000360,8.780352,8.860354,9.240370]us，中位8.860354；预设20%gate<=7.0882832us。
+
+核对真实9SDK发现639fa38的B路径缺RIGHT FMatrix配置：默认Load3DSetFMatrixCal只写LEFT。当前fa315ae8072a/357100B修为显式SetFmatrix RIGHT+公共no-reset LoadData，沿用原C10API。CPU新增LEFT/RIGHT独立register及缺setter反例，78batch pairs+8反例、guard46/57、geometry通过；不是native布局证据。新源冻结/独立DSO正在编译；639fa38未编译/未测，候选native精度/性能/full15均PENDING。无新增GM/受保护7文件变化/正式提交，未声称突破。

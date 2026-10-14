@@ -20,6 +20,11 @@ using half=uint16_t;
 namespace AscendC {
 using TEventID=unsigned;
 enum class HardEvent{MTE2_MTE1};enum class TPosition{A1,B1,A2,B2};
+struct IsResetLoad3dConfig{bool isSetFMatrix,isSetPadding;};
+constexpr IsResetLoad3dConfig DEFAULT_LOAD3D={true,true};
+enum class FmatrixMode{FMATRIX_RIGHT};
+unsigned matrixWidth[2]={0,0};
+void SetFmatrix(unsigned h,unsigned w,const uint8_t*pad,FmatrixMode){assert(h==1);for(unsigned i=0;i<4;++i)assert(!pad[i]);matrixWidth[1]=w;}
 struct Storage{std::vector<uint16_t>v;std::vector<bool>valid;TPosition pos;Storage(size_t n,TPosition p):v(n,0xfbad),valid(n,false),pos(p){}};
 template<class T>struct LocalTensor{
  Storage* owner;size_t off=0;
@@ -49,11 +54,14 @@ template<class T>struct LoadData3DParamsV2{
  unsigned mStartPt=0,kStartPt=0,mExtension=0,kExtension=0;
  bool filterSizeH=false,filterSizeW=false,enTranspose=false,fMatrixCtrl=false;
 };
-template<class T>void LoadData(LocalTensor<T>dst,LocalTensor<T>src,LoadData3DParamsV2<T>p){
+template<class T,const IsResetLoad3dConfig& config=DEFAULT_LOAD3D>void LoadData(LocalTensor<T>dst,LocalTensor<T>src,LoadData3DParamsV2<T>p){
+ // CANN9's public default config writes LEFT even when fMatrixCtrl selects RIGHT.
+ if constexpr(config.isSetFMatrix)matrixWidth[0]=p.l1W;
  assert(p.l1H==1&&p.channelSize==16&&p.filterH==1&&p.filterW==12&&p.strideH==1&&p.strideW==12);
  assert(p.dilationFilterH==1&&p.dilationFilterW==1&&!p.filterSizeH&&!p.filterSizeW&&!p.enTranspose);
  assert(!p.mStartPt&&!p.kStartPt&&p.kExtension==192&&p.mExtension%16==0&&p.l1W==p.mExtension*12);
  bool right=dst.owner->pos==TPosition::B2;assert(p.fMatrixCtrl==right);
+ assert(matrixWidth[p.fMatrixCtrl]==p.l1W);
  assert(issued==4);if(!right)assert(done==2&&ready.count(1));else assert(done==4&&ready.empty());
  assert(src.owner->pos==(right?TPosition::B1:TPosition::A1));
  assert(src.off+p.l1W*16<=src.owner->v.size());
@@ -77,7 +85,7 @@ int main(){
   }
   auto aa=a,bb=b;
   for(unsigned z=0;z<B;++z){
-   using namespace AscendC;assert(dma.empty()&&ready.empty());issued=done=0;
+   using namespace AscendC;assert(dma.empty()&&ready.empty());issued=done=0;matrixWidth[0]=matrixWidth[1]=0;
    Storage as(MP*K,TPosition::A1),bs(NP*K,TPosition::B1),ad(MP*K,TPosition::A2),bd(NP*K,TPosition::B2);
    LocalTensor<half>a1{&as},b1{&bs},a2{&ad},b2{&bd};
    gm.clear();gm[reinterpret_cast<uintptr_t>(a.data())]=&a;gm[reinterpret_cast<uintptr_t>(b.data())]=&b;
@@ -128,10 +136,10 @@ return;
    (p/(name+'.cpp')).write_text(PRE+body+frame+POST);subprocess.run(['c++','-std=c++17','-O2',str(p/(name+'.cpp')),'-o',str(p/name)],check=True)
    return subprocess.run([str(p/name)],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
   r=run(helper,'model');assert r.returncode==0,r.stderr.decode();print(r.stdout.decode(),end='')
-  for label,bad in [('tail_fill',helper.replace('if(rows<paddedRows){','if(false){')),('row_stride',helper.replace('panel.strideW=12','panel.strideW=1')),('right_matrix',helper.replace('panel.fMatrixCtrl=RIGHT','panel.fMatrixCtrl=false')),('read_offset',helper.replace('src[offset],rows*k','src[offset+16],rows*k'))]:
+  for label,bad in [('tail_fill',helper.replace('if(rows<paddedRows){','if(false){')),('row_stride',helper.replace('panel.strideW=12','panel.strideW=1')),('right_matrix',helper.replace('panel.fMatrixCtrl=RIGHT','panel.fMatrixCtrl=false')),('read_offset',helper.replace('src[offset],rows*k','src[offset+16],rows*k')),('missing_right_setup',helper.replace('AscendC::SetFmatrix(1,paddedRows*12,zeroPad,AscendC::FmatrixMode::FMATRIX_RIGHT);',''))]:
    assert bad!=helper;result=run(bad,label);assert result.returncode!=0,label
   for label,bad in [('A_ready',caller.replace('AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(0);','')),('B_ready',caller.replace('AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(1);','')),('batch_stride',caller.replace('int64_t(worker)*s.n*s.k','int64_t(worker)*s.m*s.k'))]:
    assert bad!=caller;result=run(helper,label,bad);assert result.returncode!=0,label
- print('Scope/protected7/seven negative controls PASS',hashlib.sha256(s.encode()).hexdigest())
+ print('Scope/protected7/eight negative controls including actual SDK RIGHT setup PASS',hashlib.sha256(s.encode()).hexdigest())
  print('CPU im2col instruction semantics are an explicit hypothesis. Native Load3D support/layout/float accuracy/performance PENDING.')
 if __name__=='__main__':main()
