@@ -25,3 +25,11 @@ NPU UB只用一个32B输出buffer，预留64B cacheline+1024资源余量，显�
 缓存/事件是mock，不是NPU coherence/时序证明。`validate_c1_scalar_guard.py` 抽取实际guard，8种dtype/layout接受，production/TUNING22/33个shape/alignment/plan/core/UB边界/pin拒绝；非SDK tiler。
 
 候选修正后CANN编译/nativeFP16/BF16/缓存变化输入/五默认性能：PENDING。当前没有新OJ任务。
+
+## Native终态：精度与变化输入通过，但明显变慢，恢复parent
+
+修正4c081854 CANN9/dav2201编译PASS，DSObf9f52ceecb15317851a2c2eccae283a68c5a5fcf0231988708d61e0d55374c0/source4c081854/wrapper994e29f。一次mixed和同context/stream/输入地址A/B/A mixed→negative→mixed均通过，输出[.2724899649620056,-.6596844792366028,.2724899649620056]，最大abs5.960464477539063e-8/rel9.035327044504768e-8，input/yguard完整。支持此fixture下失效/刷新实际有效，不证明所有SoC缓存行为。
+
+default8表×5实际scalar_cache_dot32<false>/pureVector1AIV，全部输出通过；times[7.840313,7.880315,2.240090,2.280091,2.340094]us，中位2.340094us，parent1.600064，慢46.25%。保留首两项高耗时，不过滤，不无证据归因缓存/Icache/温度。未20%gate，不扫unroll/accumulator/UBoffset或删缓存维护救性能，不再运行BF16硬件/正式15/OJ。完整恢复2073，候选归档28e1a82/8b6fba3。
+
+全部原始失败/修正build、baseline/candidate精度及五报告、input序列/DSO身份保留远端c1-scalar-evidence.tgz；下载至artifacts/c1-scalar-cache-dot后作为原始证据，不将CPU有限编码覆盖写成BF16硬件通过。

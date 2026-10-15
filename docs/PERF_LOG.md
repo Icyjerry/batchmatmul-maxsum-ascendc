@@ -1251,3 +1251,7 @@ PMU核心均值五次中位：AIV Vector5.146000→1.953111us，但AIC MTE1 25.4
 Parent2073/DSOca36实际C1 FP16/B1M1N1K32 plan dual15/group2/final1/total0，baseline一次及五输出fullstorageFP64通过（abs2.98e-8），原dotshort pureVector1AIV/default8表×5，times[1.960078,2.000080,1.560062,1.560062,1.600064]us，中位1.600064，采前20%gate<=1.2800512us。
 
 新结构为NPU scalar DCache读取packed32bit完整64B/输入、FP16/BF16解码、FP32两链全K32累加，原4B DMA输出和PIPE_ALL。每调用input64B cacheline失效、UB输出cacheflush/S_MTE3，无新增GM。不同于已失败literal Vector。初始9e699fe1编译反证CANN9 publicLocal Dcci重载const_cast非法，未改SDK；4c081854用该SDK内部对应的实际dcci指令，编译中。43ASC新增行/default inverse/保护7、全部128768有限编码/256fullK FP64CPU样本/6故障反例及guard22/33通过，是mock非native证明。实现28e1a82，候选native精度/缓存一致性/性能PENDING，无新OJ。详见C1_SCALAR_CACHE_DOT。
+
+### C1 scalar-cache终态：编译/FP16精度/同地址交替输入通过，性能慢46.25%
+
+4c081854（实现28e1a82），修正CANN编译PASS，DSObf9f52ce。Mixed及A/B/A同context/stream/输入分配输出[.2724899649620056,-.6596844792366028,.2724899649620056]，maxabs5.96e-8，input/yguard完整。profile实际scalar_cache_dot32<false>/pureVector1AIV/default8表×5，五输出通过；times[7.840313,7.880315,2.240090,2.280091,2.340094]us，中位2.340094，parent1.600064，慢46.25%，未20%gate。保留全部高值，不归因无证据的单一缓存因素，不删缓存维护/扫unroll或accumulator救性能，不OJ/重采。BF16硬件/正式15未做，恢复2073。下一C3 flatten Gather：保持原数据转换与点积归约，仅将逐行Gather改成完整offset矩阵一次Gather，待SDK/CPU/native验证，不重复Ktree/transpose。
