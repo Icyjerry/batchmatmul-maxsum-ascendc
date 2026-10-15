@@ -1,3 +1,11 @@
+# 当前：新 SSH 已恢复，C2 half Gather/mixed FP32 原生精度通过，性能对照中
+
+experiment/c2-half-gather-mla，source9c29cf19/+68lines over retained2073；CANN9/9382/24AIC48AIV/caller20已编译，DSOc88f3a71。CPU536/all4layout+8faults、guard5/31及5/42、inverse/protected7通过。Native四layout各mixed-negative-mixed同地址三调用full FP64/output/input guards精确通过，真实plan dual16/vector1/noGM。正式C2 dtype/layout未知，勿把FP16fixture冒充隐藏配置；BF16回原。详见C2_HALF_GATHER_MLA。
+
+NEXT poll exec45886（四correctness已终态0，现parent FF default8表×5 profile进行中）。父source2073/DSOca36。父完成先冻结gate=median*.9且所有五<父最快，再采候选一次default5，actualsymbol必须half_mla40/1AIV。失败归档恢复2073，不重采/扫近邻/OJ；成功才进一步提交门槛验证。新SSHmaster57930/pid13934有效，config已更新/askpass删除，scp-O。当前无OJ。原正式任务820092/2073 Pass15保持，整体目标active未完成。
+
+## 以下保留历史交接（当前以上段为准）
+
 # 最新连接状态：本turn验证已完成后master断开，备用授权重连被拒
 
 本turn C9与C1所有任务已terminal0、raw完整下载、kernel已恢复2073并push8e9d473；随后最后检查control socket缺失、pid9058不存在，原master63301已terminal（内部SSH exit255）。使用用户备用授权+原root认证干净重连实际platform authorization denied，askpass已删除，private master-reconnect.log0600。已异步请求新入口，无需重复root密码。这是完成本turn设备工作之后的新阻碍，不把前序已解除的blocked直接沿用；当前goal仍active，不标完成。

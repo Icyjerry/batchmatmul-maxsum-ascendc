@@ -1,0 +1,28 @@
+{
+  "shape": [
+    1,
+    3,
+    5,
+    40
+  ],
+  "dtype": 1,
+  "transpose": [
+    1,
+    0
+  ],
+  "core_limit": 20,
+  "device": 0,
+  "expected_soc": "Ascend910_9382",
+  "expected_physical": 14,
+  "smi_card": 7,
+  "smi_chip": 0,
+  "provenance": "User-provided C2 shape; explicit FP16 four-layout local fixture; formal dtype/layout not uniquely confirmed.",
+  "capture": {
+    "op_type": "vector",
+    "family": "bmmms_tiny",
+    "block_dim": 1,
+    "mix_block_dim": 0,
+    "aic": 0,
+    "aiv": 1
+  }
+}
