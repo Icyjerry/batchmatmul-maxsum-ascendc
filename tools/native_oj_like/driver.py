@@ -10,7 +10,7 @@ def check(code,what):
 def main():
  p=argparse.ArgumentParser();p.add_argument('--lib',required=True);p.add_argument('--case',required=True)
  p.add_argument('--inputs',required=True);p.add_argument('--output',required=True);p.add_argument('--calls',type=int,default=1)
- p.add_argument('--frame');p.add_argument('--plan-only',action='store_true');a=p.parse_args();case=json.loads(Path(a.case).read_text())
+ p.add_argument('--frame');p.add_argument('--plan-only',action='store_true');p.add_argument('--input-sequence');a=p.parse_args();case=json.loads(Path(a.case).read_text())
  out=Path(a.output);out.mkdir(parents=True,exist_ok=True);inputs=Path(a.inputs)
  B,M,N,K=case['shape'];dt=case['dtype'];tx1,tx2=case['transpose'];limit=case['core_limit'];dev=case['device']
  manifest=json.loads(Path(a.lib+'.identity.json').read_text());assert manifest['dso_sha256']==sha(a.lib)
@@ -38,11 +38,18 @@ def main():
   (out/'identity.json').write_text(json.dumps(identity,indent=2))
   if a.plan_only:print(json.dumps(identity,indent=2));return
   assert a.frame and frame==json.loads(Path(a.frame).read_text()),'normal plan differs from reviewed complete frame'
-  expected=np.fromfile(inputs/'golden.f32',dtype='<f4');assert expected.size==B
-  raw=[(inputs/n).read_bytes() for n in ['x1.b16','x2.b16']]
-  assert len(raw[0])==B*M*K*2 and len(raw[1])==B*N*K*2
-  ref=json.loads((inputs/'reference.json').read_text());assert ref['case']==case and ref['full_math']
-  assert ref['input_sha256']==[hashlib.sha256(x).hexdigest() for x in raw]
+  def payload(folder):
+   expected=np.fromfile(folder/'golden.f32',dtype='<f4');assert expected.size==B
+   raw=[(folder/n).read_bytes() for n in ['x1.b16','x2.b16']]
+   assert len(raw[0])==B*M*K*2 and len(raw[1])==B*N*K*2
+   ref=json.loads((folder/'reference.json').read_text());assert ref['case']==case and ref['full_math']
+   assert ref['input_sha256']==[hashlib.sha256(x).hexdigest() for x in raw]
+   return raw,expected
+  sequence=json.loads(Path(a.input_sequence).read_text()) if a.input_sequence else None
+  if sequence is not None:
+   assert len(sequence)==a.calls and Path(sequence[0]).resolve()==inputs.resolve()
+   identity['input_sequence']=[]
+  raw,expected=payload(inputs)
   identity['input_sha256']=[hashlib.sha256(x).hexdigest() for x in raw];identity['golden_sha256']=sha(inputs/'golden.f32')
   for v in raw:
    ptr=c.c_void_p();check(acl.aclrtMalloc(c.byref(ptr),len(v),0),'input malloc');buffers.append(ptr)
@@ -51,6 +58,15 @@ def main():
   check(acl.aclrtMalloc(c.byref(y),guard.nbytes,0),'output malloc');buffers.append(y)
   check(acl.aclrtCreateStream(c.byref(stream)),'createStream');results=[]
   for i in range(a.calls):
+   if sequence is not None:
+    if i:
+     for ptr,v in zip(buffers,raw):
+      read=c.create_string_buffer(len(v));check(acl.aclrtMemcpy(read,len(v),ptr,len(v),2),'previous input D2H');assert read.raw==v,'previous input modified'
+     raw,expected=payload(Path(sequence[i]))
+     for ptr,v in zip(buffers,raw):
+      src=c.create_string_buffer(v);check(acl.aclrtMemcpy(ptr,len(v),src,len(v),1),'next input H2D')
+    identity['input_sequence'].append({'call':i,'directory':sequence[i],'input_sha256':[hashlib.sha256(v).hexdigest() for v in raw],'golden_sha256':sha(Path(sequence[i])/'golden.f32')})
+    (out/'identity.json').write_text(json.dumps(identity,indent=2))
    check(acl.aclrtMemcpy(y,guard.nbytes,c.c_void_p(guard.ctypes.data),guard.nbytes,1),'output guard reset')
    check(lib.native_call(buffers[0],buffers[1],y,stream,*args),'run_kernel')
    check(acl.aclrtSynchronizeStreamWithTimeout(stream,60000),'synchronize')

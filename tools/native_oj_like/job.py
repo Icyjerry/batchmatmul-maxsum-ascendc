@@ -26,10 +26,14 @@ def serial(root,name):
 
 def main():
  p=argparse.ArgumentParser();p.add_argument('--lib',required=True);p.add_argument('--case',required=True);p.add_argument('--inputs',required=True)
- p.add_argument('--frame');p.add_argument('--output',required=True);p.add_argument('--python',required=True);p.add_argument('--queue',required=True);p.add_argument('--mode',choices=['plan','correctness','profile'],required=True)
+ p.add_argument('--frame');p.add_argument('--output',required=True);p.add_argument('--python',required=True);p.add_argument('--queue',required=True);p.add_argument('--mode',choices=['plan','correctness','profile'],required=True);p.add_argument('--input-sequence')
  a=p.parse_args();out=Path(a.output);out.mkdir(parents=True,exist_ok=False)
  cmd=[a.python,str(Path(__file__).with_name('driver.py')),'--lib',str(Path(a.lib).resolve()),'--case',str(Path(a.case).resolve()),'--inputs',str(Path(a.inputs).resolve()),'--output',str(out/'application')]
  if a.frame:cmd+=['--frame',str(Path(a.frame).resolve())]
+ if a.input_sequence:
+  assert a.mode=='correctness','input alternation is a correctness diagnostic, not a timing mode'
+  sequence=json.loads(Path(a.input_sequence).read_text());assert sequence and len(sequence)>1
+  cmd+=['--input-sequence',str(Path(a.input_sequence).resolve()),'--calls',str(len(sequence))]
  if a.mode=='plan':cmd+=['--plan-only']
  elif a.mode=='profile':cmd+=['--calls','5'];cmd=['msprof','op','--application='+shlex.join(cmd),'--output='+str(out/'profiler'),'--warm-up=5','--launch-count=5000','--replay-mode=kernel']
  (out/'command.json').write_text(json.dumps(cmd,indent=2))

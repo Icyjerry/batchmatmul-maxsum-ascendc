@@ -1196,4 +1196,9 @@ CPU实际新增producer分支/helpers78batch pairs/完整K/负值/零尾/输入b
 
 ## C15 resident input终态：native PASS，仅1.28%，归档保留就绪修复
 
-42d3e95/dd a7b307（完整SHAdda7b307090859d1ec4f9f2d88b3622c5d85b26c50eb7f7b32388002b86bce67）/356494B，DSO59878aa0，真实RESIDENT true/8AIC8AIV/每核8个K128 MMAD/default8表×5。混合/全负/全部五性能输出通过，混合与fullFP64golden精确，inputs/guard完整。times[10.980439,10.580423,10.800432,10.860435,10.760430]us，中位10.800432，对正确parent10.940437仅-1.279702%，未20%门槛，不OJ/重复/参数扫描。AIC MTE2 3.659375→2.958681/MTE1 1.086945→.921389/scalar5.270903→2.468750，但新增cube-stall2.889514、AIV flag0wait几乎未变，重叠不可相加或作单因素因果。原始资料全下载artifacts/c15-resident-split-input。恢复完整2073f48e/a11e2d9，保留实际修复零输出的Cube就绪通知，不恢复错误ZIP。下一大矩阵原MDL实际pipeline分析，不重做队友失败的分组/BM方案。
+42d3e95/dda7b307（完整SHAdda7b307090859d1ec4f9f2d88b3622c5d85b26c50eb7f7b32388002b86bce67）/356494B，DSO59878aa0，真实RESIDENT true/8AIC8AIV/每核8个K128 MMAD/default8表×5。混合/全负/全部五性能输出通过，混合与fullFP64golden精确，inputs/guard完整。times[10.980439,10.580423,10.800432,10.860435,10.760430]us，中位10.800432，对正确parent10.940437仅-1.279702%，未20%门槛，不OJ/重复/参数扫描。AIC MTE2 3.659375→2.958681/MTE1 1.086945→.921389/scalar5.270903→2.468750，但新增cube-stall2.889514、AIV flag0wait几乎未变，重叠不可相加或作单因素因果。原始资料全下载artifacts/c15-resident-split-input。恢复完整2073f48e/a11e2d9，保留实际修复零输出的Cube就绪通知，不恢复错误ZIP。下一大矩阵原MDL实际pipeline分析，不重做队友失败的分组/BM方案。
+
+
+## C15 同进程交替输入：保留修复通过 A/B/A
+
+仅独立 native correctness 工具增加可选 input-sequence，正式 main/golden/阈值及性能五报告 preset 不变；每次更换前验证旧输入未修改，复用同一输入分配、stream/context 和内部 workspace。correctness-only 固定三次 mixed→all-negative→mixed，不能当作性能模式。正确parent2073f48e/DSOca36b327实际输出[1.6493455171585083,-40.063804626464844,1.6493455171585083]，fullFP64golden负值-40.06380844116211，最大abs3.814697265625e-6/rel9.52155427566823e-8，三次全部通过且input/yguard完整。支持修复在此变化输入序列下有效；不是对所有重入/SoC的证明。未复测已失败ZIP，无新OJ。raw remote results/c15-ready-alternating。
