@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.16)
+find_package(ASC REQUIRED)
+project(bmmms_host_tiling_query LANGUAGES ASC CXX)
+add_executable(host_tiling_query main.asc)
+target_compile_options(host_tiling_query PRIVATE $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>)
+target_link_libraries(host_tiling_query PRIVATE tiling_api register platform unified_dlog dl m graph_base)

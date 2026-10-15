@@ -1202,3 +1202,9 @@ CPU实际新增producer分支/helpers78batch pairs/完整K/负值/零尾/输入b
 ## C15 同进程交替输入：保留修复通过 A/B/A
 
 仅独立 native correctness 工具增加可选 input-sequence，正式 main/golden/阈值及性能五报告 preset 不变；每次更换前验证旧输入未修改，复用同一输入分配、stream/context 和内部 workspace。correctness-only 固定三次 mixed→all-negative→mixed，不能当作性能模式。正确parent2073f48e/DSOca36b327实际输出[1.6493455171585083,-40.063804626464844,1.6493455171585083]，fullFP64golden负值-40.06380844116211，最大abs3.814697265625e-6/rel9.52155427566823e-8，三次全部通过且input/yguard完整。支持修复在此变化输入序列下有效；不是对所有重入/SoC的证明。未复测已失败ZIP，无新OJ。raw remote results/c15-ready-alternating。
+
+## C11 Cᵀ MDL：实际 parent 对照、SDK tiling 与候选精度
+
+当前parent2073f48e/DSOca36b327，C11本地BF16TT1/1536/2048/2048实际完整plan BM256BN128/Mt6Nt16Ns16/dual2/workers20（并非旧BM128BN256），9382/24AIC48AIV/caller20。golden116.7254638671875，parent116.72545623779297/abs7.6294e-6，一次及五次全部通过；默认8表×5，20Cube40Vector，times[75.783028,76.703072,76.423058,75.923035,76.023041]us，中位76.023041us。
+
+候选kernel06f3e06e/356971B，MDL NN交换物理输入计算Cᵀ+沿原N纵向Max，原GM/任务/握手/finalizer不动。预设20%gate<=60.8184328us；SDK actual-selector FP16/BF16均selected1，fresh12825664/stepKa8Kb2/depthA16B4/db2/2/1/shareL1393216。CANN编译PASS，metadataDSObcd8a8e0/source06f3/wrapper225154c4+included994e29f；一次完整native golden精确通过，五默认报告采集中/PENDING，不称突破。详见C11_TRANSPOSED_MDL；CPU构造C矩阵+实际分支抽取/逆补丁/反例不是完整K硬件证据。无新OJ。

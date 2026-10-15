@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.16)
+find_package(ASC REQUIRED)
+project(c11_transpose_runner LANGUAGES ASC CXX)
+add_library(native_bmmms SHARED library.asc)
+target_include_directories(native_bmmms PRIVATE ${KERNEL_DIR})
+target_link_libraries(native_bmmms PRIVATE tiling_api register platform unified_dlog dl m graph_base)
+target_compile_options(native_bmmms PRIVATE $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>)
