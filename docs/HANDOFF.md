@@ -1,3 +1,15 @@
+# 当前进行：C15完整L0单缓冲两MMAD新producer已编译，native精度验证中
+
+- 分支experiment/c15-two-mmad-frame，当前kernel20ee2dde864cc79ec7cd395dfc0c4a2c3f7bfd9a8d6585f63d80715c85cfa1c4，77新增行；parent2073f48e/a11e2d9正式Pass15/398.92us。只增加新producer/guard/dispatch，原函数/GM/MakePlan/其它kernel逐字保持。
+- 固定原C15 FP16TT/B1M64N64K8192/dual25/8splitK1024/8workers，L1完整split262144B、单L0A/B各65536B、两次K512 MMAD/4次Load2D，Cube无源级TPipe队列、仅4GM ABI。原Fix通知→AIV等待→全AIVbarrier→原packed finalizer不变。旧resident8MMAD反例未直接并入、不扫BK参数。
+- CPU实际producer4194304地址/32split/4full数学golden/7反例，guard54/65+满容量临界、inverse/保护7通过；不是native布局/速度证明。详见C15_TWO_MMAD_FRAME。
+- CANN9/dav2201编译PASS，DSOf8f1da4c8d1af3a8ea691fef9433f8219370f109fb704cd6d02588776b76747d /source20ee2dde/wrapper994e29f。frozen imports/c15-two-mmad-20ee2dde864c/kernel.asc，native_oj_like/build-c15-two-mmad/libnative_bmmms.so。
+- **NEXT poll exec12330**，results/c15-two-mmad-correctness；成功后同frozen c15.json/c15.complete_frame.json/inputs/c15跑原c15_input_sequence.json的A/B/A correctness，再一次default五报告，actual新symbol/8Cube8Vector/每核每次2MMAD必须确认。
+- 新active目标采前准入：median<=9.8463933us（parent10.940437降低>=10%），所有5样本<父最快10.540421，且完整精度/全负/变化输入/guard全部通过，才能进一步正式15验证。20%目标8.7523496仍保留。未达归档恢复2073、不扫参数/重采/OJ。尚无性能结论或新OJ。
+- 连接master35585已实际检查有效、hostname2ef29bca0f61/9382/24AIC48AIV/dev0physical14/CANN9；queue初始空，编译97125 terminal0，当前仅12330一次correctness。凭据不入Git，scp-O。
+
+## 以下为前序完整终态与操作约定（当前状态以上段为准）
+
 # 当前：三条新结构验证终态，恢复正式Pass15的2073
 
 ## 有效保留版本与Git

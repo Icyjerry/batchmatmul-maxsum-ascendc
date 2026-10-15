@@ -1273,3 +1273,11 @@ a55b767/source8b13ff71，DSO5a7b7194。一次精度+五性能输出与fullFP64go
 在保留2073的既有build-c15-ready目录读取library.asc.o（SHA bf99376cfaf9d094ff26cc81cb7d2ab1bc6262ab1cf5d3bfae5ac8ba7bcbc452），不重编译/重跑性能。msobjdump对ASC .aicore_binary不输出列表，且其FileAction把路径中“.asc”误判成“.a”archive，未修改SDK工具。独立ELF64解析从.aicore_binary/__aicore_rel_binary各提取一个machine4137 ELF；llvm-objdump -t能读symbol表，选中C6 AIC504B/AIV1072B、C1 FP16group2 876B、C3 BF16TN/K48 2116B。
 
 但llvm-objdump -d的所有指令均显示not available，显式--mcpu=dav-c220-vec同样失败；只有size，不是完整callgraph footprint或指令类别/运行次数/延时证据。没有从尺寸断言瓶颈或据此加入第四个猜测优化。原始提取脚本、ELF、symbols/asm失败输出/summary保留server codegen-audit并打包下载，凭据不入Git。下一若需要opcode，先核对安装编译器保存汇编/临时文件选项，仅独立工具构建且保持原源；不重测已失败candidate、不篡改正式构建。
+
+## C15 两MMAD满L0新frame，完整producer重构
+
+最新active目标鼓励激进实现。由正式Pass15/398.92us的2073派生，固定C15原8个K1024 split/原GM及PACKED finalizer。新20ee2dde/77增行：L1完整split262144B、单L0A/B各65536B、2次K512 MMAD/4次Load2D，Cube直接LocalTensor/固定events/4GM ABI；保留FP32 K累加、Fix→AIV通知/原barrier和最终Sum split→MaxN→SumM。旧resident-input（8MMAD双L0）1.28%反例保留，本次不进行邻近BK参数扫描。
+
+采前新准入：native五次完整+所有精度/变化输入/guards/实际symbol与2MMAD通过，中位<=9.8463933us（较正确parent10.940437至少10%），且全部5样本低于父最快10.540421；20%目标<=8.7523496保留。未过归档恢复parent、不扫大小/split/队列、不重采/OJ。它是继续正式验证的准入，不是完整目标完成。
+
+CPU实际producer4194304地址、32split/4fullM64N64K8192整数golden、7反例、wholeinverse/保护7通过；真实guard54/65拒绝与全资源临界值通过。CANN9/dav2201编译PASS，DSOf8f1da4c/source20ee2dde/wrapper994e29f。第一次native correctness12330运行中，candidate native性能/正式15 PENDING，无新OJ；详见C15_TWO_MMAD_FRAME。
