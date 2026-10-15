@@ -1171,3 +1171,10 @@ CPU实际新增producer分支/helpers78batch pairs/完整K/负值/零尾/输入b
 0689e2d/fa315ae8/357100B实际CANN9独立编译exit0/8host GM_ADDR warnings，DSOe0e6aa7f绑定source/wrapper994e29f。相同C6输入和reviewed actual normalPlan，一次native correctness synchronize后fullFP64输出比较FAIL/exit1；日志最大abs约0.47670078/rel0.12828762，原版2.38e-7。工具返回actual是NumPy舍入显示，完整原始FP32未保存，不补造精确位。CPU假设Load3D layout被反证，具体排列未证明，离线outer-block假设未复现；未扫描参数/重测/采候选profile/OJ。实现保存在0689e2d，当前恢复整份e2f1b63/ZIP078635。没有加速结论。
 
 候选raw补下载时SSHmaster超时退出，干净重连跳板认证成功但目标转发platform authorization denied；已请求新入口。编译log/failed correctness原始目录在remote，下载PENDING；本地candidate-terminal-observation.json明确保存工具已见事实与显示精度限制。baseline三包完整已下载。独立native driver加入校验前保存actual+guard原始bits/失败JSON，只加强未来诊断，未部署/不更改此前结果、阈值或正式测试。整体目标未完成。
+
+
+## C15 resident split input：仅结构与地址审查，尚无候选
+
+从C6失败归档5767186派生experiment/c15-resident-input-audit，kernel字节保持ZIP078635。历史审阅后考虑原dual25长K split-TT：A一次batched ND2NZ保留原八个K128面板顺序，B一次完整split NZ，原Load2D/MMAD/K累加/Fix/AIV/packed finalizer/GM不动。记录shape64/64/8192每split输入ND2NZ16→2，GM总2MiB不减，L1从65536增262144B；大首批DMA可能损伤重叠，没有速度预测。M=N128需524288B>actual524032B而拒绝。4组地址模型全八split、各K128与旧面板地址一致，naive fullA NZ反例不同；不是SDK/实际kernel证据。
+
+新c15.json明确FP16TT/8AIC8AIV只是历史源对应期望，最新DISPATCH未唯一确认。下一先恢复SSH补C6raw，再actual C15 MakePlan/完整storageFP64golden/一次精度+五完整baseline报告，不强制分派；缺这步不生成待提交候选。预设20%中位收益门槛；无ASC修改、CANN编译、nativeC15或OJ数据。C15_RESIDENT_INPUT_AUDIT给出字段、原资源与停止规则。

@@ -1,8 +1,8 @@
-# 当前工作：C6 raw row 已 native 精度失败撤回，整理下一结构方向
+# 当前工作：C6 native失败已撤回；C15完整split输入常驻L1审查完成
 
 ## 当前源码与边界
 
-- 分支 `experiment/c6-raw-row-input`；当前 kernel已恢复整份 e2f1b63 / ZIP078635 /353179B / SHA0786352034e77506894d4094083960f4f6af82782bf7cee6a0386148437ca436。失败候选357100B/fa315ae8完整保存在0689e2d。
+- 当前分支 `experiment/c15-resident-input-audit`（从C6归档5767186派生）；kernel已恢复整份 e2f1b63 / ZIP078635 /353179B / SHA0786352034e77506894d4094083960f4f6af82782bf7cee6a0386148437ca436。失败候选357100B/fa315ae8完整保存在0689e2d。
 - 初始140080d/639fa38未经设备编译；本轮核对实际SDK发现默认LoadData只配置LEFT，不能自动配置B的RIGHT。当前修正显式SetFmatrix RIGHT + public no-reset LoadData，与保留C10写法一致。CPU新增register模型和第8个故障反例。没有新增GM，原MMAD/Fix/AIV/Plan/其它路径保留。
 - 算法仅改kernel.asc，七个受保护文件与1734f16相同；未并main/未新OJ。ZIP078635与DISPATCH接受源b881不同，后者Pass15/401.13us不是当前源的结果。
 
@@ -22,7 +22,7 @@
 - 不采候选性能/不OJ/不重复或扫邻近filter-stride。恢复整份ZIP，失败实现留0689e2d，细节C6_RAW_ROW_INPUT。
 - SSHmaster随后超时，原始候选编译日志/失败目录补下载PENDING；revalidate跳板已认证但target转发platform authorization denied，新入口问题已发出。baseline三个完整包已下载；本地candidate-terminal-observation.json明确仅保存工具已返回失败，不冒充原始FP32。
 - 下一条设备动作：恢复后先下载build-c6-raw.log/DSO manifest/results/c6-raw-correctness，不重跑失败候选；检查queue/SoC/映射。
-- 下一结构研究可审核C15原longK split-TT的八次K128供料是否能在原L1常驻完整splitK片；这是未实现假设，要先查历史反例/实际normalPlan与baseline完整profile，不把逆向FP16TT frame当唯一正式属性。不能设备受阻时堆叠未经验证kernel。
+- C15结构审查已完成，见 C15_RESIDENT_INPUT_AUDIT：A使用保留API的batched ND2NZ拼成原K128面板顺序，B整split NZ；目标输入ND2NZ每split16→2，GM字节不减/L1由64KiB增256KiB。离线4组全部八split面板地址一致，naive fullA NZ次序反例被检出。M=N128需要524288B>actual524032B，必须拒绝。尚未生成ASC候选；缺C15真实normalPlan/完整baseline profile，先补这步，20%门槛明确。不能把逆向FP16TT frame当唯一正式属性。
 - 独立native driver增加校验前保存actual+guard原始bits及precision_failure.json，便于未来失败诊断；不改正式阈值/7文件或此次结果。工具更新尚未部署服务器。
 
 ## 既有失败结论与交接
