@@ -66,3 +66,15 @@ bash c15-cube-collective-validation/run.sh /workspace/bmmms-codex
 ```
 
 只有脚本开始启动后产生的新handle才可作为verified wait。当前仅`bash -n`、三个嵌入Python段AST解析、9文件hash/实际wrapper身份、archive安全路径及权限检查PASS；**没有运行build.sh/编译/NPU/profile**。启动时对原server输入/完整frame依赖缺失或属性变化应停止并审阅，不静默生成替换数据或放宽检查。
+
+## 2026-10-15 Native 终态：协议正确，中位无新增收益
+
+用户刷新入口后连接恢复：host2ef29bca0f61、Ascend910_9382、24AIC48AIV、dev0/physical14/card7chip0、CANN9、caller20。先检查实际queue空/ps无旧任务；前台master63301/pid9058，临时askpass连接后删除，凭据未入Git。冻结包实际源路径为`imports/c15-cube-collective-ca66a5417b3b/c15-cube-collective-validation/source/kernel.asc`。
+
+原包脚本75161 terminal0，CANN9/dav2201编译PASS，DSO **85f8f7296db8f27ec0a1ec59ecc21b3fc5c274ccae4fe0895c91cb77d88a6607**，wrapper994e29f/sourceca66a541绑定。首次mixed、同context/stream/输入地址mixed→negative→mixed全部PASS，混合输出精确1.6493455171585083，全负-40.063804626464844/maxAbs3.8146973e-6/maxRel9.52155e-8；输入不变与16-word yguard通过。
+
+一次完整default8表×5报告，actual bmmms_manual_split_tt<half,true,true>/8Cube8Vector，40个Cube记录均8MMAD，五完整输出fullFP64通过。TaskDuration **[9.980399,10.260410,10.660426,10.040401,10.360415]us**，中位 **10.260410us**。与row-only版本中位完全相同；对正确parent10.940437的6.2157%改善是按行归约已有收益，**没有观察到新ready协议的额外中位收益**。且10.660426慢于父最快10.540421，median也未<=9.8463933；未过原准入，无OJ/重采/flag或参数扫描。恢复工作kernel到2073/a11e2d9，候选源码保存在ccfaecc。
+
+PMU按实际block_id：Cube平均time6.259736/MTE2 3.573542/MAC.735111us；AIV0平均time7.653333/Vector.267778/MTE2.304111us；其它7AIV平均time7.312667/Vector.229444/MTE2.197413us。相较旧row-only，Cube统计time提高而Vector统计未减少，符合协议未产生新延时改善的观察；这些重叠计数仍不能相加或证明某条指令的因果成本。
+
+全部原始correctness/alternating/五份默认8表、身份、成功build.log已下载`artifacts/c15-cube-collective/c15-cube-collective-evidence.tgz`，summary与pmu-summary同目录、目录700/files600；下载58231 terminal0。实际远端queue再次空，无活跃NPU/OJ。正式15及其它SoC/dtype/layout未测；全局冲榜目标仍未完成。新入口已解决此前服务器阻碍，不继续报告旧platform denial为当前状态。

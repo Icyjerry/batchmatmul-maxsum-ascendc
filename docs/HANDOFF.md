@@ -1,3 +1,23 @@
+# 当前终态：新SSH恢复，C15 Cube collective验证完成，恢复正式Pass15保留版
+
+- 分支experiment/c15-cube-collective，当前kernel逐字a11e2d9/2073f48e78d4fa86c409c4befc620744b2532d5f01223cf94564900f35d1ec2b。正式Pass15任务820092/6ad046feaad397b6d98aa318总398.92us仍是已确认提交，本次无新OJ。
+- 用户新入口已实际恢复连接：host2ef29bca0f61、9382/24AIC48AIV/dev0physical14/CANN9/caller20；当前master63301/pid9058，私有config更新且askpass已删。旧blocked/platform denial记录均为历史，不再当当前阻碍。
+- sourceca66a541/ccfaecc完整候选native终态：CANN9编译PASS、DSO85f8f7296db8f27ec0a1ec59ecc21b3fc5c274ccae4fe0895c91cb77d88a6607、wrapper994e29f。首次及同context/stream/输入地址mixed-negative-mixed全PASS，input/yguard完整；混合精确/负值abs3.8146973e-6。
+- default五完整8表/actualtrue/8Cube8AIV/每核8MMAD确认。times[9.980399,10.260410,10.660426,10.040401,10.360415]median10.260410，与row-only完全相同，未观察新ready协议额外中位收益。对parent10.940437的6.2157%是旧row结构已有收益，不能归新protocol。未原10%+全五快于父最快门槛，恢复2073，无重采/OJ/flag或参数扫描。
+- raw全部本地artifacts/c15-cube-collective/c15-cube-collective-evidence.tgz，summary/pmu-summary同目录，700/600；包含实际首次/交替/五报告/DSO身份/buildlog。原脚本75161、下载58231 terminal0，远端queue已再次实际空，无活跃任务。
+- **NEXT**：停止C15现有collective/row/BK/split近邻方向；只有证明全新结构才另开候选。继续优先关注tiny/C6得分差距，但勿复活旧bit transpose/Gather/storage-Ktree/纯Vector或旧C8参数。刚复查26beaac：原bit transpose主要tinyK<=64，正式C2严重退化，无新C4 native依据，未据此再写另一个相同transpose候选。需要新源码/真实PMU依据。全局目标未完成；get_goal的控制状态仍blocked，工具不能主动改active，但实际服务器障碍已解除并已完成本次授权设备工作。
+
+## 以下保留历史交接（当前以上段为准）
+
+# 当前已恢复连接：C15 Cube collective冻结包正在编译
+
+- 用户提供新授权后实际连接成功，hostname2ef29bca0f61，npu mapping逻辑0/physical14/card7chip0保持，实际queue为空且ps无旧job/msprof/build。前台master exec63301/pid9058，私有config已更新；临时askpass连接后已删除，凭据不入Git。原访问阻碍已解除，下面blocked记录均为历史。
+- **NEXT poll exec75161，不要重启**：已上传冻结63748B/0de34414包到/workspace/bmmms-codex/imports/c15-cube-collective-ca66a5417b3b/，解压c15-cube-collective-validation。脚本已确认source/harness/frame/两input/golden身份，现在实际CANN9/dav2201编译中（ps确认bisheng活跃），build-c15-cube-collective。日志在包内build.log。
+- 成功后原脚本自动只跑一次correctness→mixed-negative-mixed→default五报告，队列沿用/workspace/bmmms-codex。实际source路径为包内source/kernel.asc（ca66a541），不是旧文档预想的imports根文件；DSO identity将绑定实际路径。没有新OJ，native/perf仍PENDING。
+- 原不变gate：median<=9.8463933且全五<10.540421、完整精度/全负/变化输入/guard通过才考虑正式15；对正确parent10.940437及row-only10.260410都报告，不降低门槛。新代码无改动，仍ccfaecc/ca66a541。注意get_goal控制状态仍blocked，当前用户提供新入口已实际恢复工作；工具不能主动改active，不据此假称服务器仍受阻。
+
+## 以下为历史交接（当前以上段为准）
+
 # 当前阻碍：等待新的云平台 SSH 授权入口
 
 恢复后连续三个goal turn遭遇同一远端访问阻碍；前两turn已完成候选CPU协议检查/提交与冻结验证包，本turn再次核对工作区clean/7b65ab5、kernelca66a541、bundle0de34414均未变。干净SSH仍exit255/Connection closed by UNKNOWN port65535；此前platform authorization denied是历史明确诊断。本机bisheng/npu-smi均不存在。无可确认的活跃远端任务handle，queue未知。
