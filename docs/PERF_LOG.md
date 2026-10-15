@@ -1261,3 +1261,9 @@ Parent2073/DSOca36实际C1 FP16/B1M1N1K32 plan dual15/group2/final1/total0，bas
 source8b13ff71/35增6删，原GROUPED K48/B2M7N13/group1/2AIV需转置输入，Brcb行号+重复Add形成完整byte偏移矩阵，逐rowGather变每input一次Gather（本地TF20→2），新增UB3008B，原DMA/Cast/Mul/Ksum/Nmax/Msum不变；默认false/其它shape/layout/pins回退。SDK9 int32Brcb b32语义核对，CPU实际48fullK batch-layout pairs/5反例/whole inverse/保护7通过，guard临界值检查中；不是hardware证明。
 
 BF16TN是本地明确fixture，正式C3属性未确认/已询问用户。实际parent2073/DSOca36 plan dual24/group1/workers2/final2/total0，baseline一次+五完整fullFP64输出精确，input/yguard完整，pureVector2AIV/default8表×5，times[3.420137,3.020121,2.880115,3.120125,2.920117]us，中位3.020121，采前20%gate<=2.4160968us。候选编译exec47243，native精度/性能PENDING，无新OJ。C1 scalar慢46.25%已归档34f72b0，未带入。
+
+### C3 flat Gather终态：本地BF16TN完整精度通过，5.96%未过20%gate
+
+a55b767/source8b13ff71，DSO5a7b7194。一次精度+五性能输出与fullFP64golden[1.5601825714111328,1.773697018623352]精确，input/yguard完整。实际BF16/TN/K48/FLAT_GATHERtrue/pureVector2AIV/default8表×5。times[3.320133,2.740110,3.160126,2.820113,2.840114]us，中位2.840114，对parent3.020121约-5.96%；样本重叠，不称稳定收益。未20%gate<=2.4160968，不重采/相邻扫描/OJ，恢复完整2073。
+
+用户回复C3属性记录“可能有问题”，仍未确认正式dtype/layout，本地BF16TN不是正式路径证明。候选其它dtype/layout硬件、全负、正式15 NOT RUN。全部raw下载artifacts/c3-flat-gather/c3-flat-gather-evidence.tgz。C6compactNZ仅.45%、C1scalar慢46.25%均归档，无新突破或OJ。下一应从原始binary/指令及PMU辨明剩余瓶颈，避免只按源级API数量预测性能。

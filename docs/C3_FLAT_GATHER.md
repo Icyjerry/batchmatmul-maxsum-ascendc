@@ -25,3 +25,13 @@ source **8b13ff71f8d5897048efee80c4f8817f7d4c1098308f501eb789df473d2c598b**，�
 实际guard抽取production/TUNING检查TF/TT/FF接受、NT拒绝、shape/group/grid/AIV/每布局UB精确边界和pins；是控制流而非SDK tiler。CANN编译正在exec47243，候选native精度/性能/正式15 PENDING，尚无新OJ任务。
 
 CANN9/dav2201编译PASS（8条原host GM_ADDR warnings），DSO5a7b719401d77aa7febe05a95ff17bed2b72f82a6b639d824c44620e934f2fbb/source8b13ff71/wrapper994e29f，冻结imports/c3-flat-gather-8b13ff71f8d5。guard production/TUNING分别31/64拒绝通过；独立guard脚本最初漏struct结束符、漏Tune定义，修正模型提取后重跑通过，kernel未改。一次native correctness exec97615进行中，仍无性能结论。
+
+## Native终态：本地精度全过，中位改善5.96%，未过门槛
+
+实现a55b767/source8b13ff71，DSO5a7b7194。同reviewed plan/输入，一次精度及五性能输出fullFP64精确，input/yguard完整。实际symbol为bmmms_tiny_grouped<bf16,true,false,48,true>，确实命中FLAT_GATHERtrue，pureVector2AIV/default8表×5。
+
+times[3.320133,2.740110,3.160126,2.820113,2.840114]us，中位2.840114，对parent3.020121改善约5.96%。两组样本重叠，不能称稳定收益；未采前20%gate<=2.4160968，不重复采样/扫stride或附近shape，不OJ。完整恢复2073f48e。候选全负硬件、其它dtype/layout、正式15未运行，不将CPU覆盖写成hardware通过。
+
+用户回复现有属性记录“可能有问题”，继续把BF16TN和正式C3的对应关系视为未确认。这不否定上述本地实际输入的完整精度/采集证据，也不能从本地耗时反推隐藏属性。
+
+全部baseline/candidate原始正确性、plan、默认五报告、build与DSO身份已下载artifacts/c3-flat-gather/c3-flat-gather-evidence.tgz，目录700/files600；保存完整summary，候选实现/模型留a55b767。没有修改正式best或声称新正式成绩。

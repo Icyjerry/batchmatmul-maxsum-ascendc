@@ -1,37 +1,36 @@
-# 当前进行：C3 flattened Gather 已编译，native精度验证中
+# 当前：三条新结构验证终态，恢复正式Pass15的2073
 
-## 当前源码与有效保留版
+## 有效保留版本与Git
 
-- 分支experiment/c3-flat-gather。候选kernel SHA **8b13ff71f8d5897048efee80c4f8817f7d4c1098308f501eb789df473d2c598b**，仅在原grouped K48/B2M7N13/group1/2AIV需转置输入时，Brcb/Add生成完整offset矩阵，每input一次Gather代替逐行Gather。原DMA/Cast/Mul/Ksum/Nmax/Msum和GM不变，UB额外3008B；其它/pins回默认。35增6删。详见C3_FLAT_GATHER。
-- 有效保留parent **a11e2d9/kernel2073f48e78d4fa86c409c4befc620744b2532d5f01223cf94564900f35d1ec2b/353255B**，正式任务820092/6ad046feaad397b6d98aa318已Pass15/allprecision1，总398.92us。含C15 Cube PIPE_FIX→AIV就绪修复，别回退到本机C15输出0的ZIP078635。接受队友b881与ZIP不同，不借它成绩。
-- 算法只kernel.asc；七保护文件等1734f16。main/历史tags不动，无SDK/编译规则/正式测试/容差改动。GitHub允许push实验分支，不改写历史。
+- 当前分支experiment/c3-flat-gather，kernel **2073f48e78d4fa86c409c4befc620744b2532d5f01223cf94564900f35d1ec2b /353255B**，逐字a11e2d9。正式任务820092/6ad046feaad397b6d98aa318已Pass15/allprecision1，总398.92us；含实际修复C15零输出的Cube PIPE_FIX→AIV就绪通知，不回退已反证的ZIP078635。
+- 用户本轮要求开始优化，已完成C6/C1/C3三条独立结构试验，均未达到预设20%提交门槛，未增加任何OJ任务。失败代码和数据完整保存，不混入保留版。
+- 算法仅kernel.asc；保护7等1734f16，正式测试/阈值/SDK/main/CMake均未改。GitHub允许push实验分支，不移动tags/main或改写历史。
 
-## 本次C3证据与下一条动作
+## 三条本次实验（native实测）
 
-- 正式C3 dtype/layout尚未唯一确认，已通过async询问用户；当前本地fixture **BF16 TN** /B2M7N13K48。不能把此假设当隐藏属性。TT/FF也具备Flatten入口，NT原无Gather回原路径。
-- 原source2073/DSOca36实际plan dual24/group1/workers2/final2/Cube0/total0，纯Vector2AIV；fullstorageFP64golden[1.5601825714111328,1.773697018623352]，一次及五性能输出精确通过/input及yguard完整。
-- baseline默认8表×5 times[3.420137,3.020121,2.880115,3.120125,2.920117]us，中位3.020121。采前20%gate **<=2.4160968us**。不过归档恢复完整2073，不扫repeat/stride或相邻M/N/K、不重采/OJ。通过再补相关dtype/layout/negative/变化输入/回退并考虑正式15。
-- CPU实际Brcb/Muls/Add/Gather执行48 fullK batch-layout/mixed-negative pairs，canonical operands/全部dot/MaxN-SumM/bounds/UBguard/5反例通过；default inverse恢复parent全文件及保护7。guard production/TUNING31/64拒绝、每布局UB临界TF36608/TT34144/FF35296通过。只是模型，非硬件证据。
-- source8b13ff71独立CANN9/dav2201编译PASS；DSO **5a7b719401d77aa7febe05a95ff17bed2b72f82a6b639d824c44620e934f2fbb** /wrapper994e29f。完整identity sidecar已写。
-- **NEXT poll exec97615**，当前一次correctness results/c3-flat-gather-correctness。通过才运行一次default五报告；actual mangled symbol须有FLAT_GATHERtrue，2AIV/default8表×5/五golden/guards/input完整。若transport观察丢失先查queue/ps/results，别重跑。
-- reviewed frame native_oj_like/c3.complete_frame.json；case c3.json；inputs/c3；baseline results/c3-baseline-{plan,correctness,profile}；candidate frozen imports/c3-flat-gather-8b13ff71f8d5，DSO native_oj_like/build-c3-flat-gather/libnative_bmmms.so；buildlog同工具根。raw待终态下载artifacts/c3-flat-gather。
+1. **C6 compact NZ**，实现5fc448b/source360db6f0，归档6fd56e0。保持输入/完整K192/UnitFlag3/握手/arena，将有效M23紧凑NZ交接，写10240→7360B。native精度一次+五输出通过，actualtrue/13Cube13Vector/default8表×5。8.860354→8.820353us仅0.4515%，未gate7.0882832。不扫format/stride/重采/OJ。raw artifacts/c6-compact-nz-output，详见C6_COMPACT_NZ_OUTPUT。
+2. **C1 scalar-cache fullK32**，实现28e1a82/source4c081854，归档34f72b0。NPU scalar GM直读真实编码、FP32两链累加、输入失效/UB刷新/S_MTE3/4B输出/PIPE_ALL。初始9e699fe1因CANN publicLocal Dcci封装const_cast非法编译FAIL，未改SDK；修正用实际内部同dcci指令，CANN通过/DSObf9f52ce。FP16一次及同context/stream/input地址A/B/A全负变化通过，guard/input完整。五times[7.840313,7.880315,2.240090,2.280091,2.340094]，median2.340094，parent1.600064，慢46.25%；高值全保留不无证据归因，不删缓存维护/扫unroll或accumulator救性能，不OJ。raw artifacts/c1-scalar-cache-dot/c1-scalar-evidence.tgz，详见C1_SCALAR_CACHE_DOT。BF16硬件/正式15未做。
+3. **C3 flattened Gather**，实现a55b767/source8b13ff71/DSO5a7b7194。Brcb/Add完整offset矩阵每input一次Gather，原DMA/Cast/Mul/Ksum/Nmax/Msum不变/extraUB3008。native一次+五完整输出fullFP64精确，actualbf16/TN/K48/FLAT_GATHERtrue/pureVector2AIV/default8表×5。parent[3.420137,3.020121,2.880115,3.120125,2.920117]median3.020121，candidate[3.320133,2.740110,3.160126,2.820113,2.840114]median2.840114，约快5.96%，样本重叠，未gate2.4160968。不重复/扫stride/附近shape/OJ，恢复2073。raw artifacts/c3-flat-gather/c3-flat-gather-evidence.tgz，详见C3_FLAT_GATHER。
 
-## 本次已结束的独立候选
+全部raw已下载，目录700/files600，精确source/DSO/input/plan绑定、所有样本保留。CPU模型均只对各冻结候选运行：不要改成在parent运行也报告PASS。default逆变换/保护7、实际资源边界/负控制完整，不能替代硬件精度/时序。
 
-- C6 compact NZ：实现5fc448b/source360db6f0，archive6fd56e0。完整FP64及五输出通过，实际true/13Cube13Vector/default8表×5；8.860354→8.820353us仅0.4515%，未20%。已恢复2073，不扫format/stride/重采/OJ。全部raw下载artifacts/c6-compact-nz-output。C6_COMPACT_NZ_OUTPUT详述。
-- C1 scalar-cache：实现28e1a82/source4c081854，archive34f72b0。初始9e699fe1因SDK publicLocal Dcci封装const_cast错误编译FAIL，未改SDK；修正源采用对应dcci指令编译PASS/DSObf9f52ce。native FP16 mixed及同输入分配/stream/context A/B/A全负变化通过，input/yguard完整。五time[7.840313,7.880315,2.240090,2.280091,2.340094]中位2.340094，parent1.600064，慢46.25%；高值全保留，不删缓存维护/扫unroll/accumulator/重采/OJ。BF16硬件/正式15 NOT RUN。全部raw已下载artifacts/c1-scalar-cache-dot/c1-scalar-evidence.tgz，目录700/files600。C1_SCALAR_CACHE_DOT详述。
-- 上述均未带入当前C3，当前结构从完整2073派生。无活跃正式OJ任务，本次仅开展本地优化；只有重大已验证收益才考虑新任务，不默认重复提交。
+## 属性与下一条可执行动作
 
-## 比赛对照与此前失败
+- 正式C3只有用户shape记录2/7/13/48，dtype/layout未唯一确认；用户本轮回复“可能有问题”。本地BF16TN仅明确fixture，不用本地耗时反推隐藏属性，不将native改善当正式覆盖。
+- 当前全部设备任务terminal0、queue空，无活跃OJ或新性能候选。下一先检查已有编译对象的NPU指令/代码生成和PMU，解释源级Gather/GM减少为何完整收益有限，避免复做三条邻近参数。工具发现可用objdump后只读既有binary，不需要再采同输入性能。若编译对象不支持读，记录限制后选真正不同的结构，别强行解释延时。
+- 当前正确parent DSO **ca36b327c9104b3006de2bb7ec732a3b817ae8fff447c6ce2a37e2d9c5fd28e6**，native_oj_like/build-c15-ready/libnative_bmmms.so；source imports/c15-producer-ready-2073f48e78d4/kernel.asc。
+- C6 candidate build-c6-compact-nz、C1 candidate build-c1-scalar-dot-fixed、C3 candidate build-c3-flat-gather，各.so及identity.json/源都在/workspace/bmmms-codex。完整reviewed c1/c3/c6.complete_frame.json及inputs/c1/c3/c6保留。
 
-- 现保留源正式15向量[2.09,2.64,3.12,4.19,4.70,9.45,6.64,36.47,56.95,76.65,78.43,88.04,8.84,9.61,11.10]us，398.92us；用户最新第一名总348.37us，我方总慢14.51%。计分均分不是总耗时，固定旧Tbest敏感度C6/C1/C3优先。最新实时Tbest未读取，不称实时排名。
-- C15resident仅1.28%归档6d2c47b；C11 NN Cᵀ慢5.025%归档3ff5ff4；C6raw Load3D精度FAIL归档0689e2d；C13fullK仅.66%；C12stridedB仅.53%；C4compact变慢。不要改名复做/附近参数扫。
-- 旧tiny raw transpose/storage Ktree/static FT/literal Vector候选已经无明确收益；当前C3是只改变Gather地址生成与批处理的新结构。队友C8五轮已结束/C7parked/C9constantSchedule paused，其它反例见TEAMMATE_777734_REVIEW及PERF_LOG。
+## 比赛目标与旧反例
 
-## 服务器与操作
+当前正式向量[2.09,2.64,3.12,4.19,4.70,9.45,6.64,36.47,56.95,76.65,78.43,88.04,8.84,9.61,11.10]us，总398.92；用户第一名总348.37，整体慢14.51%。按固定旧Tbest敏感度C6/C1/C3优先，计分非总时长。最新实时Tbest未读取，不称排名。
 
-- 私有config /private/tmp/bmmms-remote-access/config，前台master exec35585/ControlPersist=no，先ssh -O check；askpass删除，不记录/提交凭据。scp需-O。
-- hostname2ef29bca0f61，实际Ascend910_9382/24AIC48AIV/dev0physical14/card7chip0/CANN9/driver26.1.1，callerlimit20。fresh入口已实际连接，不沿用旧blocked结论。
-- 工作根/workspace/bmmms-codex；工具native_oj_like；Python test-venv/bin/python。source /usr/local/Ascend/cann-9.0.0/set_env.sh，driver/lib64/common及driver/lib64/driver进LD_LIBRARY_PATH。
-- filelock+queue串行NPU，状态npu_test_state.json。编译47243已terminal0；C3baseline28094/8286 terminal0，当前只97615 correctness。所有CPU/编译/native/OJ分开报告；9382本地不是另一SoC覆盖，正式平台未提供actualSoC/plan/profile。
-- 正确parent DSO build-c15-ready/libnative_bmmms.so/ca36b327，frozen imports/c15-producer-ready-2073f48e78d4/kernel.asc。整体冲榜目标未完成。
+C15resident仅1.28%归档6d2c47b；C11NN Cᵀ慢5.025%归档3ff5ff4；C6raw Load3D精度FAIL0689e2d；C13fullK仅.66%；C12stridedB仅.53%；C4compact变慢。旧tiny raw transpose/storage Ktree/static FT/literal Vector无明确收益。本轮三结构同样不换名复做。队友C8五轮结束/C7parked/C9constantSchedule paused，其它见TEAMMATE_777734_REVIEW/PERF_LOG。接受队友b881与ZIP078635身份不同，不能借其成绩。
+
+## 连接与操作
+
+私有config /private/tmp/bmmms-remote-access/config，前台master exec35585/ControlPersist=no，先ssh -O check；askpass已删、凭据不入Git，scp需-O。hostname2ef29bca0f61、Ascend910_9382/actual24AIC48AIV/dev0physical14/card7chip0/CANN9/driver26.1.1，caller20不等于硬件核数。新入口已实际连接，不沿用旧blocked结论。
+
+工具/workspace/bmmms-codex/native_oj_like，Python /workspace/bmmms-codex/test-venv/bin/python。source /usr/local/Ascend/cann-9.0.0/set_env.sh，driver/lib64/common及driver/lib64/driver加LD_LIBRARY_PATH。filelock+queue串行NPU，状态/workspace/bmmms-codex/npu_test_state.json，启动前查真实state/ps。最后C3profile28889、baseline28094、编译47243均terminal0。
+
+当前parent正式15已过；平台未给actualSoC/plan/profile，不能把本地9382当OJ机器或另一SoC覆盖。整体冲榜目标未完成。
