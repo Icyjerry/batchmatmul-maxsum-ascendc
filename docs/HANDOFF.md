@@ -1,3 +1,14 @@
+# 当前进行：C9 LEFT FMatrix复用，CPU已过/CANN编译中
+
+- experiment/c9-left-fmatrix，kernel4693eb7a60827baa354522fe83748eb0c00313459a6f4c9d713e59c429c183f0/354840B，尚未native候选。正式保留2073/a11e2d9仍Pass15/398.92us。用户已将goal控制状态active。
+- C9真实parent plan已采：FP16NT1/2048/1536/1280、dual36/BM128BN128BK128/Mt16Nt12/Ns5/window3/Kchunk256/W20，原ca36DSO/9382/24AIC48AIV/caller20。一次及default5全报告/完整golden191.8094940185547/input-yguard通过。times[55.142204,54.922195,56.122246,55.062202,55.382214]median55.142204，actual20Cube40AIV/每核90或100MMAD。
+- stationary-B按新真实plan审计每核tiles已9/10均衡，总input字节只省1.7857%且最忙核相同，取消未写该kernel。新候选仅启用原C10现有FMatrixLEFT复用到C9 NT：A SetFmatrix每refresh、K128 Load3D不resetFmatrix/pad，B2D不动LEFT。padding原entry0；原全K/加载/MMAD/Vector/credits/arena/MakePlan/其它分支保持。
+- Actualhelper62914560地址tag/1920Kpanels新旧一致、设置1920→32/4faults，guard48/59+8/20/24/32预算/容量临界，wholeinverse2073/保护7PASS。不是native或时间证明。详见C9_LEFT_FMATRIX。
+- **NEXT poll exec35373**：真实CANN9/dav2201 compile，remoteimports/c9-left-fmatrix-4693eb7a6082/kernel.asc；build-c9-left-fmatrix；log/workspace/bmmms-codex/c9-left-fmatrix-build.log。成功后写source/DSO/wrapper994e29f identity→原c9.json/c9.complete_frame/inputs/c9一次correctness→一次default8表×5。原CubeMMADpattern不变，新last-template-bool=true，20Cube40AIV。gate预定median<=49.6279836且全五<父最快54.922195，全部精度/guards后才补全负/同地址序列/正式15。失败恢复2073不扫附近参数、不重采/OJ。
+- 原parent plan33301/correct81085/profile93219/download13714均terminal0，raw已本地artifacts/c9-stationary-b-audit700/600。新native未启动，无OJ。前台SSH master63301/pid9058仍实际有效；用户新备用授权仅更新私有config，askpass已删/凭据不入Git，scp-O。
+
+## 以下为历史终态（当前以上段为准）
+
 # 当前终态：新SSH恢复，C15 Cube collective验证完成，恢复正式Pass15保留版
 
 - 分支experiment/c15-cube-collective，当前kernel逐字a11e2d9/2073f48e78d4fa86c409c4befc620744b2532d5f01223cf94564900f35d1ec2b。正式Pass15任务820092/6ad046feaad397b6d98aa318总398.92us仍是已确认提交，本次无新OJ。

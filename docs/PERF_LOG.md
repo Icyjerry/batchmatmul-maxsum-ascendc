@@ -1312,3 +1312,9 @@ experiment/c15-cube-collective/sourceca66a541/356814B，从已验证8AIV按行81
 ## 2026-10-15 C15 Cube-ready collective完成native：无额外中位收益，归档
 
 新入口实际恢复host2ef29bca0f61/9382/24AIC48AIV/dev0physical14/CANN9/caller20。frozen sourceca66a541/ccfaecc，DSO85f8f729，原包75161一次执行CANN编译→首次精度→同地址mixed-negative-mixed→default8表×5，terminal0。mixed精确1.6493455171585083/全负-40.063804626464844绝对误差3.8146973e-6，input/yguard均通过；actualtrue/8Cube8AIV/每核8MMAD确认。times[9.980399,10.260410,10.660426,10.040401,10.360415]median10.260410，与旧row-only相同，未观察新协议额外中位收益。相对正确parent10.940437的6.2157%不能归新protocol；未median<=9.8463933且全五<10.540421准入，不OJ/重采/扫flags/参数，恢复2073。raw已完整下载artifacts/c15-cube-collective，700/600，下载58231 terminal0，queue再次空。旧SSH阻碍已解除；整体目标未达成。详见C15_CUBE_COLLECTIVE。
+
+## 2026-10-15 C9真实计划/parent五报告，取消stationary-B，验证LEFT FMatrix复用
+
+branch experiment/c9-left-fmatrix。原2073/ca36，9382/24AIC48AIV/dev0physical14/CANN9/caller20，C9FP16NT1/2048/1536/1280实际dual36/128x128x128/Ns5/window3/Kchunk256/workers20（不是旧Ns3）。fullFP64golden191.8094940185547，一次及五完整报告输出/input/yguardPASS，actual20Cube40AIV/90或100MMAD每核。times[55.142204,54.922195,56.122246,55.062202,55.382214]median55.142204。实际任务已9/10tile均衡，stationary-B模型总GM仅-1.7857%/最忙核字节不变，取消该新算法，未写kernel。raw全下载c9-stationary-b-audit。
+
+新hypothesis复用C10已存在LEFT FMatrix控制到原NT C9：A fullK resident、B Load2D不改matrix，原paddingentry0，K面板可不反复重设。真实CANN9 resetflags/header已读。source4693eb7a/354840B/31增2删，只有assert允许NT+精确guard+原template最后bool=true，计算/GM/plan/Vector/C10不变。actualhelper新旧62914560地址tag检查/4faults/wholeinverse保护7PASS，guard48/59和8/20/24/32预算临界PASS。CANN编译35373进行中，sourcefrozenimports/c9-left-fmatrix-4693eb7a6082。采前固定median<=49.6279836且全五<54.922195，完整精度/guards后才补全负/变化输入/正式15；未过恢复2073不重采/参数扫描/OJ。详见C9_LEFT_FMATRIX，无新OJ，目标未完成。
