@@ -1,0 +1,28 @@
+{
+  "shape": [
+    1,
+    1,
+    1,
+    32
+  ],
+  "dtype": 1,
+  "transpose": [
+    0,
+    0
+  ],
+  "core_limit": 20,
+  "device": 0,
+  "expected_soc": "Ascend910_9382",
+  "expected_physical": 14,
+  "smi_card": 7,
+  "smi_chip": 0,
+  "provenance": "User-provided C1 shape; FP16 local fixture, formal dtype not uniquely isolated. At M=N=1 storage flags do not alter input order. Read actual full plan and capture.",
+  "capture": {
+    "op_type": "vector",
+    "family": "bmmms_scalar_cache_dot32",
+    "block_dim": 1,
+    "mix_block_dim": 0,
+    "aic": 0,
+    "aiv": 1
+  }
+}
