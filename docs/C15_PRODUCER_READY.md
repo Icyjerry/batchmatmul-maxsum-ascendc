@@ -40,3 +40,7 @@ Raw私有 `artifacts/c15-producer-ready` 与remote native_oj_like/results/c15-ba
 五sample内各role core-mean的中位：AIC MTE2 3.659375us、MTE1 1.086945us、Cube0.748125us、Fix0.218334us，AIV wait-id0 4.678958us、Vector0.131320us、barrier wait-id14 0.697431us。PMU时间重叠，不能相加或据此保证驻留收益。
 
 下一resident split input实验以本2073f48e为parent，预设20%gate **<=8.7523496μs**；失败恢复本正确修复版，不恢复已实测错误的原ZIP。正确修复保留在独立分支，未OJ/未main。全部raw包已下载 artifacts/c15-producer-ready/c15-ready-*，完整source/DSO/输入/Plan/SoC绑定。
+
+## 同进程变化输入补充验证
+
+独立correctness-only input-sequence复用同输入分配/context/stream/内部workspace，mixed→all-negative→mixed输出[1.6493455171585083,-40.063804626464844,1.6493455171585083]，fullFP64负值golden-40.06380844116211、最大abs3.814697265625e-6/rel9.52155427566823e-8，全部通过，input/yguard完整。三调用不是性能采集，不修改正式测试/阈值。不证明所有并发/SoC场景。raw已下载c15-ready-alternating.tgz。

@@ -1208,3 +1208,9 @@ CPU实际新增producer分支/helpers78batch pairs/完整K/负值/零尾/输入b
 当前parent2073f48e/DSOca36b327，C11本地BF16TT1/1536/2048/2048实际完整plan BM256BN128/Mt6Nt16Ns16/dual2/workers20（并非旧BM128BN256），9382/24AIC48AIV/caller20。golden116.7254638671875，parent116.72545623779297/abs7.6294e-6，一次及五次全部通过；默认8表×5，20Cube40Vector，times[75.783028,76.703072,76.423058,75.923035,76.023041]us，中位76.023041us。
 
 候选kernel06f3e06e/356971B，MDL NN交换物理输入计算Cᵀ+沿原N纵向Max，原GM/任务/握手/finalizer不动。预设20%gate<=60.8184328us；SDK actual-selector FP16/BF16均selected1，fresh12825664/stepKa8Kb2/depthA16B4/db2/2/1/shareL1393216。CANN编译PASS，metadataDSObcd8a8e0/source06f3/wrapper225154c4+included994e29f；一次完整native golden精确通过，五默认报告采集中/PENDING，不称突破。详见C11_TRANSPOSED_MDL；CPU构造C矩阵+实际分支抽取/逆补丁/反例不是完整K硬件证据。无新OJ。
+
+### C11 Cᵀ MDL终态：Vector减少，完整op慢5.025%
+
+5edc14f/06f3e06e/356971B，metadataDSObcd8a8e0，实际TRANSPOSE_Ctrue/20Cube40Vector/default8表×5。一完整precision+五性能输出精确fullFP64golden116.7254638671875，input/yguard完整。times[79.703186,80.263214,79.023163,79.843193,80.363213]us，中位79.843193，比parent76.023041慢约5.025%，未20%gate<=60.8184328。不OJ/重采/相邻NN参数扫描，恢复完整2073f48e/a11e2d9，保留C15就绪修复。
+
+PMU核心均值五次中位：AIV Vector5.146000→1.953111us，但AIC MTE1 25.440472→32.894028、MTE2 45.608556→49.547611、MAC44.009944→44.391416，Fix4.217611→4.087889；重叠不可相加/作单因素因果。全部原始编译/host实际查询/selector/正确性/profile已下载artifacts/c11-mdl-transposed-c；C15alternating raw也下载artifacts/c15-producer-ready。candidateFP16硬件/full15/其它SoC未做，不继续验证已无收益路径。

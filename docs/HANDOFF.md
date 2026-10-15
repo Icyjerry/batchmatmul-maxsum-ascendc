@@ -1,38 +1,38 @@
-# 当前工作：C11 Cᵀ MDL 完整精度通过，五次默认性能采集中
+# 当前工作：C11 Cᵀ 实测无收益已归档，恢复 C15 就绪修复版
 
-## 当前源码与保留 parent
+## 当前可继续的源码
 
-- 分支 experiment/c11-mdl-transposed-c，parent a11e2d9/kernel2073f48e/353255B 是当前有效保留版本：含 C15 Cube PIPE_FIX→AIV 等待修复。不要回退到已被本机反证 C15输出0的原 ZIP078635；接受源b881与ZIP不同，不能借其Pass15。
-- 当前候选 kernel356971B/SHA06f3e06e0f3fde1e3cd7c63e2487f978298e0502ef6ca8ad9bcb0a6cb25050c5。C11 TT 用物理输入交换计算 NN Cᵀ，再沿原 N 纵向Max，原 M Sum/任务/GM arena/credits/finalizer不变。其它入口及保护7保持。详见 C11_TRANSPOSED_MDL.md。
-- C15 resident-input 候选42d3e95/dda7b307已经完整验证且归档6d2c47b：10.940437→10.800432us仅1.28%，未20%门槛；不重复/参数扫描/OJ，完整恢复2073后才开展当前 C11。
+- 分支 experiment/c11-mdl-transposed-c，当前kernel **353255B/SHA2073f48e78d4fa86c409c4befc620744b2532d5f01223cf94564900f35d1ec2b**，完整恢复a11e2d9：只保留C15 Cube PIPE_FIX→AIV wait就绪修复。
+- 不回退到ZIP078635：该份本机C15第一次输出0已反证。接受源b881与ZIP不同，不能借它的Pass15/401.13us证明当前源。七个保护文件保持1734f16；未改main/正式测试/阈值，未main合并/新OJ。
+- C11候选实现保留commit5edc14f/source06f3e06e/356971B；CPU候选模型需对该冻结源运行，当前parent不应误跑或放宽候选模型。
 
-## 当前 native 证据
+## 本次已完成的真实设备验证
 
-- hostname2ef29bca0f61，Ascend910_9382/24AIC48AIV/CANN9/driver26.1.1，dev0physical14/card7chip0，callerlimit20。FP16/BF16属性是本地fixture明确假设，不是已读取隐藏OJ属性。
-- C15正确parent2073/DSOca36b327：mixed/fullnegative/五默认报告全部通过，中位10.940437us；新同context/stream/workspace mixed→negative→mixed三次再次通过，输出[1.6493455171585083,-40.063804626464844,1.6493455171585083]，最大abs3.8147e-6，input/yguard完整。独立工具 optional input-sequence 仅correctness可用，不改性能preset。
-- C11 BF16TT1/1536/2048/2048实际parentnormalPlan BM256BN128/Mt6Nt16Ns16/dual2/workers20/final1（旧注释128/256不是当前plan）。source2073/DSOca36完整FP64golden及五性能输出通过：76.023041us中位，actual MIX20Cube40Vector/default全部8表×5。raw已下载artifacts/c11-mdl-output-audit。
-- C11候选两份独立wrapper均CANN9/dav2201编译成功；带metadata export的DSObcd8a8e0951a3d9b255088a2b7ad8e8c48b5cbcdb3506ae6151e1209414b7cde，source06f3，wrapper225154c4/base994e29f身份绑定。新入口检查上一SSH断开时的编译实际已经完成，没有重编译。
-- actual host selector（无kernel launch）BF16及FP16均selected1，freshNN tiling128/256/64、stepKa8/depthA16、stepKb2/depthB4、dbl2/2/1/shareL1393216；独立host query初始漏arch编译失败，补自建CMake dav2201后通过。原CMake没改。
-- C11候选一次完整native precision PASS，实际116.7254638671875与fullBF16storage→FP64golden精确，input/yguard完整。完整性能采集正在exec79837，不能重复启动同任务。
-- CPU抽取实际operand、offset/tail、GM copy、纵向Max，6个完整构造C矩阵及4反例/默认分支逆补丁/范围/保护7通过；不是完整K硬件计算证据。
+9382/24AIC48AIV/dev0physical14/card7chip0/CANN9/driver26.1.1，hostname2ef29bca0f61。caller limit20不等于物理核数，fixture dtype/layout是明确本地假设，不是读取隐藏OJ属性。
+
+1. C15正确parent2073/DSOca36b327：mixed/fullnegative/五默认报告通过，中位10.940437us。另同context/stream/workspace mixed→negative→mixed三次输出[1.6493455171585083,-40.063804626464844,1.6493455171585083]，最大abs3.8147e-6/rel9.52155e-8；input/yguard完整。原零输出问题已在此机/fixture修复，正式15和另一SoC尚未全证。
+2. C15 resident-input42d3e95/dda7b307：编译/精度全部通过，中位10.800432us仅快1.28%，未预设20%gate，归档6d2c47b并恢复2073。不扫描BK/chunk/queue，不OJ。详见C15_RESIDENT_SPLIT_INPUT。
+3. C11 BF16TT1/1536/2048/2048 parent actual完整plan BM256BN128/Mt6Nt16Ns16/dual2/workers20/final1（旧128/256不是当前plan），DSOca36。golden116.7254638671875，parent116.72545623779297/abs7.6294e-6；一次及五报告全通过。times[75.783028,76.703072,76.423058,75.923035,76.023041]us，中位76.023041。
+4. C11候选 NN交换物理输入计算Cᵀ+原N纵向Max，原GM/任务/credits/finalizer不变，真实SDK新query返回12825664/Ka8Kb2/depthA16B4/db2/2/1。两wrapper独立CANN9/dav2201编译成功，actual selector BF16/FP16均selected1，metadataDSObcd8a8e0/source06f3/wrapper225154c4+included994e29f。
+5. C11实际profile TRANSPOSE_Ctrue/20Cube40Vector/default8表×5，一次精度及五性能输出均精确golden/input/yguard完整。但times[79.703186,80.263214,79.023163,79.843193,80.363213]us，中位79.843193，比parent慢5.025%，未预设20%gate<=60.8184328。已经归档并恢复完整2073，不重复采集/相邻NN参数扫描/OJ。Vector5.146→1.953us下降，但AIC MTE1/MTE2上升，不能相加或作单因素因果。详见C11_TRANSPOSED_MDL。
 
 ## 下一条可执行动作
 
-1. poll exec79837；远端 results/c11-transposed-profile 和queue判断真实状态，不能因SSH观察失效重跑。
-2. 只比较全部五报告完整TaskDuration中位、actual TRANSPOSE_Ctrue/20AIC40AIV、8表×5、五golden/guards/input。采前20%门槛 **<=60.8184328us**（baseline76.023041）；未达则保存证据、恢复完整2073/a11e，不做相邻参数/无变化重采。通过才补FP16/fullnegative/回退与正式15覆盖，考虑OJ。
-3. 下载candidate build/metadata/correctness/profile与C15alternating原始资料，更新PERF_LOG及本文件，commit/push当前分支。目录700/files600，凭据不入Git。
-4. 当前无新正式OJ任务，无突破声明。既有 CLI会话加载成功但HTTP403不是401，不凭此要求重新登录。整体冲榜任务未完成。
+- 当前没有活跃NPU任务，exec79837/95735/8673均terminal0。全部C11编译/host SDK query/真实selector/correctness/profile包以及C15alternating包已下载，private artifacts目录700/files600。不要重新启动这些任务。
+- 后续应从2073出发选择有新证据且未失败的结构方向，或补本机shape/layout/dtype正确性覆盖；不复活C11 NN tiling/C15resident微调。没有达到用户要求的重大性能突破，暂不创建新OJ任务。
+- 各候选具体终态和停止规则看PERF_LOG及独立档案。CPU/编译/native/OJ分开；正式15/另一SoC仍PENDING。
+- 用户授权GitHub push当前实验分支，不移动tag/不改写历史；接手先git status/log及本文件。整体冲榜未完成。
 
 ## 连接与工具
 
-- 私有SSH配置 /private/tmp/bmmms-remote-access/config，前台master exec60861，ControlPersist=no；先ssh -O check。askpass已删除。fresh入口已实际连接，不沿用旧blocked结论。
-- 独立工具 /workspace/bmmms-codex/native_oj_like；Python /workspace/bmmms-codex/test-venv/bin/python。source /usr/local/Ascend/cann-9.0.0/set_env.sh，并把driver/lib64/common和driver/lib64/driver加LD_LIBRARY_PATH。
-- filelock+queue串行NPU，状态/workspace/bmmms-codex/npu_test_state.json。传输scp需-O（默认sftp Connection closed），未涉及平台权限问题。
-- 当前候选冻结 imports/c11-transposed-mdl-06f3e06e0f3f/kernel.asc；metadataDSO build-c11-transposed-metadata/libnative_bmmms.so；correctness results/c11-transposed-correctness，真实host query results/c11-transposed-host-query，reviewed c11.complete_frame.json仍为原MakePlan完整frame。
-- 正确parent冻结 imports/c15-producer-ready-2073f48e78d4/kernel.asc / build-c15-ready/libnative_bmmms.so；新序列结果 results/c15-ready-alternating。
+- 私有SSH配置 /private/tmp/bmmms-remote-access/config，前台master exec60861，ControlPersist=no；先ssh -O check。askpass已删除，凭据不入Git。新入口已实际连接，不沿用旧blocked结论。
+- 工作根/workspace/bmmms-codex，工具native_oj_like，Python test-venv/bin/python。source /usr/local/Ascend/cann-9.0.0/set_env.sh，driver/lib64/common及driver/lib64/driver加入LD_LIBRARY_PATH。
+- filelock+queue串行NPU，状态npu_test_state.json，启动前检查实际queue/ps。scp需-O（默认sftp Connection closed与平台认证无关）。
+- 正确parent冻结imports/c15-producer-ready-2073f48e78d4/kernel.asc，DSO native_oj_like/build-c15-ready/libnative_bmmms.so（ca36b327），完整c11/c15.complete_frame.json均保留。
+- C11候选冻结imports/c11-transposed-mdl-06f3e06e0f3f/kernel.asc，DSO build-c11-transposed-metadata/libnative_bmmms.so（bcd8a8e0）；结果results/c11-transposed-{host-query,correctness,profile}。本地artifacts/c11-mdl-transposed-c/c11-transposed-evidence.tgz及summary/pipe比较。
+- C15变化输入结果results/c15-ready-alternating，本地artifacts/c15-producer-ready/c15-ready-alternating.tgz。工具input-sequence只用于correctness，性能preset未改。
+- 接受源readonly CLI查询6acdd94d会话加载成功但HTTP403，不是401；未取到source/result，不据此要求重登录。
 
-## 失败档案与边界
+## 避免重复的失败方向
 
-C6 raw-row native精度FAIL已归档0689e2d（raw已下载，CPU布局假设被反证，不扫描救活）；C13fullK9.100364→9.040361us未15%gate；C12stridedB83.123322→82.683304未10%；C4compact3.060122→3.100124变慢；C15resident仅1.28%。队友C8五轮已结束/C7parked/C9constantSchedule paused，C10/C11旧失败见独立档案和TEAMMATE_777734_REVIEW，不改名复做。
-
-所有正式15/另一SoC尚待验证，不把本机单fixture当正式全部通过。算法仅kernel.asc；保护7不变，不移动历史tag/main或改写Git历史。GitHub允许push当前实验分支。
+C6 raw-row native精度FAIL归档0689e2d（raw已下载、CPU布局假设被反证，不扫描救活）；C13fullK9.100364→9.040361未15%gate；C12stridedB83.123322→82.683304未10%；C4compact3.060122→3.100124变慢；C15resident仅1.28%；C11 NN Cᵀ慢5.025%。队友C8五轮已结束/C7parked/C9constantSchedule paused，其它历史见TEAMMATE_777734_REVIEW，不改名复做。
