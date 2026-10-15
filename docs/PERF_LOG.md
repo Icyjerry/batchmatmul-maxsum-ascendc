@@ -1245,3 +1245,9 @@ PMU核心均值五次中位：AIV Vector5.146000→1.953111us，但AIC MTE1 25.4
 ### C6 compact NZ终态：native PASS，完整op仅0.4515%，归档
 
 5fc448b/source360db6f0，DSO046682f0，actualCOMPACT_NZtrue/13Cube13Vector/default8表×5。一完整correctness+五性能输出fullFP64通过，maxabs2.384185791015625e-7/rel6.52273e-8、五输出一致、input/yguard完整。times[9.020361,8.820353,9.020361,8.660346,8.060323]us，中位8.820353对parent8.860354仅下降0.4515%，未20%gate，不重复/扫描/OJ，恢复完整2073f48e/a11e2d9。候选全负硬件/另一SoC/正式15未做。源码写回10240→7360B不等于完整耗时收益。raw全部下载artifacts/c6-compact-nz-output。
+
+## C1 NPU scalar-cache fullK32 新结构
+
+Parent2073/DSOca36实际C1 FP16/B1M1N1K32 plan dual15/group2/final1/total0，baseline一次及五输出fullstorageFP64通过（abs2.98e-8），原dotshort pureVector1AIV/default8表×5，times[1.960078,2.000080,1.560062,1.560062,1.600064]us，中位1.600064，采前20%gate<=1.2800512us。
+
+新结构为NPU scalar DCache读取packed32bit完整64B/输入、FP16/BF16解码、FP32两链全K32累加，原4B DMA输出和PIPE_ALL。每调用input64B cacheline失效、UB输出cacheflush/S_MTE3，无新增GM。不同于已失败literal Vector。初始9e699fe1编译反证CANN9 publicLocal Dcci重载const_cast非法，未改SDK；4c081854用该SDK内部对应的实际dcci指令，编译中。43ASC新增行/default inverse/保护7、全部128768有限编码/256fullK FP64CPU样本/6故障反例及guard22/33通过，是mock非native证明。实现28e1a82，候选native精度/缓存一致性/性能PENDING，无新OJ。详见C1_SCALAR_CACHE_DOT。

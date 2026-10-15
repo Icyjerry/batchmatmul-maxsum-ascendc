@@ -1,3 +1,13 @@
+# 当前进行：C1 NPU scalar-cache完整K32候选编译中
+
+- 分支experiment/c1-scalar-cache-dot，实现28e1a82/source4c0818544891c4b0da051d4777417871fb179accd3d4023c23614bdd0274dbbe，parent2073f48e正式Pass15/398.92us。C6compactNZ失败已归档6fd56e0，未带入。
+- C1新结构为NPU scalar GM直读/实际编码解码/FP32全K32累加，不是CPU计算/旧literal Vector。输入cacheline64B显式失效、UBcacheflush/S_MTE3/4B输出/PIPE_ALL，实际资源和对齐guard。CPU全部有限128768编码/256完整dot/6反例、guard22/33、inverse/保护7通过。
+- 初始9e699fe1编译FAIL（CANN publicLocal Dcci封装const_cast错误），未改SDK。修正4c081854用SDK内部同dcci指令；当前compile exec66564/build-c1-scalar-dot-fixed。先poll同handle，不因SSH断开重编译。详见C1_SCALAR_CACHE_DOT。
+- baselineC1原DSOca36一次精度及五profile通过，median1.600064us，采前20%gate<=1.2800512us。actual c1.complete_frame.json/fixture c1.json；candidate c1_scalar.json仅期望symbol不同，inputs/c1-scalar的b16/golden字节与baseline完全相同。先精度再profile全5，过gate补BF16/变化输入/全负/OJ，否则归档恢复2073，无相邻扫描。
+- SSHmaster35585/hostname2ef29bca0f61/9382/dev0physical14/24AIC48AIV，queue空，askpass删；C1baseline39147 terminal0。
+
+## 下方为C6及前序过程档案（状态以上段为准）
+
 # 当前终态：C6 compact NZ未过性能门槛，恢复正式Pass15的2073
 
 - 实现5fc448b/source360db6f0已归档：native完整精度及五输出通过，actualtrue/13Cube13Vector/default8表×5，8.860354→8.820353us仅0.4515%，未20%gate。不扫相邻NZ参数/重采/OJ。raw全下载，详见C6_COMPACT_NZ_OUTPUT。
