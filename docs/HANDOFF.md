@@ -1,3 +1,15 @@
+# 当前进行：C1混合half输入直接累加FP32，CPU过/CANN编译中
+
+- experiment/c1-mixed-fp32-mac，当前kernel43dbf4f3a4d0f35ec6536123f5d4f14a214d4de4ff666fd1072ab2126f917e86/355211B，**未native候选**，从2073/a11e2d9派生。正式保留2073 Pass15/398.92us不变，无新OJ。
+- 新实际SDK依据MulAddDst<Tuple<float,half>>，不是旧floatfloat MLA或scalarcache：prod0与input64B×2DMA重叠，MTE2ready后直接混合VMLA，省Cast依赖阶段；fullK32 ReduceSum/4B y/events/PIPE_ALL保持。只FP16B1M1N1K32、实际guard/GM32B对齐，BF16回原。M=N1四storage同物理顺序。新UB288B，无新GM/plan变更。
+- CPU actualentry2115编码fullK/all63488finitehalf/随机/大乘积/小乘积/全负+5faults/guards/inverse2073/保护7PASS，actualguard25/36反例/四flags/UB/AIV边界通过。CPU混合FMA语义是假设，必须native证。
+- **NEXT poll exec82517**：CANN9/dav2201 compile，imports/c1-mixed32-43dbf4f3a4d0/kernel.asc；build-c1-mixed32，log/workspace/bmmms-codex/c1-mixed32-build.log。stress输入准备完成、旧normal未改。编译成功写DSO identity/source43db/wrapper994e29f，原c1.json/c1.complete_frame/inputs/c1跑job correctness --input-sequence native_oj_like/c1_mixed_input_sequence.json（mixed→max65504^2→tiny32*(2^-14)^2→negative-32→mixed）。
+- **关键必须**：完成sequence后检查actual_with_guard第1/2/3次首4B与各stress golden.f32完全一致，tiny值不能让普通atol容忍0。没有native精度/性能结论。然后一次default8表×5，actual bmmms_dot_short_mixed32/pureVector1。原baseline完整五[1.960078,2.000080,1.560062,1.560062,1.600064]median1.600064，source2073/DSOca36，raw在c1-scalar-cache-dot包。
+- gate采前<=1.4400576且全部五<1.560062、fulloutputs/input-yguard/三stress exact后才考虑正式15。失败恢复2073，不扫UB/stride/清零位置/K、不重采/OJ。详见C1_MIXED_FP32_MAC。
+- C9前序已归档f06d202：FMatrix新true精度/5报告过但55.142204→54.662186仅.8705%，stall分类改变非大加速。raw全本地；其compile/native/profile均terminal0。当前只有82517编译，无NPU/OJ；master63301/pid9058有效、备用授权私有config已更新/askpass删除/scp-O。
+
+## 以下为历史交接（当前以上段为准）
+
 # 当前：C9原生验证终态，恢复正式Pass15保留版
 
 - 当前experiment/c9-left-fmatrix，kernel逐字a11e2d9/2073f48e，正式Pass15/398.92us不变。新source4693eb7a保存在05c86ea，native仅改善0.8705%，已归档，无新OJ。

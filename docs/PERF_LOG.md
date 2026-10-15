@@ -1324,3 +1324,9 @@ branch experiment/c9-left-fmatrix。原2073/ca36，9382/24AIC48AIV/dev0physical1
 05c86ea/source4693eb7a/DSObf4054fe CANN9编译PASS。首次及default完整五报告fullFP64精度、输入/yguard全过，actualtrue/20Cube40AIV/90或100MMAD pattern原样。times[54.662186,55.342213,53.322132,54.662186,54.622185]median54.662186，parent55.142204，仅-0.8705%，未采前10%及全五界限；恢复2073、不OJ/重采/扫参数。MTE1stall32.607→.219但Cube stall.071→31.619，MTE1活动/MAC几乎不变，等待分类变化不代表速度；raw全下载c9-left-fmatrix700/600。CANN35373/native14509/profile95861/download35588终态。
 
 只读实际SDK另发现MulAddDst支持float目标/half双输入，可研究C1去掉Cast依赖链并把prod清零与DMA重叠。BF16不支持；大half乘积FP32精度需native，不是既有floatfloat MLA或scalarcache的复做。尚未实现/未测/无速度主张。
+
+## 2026-10-15 C1 mixed half→FP32 MAC 新架构进入编译
+
+从2073派生experiment/c1-mixed-fp32-mac/source43dbf4f3/355211B。实际CANN9 MulAddDst支持Tuple<float,half>，以FP32 prod0与inputDMA重叠，inputready后混合VMLA省Cast依赖阶段，ReduceSum32/4B输出/显式events完整；BF16不支持回原路。不加GM/不改plan，shape仅FP16B1M1N1K32，四storage同连续raw顺序。CPU实际入口2115编码fullK/all63488finitehalf/随机/大乘积/小乘积/负值+5faults/guards/inverse保护7PASS；guard25/36+四布局/对齐UB/AIV临界PASS，非native证明。
+
+真实FP16乘积精度必须先native已知输入max65504^2、32*(2^-14)^2和-32输出bits精确，再标准mixed;原job5call同context/输入地址mixed→max→tiny→negative→mixed，独立stress输入完整FP64golden，不改旧inputs/正式tests。CANN编译82517进行中sourcefrozen，wrapper994e29f。采前gate相对原C1完整五median1.600064：<=1.4400576且所有五<1.560062、fullprecision/guards/三stress exact后才正式15；失败归档2073不扫位置/stride/K/UB、不重采/OJ。详见C1_MIXED_FP32_MAC。
