@@ -39,4 +39,13 @@
 - 设备工具 `/workspace/bmmms-codex/native_oj_like`；私有NumPy2.2.6 Python `/workspace/bmmms-codex/test-venv/bin/python`。source CANN set_env，runtime driver/lib64/common和driver/lib64/driver加入LD_LIBRARY_PATH。
 - 真globalfilelock+active/pending queue序列化设备，编译可以并行。baseline任务已终态，最新是否有活动任务以真实queue/ps为准。shared_assets只读未改。
 - GitHub私有 `Icyjerry/batchmatmul-maxsum-ascendc` 已授权，push当前实验分支；不移动历史tag/不重写已推送历史。
-- 当前目标active，历史block曾因新入口解除，本轮完成native实测后再次失去target授权；这按新的阻塞周期计。候选已明确编译PASS/nativeFAIL，不再写PENDING。当前源full15/另一SoC/ZIP-accepted绑定仍未验证，整体冲榜未完成。
+- 本轮新的阻塞审查已达阈值：恢复访问并完成C6实测的用户触发轮，随后两次goal continuation均遇同一目标转发platform authorization denied。最新干净重连仍跳板已认证/目标转发被拒/exit255，无可观察的活动任务等待。目标设为blocked，整体冲榜未完成；新入口恢复后继续，不重复失败候选或盲叠加未验证优化。
+
+
+## 2026-10-15 新阻塞周期终态与恢复顺序
+
+最新脱敏实查 `/private/tmp/bmmms-remote-access/blocked-audit-sanitized.log`；私有原始SSH日志不入Git。没有新OJ任务或运行中的本Agent NPU作业；C6baseline/profile/candidate correctness的执行handle均已返回终态。服务器当前全局任务状态因不可达无法重新确认，不把历史空队列当当前证据。
+
+已有有效独立工作完成：C6实际设备反证/完整parent原始包、failed source归档与精确回滚、未来失败原始bits工具、C15资源/布局/地址审核及fixture。下一关键步骤是实际C15 normalPlan与baseline全golden五报告，当前缺设备；不能用更多CPU模型或未经编译分支替代性能证据。刷新入口请求已发出，无需重复root密码。
+
+恢复时依次：更新私有SSH配置并建立前台master→核对hostname/CANN/SoC/physical映射和队列→补下载C6原始失败目录、编译log和DSO manifest→部署独立driver改进与c15.json→冻结ZIP078635 baseline身份执行C15 plan→审阅完整frame→全FP64storage参考/一次精度/五default报告。再按C15_RESIDENT_INPUT_AUDIT实现单一结构候选，采前20%门槛保持；当前kernel仍ZIP078635，main/tag不动。
