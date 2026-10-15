@@ -1,3 +1,11 @@
+# 最新连接状态：本turn验证已完成后master断开，备用授权重连被拒
+
+本turn C9与C1所有任务已terminal0、raw完整下载、kernel已恢复2073并push8e9d473；随后最后检查control socket缺失、pid9058不存在，原master63301已terminal（内部SSH exit255）。使用用户备用授权+原root认证干净重连实际platform authorization denied，askpass已删除，private master-reconnect.log0600。已异步请求新入口，无需重复root密码。这是完成本turn设备工作之后的新阻碍，不把前序已解除的blocked直接沿用；当前goal仍active，不标完成。
+
+远端queue最后一次实际检查为空发生在master断开前，目前未知；我方无未终态NPU/OJ job，不能凭旧queue文件说现在verified wait。接下来可独立准备C2 half Gather+mixed FP32 product模型（API已有实际SDK依据），新入口后先核对真实plan/设备/queue及完整parentprofile，再验证一个新候选；不重启本turn已完成任务。
+
+## 以下为完整实验结果与下一方向
+
 # 当前终态：C9及C1新结构均完成native，恢复正式Pass15的2073
 
 - 当前experiment/c1-mixed-fp32-mac，kernel逐字a11e2d9/2073f48e78d4fa86c409c4befc620744b2532d5f01223cf94564900f35d1ec2b。正式已确认任务820092/6ad046feaad397b6d98aa318 Pass15/398.92us，本turn无新OJ。目标active且未完成。
