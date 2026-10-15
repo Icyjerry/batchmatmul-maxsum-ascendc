@@ -1,3 +1,15 @@
+# 当前进行：C11原MDL常量tiling配置，CPU过、设备编译中
+
+experiment/c11-static-mdl，候选3bcc585a/355430B、45增2改 kernel lines。实际CANN9 MatmulApiStaticTiling公开类型，13字段冻结为actualC11 256x128x64/step1,1,4,4/depth8,8/db2,2,1/L1393216，余字段-1回runtime，DUAL_MDL_CONFIG原值不动。非换tile/输入转置/旧full-A/N-pair/GM新通路，原MDL所有计算/事件/归约body保持。formalC11属性仍明确假设，本地BF16TT。
+
+CPU tools/validate_c11_static_mdl.py：12/62及12/73实际guard反例/容量边界、13constants/16runtime defaults/wholeinverse2073/protected7 PASS；不是native证据。首compile75928源41ddda11因namespace/早hook错误exit2，已保留；修正source3bcc585a新独立目录。
+
+NEXT poll exec46296，actualbisheng进程已确认live；native_oj_like/build-c11-static-mdl-fixed，log /workspace/bmmms-codex/c11-static-mdl-fixed-build.log，frozen imports/c11-static-mdl-fixed/kernel.asc。成功后写source/DSO/wrapper994e29f identity→原c11.json/c11.complete_frame/inputs/c11一次correctness→一次default完整五。采前gate<=68.4207369且全五<75.783028，对parent76.023041（原五[75.783028,76.703072,76.423058,75.923035,76.023041]）。要求statictrue/20AIC40AIV/MMAD[160]*16+[128]*4不变。失败恢复2073、不扫static字段/flags/block/step、不重采/OJ。详见C11_STATIC_MDL。
+
+当前无NPU/OJ job，master57930/pid13934实际有效，queue本turn重查空，设备9382/24AIC48AIV/dev0physical14/CANN9/caller20。正式保留2073/820092不变。前轮C2半精度Gather已失败归档371556b，不复做。目标active未完成。
+
+## 以下保留历史交接（当前以上段为准）
+
 # 当前终态：新SSH恢复；C2新混合流水完成native但变慢，恢复保留版2073
 
 - experiment/c2-half-gather-mla；当前kernel逐字a11e2d9/2073f48e/353255B，正式820092 Pass15/398.92us保持，本turn无OJ，整体冲榜目标active未完成。
