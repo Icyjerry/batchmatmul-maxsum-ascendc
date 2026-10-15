@@ -1,3 +1,14 @@
+# 当前进行：C15八AIV按行归约新结构，CPU通过/设备编译中
+
+- experiment/c15-row-finalize，kernel00c23fa0f42564df10187e01ed0b1da03f2c405b64119b8ac3c8e47060bbc406。从正式Pass15保留2073派生，原Cube函数体/GM arena不变，仅新ROW_FINAL默认false/template真分派/精确guard及原arena按行复用finalizer。失败two-MMAD不并入。
+- 每AIV覆盖8个完整N64行在全部8Ksplit的贡献，先FP32 SumK再MaxN/Sum8M，自己split0行起点写32B得分槽，MTE3_S+全AIVbarrier后AIV0固定顺序Sum8组分数，4B写y，无atomic/新GM。额外barrier可能抵消收益。详见C15_ROW_FINALIZE。
+- CPU实际完整finalizer8线程/4个完整partial张量/6故障控制，host实际guard54+65/资源临界，inverse恢复2073/保护7一致均PASS；不是native证据。
+- **NEXT poll exec67879**：CANN9/dav2201 compile，远端/workspace/bmmms-codex/c15-row-finalize-build.log，build-c15-row-finalize，冻结imports/c15-row-finalize-00c23fa0f425。初始95664工具误填目录kernel找不到，已记录/修正，源码未改。成功后写DSO identity（wrapper994e29f/source00c23fa0），仅一次correctness及原c15_input_sequence mixed-negative-mixed，然后一次完整default五profile。native捕获新ROW_FINAL=true/8Cube8Vector/每Cube仍8MMAD。
+- 采前门槛median<=9.8463933且所有五<父最快10.540421us、完整精度/全负/变化输入/guard通过，才做进一步正式15验证。20%目标8.7523496；失败恢复2073，不扫行数/核数/buffer/stride，不重采/OJ。当前无新OJ，整体冲榜仍未完成。
+- C15两MMAD结果已归档87ff608并推送：真实40个Cube均2MMAD但median10.800432/仅1.28%；raw完整本地。C3dtype/layout仍未知，用户“可能有问题”。连接master35585实际仍有效，凭据不入Git/scp-O。
+
+## 以下保留前序终态（当前以上段为准）
+
 # 当前：C15两MMAD结构验证终态，恢复正式Pass15保留版
 
 - kernel逐字a11e2d9/2073f48e，正式Pass15/398.92us不变。新producer永久保存在273073e，native精度/全负/同地址变化输入/guard全部PASS，但五完整默认报告中位10.800432us对parent10.940437仅快1.28%，未采前10%且全五快于父最快门槛。40个Cube记录确实全部仅2次MMAD；无OJ、无重采、无参数扫描。

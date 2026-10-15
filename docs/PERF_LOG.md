@@ -1285,3 +1285,7 @@ CPU实际producer4194304地址、32split/4fullM64N64K8192整数golden、7反例�
 ## 2026-10-15 C15两MMAD完整producer：native通过，收益1.28%归档
 
 source20ee2dde/273073e，CANN9/9382/24AIC48AIV/caller20/FP16TT；DSOf8f1da4c。首次及同地址mixed/negative/mixed输入与yguard通过，五报告allfullFP64精确，actual新符号/8AIC8AIV/每Cube2MMAD全部确认。times[10.760430,10.800432,10.740430,11.060442,10.900436]median10.800432，对parent10.940437仅1.2797%，未采前>=10%且全五快于10.540421门槛。无OJ/重采/参数扫描，恢复2073。raw已全下载。PMU按block_id验证只有AIV0归约：aivtime8.051/Vec.936667/MTE2.685us，其余7AIVtime6.172508/Vec.015556us；重叠计数不是临界路径证明。详见C15_TWO_MMAD_FRAME。
+
+## 2026-10-15 C15按行分配8AIV finalizer，进入编译
+
+experiment/c15-row-finalize/source00c23fa0。原2073 Cube producer逐字不变、原8K1024 splits/arena/ready通知保持。每AIV读取全部K的自己8行（16KiB而非单核128KiB），先SumK再MaxN/Sum8M，原split0自己行前32B存一个分数+7zero，MTE3_S→全AIVbarrier后AIV0按2048Bstride读8slots/Sum64/4B输出。按行所有权保证复用无跨AIV读写重叠；额外barrier是风险。精确guard其它case默认false。CPU实际函数8线程/4fullpartial/6faults/guard54+65/inverse/保护7PASS，非native证明。初始工具冻结目录误填导致找不到kernel，修正为真实00c23fa0目录，CANN编译67879进行中。采前>=10%且全五快于父最快、全精度/负值/变化输入门槛，同C15_ROW_FINALIZE；无新OJ。
