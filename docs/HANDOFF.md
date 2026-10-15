@@ -1,3 +1,11 @@
+# 当前阻碍：等待新的云平台 SSH 授权入口
+
+恢复后连续三个goal turn遭遇同一远端访问阻碍；前两turn已完成候选CPU协议检查/提交与冻结验证包，本turn再次核对工作区clean/7b65ab5、kernelca66a541、bundle0de34414均未变。干净SSH仍exit255/Connection closed by UNKNOWN port65535；此前platform authorization denied是历史明确诊断。本机bisheng/npu-smi均不存在。无可确认的活跃远端任务handle，queue未知。
+
+当前候选未经CANN/native，不是已通过最优。离线可执行准备已经完成，按项目约定不再叠加未上板算法、不以CPU代替native、不绕过采前大收益门槛提交OJ。下一条实际必需动作是用户刷新云平台授权并给新SSH入口（不需重复root密码），随后执行下文冻结包验证链。此前异步请求仍待答。保留全部scope和冲榜目标，不称已完成。
+
+## 以下为完整候选与验证包交接
+
 # 当前进行：C15 Cube端ready集合，CPU已过，待刷新SSH后编译
 
 - experiment/c15-cube-collective，当前kernel356814B/SHAca66a5417b3ba41d6dd86231e4f3e36fb28dc6ca7df9feb854c1218bee872583，**未经CANN/native验证的实验候选**，不是已确认最优。正式Pass15保留版仍a11e2d9/2073f48e，任务820092总398.92us。

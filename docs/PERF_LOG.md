@@ -1303,3 +1303,8 @@ experiment/c15-cube-collective/sourceca66a541/356814B，从已验证8AIV按行81
 ## 2026-10-15 SSH未恢复，冻结C15验证包准备完成
 
 当前ccfaecc/ca66a541不变。重连exit255，当前仅Connection closed by UNKNOWN port65535，未收到新入口；前次platform authorization denied不冒充当前更明确diagnosis。新tools/native_oj_like/c15_cube_collective/run.sh及私有63748B包0de34414准备：source/wrapper/harness/完整frame/两input和golden/序列哈希核对，已有结果拒绝重启，实际CANN成功后绑定DSO，沿用原队列完成一次correctness→alternating→default五profile并打印不变gate；不自动OJ。Bash语法/三Python AST/九hash/archive权限路径已静态验证，**未执行任何CANN或NPU**。包忽略artifacts/c15-cube-collective，脚本与说明入Git，可在新入口后直接运行。当前阻碍仍有效云平台访问授权，整体目标未达成。
+
+
+## 2026-10-15 远端授权阻碍第三次复核，等待新入口
+
+恢复后连续3个goal turn同一服务器访问障碍。本turn实际核对clean/7b65ab5、sourceca66a541与bundle0de34414未变，干净SSHexit255/Connection closed by UNKNOWN port65535，local bisheng/npu-smi均无。没有新的运行handle，不能报verified wait。前序CPU与包准备均已完，后续必须CANN/native，同scope下无继续堆叠未经上板改动或绕过10%gate发OJ的依据。等待用户刷新入口；整体目标未完成，CANN/native/五报告/正式15仍PENDING。凭据无入Git，private log0600。
