@@ -1,3 +1,12 @@
+# 当前：C15两MMAD结构验证终态，恢复正式Pass15保留版
+
+- kernel逐字a11e2d9/2073f48e，正式Pass15/398.92us不变。新producer永久保存在273073e，native精度/全负/同地址变化输入/guard全部PASS，但五完整默认报告中位10.800432us对parent10.940437仅快1.28%，未采前10%且全五快于父最快门槛。40个Cube记录确实全部仅2次MMAD；无OJ、无重采、无参数扫描。
+- times[10.760430,10.800432,10.740430,11.060442,10.900436]，详见C15_TWO_MMAD_FRAME。raw已完整下载artifacts/c15-two-mmad-frame，目录700/files600。编译/正确性12330/交替52815/profile38701/下载55679全部terminal0，queue空。
+- 唯一执行归约的AIV block0平均time8.051/Vec.936667/MTE2.685us，另7AIV time6.172508/Vec.015556us；PMU重叠不相加，证明归约集中而不证明瓶颈因果。下一结构应研究原GM arena内按行分配8个AIV归约，保留全K先于MaxN、确定性SumM及ready通知；不要重做BK/slot/split参数。
+- C3正式dtype/layout仍未确认，用户回复“可能有问题”。不将本地BF16TN当隐藏事实。
+
+## 以下保留前序记录（当前以上段为准）
+
 # 当前进行：C15完整L0单缓冲两MMAD新producer已编译，native精度验证中
 
 - 分支experiment/c15-two-mmad-frame，当前kernel20ee2dde864cc79ec7cd395dfc0c4a2c3f7bfd9a8d6585f63d80715c85cfa1c4，77新增行；parent2073f48e/a11e2d9正式Pass15/398.92us。只增加新producer/guard/dispatch，原函数/GM/MakePlan/其它kernel逐字保持。

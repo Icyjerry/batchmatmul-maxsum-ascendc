@@ -1281,3 +1281,7 @@ a55b767/source8b13ff71，DSO5a7b7194。一次精度+五性能输出与fullFP64go
 采前新准入：native五次完整+所有精度/变化输入/guards/实际symbol与2MMAD通过，中位<=9.8463933us（较正确parent10.940437至少10%），且全部5样本低于父最快10.540421；20%目标<=8.7523496保留。未过归档恢复parent、不扫大小/split/队列、不重采/OJ。它是继续正式验证的准入，不是完整目标完成。
 
 CPU实际producer4194304地址、32split/4fullM64N64K8192整数golden、7反例、wholeinverse/保护7通过；真实guard54/65拒绝与全资源临界值通过。CANN9/dav2201编译PASS，DSOf8f1da4c/source20ee2dde/wrapper994e29f。第一次native correctness12330运行中，candidate native性能/正式15 PENDING，无新OJ；详见C15_TWO_MMAD_FRAME。
+
+## 2026-10-15 C15两MMAD完整producer：native通过，收益1.28%归档
+
+source20ee2dde/273073e，CANN9/9382/24AIC48AIV/caller20/FP16TT；DSOf8f1da4c。首次及同地址mixed/negative/mixed输入与yguard通过，五报告allfullFP64精确，actual新符号/8AIC8AIV/每Cube2MMAD全部确认。times[10.760430,10.800432,10.740430,11.060442,10.900436]median10.800432，对parent10.940437仅1.2797%，未采前>=10%且全五快于10.540421门槛。无OJ/重采/参数扫描，恢复2073。raw已全下载。PMU按block_id验证只有AIV0归约：aivtime8.051/Vec.936667/MTE2.685us，其余7AIVtime6.172508/Vec.015556us；重叠计数不是临界路径证明。详见C15_TWO_MMAD_FRAME。

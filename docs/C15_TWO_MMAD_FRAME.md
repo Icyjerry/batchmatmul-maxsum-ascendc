@@ -37,3 +37,13 @@ CPU模型提取实际整个Cube producer，延迟两次DMA、MMAD读者和Fix写
 真实guard production/TUNING分别54/65拒绝及所有资源容量临界值通过，L0A/B恰65536接受、少1B拒绝；不是SDK tiler或native命中证明。
 
 CANN9/dav2201独立SHARED编译PASS，8条原host GM_ADDR attribute warnings。DSO **f8f1da4c8d1af3a8ea691fef9433f8219370f109fb704cd6d02588776b76747d**，source20ee2dde/wrapper994e29f，冻结imports/c15-two-mmad-20ee2dde864c；首次native correctness exec12330进行中，mixed/negative/变化输入/五报告/正式15结果PENDING。未创建新OJ任务，不称已提升。
+
+## 2026-10-15 终态：未达准入，恢复保留版
+
+CANN编译及首次native、同context/stream/输入地址的mixed→全负→mixed均PASS；混合输出精确1.6493455171585083，全负-40.063804626464844，绝对误差3.8146973e-6。输入不变及16-word输出guard通过。
+
+一次完整默认8表×5报告：actual新two_mmad符号/8Cube8Vector，40个Cube记录全部恰2条MMAD；五完整输出fullFP64精确。TaskDuration **[10.760430,10.800432,10.740430,11.060442,10.900436]us**，中位 **10.800432us**，相对正确parent10.940437仅快 **1.2797%**，全部样本还慢于父最快10.540421。未达采前10%及全样本门槛，不提交OJ，不保留新producer，不扫描邻近参数。
+
+PMU按实际block_id分组（不能把每核sub_block_id=vector0误当全局Vector0）：Cube平均aic_time5.360236/MTE2 2.995264/MAC0.616667us；唯一执行完整归约的Vector block0平均aiv_time8.051000/Vector0.936667/MTE2 .685000us，其余7个AIV平均aiv_time6.172508/Vector .015556us。计数重叠，不能相加或据此断言临界路径，但它直接证明归约仍集中单AIV、其余AIV未分担。
+
+全部raw、identity、5份8表已下载artifacts/c15-two-mmad-frame/c15-two-mmad-evidence.tgz，summary/pmu-summary同目录，权限700/600。候选源码在273073e永久保留；工作kernel恢复a11e2d9:kernel.asc/2073f48e。完整正式15/其它SoC未跑，未新增OJ任务。
