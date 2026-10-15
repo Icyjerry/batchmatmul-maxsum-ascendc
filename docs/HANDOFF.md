@@ -1,3 +1,15 @@
+# 当前进行：C5完整FP16批次改纯Vector，四布局native精度过，父性能对照中
+
+experiment/c5-half-vector，sourceeb1ac4bd/356572B，50 added kernel lines over正式保留2073。新entry bmmms_c5_half_vector：B8/M16/N32/K128/F16/all4layout，每批1AIV，half Gather+两次64-lane混合FMA完成全K128→MaxN32→SumM16，直接4B y，无Cube/GM similarity交接/全核同步，原arena/MakePlan不动。BF16回原，UB159328+1024、实际core/plan/alignment/pins guard。不是旧C6 Vectorpairs或同点C2扫描。CPU320 entries+9fault/guard4/41及4/52/inverse/protected7通过。
+
+用户新SSH已恢复master38319/pid20843，旧89986连接断开255不代表编译失败；实际原buildlog/DSO确认CANN9编译完成，不重启。DSO9f340062/wrapper994e29f/sourceeb1ac4bd。实际normalPlan FFdual19，其余dual3；其它字段相同，8Cube/原MIX11，均已逐项审查。四layout各mixed-negative-mixed同地址native全FP64/input-yguard通过，FF abs2.38e-7/negative9.54e-7。81042包含00成功和01 frame缺文件的工具失败（尚未launch），76810在实际frame审查后01/10/11均成功；无重复已成功00。
+
+NEXT poll exec10384：原parent2073/DSOca36的01/10/11三layout一次完整default5采集中。FF parent已完整五[4.840194,4.460178,4.880195,4.580183,4.580183]median4.580183（actualMIX11/8AIC8AIV/每核1MMAD），raw全本地artifacts/c5-vector-audit。采候选前已冻结四layout独立准入>=20%median且全五低于各自父最快（FF<=3.6641464且全五<4.460178）；全5/default8表/精度/输入-yguard/实际pureVector8符号必须过。无static参数/UB/stride/K/flag扫描或重采。各layout未达回原，全部失败恢复2073，无OJ；有大收益才继续范围/正式15。详见C5_HALF_VECTOR。正式C5 dtype/layout未知，勿把FP16fixtures当hidden确认。
+
+目前尚无candidateprofile/OJ。元数据/源码/CPU工具已可接手。新入口privateconfig、askpass删除、scp-O；9382/24AIC48AIV/dev0physical14/CANN9/caller20。C11常量metadata2.58%已归档c628c2e，不复做。整体goal active未完成。
+
+## 以下保留历史交接（当前以上段为准）
+
 # 当前终态：C11常量metadata通过native，仅2.58%，恢复正式Pass15保留版
 
 experiment/c11-static-mdl，当前kernel逐字a11e2d9/2073/353255B；正式820092 Pass15/398.92us保持，无新OJ，goal active未完成。80bb3ed/source3bcc585a保留完整实现；CANN9编译/native一次+五fullFP64/input-yguard通过，真实STATICtrue/20AIC40AIV/MMAD[160]*16+[128]*4不变。
