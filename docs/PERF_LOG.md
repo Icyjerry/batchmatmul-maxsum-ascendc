@@ -1267,3 +1267,9 @@ BF16TN是本地明确fixture，正式C3属性未确认/已询问用户。实际p
 a55b767/source8b13ff71，DSO5a7b7194。一次精度+五性能输出与fullFP64golden[1.5601825714111328,1.773697018623352]精确，input/yguard完整。实际BF16/TN/K48/FLAT_GATHERtrue/pureVector2AIV/default8表×5。times[3.320133,2.740110,3.160126,2.820113,2.840114]us，中位2.840114，对parent3.020121约-5.96%；样本重叠，不称稳定收益。未20%gate<=2.4160968，不重采/相邻扫描/OJ，恢复完整2073。
 
 用户回复C3属性记录“可能有问题”，仍未确认正式dtype/layout，本地BF16TN不是正式路径证明。候选其它dtype/layout硬件、全负、正式15 NOT RUN。全部raw下载artifacts/c3-flat-gather/c3-flat-gather-evidence.tgz。C6compactNZ仅.45%、C1scalar慢46.25%均归档，无新突破或OJ。下一应从原始binary/指令及PMU辨明剩余瓶颈，避免只按源级API数量预测性能。
+
+## 只读编译对象检查：能读函数尺寸，当前工具不能解码opcode
+
+在保留2073的既有build-c15-ready目录读取library.asc.o（SHA bf99376cfaf9d094ff26cc81cb7d2ab1bc6262ab1cf5d3bfae5ac8ba7bcbc452），不重编译/重跑性能。msobjdump对ASC .aicore_binary不输出列表，且其FileAction把路径中“.asc”误判成“.a”archive，未修改SDK工具。独立ELF64解析从.aicore_binary/__aicore_rel_binary各提取一个machine4137 ELF；llvm-objdump -t能读symbol表，选中C6 AIC504B/AIV1072B、C1 FP16group2 876B、C3 BF16TN/K48 2116B。
+
+但llvm-objdump -d的所有指令均显示not available，显式--mcpu=dav-c220-vec同样失败；只有size，不是完整callgraph footprint或指令类别/运行次数/延时证据。没有从尺寸断言瓶颈或据此加入第四个猜测优化。原始提取脚本、ELF、symbols/asm失败输出/summary保留server codegen-audit并打包下载，凭据不入Git。下一若需要opcode，先核对安装编译器保存汇编/临时文件选项，仅独立工具构建且保持原源；不重测已失败candidate、不篡改正式构建。

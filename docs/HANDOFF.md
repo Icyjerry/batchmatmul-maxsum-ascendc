@@ -34,3 +34,9 @@ C15resident仅1.28%归档6d2c47b；C11NN Cᵀ慢5.025%归档3ff5ff4；C6raw Load
 工具/workspace/bmmms-codex/native_oj_like，Python /workspace/bmmms-codex/test-venv/bin/python。source /usr/local/Ascend/cann-9.0.0/set_env.sh，driver/lib64/common及driver/lib64/driver加LD_LIBRARY_PATH。filelock+queue串行NPU，状态/workspace/bmmms-codex/npu_test_state.json，启动前查真实state/ps。最后C3profile28889、baseline28094、编译47243均terminal0。
 
 当前parent正式15已过；平台未给actualSoC/plan/profile，不能把本地9382当OJ机器或另一SoC覆盖。整体冲榜目标未完成。
+
+## 只读codegen检查已完成的限制
+
+已从保留build-c15-ready/library.asc.o解析两份现有device ELF，源对象SHA bf99376c。当前llvm-objdump能读函数symbol尺寸（C6AIC504/AIV1072、C1 FP16group2 876、C3BF16TN/K48 2116B），但反汇编opcode全not available，显式mcpu也无效；不能据此声称多少条指令或瓶颈原因。SDK msobjdump对新ASC fatbin也不列出，未改工具。原始包artifacts/native-codegen-audit/codegen-audit-evidence.tgz（下载完成后），远端codegen-audit保存extract.py/ELFs/summary/失败asm。
+
+后续可核对bisheng实际help中的save-temps/汇编输出选项，仅在独立工具构建保留同源时保存生成汇编；这比再扫三条失败方向的参数更有证据价值。当前没有第四个性能候选，正式保留源仍2073。
