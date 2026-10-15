@@ -1,3 +1,13 @@
+# 当前：C9原生验证终态，恢复正式Pass15保留版
+
+- 当前experiment/c9-left-fmatrix，kernel逐字a11e2d9/2073f48e，正式Pass15/398.92us不变。新source4693eb7a保存在05c86ea，native仅改善0.8705%，已归档，无新OJ。
+- 实际C9parentFP16NT/1,2048,1536,1280/9382/24AIC48AIV/caller20，dual36/128x128x128/Ns5/window3/Kchunk256/W20；fullgolden191.8094940185547，五times[55.142204,54.922195,56.122246,55.062202,55.382214]median55.142204，实际9/10tile各核均衡。stationary-B模型最忙核GM字节不变，取消未写。
+- LEFT FMatrix复用候选CANN9PASS/DSObf4054fe，首次及五fullFP64/input-yguard通过，actualtrue/20Cube40AIV/每核MMADpattern不变。times[54.662186,55.342213,53.322132,54.662186,54.622185]median54.662186，未10%及全五门槛。不重采/扫FMatrix或K参数/OJ。MTE1stall下降转为Cube stall，活动MTE1/MAC不变，是不能以stall单项作加速结论的反例。
+- raw全本地artifacts/c9-stationary-b-audit及c9-left-fmatrix，700/600。plan33301/parentCorrect81085/parentProfile93219/原download13714、新compile35373/native14509/profile95861/download35588均terminal0。当前无活跃NPU/OJ，master63301/pid9058实际仍有效，备用授权更新私有config/askpass已删/scp-O。
+- **NEXT新依据**：实际CANN9 dav_c220 MulAddDst支持Tuple<float,half>。研究C1FP16 K32用混合vmla直接生成FP32乘积，prod清零放在输入DMA期间，省Cast依赖阶段；BF16明确不支持仍回退。必须证明真实mixed stride/大half乘积在FP32不溢出/完整精度和default五报告。不是旧C4 floatfloat compact MLA或C1scalarcache。尚未写代码/无速度结论。勿复做C9相邻N共享A既有反例。整体目标未完成。
+
+## 以下为历史交接（当前以上段为准）
+
 # 当前进行：C9 LEFT FMatrix复用，CPU已过/CANN编译中
 
 - experiment/c9-left-fmatrix，kernel4693eb7a60827baa354522fe83748eb0c00313459a6f4c9d713e59c429c183f0/354840B，尚未native候选。正式保留2073/a11e2d9仍Pass15/398.92us。用户已将goal控制状态active。

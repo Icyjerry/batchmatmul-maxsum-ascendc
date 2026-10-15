@@ -1318,3 +1318,9 @@ experiment/c15-cube-collective/sourceca66a541/356814B，从已验证8AIV按行81
 branch experiment/c9-left-fmatrix。原2073/ca36，9382/24AIC48AIV/dev0physical14/CANN9/caller20，C9FP16NT1/2048/1536/1280实际dual36/128x128x128/Ns5/window3/Kchunk256/workers20（不是旧Ns3）。fullFP64golden191.8094940185547，一次及五完整报告输出/input/yguardPASS，actual20Cube40AIV/90或100MMAD每核。times[55.142204,54.922195,56.122246,55.062202,55.382214]median55.142204。实际任务已9/10tile均衡，stationary-B模型总GM仅-1.7857%/最忙核字节不变，取消该新算法，未写kernel。raw全下载c9-stationary-b-audit。
 
 新hypothesis复用C10已存在LEFT FMatrix控制到原NT C9：A fullK resident、B Load2D不改matrix，原paddingentry0，K面板可不反复重设。真实CANN9 resetflags/header已读。source4693eb7a/354840B/31增2删，只有assert允许NT+精确guard+原template最后bool=true，计算/GM/plan/Vector/C10不变。actualhelper新旧62914560地址tag检查/4faults/wholeinverse保护7PASS，guard48/59和8/20/24/32预算临界PASS。CANN编译35373进行中，sourcefrozenimports/c9-left-fmatrix-4693eb7a6082。采前固定median<=49.6279836且全五<54.922195，完整精度/guards后才补全负/变化输入/正式15；未过恢复2073不重采/参数扫描/OJ。详见C9_LEFT_FMATRIX，无新OJ，目标未完成。
+
+## 2026-10-15 C9 LEFT FMatrix native终态：仅0.8705%，归档
+
+05c86ea/source4693eb7a/DSObf4054fe CANN9编译PASS。首次及default完整五报告fullFP64精度、输入/yguard全过，actualtrue/20Cube40AIV/90或100MMAD pattern原样。times[54.662186,55.342213,53.322132,54.662186,54.622185]median54.662186，parent55.142204，仅-0.8705%，未采前10%及全五界限；恢复2073、不OJ/重采/扫参数。MTE1stall32.607→.219但Cube stall.071→31.619，MTE1活动/MAC几乎不变，等待分类变化不代表速度；raw全下载c9-left-fmatrix700/600。CANN35373/native14509/profile95861/download35588终态。
+
+只读实际SDK另发现MulAddDst支持float目标/half双输入，可研究C1去掉Cast依赖链并把prod清零与DMA重叠。BF16不支持；大half乘积FP32精度需native，不是既有floatfloat MLA或scalarcache的复做。尚未实现/未测/无速度主张。

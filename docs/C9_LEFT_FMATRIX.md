@@ -41,3 +41,15 @@ Guard仅FP16NT/B1M2048N1536K1280、原dual36/BM128BN128BK128/fullK/匹配计划/
 独立CANN9/dav2201编译中**exec35373**，冻结`imports/c9-left-fmatrix-4693eb7a6082/kernel.asc`，`native_oj_like/build-c9-left-fmatrix`，log`c9-left-fmatrix-build.log`；目前native/profile/正式15 PENDING，无新OJ。
 
 原parent raw已下载`artifacts/c9-stationary-b-audit/c9-parent-evidence.tgz`、identity/summary/PMU/分工模型同目录（700/600）。parent plan33301/correctness81085/profile93219/下载13714均terminal0，不重启这些任务。候选原始资料放`artifacts/c9-left-fmatrix`。
+
+## Native终态：精度通过，仅0.87%，恢复保留版
+
+实现05c86ea/source4693eb7a，CANN9/dav2201编译PASS（8条原host属性warning），DSO **bf4054fef6aa43bc641b5da09fa36f05124daa5d89c8f472ef37d34d38ceaa73**。首次correctness及一次完整default8表×5均fullFP64通过，五次输出一致191.80950927734375/maxAbs1.5258789e-5/maxRel7.95518e-8、input/yguard完整。实际新SPLIT_FMATRIX=true符号/20Cube40AIV，全部每核MMAD计数与parent90/100 pattern逐个相等。
+
+五TaskDuration **[54.662186,55.342213,53.322132,54.662186,54.622185]us**，中位 **54.662186us**，对55.142204仅快 **0.8705%**，未采前49.6279836及全部快于54.922195门槛。无OJ/重采/FMatrix或K参数扫描；工作kernel恢复2073/a11e2d9。全负/变化输入、其它SoC/正式15未做，不能用混合输入替代。
+
+计数的重要反例：AIC平均scalar MTE1 stall32.607439→.219244us，scalar Cube stall .070844→31.618728us，MTE1活动25.904378→25.824267us，MAC28.281706→28.274050us。等待分类明显改变，但完整耗时仅0.87%；不得以某一stall下降声称整op同幅度改善或把重叠计数相加。C9相邻N共享A的已有61.54/62.36对57.46反例继续有效，本次未另写同样Kouter-Npair方案。
+
+全部原始correctness/5完整8表/DSO身份/buildlog已下载artifacts/c9-left-fmatrix/c9-left-fmatrix-evidence.tgz、summary和pmu-summary同目录700/600。编译35373/correct14509/profile95861/download35588均terminal0，无新NPU/OJ任务。
+
+下一次真实SDK发现（未实现）：dav_c220 MulAddDstIntrinsicsImpl明确支持Tuple<float,half>，允许half输入乘积直接累加到FP32目标，现有C1可研究预先清零FP32产品、与输入DMA重叠，去掉依赖链中的FP32 Cast。不是已失败的float/float C4 compact MLA，也不是scalar-cache；必须验证mixed模式源block/repeat stride、真实FP32乘积精度及大half乘积不会先在half溢出，再看完整耗时。BF16不在该tuple支持范围，不能冒充可用。没有代码/设备结果，不能称加速。
