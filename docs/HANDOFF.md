@@ -1,3 +1,12 @@
+# 当前进行：C6紧凑NZ输出已编译，native精度验证中
+
+- 分支experiment/c6-compact-nz-output；当前候选360db6f00491f00cf10626e867fcacd7ff741f8b5ab04c50a5115c3ae130604b。正确保留parent2073f48e/a11e2d9已经正式Pass15/398.92us，不覆盖其证据。失败恢复完整parent。
+- C6保持输入/完整K192/UnitFlag3/通知/grid/arena，改变有效M23紧凑NZ交接，写10240→7360B；详见C6_COMPACT_NZ_OUTPUT。CPU fullK78pairs/5反例、default逆补丁、guard36/47通过；CANN编译PASS，DSO046682f0。
+- 当前exec69188一次correctness（results/c6-compact-nz-correctness）进行中，先poll同handle；通过后同输入/frame/default五报告，门槛<=7.0882832us。失败归档恢复2073，不重采/扫参数/OJ；通过再补全负/变化输入/回退及正式15。
+- 新SSHmaster35585，config同私有路径，已验证hostname/mapping/queue，askpass已删除。源imports/c6-compact-nz-360db6f00491、DSO native_oj_like/build-c6-compact-nz。
+
+## 前一工作终态（保留历史上下文）
+
 # 当前工作：整合保留版正式Pass15/398.92us；第一名对照348.37us
 
 ## 当前可继续的源码
