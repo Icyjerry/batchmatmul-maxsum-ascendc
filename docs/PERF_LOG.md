@@ -1164,3 +1164,10 @@ CPU实际新增producer分支/helpers78batch pairs/完整K/负值/零尾/输入b
 新入口已连通，9382/actual24AIC48AIV/dev0physical14/CANN9，队列复核后串行运行。C4候选raw两包补回，不重采。C6 BF16NT13/23/73/192 actual normalPlan dual19/BM32BN80/K192/workers13/cube13/final2，完整frame冻结。ZIP078635/DSO0357587a完整storage FP64golden，一次精度+五profile输出通过，maxabs2.384185791015625e-7/maxrel6.522730018203635e-8，inputs/yguard不变。默认全部8表×5，实际baseline MIX11/13AIC13AIV/每核一次Cube，TaskDuration[8.260330,9.000360,8.780352,8.860354,9.240370]us，中位8.860354；预设20%gate<=7.0882832us。
 
 核对真实9SDK发现639fa38的B路径缺RIGHT FMatrix配置：默认Load3DSetFMatrixCal只写LEFT。当前fa315ae8072a/357100B修为显式SetFmatrix RIGHT+公共no-reset LoadData，沿用原C10API。CPU新增LEFT/RIGHT独立register及缺setter反例，78batch pairs+8反例、guard46/57、geometry通过；不是native布局证据。新源冻结/独立DSO正在编译；639fa38未编译/未测，候选native精度/性能/full15均PENDING。无新增GM/受保护7文件变化/正式提交，未声称突破。
+
+
+### C6 raw-row native终态：编译PASS，精度FAIL，整份恢复ZIP
+
+0689e2d/fa315ae8/357100B实际CANN9独立编译exit0/8host GM_ADDR warnings，DSOe0e6aa7f绑定source/wrapper994e29f。相同C6输入和reviewed actual normalPlan，一次native correctness synchronize后fullFP64输出比较FAIL/exit1；日志最大abs约0.47670078/rel0.12828762，原版2.38e-7。工具返回actual是NumPy舍入显示，完整原始FP32未保存，不补造精确位。CPU假设Load3D layout被反证，具体排列未证明，离线outer-block假设未复现；未扫描参数/重测/采候选profile/OJ。实现保存在0689e2d，当前恢复整份e2f1b63/ZIP078635。没有加速结论。
+
+候选raw补下载时SSHmaster超时退出，干净重连跳板认证成功但目标转发platform authorization denied；已请求新入口。编译log/failed correctness原始目录在remote，下载PENDING；本地candidate-terminal-observation.json明确保存工具已见事实与显示精度限制。baseline三包完整已下载。独立native driver加入校验前保存actual+guard原始bits/失败JSON，只加强未来诊断，未部署/不更改此前结果、阈值或正式测试。整体目标未完成。

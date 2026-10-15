@@ -55,9 +55,13 @@ def main():
    check(lib.native_call(buffers[0],buffers[1],y,stream,*args),'run_kernel')
    check(acl.aclrtSynchronizeStreamWithTimeout(stream,60000),'synchronize')
    got=np.empty_like(guard);check(acl.aclrtMemcpy(c.c_void_p(got.ctypes.data),got.nbytes,y,got.nbytes,2),'output D2H')
+   # Preserve actual bits before validation so a rejected candidate can be diagnosed.
+   (out/f'actual_with_guard_{i}.u32').write_bytes(got.tobytes())
    assert np.array_equal(got[B:],guard[B:]),'output canary modified'
    value=got[:B].view('<f4');assert np.all(np.isfinite(value))
    error=np.abs(value.astype(np.float64)-expected.astype(np.float64));relative=error/np.maximum(np.abs(expected.astype(np.float64)),1e-30)
+   if not np.allclose(value,expected,rtol=1e-4,atol=1e-4):
+    (out/'precision_failure.json').write_text(json.dumps({'call':i,'actual':value.tolist(),'expected':expected.tolist(),'absolute_error':error.tolist(),'relative_error':relative.tolist()},indent=2))
    assert np.allclose(value,expected,rtol=1e-4,atol=1e-4),(value,expected,error,relative)
    (out/f'y_{i}.f32').write_bytes(value.tobytes())
    results.append({'call':i,'y':value.tolist(),'max_abs_error':float(error.max()),'max_relative_error':float(relative.max())})
