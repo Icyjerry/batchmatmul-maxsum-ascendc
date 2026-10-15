@@ -1,10 +1,10 @@
-# 当前工作：C15 原版native输出0，补齐Cube→Vector写回通知并编译
+# 当前工作：C15就绪修复native通过；resident split输入候选已编译并通过混合精度
 
 ## 当前源码和身份
 
-- 分支 `experiment/c15-split-producer-ready`，parent3cb10e5 / ZIP078635/e2f1b63。当前kernel353255B/SHA2073f48e78d4fa86c409c4befc620744b2532d5f01223cf94564900f35d1ec2b，仅manual_split_tt新增Cube PIPE_FIX通知与Vector等待两行。保护7文件不变，未main/OJ。
-- C6 raw候选fa315ae8/0689e2d已native精度失败，已归档撤回；新SSH已补回原始失败包/编译log/DSO manifest，没有重跑。原baseline C6中位8.860354us，完整五报告在artifacts/c6-input-layout-audit。
-- ZIP078635与队友接受源b881不同；后者正式Pass15/401.13us不能赋予本源。当前原ZIP在C15本地已出现实际正确性失败。
+- 分支 `experiment/c15-resident-split-input`，parent a11e2d9/2073f48e（正确就绪修复）。当前kernel356494B/SHAdda7b307090859d1ec4f9f2d88b3622c5d85b26c50eb7f7b32388002b86bce67，新增默认false resident input，仅完整C15 frame开启。
+- 原始ZIP078635 C15输出0已被native反证，2073f48e两行通知修复混合/全负/五调用通过；失败时应恢复2073f48e，不恢复错误ZIP。
+- C6 raw失败源留0689e2d，原始日志已补回；ZIP与接受b881身份不同，后者Pass15不能借给当前源。保护7不动，未main/OJ。
 
 ## 当前实际设备证据
 
@@ -16,10 +16,12 @@
 
 ## 正在进行与下一条动作
 
-- CANN独立build-c15-ready编译中，冻结 imports/c15-producer-ready-2073f48e78d4/kernel.asc；日志native_oj_like/build-c15-ready.log。
-- 编译通过：真实source/DSO/wrapper manifest→同c15 fixture/frame/inputs一次correctness，失败保存raw继续诊断；通过则补全负/多次重入并采5完整default全部表，actualMIX11/8Cube8Vector符号核对。
-- 只有正确修复版才能作为C15有效性能基准。随后实施单一resident split input结构（C15_RESIDENT_INPUT_AUDIT）：A batched ND2NZ保留原K128块顺序，B整split NZ，原Load2D/8MMAD/Fix/AIV/GM保持；预设20%中位门槛，失败归档不扫参数。不能与原错误输出0的版本比较加速。
-- 独立native driver失败前保存actual+guard原始bits和precision_failure.json已部署，正式main/CMake/golden/阈值均不改。
+- 正确parent2073f48e，DSOca36b327：混合1.6493455171585083精确/全负-40.06380844116211通过/五输出相同，default8表×5实际8AIC8AIV。TaskDuration[10.540421,10.940437,11.080443,11.540462,10.760430]μs，中位10.940437；原始包已下载artifacts/c15-producer-ready。
+- 新resident源dda7b307/DSO59878aa0独立CANN9编译PASS、同完整frame混合precision PASS；负值+五default profile正在exec54174运行，不能重启同任务。
+- 新分支每split A一次batched ND2NZ/B一次整split NZ，原两次Load2D/8MMAD/K顺序/Fix/就绪通知/AIV/GM不变，L1 64KiB→256KiB、GM字节不减。真实资源/精确frame/alignment/tuning guard，默认false回退。
+- CPU实际Read/select/Load2D：全8split/1048576源地址tag一致/五故障反例，guard47/58资源边界通过；不是FP16硬件证据。详见C15_RESIDENT_SPLIT_INPUT。
+- NEXT poll54174同handle；完整五报告与actualRESIDENT true/8AIC8AIV核查后，比较20%gate<=8.7523496μs。失败归档恢复2073f48e、不扫参数或重采；过gate再补回退/native/正式15并考虑OJ。当前无性能结论或正式任务。
+- 独立native driver失败原始bits诊断已部署，原main/CMake/golden/阈值不改。最新SoC/queue以真实设备状态为准。
 
 ## 既有失败结论与交接
 
