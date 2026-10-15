@@ -1289,3 +1289,7 @@ source20ee2dde/273073e，CANN9/9382/24AIC48AIV/caller20/FP16TT；DSOf8f1da4c。�
 ## 2026-10-15 C15按行分配8AIV finalizer，进入编译
 
 experiment/c15-row-finalize/source00c23fa0。原2073 Cube producer逐字不变、原8K1024 splits/arena/ready通知保持。每AIV读取全部K的自己8行（16KiB而非单核128KiB），先SumK再MaxN/Sum8M，原split0自己行前32B存一个分数+7zero，MTE3_S→全AIVbarrier后AIV0按2048Bstride读8slots/Sum64/4B输出。按行所有权保证复用无跨AIV读写重叠；额外barrier是风险。精确guard其它case默认false。CPU实际函数8线程/4fullpartial/6faults/guard54+65/inverse/保护7PASS，非native证明。初始工具冻结目录误填导致找不到kernel，修正为真实00c23fa0目录，CANN编译67879进行中。采前>=10%且全五快于父最快、全精度/负值/变化输入门槛，同C15_ROW_FINALIZE；无新OJ。
+
+## 2026-10-15 C15八AIV按行归约终态：6.2157%，未达采前10%准入
+
+source00c23fa0/81f49ff/CANN9编译PASS/DSO82f68853。实际FP16TT/9382/8Cube8AIV/<half,true,true>命中，每核8MMAD不变；完整首次、同地址mixed-negative-mixed、五输出fullFP64及输入/yguard全PASS。times[10.300412,10.360415,9.900396,10.260410,10.080403]median10.260410，相对正确parent10.940437快6.2157%。全五快于父最快10.540421，但未median<=9.8463933准入，恢复2073，无OJ/重采/分块扫描。PMU确认全部8AIV参与，Vector0 .267778us/其它.229444us，非临界路径因果证明。完整raw已本地700/600，详见C15_ROW_FINALIZE。

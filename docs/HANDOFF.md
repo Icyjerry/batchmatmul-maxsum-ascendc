@@ -1,3 +1,16 @@
+# 当前：两条C15结构均完成设备验证，未达门槛，恢复正式Pass15保留版
+
+- 当前experiment/c15-row-finalize，kernel逐字a11e2d9/2073f48e78d4fa86c409c4befc620744b2532d5f01223cf94564900f35d1ec2b。正式任务820092/6ad046feaad397b6d98aa318仍是已确认Pass15/398.92us；本次没有新增OJ。
+- 新C15完整L0两MMAD source20ee2dde/273073e，归档87ff608：CANN/native精度/全负/同地址变化输入及五报告全通过，actual40个Cube各2MMAD，median10.800432相对正确父10.940437仅快1.28%，未采前10%+全五快于父最快准入。
+- 新C15八AIV按行归约 source00c23fa0/81f49ff：原Cube8MMAD不变、全K先于MaxN/原arena行所有权复用。CANN/实际native精度/全负/同地址变化/guard通过，actual<half,true,true>/8Cube8AIV/default8表×5全部完整。times[10.300412,10.360415,9.900396,10.260410,10.080403]，median10.260410仅快6.2157%；五次均快于父最快，但未采前median<=9.8463933。不降低门槛、不重采、不扫邻近行数/核数/slot/BK/split。正式15及其它layout/dtype/SoC未跑。
+- raw完整下载artifacts/c15-two-mmad-frame及artifacts/c15-row-finalize，均700/600，包含identity/全部五报告8表/正确性/变化输入/成功编译log及工具错误路径log。详见C15_TWO_MMAD_FRAME/C15_ROW_FINALIZE。两条候选完整源码在原commit可恢复，当前不混入保留版。
+- PMU证明两MMAD的归约集中AIV0，按行版本全部8AIV参与；计数有重叠，不能相加或无证据认定同步临界路径。仅改变finalizer一项的latency对照以上正确parent为准，勿用两MMAD PMU当相同producer的因果证据。
+- native51976/交替72374/profile1728/下载54635均terminal0，远端queue应空，无活跃OJ。前台SSH master35585仍实际有效；先检查真实连接/queue再开新任务，不要重跑已完成case。
+- C3正式只有shape2/7/13/48，dtype/layout用户回复“可能有问题”，仍未知。旧BF16TN native只是fixture，不能反推正式隐藏属性。
+- **NEXT**：先只读比较这两条与正确parent的现有完整PMU和实际SDK同步实现，解释额外barrier/原producer-ready约束，识别可证的新同步架构；不凭CrossCore modeId名字删全AIVbarrier，不把两个未达门槛小收益简单相加。若无新语义证据换方向，避免重复已失败结构。整体冲榜目标未完成，继续保留正式Pass15来源并按新完整结构验证。
+
+## 以下为历史完整记录（当前以上段为准）
+
 # 当前进行：C15八AIV按行归约新结构，CPU通过/设备编译中
 
 - experiment/c15-row-finalize，kernel00c23fa0f42564df10187e01ed0b1da03f2c405b64119b8ac3c8e47060bbc406。从正式Pass15保留2073派生，原Cube函数体/GM arena不变，仅新ROW_FINAL默认false/template真分派/精确guard及原arena按行复用finalizer。失败two-MMAD不并入。

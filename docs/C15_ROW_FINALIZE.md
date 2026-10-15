@@ -25,3 +25,13 @@ kernel **00c23fa0f42564df10187e01ed0b1da03f2c405b64119b8ac3c8e47060bbc406**，�
 CPU提取实际完整finalizer、8个并发线程、延迟DMA读写，4个完整32768partial有符号张量（含全负）、全部行/全部split的独立double参考归约、行所有权/完成后复用、发布后barrier/读可见性、原partial未覆盖区域和16-word yguard均通过；6个stride/owner/read-ready/publish-ready/barrier故障控制拒绝。实际guard production54/TUNING65拒绝+容量临界通过。不是FP16 native布局/速度证明。
 
 第一次独立工具构建误填不存在的冻结目录，报kernel.asc找不到；这是工具路径错误，无源码修改。已改为上列实际SHA目录，CANN9/dav2201编译进行中exec67879。native精度、全负/变化输入、默认五报告、正式15全部PENDING，无新OJ任务。
+
+## 2026-10-15 终态：精度通过，中位改善6.22%，未达提交准入
+
+CANN9/dav2201实际编译PASS/8条原host属性warnings；DSO **82f68853956b95c11f0dffaa95a4d051cf6c6866ed7c616902e95072cd304545**，wrapper994e29f/源00c23fa0。首次mixed和同context/stream/输入地址的mixed→negative→mixed全部PASS，mixed精确1.6493455171585083，负值-40.063804626464844/maxAbs3.8146973e-6，输入不可变/16-word yguard通过。
+
+一次默认完整8表×5，actual bmmms_manual_split_tt<half,true,true>，8Cube8AIV，全部40个Cube记录仍各8MMAD，五个完整输出fullFP64精确。TaskDuration **[10.300412,10.360415,9.900396,10.260410,10.080403]us**，中位 **10.260410us**，比正确父10.940437快 **6.2157%**。五个样本都小于父最快10.540421，但中位仍高于预设9.8463933，因此**不新增OJ、不重采、不改门槛、不扫分块参数**。候选源码永久保留81f49ff，工作kernel恢复2073/a11e2d9。
+
+PMU实际block_id分组，AIV0平均Vector .267778/MTE2 .302333/time7.559333us，其余7AIV平均Vector .229444/MTE2 .212270/time7.240524us，确认8AIV均实际参与归约。Cube平均time5.325444/MTE2 3.610000/MAC .737667us。计数重叠，不相加；与此前two-MMAD的PMU不是只改变finalizer的受控逐指令对照。仍不能断言是哪一个同步支配全时延。
+
+raw完整下载artifacts/c15-row-finalize/c15-row-finalize-evidence.tgz，包含首次/交替/五份默认8表/DSO身份/成功编译log与错误目录log，summary/pmu-summary同目录，目录700/files600。编译67879、native51976、交替72374、profile1728、下载54635均terminal0，当前无活跃NPU/OJ任务。正式15及其它dtype/layout/SoC未做，不声称冲榜突破。

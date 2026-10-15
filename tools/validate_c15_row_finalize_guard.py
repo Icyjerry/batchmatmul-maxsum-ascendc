@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Extract exact two-MMAD host guard and exercise real resource boundaries."""
+"""Extract the exact row-finalizer host guard and exercise resource boundaries."""
 from pathlib import Path
 import subprocess,tempfile
 R=Path(__file__).resolve().parents[1];s=(R/'kernel.asc').read_text()
@@ -23,7 +23,7 @@ for(auto field:{&platform_ascendc::PlatformAscendCManager::aic,&platform_ascendc
 #ifdef BMMMS_TUNING
 for(auto field:{&TuneConfig::group,&TuneConfig::rows,&TuneConfig::dual,&TuneConfig::early,&TuneConfig::tree,&TuneConfig::bm,&TuneConfig::bn,&TuneConfig::window,&TuneConfig::ns,&TuneConfig::ks,&TuneConfig::workers}){auto v=Tune();Tune().*field=1;assert(!ok(s,p));Tune()=v;assert(ok(s,p));++rejected;}
 #endif
-std::cout<<"Actual full-capacity frame guard: "<<rejected<<" rejected shape/dtype/layout/plan/alignment/core/capacity/workspace/pin cases, exact producer/vector capacities accepted PASS\n";}
+std::cout<<"Actual row-finalizer frame guard: "<<rejected<<" rejected shape/dtype/layout/plan/alignment/core/capacity/workspace/pin cases, exact producer/vector capacities accepted PASS\n";}
 '''
 code=(R/'tests/cpu/planner_stub.hpp').read_text()+'\nusing GM_ADDR=void*;\n'+types+plans+guard+main
 with tempfile.TemporaryDirectory(prefix='bmmms-c15-two-guard-') as tmp:
