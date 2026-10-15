@@ -1,9 +1,9 @@
-# 当前工作：C11 Cᵀ 实测无收益已归档，恢复 C15 就绪修复版
+# 当前工作：C15就绪修复保留版已按用户授权正式提交一次，待同ID终态
 
 ## 当前可继续的源码
 
 - 分支 experiment/c11-mdl-transposed-c，当前kernel **353255B/SHA2073f48e78d4fa86c409c4befc620744b2532d5f01223cf94564900f35d1ec2b**，完整恢复a11e2d9：只保留C15 Cube PIPE_FIX→AIV wait就绪修复。
-- 不回退到ZIP078635：该份本机C15第一次输出0已反证。接受源b881与ZIP不同，不能借它的Pass15/401.13us证明当前源。七个保护文件保持1734f16；未改main/正式测试/阈值，未main合并/新OJ。
+- 不回退到ZIP078635：该份本机C15第一次输出0已反证。接受源b881与ZIP不同，不能借它的Pass15/401.13us证明当前源。七个保护文件保持1734f16；未改main/正式测试/阈值，未main合并；本次用户新授权一次OJ，见下一条动作。
 - C11候选实现保留commit5edc14f/source06f3e06e/356971B；CPU候选模型需对该冻结源运行，当前parent不应误跑或放宽候选模型。
 
 ## 本次已完成的真实设备验证
@@ -18,8 +18,10 @@
 
 ## 下一条可执行动作
 
+- 用户澄清比较最早队友版本，授权一次正式验证；唯一新任务 **6ad046feaad397b6d98aa318** 已创建，kernel2073f48e/353255B、七保护文件及dry-run一致。立即查询同ID到终态，不重复提交。本次授权已用，不沿用此前“无新任务”状态。CANN/15precision/perf PENDING，raw ignored artifacts/producer-ready-formal-20261015。
+
 - 当前没有活跃NPU任务，exec79837/95735/8673均terminal0。全部C11编译/host SDK query/真实selector/correctness/profile包以及C15alternating包已下载，private artifacts目录700/files600。不要重新启动这些任务。
-- 后续应从2073出发选择有新证据且未失败的结构方向，或补本机shape/layout/dtype正确性覆盖；不复活C11 NN tiling/C15resident微调。没有达到用户要求的重大性能突破，暂不创建新OJ任务。
+- 后续应从2073出发选择有新证据且未失败的结构方向，或补本机shape/layout/dtype正确性覆盖；不复活C11 NN tiling/C15resident微调。没有达到重大性能突破；仅执行本次用户明确授权的唯一OJ验证，不额外创建任务。
 - 各候选具体终态和停止规则看PERF_LOG及独立档案。CPU/编译/native/OJ分开；正式15/另一SoC仍PENDING。
 - 用户授权GitHub push当前实验分支，不移动tag/不改写历史；接手先git status/log及本文件。整体冲榜未完成。
 

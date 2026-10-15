@@ -1214,3 +1214,9 @@ CPU实际新增producer分支/helpers78batch pairs/完整K/负值/零尾/输入b
 5edc14f/06f3e06e/356971B，metadataDSObcd8a8e0，实际TRANSPOSE_Ctrue/20Cube40Vector/default8表×5。一完整precision+五性能输出精确fullFP64golden116.7254638671875，input/yguard完整。times[79.703186,80.263214,79.023163,79.843193,80.363213]us，中位79.843193，比parent76.023041慢约5.025%，未20%gate<=60.8184328。不OJ/重采/相邻NN参数扫描，恢复完整2073f48e/a11e2d9，保留C15就绪修复。
 
 PMU核心均值五次中位：AIV Vector5.146000→1.953111us，但AIC MTE1 25.440472→32.894028、MTE2 45.608556→49.547611、MAC44.009944→44.391416，Fix4.217611→4.087889；重叠不可相加/作单因素因果。全部原始编译/host实际查询/selector/正确性/profile已下载artifacts/c11-mdl-transposed-c；C15alternating raw也下载artifacts/c15-producer-ready。candidateFP16硬件/full15/其它SoC未做，不继续验证已无收益路径。
+
+## 2026-10-15 用户授权：当前保留版对比最早队友版，正式提交一次
+
+用户澄清比较对象为最早队友版本，授权一次正式验证。当前kernel2073f48e/353255B（3ff5ff4，字节等于a11e2d9），包含较新队友整合及本机C15 producer-ready修复，不包含已撤回的C11 NN Cᵀ或其它未过gate实验。七保护文件逐字1734f16，隔离工程dry-run只上传kernel.asc且SHA一致。
+
+唯一正式任务 **6ad046feaad397b6d98aa318** 已创建。查询同ID至终态，不重复提交；当前CANN/15precision/性能结果PENDING。这不是已确认相对最早队友版的同设备总耗时收益。原始身份/results保留ignored artifacts/producer-ready-formal-20261015。
