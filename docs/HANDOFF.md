@@ -1,4 +1,4 @@
-# 当前工作：C15就绪修复保留版已按用户授权正式提交一次，待同ID终态
+# 当前工作：整合保留版正式Pass15/398.92us；第一名对照348.37us
 
 ## 当前可继续的源码
 
@@ -18,11 +18,11 @@
 
 ## 下一条可执行动作
 
-- 用户澄清比较最早队友版本，授权一次正式验证；唯一新任务 **6ad046feaad397b6d98aa318** 已创建，kernel2073f48e/353255B、七保护文件及dry-run一致。立即查询同ID到终态，不重复提交。本次授权已用，不沿用此前“无新任务”状态。服务端ID820092/Running（无case结果），服务端源码SHA已再次核对一致。CANN/15precision/perf PENDING，raw ignored artifacts/producer-ready-formal-20261015。
+- 用户授权的唯一正式任务 **6ad046feaad397b6d98aa318 / 820092** 已终态Pass15/allprecision1，总398.92us；kernel2073f48e/353255B，服务端SHA、保护7及dry-run一致。向量[2.09,2.64,3.12,4.19,4.70,9.45,6.64,36.47,56.95,76.65,78.43,88.04,8.84,9.61,11.10]us。此次授权已完成，无活跃OJ，不重复提交。完整official在ignored artifacts/producer-ready-formal-20261015。
 
 - 当前没有活跃NPU任务，exec79837/95735/8673均terminal0。全部C11编译/host SDK query/真实selector/correctness/profile包以及C15alternating包已下载，private artifacts目录700/files600。不要重新启动这些任务。
-- 后续应从2073出发选择有新证据且未失败的结构方向，或补本机shape/layout/dtype正确性覆盖；不复活C11 NN tiling/C15resident微调。没有达到重大性能突破；仅执行本次用户明确授权的唯一OJ验证，不额外创建任务。
-- 各候选具体终态和停止规则看PERF_LOG及独立档案。CPU/编译/native/OJ分开；正式15/另一SoC仍PENDING。
+- 用户最新第一名向量总348.37us，当前总慢14.51%；C7齐平，C12仅慢3.25%。按此前固定Tbest均分收益优先C6/C1/C3（到第一名合约9.28分），再C9/C15等；最新Tbest未读取，不称实时分数/排名。要有新结构证据，不复做已失败tiny/Load3D原始布局/C11 NN/C15resident或相邻扫描。向量及计算在PERF_LOG/ignored leader-comparison.json。
+- 各候选具体终态和停止规则看PERF_LOG及独立档案。CPU/编译/native/OJ分开；当前源正式15已通过；平台未提供actualSoC/plan/profile，另一明确SoC本地覆盖仍PENDING。
 - 用户授权GitHub push当前实验分支，不移动tag/不改写历史；接手先git status/log及本文件。整体冲榜未完成。
 
 ## 连接与工具
