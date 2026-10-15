@@ -1,3 +1,15 @@
+# 当前进行：C15 Cube端ready集合，CPU已过，待刷新SSH后编译
+
+- experiment/c15-cube-collective，当前kernel356814B/SHAca66a5417b3ba41d6dd86231e4f3e36fb28dc6ca7df9feb854c1218bee872583，**未经CANN/native验证的实验候选**，不是已确认最优。正式Pass15保留版仍a11e2d9/2073f48e，任务820092总398.92us。
+- 从已验证按行8AIV版本81f49ff只改变producer-ready：Cube完成原Fix后mode0 PIPE_FIX flag8全Cube set/wait→mode2 flag9通知各AIV；Vector仅wait9直接进原row finalizer，消除初始AIVbarrier，末尾AIVbarrier不动。原数学/8MMAD/Ksplit8/GM/资源guard逐字81f49ff。不是把two-MMAD与row收益相加。
+- 实际CANN9 dav_c220 SyncAllImpl<false>/SetNextTaskStartImpl已有同AIC mode0集合pattern，SDKflags11..14与本8/9分离；全8Cube参与由精确guard保证。mode作用域/运行时配置/消息退休必须native验证，不凭CPU模型宣称硬件正确。
+- tools/validate_c15_cube_collective.py：实际协议8producer+8consumer/8种延迟完成顺序/全partial就绪后才允许AIV读、每Cube集合与每AIV配对消息各消费一次/4fault controls/source inverse整81f49ff/保护7 PASS。actual guard production54/TUNING65+容量临界PASS。完整row数学已有81f49ff native证据，未重采。
+- 暂停/恢复后旧CPUhandle33625/52590 Unknown process id，恢复新31922/37085 terminal0；原SSH master/control socket消失，干净重连platform authorization denied（无密码错误），已请求刷新入口。上次queue空是在暂停前，**当前远端queue未知**，无新NPU/OJ启动。private reconnect-current.log0600，凭据不入Git。
+- **NEXT**：等新入口→检查真实master/queue/ps→冻结imports/c15-cube-collective-ca66a5417b3b/kernel.asc→独立build-c15-cube-collective（wrapper994e29f/原CMake，不改保护7）→绑source/DSO identity→c15.json/c15.complete_frame.json一次correctness→原c15_input_sequence mixed-negative-mixed→一次default8表×5。actual<half,true,true>/8Cube8AIV/每Cube8MMAD。CANN/native/性能/正式15全PENDING。
+- gate采前保持median<=9.8463933且全五<父最快10.540421、完整精度/全负/同地址变化/guard后才正式15；另对上一row10.260410报告，20%目标8.7523496。失败恢复2073、不扫flag/row/BK/split、不重采，不降低门槛。C3dtype/layout仍未知。详见C15_CUBE_COLLECTIVE。
+
+## 以下为前序终态（当前以上段为准）
+
 # 当前：两条C15结构均完成设备验证，未达门槛，恢复正式Pass15保留版
 
 - 当前experiment/c15-row-finalize，kernel逐字a11e2d9/2073f48e78d4fa86c409c4befc620744b2532d5f01223cf94564900f35d1ec2b。正式任务820092/6ad046feaad397b6d98aa318仍是已确认Pass15/398.92us；本次没有新增OJ。

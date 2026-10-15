@@ -1293,3 +1293,9 @@ experiment/c15-row-finalize/source00c23fa0。原2073 Cube producer逐字不变�
 ## 2026-10-15 C15八AIV按行归约终态：6.2157%，未达采前10%准入
 
 source00c23fa0/81f49ff/CANN9编译PASS/DSO82f68853。实际FP16TT/9382/8Cube8AIV/<half,true,true>命中，每核8MMAD不变；完整首次、同地址mixed-negative-mixed、五输出fullFP64及输入/yguard全PASS。times[10.300412,10.360415,9.900396,10.260410,10.080403]median10.260410，相对正确parent10.940437快6.2157%。全五快于父最快10.540421，但未median<=9.8463933准入，恢复2073，无OJ/重采/分块扫描。PMU确认全部8AIV参与，Vector0 .267778us/其它.229444us，非临界路径因果证明。完整raw已本地700/600，详见C15_ROW_FINALIZE。
+
+## 2026-10-15 C15 Cube端就绪集合新协议，CPU通过/native待入口
+
+experiment/c15-cube-collective/sourceca66a541/356814B，从已验证8AIV按行81f49ff仅改变ready协议：原Cube完整Fix/事件退休后mode0/PIPE_FIX/flag8 collective set-wait，再mode2/flag9通知各AIV；AIV wait9后直接进入原row finalizer，省消费者开头全局barrier，末尾原AIVbarrier保持。基于实际CANN9 dav_c220 SyncAllImpl<false>和SetNextTaskStartImpl中的AIC mode0 pattern，不用字面名字推断；仍需native证明mode作用域/消息退休。源码inverse精确81f49ff，原8MMAD/Ksplit/数学/GM/guard全相同，保护7等1734f16。实际提取协议8producer+8consumer/8延迟到达顺序/4fault controls通过，guard54+65临界通过。最新模型明确检查每Cube集体消息及每AIV配对消息各消费一次，不能用它代替硬件重复输入检查。
+
+暂停/恢复后原master socket消失，CPU旧handle Unknown process id；恢复后重新CPU检查terminal0，无NPU重启。干净SSH重连platform authorization denied，已异步请求新入口，无需root密码；当前远端queue未知。CANN/native/五报告/正式15全PENDING，无新OJ。固定旧gate median<=9.8463933且全五<10.540421、全精度/负值/同地址输入切换与guard，再进正式15；同时报告对上一row10.260410对照，不将旧收益归新协议。文档C15_CUBE_COLLECTIVE，source身份忽略artifacts/c15-cube-collective/source.json，脱敏连接log私有0600。整体目标未达成。
