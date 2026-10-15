@@ -1,3 +1,15 @@
+# 当前终态：C5新纯Vector四布局全部native通过但均慢，恢复正式保留2073
+
+experiment/c5-half-vector，当前kernel逐字a11e2d9/2073f48e/353255B，正式820092 Pass15/398.92us保持，无新OJ/main/tag改写，goalactive未完成。新实现d2400ab/sourceeb1ac4bd/DSO9f340062保留；50行完整C5F16 Vector算法，CPU320+9fault/guard4/41及4/52/CANN9/fullinverse/protected7通过。
+
+四layout各mixed-negative-mixed同地址native fullFP64/input-yguard通过；四×5性能实际pureVector8、完整default8表/所有输出通过。00median4.580183→7.220289慢57.64%；01 4.840194→6.240250慢28.93%；10 6.400256→7.520301慢17.50%；11 6.640265→6.700268慢.90%。四布局均失败各自采前20%+全五门槛，已恢复2073，不重采或扫chunk/初始化/行数/UB/stride/K/flags/OJ；不是只挑FF忽略其他布局，全部输入/golden/plan/SoC绑定逐项核对。
+
+完整raw均下载artifacts/c5-half-vector/c5-half-vector-evidence.tgz，父FF在artifacts/c5-vector-audit，700/600。含4parent+4candidate五完整报告、四变化序列/所有inputgolden/source/DSOidentity/buildlog/actualplans/分布局采前gate/工具frame错误日志。comparison/summaries/pmu摘要另存，详见C5_HALF_VECTOR。parent三布局10384/candidate四95388/download21375均terminal0；新授权SSHmaster38319/pid20843已恢复，askpass删除/scp-O。此前89986 transport255后原编译实际已完成，未重启。正式C5dtype/layout仍未知，不将localF16反推hidden。
+
+NEXT：当前没有可提交的新性能候选。C5该FP16纯Vector/混合产品路线已实测失败，不移近邻参数救性能；C11常量metadata也只2.58%归档c628c2e。优先用现有完整PMU/真实SDK/队友版本比对寻找改变真实数据流或分工的新结构，已失败方向见下方历史与各专题，不能再换名复做。用户DISPATCH明确正式C5属性未唯一隔离；C4/C6/C9等确认属性有优先级。设备调用前核对真实socket/queue/ps，不能凭本记录说当前空闲。
+
+## 以下保留历史交接（当前以上段为准）
+
 # 当前进行：C5完整FP16批次改纯Vector，四布局native精度过，父性能对照中
 
 experiment/c5-half-vector，sourceeb1ac4bd/356572B，50 added kernel lines over正式保留2073。新entry bmmms_c5_half_vector：B8/M16/N32/K128/F16/all4layout，每批1AIV，half Gather+两次64-lane混合FMA完成全K128→MaxN32→SumM16，直接4B y，无Cube/GM similarity交接/全核同步，原arena/MakePlan不动。BF16回原，UB159328+1024、实际core/plan/alignment/pins guard。不是旧C6 Vectorpairs或同点C2扫描。CPU320 entries+9fault/guard4/41及4/52/inverse/protected7通过。

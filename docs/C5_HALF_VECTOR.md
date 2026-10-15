@@ -1,3 +1,22 @@
+# Native终态：四布局精度通过，但全部性能未达门槛，恢复2073
+
+实现d2400ab/sourceeb1ac4bd/DSO9f340062。实际CANN9编译PASS；四布局各same-address mixed-negative-mixed全FP64/input-yguard通过，四布局各五次性能调用也全部通过。ActualpureVector8/无Cube、完整符号BOOL与各自布局一致；default8表×5，每布局父/候选输入/golden/plan/SoC完整绑定核对通过。
+
+|tx1,tx2|parent median us|candidate median us|candidate five us|结果|
+|---|---:|---:|---|---|
+|00|4.580183|7.220289|7.180287/7.240290/7.220289/7.240290/7.200288|慢57.64%|
+|01|4.840194|6.240250|6.140245/6.240250/6.240250/6.260251/6.160246|慢28.93%|
+|10|6.400256|7.520301|7.560302/7.540302/7.500300/7.520301/7.520301|慢17.50%|
+|11|6.640265|6.700268|6.640265/6.700268/7.020281/6.600264/6.980279|慢0.90%|
+
+四布局均未采前各自20%median及所有五<父最快门槛，不选择任何新分支。原版完整恢复2073；不扫描产品初始化、chunk/行数、K、UB、stride、loop/flags，不原样重采或提交OJ。没有把Cube交接字节减少当完整op改善。候选正式15/另一SoC/极端值native NOT RUN，CPU控制不冒充硬件穷举。
+
+全部原始结果已下载artifacts/c5-half-vector/c5-half-vector-evidence.tgz，原FF父全包在artifacts/c5-vector-audit/c5-vector-parent-evidence.tgz（700/600）。含4actualplans/4完整变化输入序列/4父4候选共8×5×8CSV报告/各实际输入golden/源码DSOidentity/buildlog/采前分布局gate/工具frame错误原目录；comparison/summaries/pmu摘要另存私有同目录。父01/10/11采集10384、候选4采集95388、raw下载21375均terminal0。两次parent采样是不同布局，不是同一case重复取最优。新授权master38319/pid20843恢复后所有未完成任务均沿用原结果。
+
+保留正式820092/source2073 Pass15/398.92us不变。本轮没有新OJ或main/tag改写。整体冲榜目标未完成。
+
+## 以下保留采前实现记录
+
 # C5: full-batch FP16 Vector computation, no similarity GM handoff
 
 ## Scope and evidence

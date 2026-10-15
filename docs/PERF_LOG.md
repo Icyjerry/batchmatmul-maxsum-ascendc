@@ -1,3 +1,9 @@
+## 2026-10-15 C5完整FP16批次纯Vector：四布局native全过、性能均失败
+
+实现d2400ab/sourceeb1ac4bd/DSO9f340062/wrapper994e29f。50行新计算/guard/dispatch，无Cube、similarityGM交接或跨核合并；fullK128两64-lane混合FMA后MaxN32→SumM16，FP32累加，每B唯一4By。CPU320/all4layout/9fault、guard4/41和4/52/inverse/protected7通过；CANN9/dav2201编译PASS。首次SSH断开后新授权检查原build完成，未重启。
+
+9382/24AIC48AIV/caller20，明确FP16 C5 B8M16N32K128（formaldtype/layout仍未知）。四layout各三次同地址mixed-negative-mixed原生fullFP64/inputs/yguards过，四×五性能输出也全部过。ActualnewBOOLlayout/pureVector8/无Cube/default8表×5确认。Parent→candidate median us：00 4.580183→7.220289(+57.64%)；01 4.840194→6.240250(+28.93%)；10 6.400256→7.520301(+17.50%)；11 6.640265→6.700268(+.90%)。全部五样本/不利观察保留，四布局全未采前20%及全五门槛，恢复2073，不调整chunk/初始化/UB/stride/K/flag/行数，不重采/OJ。正式15/另一SoC/极端值native未跑。完整8组五报告及4序列/全goldens/build/source身份下载artifacts/c5-half-vector，FF父artifacts/c5-vector-audit，详见C5_HALF_VECTOR，goal未完成。
+
 ## 2026-10-15 C11原MDL常量tiling metadata：native通过，仅2.58%
 
 80bb3ed/source3bcc585a/DSO3c470ca0/wrapper994e29f，13字段冻结原native256x128x64/step1,1,4,4/depth8,8/db2,2,1/L1393216；原DUAL config/计算/所有事件/GM不变。CPUactualguard12/62和12/73/13constants16defaults/inverse2073/protected7 PASS。初版41ddda11编译namespace/早hook错误已保留，修正后CANN9/dav2201PASS。
