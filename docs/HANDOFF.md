@@ -1,3 +1,17 @@
+# 当前：C9半区失败已恢复；C10原版真实profile完成，B驻留/M所有权方案审计通过待实现
+
+experiment/c10-native-audit，kernel逐字2073/a11e2d9/353255B，正式820092 Pass15/398.92us保留。C9半区b8b2f53/source86c正确但慢0.91%，dd43fa8归档恢复并已push，禁止offset/PK/BK/flags救性能。
+
+新C10明确本地BF16NN1/4096/1280/1152，同保留source2073/DSOca36，9382/24AIC48AIV/caller20/dev0physical14。actualdual36/BM128BN128BK128/Ns5/window2/PK384/tree8，total22102016。一次+default8表×5 fullFP64/input-yguard通过，y398.5837707519531精确相同；实际SPLIT_FMATRIXtrue/20Cube40AIV/144MMAD每核。times72.642906/73.422935/73.242928/73.782951/72.682907，median73.242928；MAC41.734/MTE137.848/MTE252.075us，不能相加。raw完整本地artifacts/c10-native-audit/c10-retained-audit-evidence.tgz（14893593B/174members/40CSV）及summaries，input/golden核对/700-600。14712plan/45209native/22313download均terminal0，queue再次实查空，无NPU/OJ job。
+
+NEXT 按docs/C10_B_STATIONARY_AUDIT实现一个新C10固定N组/M分片结构：worker ns=w/4/shard=w%4，N两pass各8Mtile，完整B驻L1[0,294912)，A两K384槽[294912,393216)/[393216,491520)。原320C/2880MMAD/160span2windows/81920partials/5242880ring均保持。新的窗口拼两个不同M frame，不能原ManualFullMConsumeWindow直接Max合并；AIV保留8×64rowmax状态，第二Npass逐M合并再写原五partial，原FinalizeFullMTiles保持。无新GM分配/预处理/通路，非已失败Bpack/BN256/C9stationary/参数扫描。
+
+算术tools/audit_c10_b_stationary.py已PASS：所有权/完整数学整数proxy/容量；输入字节108527616→106168320仅-2.17%、最忙核-5.26%，但连续读片段374784→168960(-54.92%)。没有实际新producer/event/SDK/native或速度证明。先完整producer+M帧consumer延迟/fault/guard/inverse/protected7，再CANN→一次fullgolden→一次default5。固定gate median<=65.9186352且全五<72.642906。失败恢复2073不扫shards/PK/BK/flags/offset/重采，有大收益才负值/变化输入/正式15。候选未实现，勿声称大提速。
+
+现SSHmaster20843有效/旧会话继续工作，用户最新授权尚未用；下次先实查socket/queue/ps。无凭据入Git。目标active未完成。
+
+## 以下为历史（以上当前为准）
+
 # 当前：C9双半区native正确但慢0.91%，归档恢复正式保留2073
 
 experiment/c9-banked-l1，kernel逐字a11e2d9/2073f48e/353255B。实现b8b2f53/source86c85293/DSO9f42b673保留。CANN9/CPU actualproducer120workers/10fault/guard49-60/inverse/protected7通过；一次+五native fullFP64/input-yguard通过，actualBANKtrue/20Cube40AIV/90或100MMAD原样。times55.502220/55.542221/56.362255/55.642227/56.382256，median55.642227比parent55.142204慢0.9068%，未预定10%和全五门槛，已恢复2073，无OJ/参数扫描/重采。MTE1活动下降未成为总收益，不据SDK半区布局宣称9382物理bank证明。详见C9_BANKED_L1。

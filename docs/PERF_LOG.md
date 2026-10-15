@@ -1371,3 +1371,10 @@ C9/C1所有handles终态/完整raw下载/2073恢复与8e9d473推送后，最后m
 b8b2f53/source86c85293/DSO9f42b673 CANN9编译PASS；9382/24AIC48AIV/caller20，同c9完整plan/原input/fullFP64golden。一次及default8表×5精度/input-yguard全PASS，y191.80950927734375/abs1.52587890625e-5，actualBANKtrue/20Cube40AIV/每核[90,100,90,100,100]*4。times[55.502220,55.542221,56.362255,55.642227,56.382256]median55.642227 vs55.142204慢0.906788%，未原10%及全五门槛，已恢复2073，不扫offset/PK/BK/flags/重采/OJ。MTE1活动25.904378→22.682528但MTE2 30.282717→31.205333，总时间不降；局部指标不可相加或当物理bank证明。负值native/变化序列/另一SoC/正式15未执行，性能失败后停止此路线。
 
 完整raw15798583B/179members/40CSV本地artifacts/c9-banked-l1/c9-banked-l1-evidence.tgz，source/DSO/golden绑定验证，700/600。correct79931/profile31313/download89627终态0，queue再次空/无job-msprof-bisheng。首次下载未终态即读tar EOF，等原scp终态后完整校验通过，无重测。正式2073/820092仍保留，无大突破/新OJ，目标未完成。详见C9_BANKED_L1。
+
+
+## 2026-10-15 C10保留版实际完整profile与固定N组B驻留审计
+
+新branch experiment/c10-native-audit，kernel2073/a11e2d9未改。明确fixture BF16NN1/4096/1280/1152，实际9382/24AIC48AIV/caller20/dev0physical14/CANN9/DSOca36。normalPlan dual36/BM128BN128BK128/Ns5/W20/window2/PK384/tree8/total22102016，actualSPLIT_FMATRIXtrue/20Cube40AIV/每核144MMAD。一次+完整default8表×5精度/input-yguard通过，fullFP64golden/y398.5837707519531精确相同。times[72.642906,73.422935,73.242928,73.782951,72.682907]median73.242928。MAC41.734/MTE137.848/MTE252.075us（重叠，不相加）。raw全本地c10-native-audit/14893593B/174members/40CSV，input/golden绑定逐一核对，700/600。plan14712/native45209/download22313终态0/queue再次空，无新OJ。
+
+新proposal：每N组四M owner，每核两Npass各8Mtile，fullB驻L1+A双K384流；Vector保留8×64 max状态，第二Npass逐M合并；原span2 ring拼M frames，仍320Fix/2880MMAD/160通知、原partial/ring/GM通路不改。算术audit完整所有权/正负整数proxy/容量通过；总字节-2.17%/最忙核-5.26%/连续行片段-54.92%，不是性能预测。尚无实际producer/event/API/native，下一按C10_B_STATIONARY_AUDIT实现。固定准入median<=65.9186352且全五<72.642906，失败归档2073不扫近邻或重采。用户目标未完成。

@@ -1,0 +1,28 @@
+{
+  "shape": [
+    1,
+    4096,
+    1280,
+    1152
+  ],
+  "dtype": 2,
+  "transpose": [
+    0,
+    0
+  ],
+  "core_limit": 20,
+  "device": 0,
+  "expected_soc": "Ascend910_9382",
+  "expected_physical": 14,
+  "smi_card": 7,
+  "smi_chip": 0,
+  "provenance": "Explicit C10 BF16 NN local fixture: user-provided dimensions and teammate DISPATCH-confirmed family; does not claim all hidden formal attributes are independently verified. Retained source2073. Current full plan must be reviewed before execution.",
+  "capture": {
+    "op_type": "mix",
+    "family": "bmmms_manual",
+    "block_dim": 20,
+    "mix_block_dim": 40,
+    "aic": 20,
+    "aiv": 40
+  }
+}
