@@ -35,3 +35,19 @@ actual guard production25/TUNING36拒绝，4种storage属性、dtype/shape/对�
 **必须**额外比对stress三次actual保存的FP32 bits与golden bits完全相同：smallproduct结果很小，普通absolute tolerance会错误容许0，故这里明确要求精确非零；maxproduct检查FP32范围而非FP16Inf。该要求不修改正式验证器/容差。
 
 当前CANN9/dav2201编译exec82517，冻结imports/c1-mixed32-43dbf4f3a4d0/kernel.asc，build-c1-mixed32/log c1-mixed32-build.log；stress准备已完成，编译/native/性能/正式15 PENDING，无新OJ。成功后写绑定source/DSO/wrapper994e29f identity，先原job.py correctness+上述5call sequence，保存并精确查stress bits，再一次default8表×5。原baseline完整summary在artifacts/c1-scalar-cache-dot/c1-scalar-evidence.tgz内results/c1-baseline-profile/summary.json。
+
+## Native终态：混合精度范围通过，C1没有完整耗时收益
+
+实现9258c49/source43dbf4f3，CANN9/dav2201编译PASS（8条原host属性warning），DSO **99fe6c90130adc08b4ac63b1e5df236ae34668b0ac4d8d2584b6e7b798abc2d4**，wrapper994e29f。9382/24AIC48AIV/dev0physical14/caller20，原c1完整frame不变。
+
+5call同context/stream/输入地址序列全部fullFP64/input/yguard通过；三个stress保存的actual首4B与golden完全一致：65504²=4290774016（04c07f4f）、32*(2^-14)²=1.1920928955078125e-7（00000034）、全负-32（000000c2），前后mixed均.2724899649620056，与parent相同/maxAbs2.9802322e-8。
+
+性能采集前补充了一个具体剩余风险：half输入denormal是否被当零。用独立prepare脚本--subnormal生成min/max subnormal×65504的32元素完整dot，4call mixed→minsub→maxsub→mixed，input地址不变、guard通过；两次actual bits精确等golden：.12493896484375（00e0ff3d）、127.81256103515625（08a0ff42）。这是两组已知输入的native证据，不冒充所有FP16 bit组合的硬件穷举，也不修改普通/正式容差。
+
+一次完整default8表×5/actual bmmms_dot_short_mixed32/pureVector1/noCube，五完整输出fullFP64/input-yguard通过。TaskDuration **[1.880075,1.900076,1.600064,1.560062,1.560062]us**，中位 **1.600064us**，与父中位相同，未预设<=1.4400576及全部<1.560062。全部样本保留，不删前两次较高值，不重采/扫UB或stride/K/零初始化位置，不OJ。当前kernel恢复2073/a11e2d9，候选源码永久在9258c49。
+
+PMU parent/candidate平均Vector .060000→.057778us、MTE2 .405667→.404333us、Scalar .441444→.401889us；总TaskDuration中位不变，不能把局部统计下降当整体提速，也不能据此断言硬件绝对启动下限。
+
+全部raw/成功buildlog/DSO身份/两种输入序列/5组小stress输入与完整reference已下载artifacts/c1-mixed-fp32-mac/c1-mixed32-evidence.tgz，summary/pmu-summary同目录700/600。CANN82517/5call86512/subnormal77876/profile86733/download28862全部terminal0，queue再次实际为空，无新OJ/活跃NPU。BF16/另一SoC/正式15未跑；此候选不作为新最优。
+
+下一新API依据（只读，未实现）：dav_c220/kernel_operator_vec_gather_impl.h明确支持half/BF16/uint16/int16等2B Gather，发出vgather uint16，既有TinyCompute却先Cast为FP32再Gather。可研究**FP16 tiny BMM全程半精度存储整理+混合VMLA产生FP32产品**，不使用rawbit TransDataTo5HD，不做scalar-cache，不在已无收益C1上扫K。先读C2真实normalPlan/parent完整profile确认数据类型和资源，再检查有效K尾、half byte offsets、混合repeat stride、产品完整零初值与原MaxN/SumM。BF16仍不在混合VMLA支持组合内，不能推广。C2正式dtype/layout仍未独立确认，明确fixture假设，不按case编号断言隐藏属性。

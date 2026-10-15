@@ -1330,3 +1330,9 @@ branch experiment/c9-left-fmatrix。原2073/ca36，9382/24AIC48AIV/dev0physical1
 从2073派生experiment/c1-mixed-fp32-mac/source43dbf4f3/355211B。实际CANN9 MulAddDst支持Tuple<float,half>，以FP32 prod0与inputDMA重叠，inputready后混合VMLA省Cast依赖阶段，ReduceSum32/4B输出/显式events完整；BF16不支持回原路。不加GM/不改plan，shape仅FP16B1M1N1K32，四storage同连续raw顺序。CPU实际入口2115编码fullK/all63488finitehalf/随机/大乘积/小乘积/负值+5faults/guards/inverse保护7PASS；guard25/36+四布局/对齐UB/AIV临界PASS，非native证明。
 
 真实FP16乘积精度必须先native已知输入max65504^2、32*(2^-14)^2和-32输出bits精确，再标准mixed;原job5call同context/输入地址mixed→max→tiny→negative→mixed，独立stress输入完整FP64golden，不改旧inputs/正式tests。CANN编译82517进行中sourcefrozen，wrapper994e29f。采前gate相对原C1完整五median1.600064：<=1.4400576且所有五<1.560062、fullprecision/guards/三stress exact后才正式15；失败归档2073不扫位置/stride/K/UB、不重采/OJ。详见C1_MIXED_FP32_MAC。
+
+## 2026-10-15 C1 mixed VMLA native：精度范围证据通过，中位完全相同，归档
+
+9258c49/source43dbf4f3/DSO99fe6c90 CANN9编译PASS。5call同地址mixed/max65504²/tiny32*(2^-14)²/negative/mixed全FP64/guard通过，三stressbits精确。性能前另查half denormal输入具体风险，4call mixed/minsubnormal*maxhalf/maxsubnormal*maxhalf/mixed也精确，未放宽普通容差。default8表×5 actualmixed32/pureVector1/noCube，outputs/inputs/yguard全通过；times[1.880075,1.900076,1.600064,1.560062,1.560062]median1.600064，parent1.600064相同，未原10%及全五快于父最快gate。保留前两高值、不重采或扫UB/stride/K/清零位置/OJ，恢复2073。PMU Vector.060→.0578/MTE2.4057→.4043/Scalar.4414→.4019非整体改善。raw全下载c1-mixed-fp32-mac700/600，全部handles terminal0、queue空。正式15/另一SoC未跑，目标未完成。
+
+实际SDK新查half Gather支持2B直接vgather，后续可研究FP16 tiny BMM以half存储布局整理+混合VMLA生成FP32products，避开Cast+FP32Gather；非旧bittranspose/C1K邻近扫描。仅API依据，未实现/未测。正式C2dtype/layout尚未唯一确认；先实际nativeframe/profile，再证明K40尾/offset/stride/prod初值/MaxN→SumM。

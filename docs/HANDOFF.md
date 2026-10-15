@@ -1,3 +1,14 @@
+# 当前终态：C9及C1新结构均完成native，恢复正式Pass15的2073
+
+- 当前experiment/c1-mixed-fp32-mac，kernel逐字a11e2d9/2073f48e78d4fa86c409c4befc620744b2532d5f01223cf94564900f35d1ec2b。正式已确认任务820092/6ad046feaad397b6d98aa318 Pass15/398.92us，本turn无新OJ。目标active且未完成。
+- C9 LEFT FMatrix：05c86ea/source4693eb7a/DSObf4054fe，真实Ns5/window3，55.142204→54.662186仅.8705%，原全部90/100MMAD/input-yguard/full精度通过但未10%gate，归档f06d202；stall分类改变并非大加速。stationary-B模型最忙核GM和9/10tile分布不变，取消未写。
+- C1 mixed half->FP32 VMLA：9258c49/source43dbf4f3/DSO99fe6c90，CANN9/native5call+subnormal4call全通过。maxproduct4290774016/smallproduct1.1920929e-7/negative-32/minsubnormal*.maxhalf=.1249389648/maxsubnormal*.maxhalf=127.8125610全bits精确；mixed与原parent一致.27248996496。保护inputs/yguard完整。
+- C1一次default完整8表×5 actualmixed32/pureVector1，times[1.880075,1.900076,1.600064,1.560062,1.560062]median1.600064，原median1.600064相同。未1.4400576且全五<1.560062门槛，不删前两高值、不重采/扫UB/stride/K/清零位置/OJ，恢复2073。FP16混合模式只证明这些native范围控制；all63488编码只CPU，勿冒充NPU穷举。
+- raw完整本地artifacts/c9-stationary-b-audit、c9-left-fmatrix、c1-mixed-fp32-mac（源码身份/全报告/guardbits/5stress输入reference/两个序列/buildlogs），700/600。C1compile82517/correct86512/subnorm77876/profile86733/download28862均terminal0，queue再次实际空。master63301/pid9058有效，私有config备用授权已更新/askpass已删，scp-O。正式15/另一SoC未跑。
+- **NEXT 新依据**：实际CANN9 GatherImpl支持half等2B类型（kernel_operator_vec_gather_impl.h），可直接half Gather整理物理布局，再Tuple<float,half> VMLA生成FP32产品，避免tiny原Cast+FP32Gather整条转换；非旧raw-bittranspose/scalar-cache/C1K扫描。先生成明确C2 FP16/alllayout fixture并读取真实normalPlan/完整parentprofile，C2正式dtype/layout未独立确认只能按fixture报告；评估half-offset/stride/K40尾与完整product0，再一个新guarded结构验证。BF16混合VMLA不支持必须回退，别借2B Gather冒充支持BF16乘积。
+
+## 以下保留历史交接（当前以上段为准）
+
 # 当前进行：C1混合half输入直接累加FP32，CPU过/CANN编译中
 
 - experiment/c1-mixed-fp32-mac，当前kernel43dbf4f3a4d0f35ec6536123f5d4f14a214d4de4ff666fd1072ab2126f917e86/355211B，**未native候选**，从2073/a11e2d9派生。正式保留2073 Pass15/398.92us不变，无新OJ。
