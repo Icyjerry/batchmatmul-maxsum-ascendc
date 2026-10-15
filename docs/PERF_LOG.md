@@ -1241,3 +1241,7 @@ PMU核心均值五次中位：AIV Vector5.146000→1.953111us，但AIC MTE1 25.4
 从正式Pass15/398.92us的2073f48e保留版派生，C6不变body复用ZIP原五完整报告中位8.860354us，采前20%gate<=7.0882832us。新的360db6f0/source改变CO1/GM交接为紧凑NZ：原完整K192/输入/UnitFlag3/grid/GM不变，有效M23代替pad32，写回10240→7360B；AIV仍读7360B，四完整doc16组+mask9尾组→MaxN/SumM。实际CANN9公共CFG_NZ/stride32B与mSize语义核对，不能直接UB路径已排除。
 
 算法36增6删，CPU实际producer descriptor/reduction78fullK batch pairs+5反例、default逆补丁/保护7通过，guard production/TUNING36/47拒绝及资源边界通过。最初遗漏末doc反例因为并列最大未触发，补唯一末doc最大样本后通过，不改kernel。CANN9/dav2201编译PASS，DSO046682f0/source360db6f0/wrapper994e29f；一次native精度正在执行，性能/full15 PENDING，无新OJ。详见C6_COMPACT_NZ_OUTPUT。
+
+### C6 compact NZ终态：native PASS，完整op仅0.4515%，归档
+
+5fc448b/source360db6f0，DSO046682f0，actualCOMPACT_NZtrue/13Cube13Vector/default8表×5。一完整correctness+五性能输出fullFP64通过，maxabs2.384185791015625e-7/rel6.52273e-8、五输出一致、input/yguard完整。times[9.020361,8.820353,9.020361,8.660346,8.060323]us，中位8.820353对parent8.860354仅下降0.4515%，未20%gate，不重复/扫描/OJ，恢复完整2073f48e/a11e2d9。候选全负硬件/另一SoC/正式15未做。源码写回10240→7360B不等于完整耗时收益。raw全部下载artifacts/c6-compact-nz-output。

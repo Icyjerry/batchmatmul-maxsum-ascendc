@@ -1,3 +1,10 @@
+# 当前终态：C6 compact NZ未过性能门槛，恢复正式Pass15的2073
+
+- 实现5fc448b/source360db6f0已归档：native完整精度及五输出通过，actualtrue/13Cube13Vector/default8表×5，8.860354→8.820353us仅0.4515%，未20%gate。不扫相邻NZ参数/重采/OJ。raw全下载，详见C6_COMPACT_NZ_OUTPUT。
+- 当前kernel完整2073f48e/a11e2d9，正式Pass15/398.92us，后续从此派生C1标量GM直读结构审查，不重做已失败literal Vector。新主连接exec35585，所有C6设备任务均terminal0，队列空；凭据不入Git。
+
+## 下方为过程及前序档案（状态以本段为准）
+
 # 当前进行：C6紧凑NZ输出已编译，native精度验证中
 
 - 分支experiment/c6-compact-nz-output；当前候选360db6f00491f00cf10626e867fcacd7ff741f8b5ab04c50a5115c3ae130604b。正确保留parent2073f48e/a11e2d9已经正式Pass15/398.92us，不覆盖其证据。失败恢复完整parent。

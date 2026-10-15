@@ -25,3 +25,11 @@ CPU实际Fix descriptor和NZ reduction提取执行78个完整M23N73K192 batch pa
 真实host guard抽取production/TUNING拒绝36/47个shape/layout/type/plan/core/capacity/workspace/pin反例及实际容量临界值。模型不是SDK tiler/硬件同步证明。
 
 CANN9/dav2201独立SHARED编译PASS，8条原host GM_ADDR attribute warnings。冻结imports/c6-compact-nz-360db6f00491，build-c6-compact-nz/libnative_bmmms.so；source/DSO/wrapper绑定。一次full-storage native correctness正在运行，默认五报告性能/正式15仍PENDING。
+
+## Native终态：精度通过，仅0.45%，恢复parent
+
+实现commit5fc448b/source360db6f0，DSO046682f015a3378cd18280e37d0a8d8c8a1a308b605f55df82cbd9aeed7aa8c6。同原完整frame/输入，一次正确性及全部五性能调用fullFP64精度通过，最大abs2.384185791015625e-7/rel6.522730018203635e-8；五输出一致、input/yguard完整。实际profile COMPACT_NZtrue/13Cube13Vector/default8表×5。
+
+times `[9.020361,8.820353,9.020361,8.660346,8.060323]` us，中位8.820353us，parent8.860354，仅约0.4515%下降，未20%gate<=7.0882832。源码写回减少28.125%没有形成大幅完整op收益；保留所有样本，不称稳定提升，不做相邻format/stride扫描、重复采样或OJ。完整恢复2073f48e，候选和模型归档；全负硬件/输入变化/另一SoC/候选正式15 NOT RUN。
+
+所有build/身份/一次精度/五完整报告下载artifacts/c6-compact-nz-output/c6-compact-nz-evidence.tgz，summary/PMU另存，目录700/files600。远端results/c6-compact-nz-{correctness,profile}保留。CPU模型对归档源运行，不能放宽使其适配恢复后的parent。
