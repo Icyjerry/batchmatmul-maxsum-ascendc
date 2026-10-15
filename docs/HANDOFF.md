@@ -1,29 +1,25 @@
-# 当前工作：C6 native失败已撤回；C15完整split输入常驻L1审查完成
+# 当前工作：C15 原版native输出0，补齐Cube→Vector写回通知并编译
 
-## 当前源码与边界
+## 当前源码和身份
 
-- 当前分支 `experiment/c15-resident-input-audit`（从C6归档5767186派生）；kernel已恢复整份 e2f1b63 / ZIP078635 /353179B / SHA0786352034e77506894d4094083960f4f6af82782bf7cee6a0386148437ca436。失败候选357100B/fa315ae8完整保存在0689e2d。
-- 初始140080d/639fa38未经设备编译；本轮核对实际SDK发现默认LoadData只配置LEFT，不能自动配置B的RIGHT。当前修正显式SetFmatrix RIGHT + public no-reset LoadData，与保留C10写法一致。CPU新增register模型和第8个故障反例。没有新增GM，原MMAD/Fix/AIV/Plan/其它路径保留。
-- 算法仅改kernel.asc，七个受保护文件与1734f16相同；未并main/未新OJ。ZIP078635与DISPATCH接受源b881不同，后者Pass15/401.13us不是当前源的结果。
+- 分支 `experiment/c15-split-producer-ready`，parent3cb10e5 / ZIP078635/e2f1b63。当前kernel353255B/SHA2073f48e78d4fa86c409c4befc620744b2532d5f01223cf94564900f35d1ec2b，仅manual_split_tt新增Cube PIPE_FIX通知与Vector等待两行。保护7文件不变，未main/OJ。
+- C6 raw候选fa315ae8/0689e2d已native精度失败，已归档撤回；新SSH已补回原始失败包/编译log/DSO manifest，没有重跑。原baseline C6中位8.860354us，完整五报告在artifacts/c6-input-layout-audit。
+- ZIP078635与队友接受源b881不同；后者正式Pass15/401.13us不能赋予本源。当前原ZIP在C15本地已出现实际正确性失败。
 
-## 本轮已完成：真实 C6 baseline
+## 当前实际设备证据
 
-- 2026-10-15新入口成功，hostname2ef29bca0f61，9382/24AIC48AIV/CANN9/driver26.1.1/dev0→physical14/card7chip0；core_limit20是caller budget。
-- C6 BF16NT13/23/73/192，实际normalPlan原dual19/BM32BN80/K192/workers13/cubeBlocks13/finalBlocks2。完整reviewed frame保存在remote native_oj_like/c6.complete_frame.json。
-- baseline DSO0357587a绑定ZIP078635；全storage FP64golden，一次精度+五性能输出通过，maxabs2.3841858e-7/maxrel6.52273e-8，输入不变/y后guard完整。
-- default全部8表×5，实际single_tile_direct_batch_mix11 baseline符号/13AIC13AIV/每core一次MMAD。TaskDuration `[8.260330,9.000360,8.780352,8.860354,9.240370]`μs，中位8.860354。候选预设20%门槛<=7.0882832μs，不挑样本、不重复未改源码。
-- CPU实际raw helper+producer78batch pairs/fullK/正负/显式尾零/ready/bounds、8个反例PASS；guard production46/TUNING57反例PASS；不是实际Load3D布局或BF16设备精度证据。
-- C4 compact旧候选raw两个包已补回 `artifacts/c4-compact-k128`，没有重测。C6baseline完整plan/correctness/profile包在 `artifacts/c6-input-layout-audit`，权限700/600。
+- 新入口恢复，hostname2ef29bca0f61，9382/24AIC48AIV/CANN9/driver26.1.1，dev0physical14/card7chip0；caller core_limit20。
+- C15 FP16TT1/64/64/8192实际normalPlan dual25/BM64BN64/kSplit8/kChunk1024/workers8/cubeBlocks8/finalBlocks1，systemBytes16777216/total16908288，完整reviewed c15.complete_frame.json已冻结。
+- 原baseline DSO0357587a第一次correctness输出0.0，对fullstorage FP64golden1.6493455171585083，rel1/exit1；actual+guard原始bits和失败JSON已保存。没有性能采集。shape由用户提供，dtype/layout仍为历史对应假设；本机失败则是真实明确的证据。
+- 实际CANN9 SyncAllImpl<true>只同步AIV，不等Cube。原手写SplitTT没有Cube partial完成通知，当前两行修复建立本Cube Fix→本AIV→全AIVbarrier→finalizer依赖。源码诊断需native结果确认。
+- CPU实际函数位置/whole inverse/保护7、15task-owner DAG以及无通知/早通知反例通过，不当硬件证据。详见C15_PRODUCER_READY。
 
-## C6候选已终态，下一条动作
+## 正在进行与下一条动作
 
-- 候选fa315ae8独立CANN9编译PASS/8条host GM_ADDR warnings，DSOe0e6aa7f绑定source/wrapper994e29f。
-- 一次native correctness/fullFP64比较FAIL/exit1，最大绝对误差约0.47670078、相对约0.12828762；原版同输入误差2.38e-7。CPU Load3D布局假设被native反证，具体错误排列未证明，不能假装已知enTranspose一行可修。
-- 不采候选性能/不OJ/不重复或扫邻近filter-stride。恢复整份ZIP，失败实现留0689e2d，细节C6_RAW_ROW_INPUT。
-- SSHmaster随后超时，原始候选编译日志/失败目录补下载PENDING；revalidate跳板已认证但target转发platform authorization denied，新入口问题已发出。baseline三个完整包已下载；本地candidate-terminal-observation.json明确仅保存工具已返回失败，不冒充原始FP32。
-- 下一条设备动作：恢复后先下载build-c6-raw.log/DSO manifest/results/c6-raw-correctness，不重跑失败候选；检查queue/SoC/映射。
-- C15结构审查已完成，见 C15_RESIDENT_INPUT_AUDIT：A使用保留API的batched ND2NZ拼成原K128面板顺序，B整split NZ；目标输入ND2NZ每split16→2，GM字节不减/L1由64KiB增256KiB。离线4组全部八split面板地址一致，naive fullA NZ次序反例被检出。M=N128需要524288B>actual524032B，必须拒绝。尚未生成ASC候选；缺C15真实normalPlan/完整baseline profile，先补这步，20%门槛明确。不能把逆向FP16TT frame当唯一正式属性。
-- 独立native driver增加校验前保存actual+guard原始bits及precision_failure.json，便于未来失败诊断；不改正式阈值/7文件或此次结果。工具更新尚未部署服务器。
+- CANN独立build-c15-ready编译中，冻结 imports/c15-producer-ready-2073f48e78d4/kernel.asc；日志native_oj_like/build-c15-ready.log。
+- 编译通过：真实source/DSO/wrapper manifest→同c15 fixture/frame/inputs一次correctness，失败保存raw继续诊断；通过则补全负/多次重入并采5完整default全部表，actualMIX11/8Cube8Vector符号核对。
+- 只有正确修复版才能作为C15有效性能基准。随后实施单一resident split input结构（C15_RESIDENT_INPUT_AUDIT）：A batched ND2NZ保留原K128块顺序，B整split NZ，原Load2D/8MMAD/Fix/AIV/GM保持；预设20%中位门槛，失败归档不扫参数。不能与原错误输出0的版本比较加速。
+- 独立native driver失败前保存actual+guard原始bits和precision_failure.json已部署，正式main/CMake/golden/阈值均不改。
 
 ## 既有失败结论与交接
 
@@ -33,19 +29,9 @@
 - 尊重队友C8已完五轮/C7 parked/C9常量Schedule paused，历史失败方向详见 TEAMMATE_777734_REVIEW 和独立档案，不重命名复做。
 - 接受源readonly CLI查询6acdd94d本机会话加载成功但HTTP403，未取到source/result；不是明确401，不据此要求重新登录。原始脱敏摘要ignored accepted-identity-read.json。无新OJ任务。
 
-## 环境与资源
+## 连接与资源
 
-- 私有SSH config `/private/tmp/bmmms-remote-access/config`；前台master98210 / exec75384 已超时exit255/socket消失，干净重连platform authorization denied；脱敏判断见private revalidate日志，不输出凭据。需新入口，root密码无需重复。
-- 设备工具 `/workspace/bmmms-codex/native_oj_like`；私有NumPy2.2.6 Python `/workspace/bmmms-codex/test-venv/bin/python`。source CANN set_env，runtime driver/lib64/common和driver/lib64/driver加入LD_LIBRARY_PATH。
-- 真globalfilelock+active/pending queue序列化设备，编译可以并行。baseline任务已终态，最新是否有活动任务以真实queue/ps为准。shared_assets只读未改。
-- GitHub私有 `Icyjerry/batchmatmul-maxsum-ascendc` 已授权，push当前实验分支；不移动历史tag/不重写已推送历史。
-- 本轮新的阻塞审查已达阈值：恢复访问并完成C6实测的用户触发轮，随后两次goal continuation均遇同一目标转发platform authorization denied。最新干净重连仍跳板已认证/目标转发被拒/exit255，无可观察的活动任务等待。目标设为blocked，整体冲榜未完成；新入口恢复后继续，不重复失败候选或盲叠加未验证优化。
-
-
-## 2026-10-15 新阻塞周期终态与恢复顺序
-
-最新脱敏实查 `/private/tmp/bmmms-remote-access/blocked-audit-sanitized.log`；私有原始SSH日志不入Git。没有新OJ任务或运行中的本Agent NPU作业；C6baseline/profile/candidate correctness的执行handle均已返回终态。服务器当前全局任务状态因不可达无法重新确认，不把历史空队列当当前证据。
-
-已有有效独立工作完成：C6实际设备反证/完整parent原始包、failed source归档与精确回滚、未来失败原始bits工具、C15资源/布局/地址审核及fixture。下一关键步骤是实际C15 normalPlan与baseline全golden五报告，当前缺设备；不能用更多CPU模型或未经编译分支替代性能证据。刷新入口请求已发出，无需重复root密码。
-
-恢复时依次：更新私有SSH配置并建立前台master→核对hostname/CANN/SoC/physical映射和队列→补下载C6原始失败目录、编译log和DSO manifest→部署独立driver改进与c15.json→冻结ZIP078635 baseline身份执行C15 plan→审阅完整frame→全FP64storage参考/一次精度/五default报告。再按C15_RESIDENT_INPUT_AUDIT实现单一结构候选，采前20%门槛保持；当前kernel仍ZIP078635，main/tag不动。
+- 私有SSH配置/private/tmp/bmmms-remote-access/config，新前台master/exec55033，ControlPersist=no；用ssh -O check验证。askpass已删除，凭据不入Git。不沿用旧三轮blocked结论判断新入口。
+- 私有工具/workspace/bmmms-codex/native_oj_like，Python /workspace/bmmms-codex/test-venv/bin/python；source CANN9/set_env，driver lib64/common和lib64/driver加入LD_LIBRARY_PATH。
+- 真filelock+queue串行NPU，编译/offline可并行。此轮初始queue空/无msprof/bisheng；最新任务以真实queue/exec handle为准。
+- GitHub已授权push当前实验分支，不移动tag/不改写历史。整体冲榜未完成；修复版CANN/native/full15/另一SoC仍待证据。

@@ -1,5 +1,7 @@
 # C15 长 K：原 L1 常驻完整 split 输入的结构审查
 
+更新：新入口实际baseline C15输出0、fullFP64应为1.6493455，已转入 C15_PRODUCER_READY 修复缺失的Cube→Vector完成依赖。驻留实现尚未开始；后续对照必须使用精度通过的修复版，不能用当前错误ZIP的耗时。
+
 ## 当前状态与来源
 
 分支 experiment/c15-resident-input-audit，kernel保持整份 ZIP078635 / e2f1b63 /353179B。**没有新增 ASC 候选**，没有 native C15 测试或 OJ 提交。此前 C6 raw-row 已 native 精度失败，完整档案 C6_RAW_ROW_INPUT / commit0689e2d；不借它的 CPU 模型证明新布局。

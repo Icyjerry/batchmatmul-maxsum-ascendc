@@ -1178,3 +1178,10 @@ CPU实际新增producer分支/helpers78batch pairs/完整K/负值/零尾/输入b
 从C6失败归档5767186派生experiment/c15-resident-input-audit，kernel字节保持ZIP078635。历史审阅后考虑原dual25长K split-TT：A一次batched ND2NZ保留原八个K128面板顺序，B一次完整split NZ，原Load2D/MMAD/K累加/Fix/AIV/packed finalizer/GM不动。记录shape64/64/8192每split输入ND2NZ16→2，GM总2MiB不减，L1从65536增262144B；大首批DMA可能损伤重叠，没有速度预测。M=N128需524288B>actual524032B而拒绝。4组地址模型全八split、各K128与旧面板地址一致，naive fullA NZ反例不同；不是SDK/实际kernel证据。
 
 新c15.json明确FP16TT/8AIC8AIV只是历史源对应期望，最新DISPATCH未唯一确认。下一先恢复SSH补C6raw，再actual C15 MakePlan/完整storageFP64golden/一次精度+五完整baseline报告，不强制分派；缺这步不生成待提交候选。预设20%中位收益门槛；无ASC修改、CANN编译、nativeC15或OJ数据。C15_RESIDENT_INPUT_AUDIT给出字段、原资源与停止规则。
+
+
+## 新入口恢复后：C15 ZIP baseline正确性反证，先修生产者就绪依赖
+
+9382/24AIC48AIV/dev0physical14/CANN9队列复核，补回C6失败raw/编译log/DSO身份且不重跑。C15实际normalPlan dual25/BM64BN64/kSplit8/kChunk1024/workers8/cube8/final1，system16777216/total16908288。完整实际FP16storage FP64golden1.6493455171585083；ZIP078635/DSO0357587a一次correctness输出0.0/rel1/exit1，actual+guard bits和precision_failure.json已保存。没有profile，不能比较无效原版的速度。
+
+实际CANN9 SyncAllImpl<true>只同步AIV，原manual_split_tt无Cube partial完成通知。仅两行修复Cube PIPE_FIX set0→AIV wait0→原barrier/finalizer，source353255B/SHA2073f48e78d4，冻结独立CANN编译中。15个task-owner DAG+无/过早通知反例、实际位置/逆补丁/保护7通过，是CPU语义非native证据。完整数学/原GM/plan/其它入口不变。C15_PRODUCER_READY详述，后续先完整精度/负值/多次调用/五报告；通过才作为resident L1的有效性能对照，20%结构优化门槛保持，无新OJ任务。
