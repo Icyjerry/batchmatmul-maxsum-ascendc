@@ -1,3 +1,13 @@
+# 当前：C9双半区生产者已实现，CPU通过，当前精确保护版本CANN编译中
+
+experiment/c9-banked-l1，source86c85293/361136B。新C9BankedPrefetchB+RunC9BankedCube两独立颜色游标、A两multiND、L1地址重排，原GM/MMAD/Vector/MakePlan默认主体不变。CPU actualproducer120worker/3延迟次序/两sign/全部输入标签与完整C-Max-Sum整数proxy/10fault、guard49/60、wholeinverse/protected7 PASS；不是FP16/native或硬件队列证明。详见C9_BANKED_L1。原SDK首份a8c905bc CANN已PASS未launch，后仅PKguard收紧256，当前86c独立冻结编译，不能混用。
+
+NEXT poll exec16751（当前真实compile）；frozen imports/c9-banked-l1-86c85293/kernel.asc、native_oj_like/build-c9-banked-l1-86c85293、c9-banked-l1-86c85293-build.log。成功写真实DSO/source/wrapper994e29f identity→原c9.json/c9.complete_frame/inputs/c9一次correctness→一次default8表×5。要求BANKEDtrue/20Cube40AIV/90或100MMAD原样。固定gate median<=49.6279836且全五<54.922195，对parent55.142204。未达归档2073，不扫offset/PK/BK/flags/重采/OJ。大收益才负值/同地址变化/正式15。
+
+SSHmaster20843当前有效/队列本turn实查空；CANN编译唯一活跃任务。新用户授权尚未用，已有master继续有效。正式保留2073/820092 Pass15/398.92us不变，无新OJ/无新NPU精度或性能。目标active未完成。private artifacts700/600，凭据不入Git。
+
+## 以下为历史（以上当前为准）
+
 # 当前：C5负结果已归档；新C9双半区/双游标结构完成实现前地址审计
 
 experiment/c9-banked-l1-audit，kernel仍逐字2073/a11e2d9/353255B，正式820092 Pass15/398.92us保持，无新OJ或C9设备代码。上一C5实现d2400ab/sourceeb1ac4bd，四layout全native正确但性能全部慢，归档b8c9c56/恢复2073，所有4父4候选×5×8报告+4变化序列raw已本地，禁止初始化/chunk/UB/stride/K/flag/行数近邻重做。C11常量metadata2.58%同样归档。

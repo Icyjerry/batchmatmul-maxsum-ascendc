@@ -1359,3 +1359,8 @@ branch experiment/c9-left-fmatrix。原2073/ca36，9382/24AIC48AIV/dev0physical1
 ## 2026-10-15 全部验证完成后SSH再次失效
 
 C9/C1所有handles终态/完整raw下载/2073恢复与8e9d473推送后，最后master检查socket缺失、pid9058消失；原63301实际terminal/internalSSH255。用已提供备用授权重连明确platform authorization denied（非密码错误），askpass清理/private log0600，已请求新入口。当前远端queue未知但我方无未终态job，不重启已完成工作。此为fresh访问阻碍，goalactive/未完成；继续独立C2半精度Gather+混合FP32产品模型准备，新入口后上板。
+
+
+## 2026-10-15 C9双半区与两独立颜色流生产者实现
+
+从2073派生experiment/c9-banked-l1/source86c85293/361136B，仅C9FP16NT。A五K256包分别放0/262144/65536/327680/131072，B196608/393216，两multiND sourceNdStride512与dstNdStride32768元素；两独立颜色游标解决奇数五包跨tile错位。原GM/MMAD/Vector/MakePlan保持。SDKMDL半区策略仅启发，不声明9382bank收益。CPU actualproducer120workers/三延迟优先序/两sign/1920MMAD全标签/完整C-Max-Sum整数proxy/10fault通过，wholeinverse/protected7和guard49/60反例/8-32预算临界通过。模型Fence仅每代依赖，不是FetchEventID硬件复用/FP16证明。首份a8c905bc CANN9编译PASS未launch，后仅PK保护收紧256，当前86c独立冻结编译中（exec16751）。native精度/性能/正式15 PENDING。固定gate<=49.6279836且全五<54.922195，对parent55.142204；失败恢复2073，不扫offset/PK/BK/flags或重采/OJ。详见C9_BANKED_L1。目标active未完成。

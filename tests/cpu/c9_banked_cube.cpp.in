@@ -1,0 +1,102 @@
+// Exact source on four deferred engines. Tagged inputs + separable numeric proxy.
+// Not an Ascend instruction model, FP16 precision model, or timing simulation.
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <cstdint>
+#include <deque>
+#include <functional>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <vector>
+#include <limits>
+#define __aicore__
+using half=int16_t;using event_t=int;
+constexpr int PIPE_MTE2=0,PIPE_M=2,PIPE_FIX=3;
+struct Schedule{int64_t b,m,n,k;uint32_t baseM,baseN,mTiles,nTiles,nSplit,workers,vectorTile,window,kSplit,kChunk,microRows,batchGroup,dual,earlySum,tree,balance;};
+Schedule shape{1,2048,1536,1280,128,128,16,12,5,20,1024,3,1,256,2048,8,36,0,0,1};
+struct Tile{unsigned m,n,offset;};struct Window{unsigned m,n,tiles,slot;};
+std::vector<Tile>tiles;std::vector<Window>windows;unsigned mmads,fixes,notifies,aCopies,bCopies;
+bool negative;std::vector<int64_t>ringValues,maxima;
+int64_t q(unsigned m){return 1+m%3;}int64_t d(unsigned n){return n==1535?(negative?-1:7):(negative?-int(2+n%5):int(n%11)-5);}
+int64_t dot(unsigned begin,unsigned count){int64_t x=0;for(unsigned k=begin;k<begin+count;++k)x+=(1+k%3)*(1+k%5);return x;}
+const int64_t fullDot=dot(0,1280);
+namespace AscendC {
+enum class TPosition{A1,B1,A2,B2,CO1};enum class HardEvent{MTE1_MTE2,MTE2_MTE1,M_MTE1,MTE1_M,FIX_M,M_FIX};
+enum Engine{MTE2,MTE1,M,FIX};
+struct Cmd{std::function<bool()>ready;std::function<void()>run;};
+unsigned fenceGeneration=0;
+std::array<std::deque<Cmd>,4>queue;std::map<std::pair<int,int>,bool>tokens;bool credits[2]={true,true};
+Engine from(HardEvent e){switch(e){case HardEvent::MTE1_MTE2:case HardEvent::MTE1_M:return MTE1;case HardEvent::MTE2_MTE1:return MTE2;case HardEvent::M_MTE1:case HardEvent::M_FIX:return M;case HardEvent::FIX_M:return FIX;}assert(false);return M;}
+Engine to(HardEvent e){switch(e){case HardEvent::MTE1_MTE2:return MTE2;case HardEvent::MTE2_MTE1:case HardEvent::M_MTE1:return MTE1;case HardEvent::MTE1_M:case HardEvent::FIX_M:return M;case HardEvent::M_FIX:return FIX;}assert(false);return M;}
+void issue(Engine e,std::function<void()>f){queue[e].push_back({[]{return true;},f});}
+template<HardEvent E>void SetFlag(int id){issue(from(E),[=]{auto k=std::make_pair(int(E),id);if(tokens[k]){std::cerr<<"duplicate flag E="<<int(E)<<" id="<<id<<" mmads="<<mmads<<" fixes="<<fixes<<"\n";}assert(!tokens[k]);tokens[k]=true;});}
+template<HardEvent E>void WaitFlag(int id){auto k=std::make_pair(int(E),id);queue[to(E)].push_back({[=]{return tokens[k];},[=]{assert(tokens[k]);tokens[k]=false;}});}
+struct Store{unsigned word;std::vector<int64_t>v;Store(unsigned bytes,unsigned w):word(w),v(bytes/w,std::numeric_limits<int64_t>::min()){}};
+std::shared_ptr<Store>l1;
+template<class T>struct LocalTensor{
+ std::shared_ptr<Store>mem;unsigned offset=0,end=0;
+ LocalTensor()=default;LocalTensor(std::shared_ptr<Store>p,unsigned o,unsigned e):mem(p),offset(o),end(e){}
+ LocalTensor(TPosition p,unsigned byte,unsigned count):mem(l1),offset(byte),end(byte+count*sizeof(T)){assert((p==TPosition::A1||p==TPosition::B1)&&byte%32==0&&end<=524032);}
+ LocalTensor operator[](unsigned i)const{assert(offset+i*sizeof(T)<end);return{mem,unsigned(offset+i*sizeof(T)),end};}
+ template<class U>LocalTensor<U>ReinterpretCast()const{return{mem,offset,end};}
+ int64_t read(unsigned i)const{assert(offset+(i+1)*sizeof(T)<=end&&sizeof(T)==mem->word);auto v=mem->v[(offset+i*sizeof(T))/sizeof(T)];assert(v!=std::numeric_limits<int64_t>::min());return v;}
+ void write(unsigned i,int64_t v)const{assert(offset+(i+1)*sizeof(T)<=end&&sizeof(T)==mem->word);mem->v[(offset+i*sizeof(T))/sizeof(T)]=v;}
+};
+template<class T>struct GlobalTensor{
+ int kind=0;unsigned offset=0;GlobalTensor operator[](unsigned i)const{return{kind,offset+i};}
+ int64_t read(unsigned i)const{unsigned x=offset+i;if(kind==1){assert(x<2048*1280);return x+1;}assert(kind==2&&x<1536*1280);return-int64_t(x+1);}
+};
+template<TPosition P>struct TBuf{std::shared_ptr<Store>mem;template<class T>LocalTensor<T>Get(){assert(mem&&mem->word==sizeof(T));return{mem,0,unsigned(mem->v.size()*mem->word)};}};
+struct TPipe{int next[6]={};
+ template<HardEvent E>int AllocEventID(){assert(next[int(E)]<7);return next[int(E)]++;}
+ template<HardEvent E>void ReleaseEventID(int id){assert(id>=0&&id<next[int(E)]);}
+ template<TPosition P>void InitBuffer(TBuf<P>&b,unsigned bytes){static_assert(P==TPosition::A2||P==TPosition::B2||P==TPosition::CO1,"No old L1 allocator allowed in new frame");assert(bytes==(P==TPosition::CO1?131072:65536));b.mem=std::make_shared<Store>(bytes,P==TPosition::CO1?4:2);}
+};
+struct Nd2NzParams{unsigned ndNum=1,nValue=0,dValue=0,srcDValue=0,srcNdMatrixStride=0,dstNzC0Stride=0,dstNzNStride=0,dstNzMatrixStride=0;};
+template<class T>void DataCopy(LocalTensor<T>dst,GlobalTensor<T>src,Nd2NzParams p){assert(p.nValue==128&&p.dValue==256&&p.srcDValue==1280&&p.dstNzC0Stride==128&&p.dstNzNStride==1);
+ issue(MTE2,[=]{for(unsigned nd=0;nd<p.ndNum;++nd)for(unsigned n=0;n<p.nValue;++n)for(unsigned k=0;k<p.dValue;++k)
+ dst.write(nd*p.dstNzMatrixStride+(k/16)*p.dstNzC0Stride*16+n*p.dstNzNStride*16+k%16,src.read(nd*p.srcNdMatrixStride+n*p.srcDValue+k));if(src.kind==1)++aCopies;else ++bCopies;});}
+struct IsResetLoad3dConfig{bool a,b;};
+template<class T>struct LoadData3DParamsV2{unsigned l1H=0,l1W=0,channelSize=0,strideH=0,strideW=0,filterH=0,filterW=0,dilationFilterH=0,dilationFilterW=0,mStartPt=0,kStartPt=0,mExtension=0,kExtension=0;bool enTranspose=false;};
+template<class T>void LoadData(LocalTensor<T>dst,LocalTensor<T>src,LoadData3DParamsV2<half>p){assert(p.l1H==1&&p.l1W==128&&p.channelSize==256&&p.mExtension==128&&p.kExtension==128&&!p.enTranspose&&p.mStartPt==0);
+ issue(MTE1,[=]{for(unsigned m=0;m<128;++m)for(unsigned k=0;k<128;++k){unsigned logical=p.kStartPt+k;dst.write((m/16*8+k/16)*256+(m%16)*16+k%16,src.read((logical/16)*128*16+m*16+logical%16));}});}
+struct LoadData2DParams{unsigned repeatTimes=0,srcStride=0,dstGap=0;bool ifTranspose=false;};
+template<class T>void LoadData(LocalTensor<T>dst,LocalTensor<T>src,LoadData2DParams p){assert(p.repeatTimes==64&&p.srcStride==1&&p.dstGap==0&&!p.ifTranspose);issue(MTE1,[=]{for(unsigned i=0;i<16384;++i)dst.write(i,src.read(i));});}
+struct MmadParams{unsigned m=0,n=0,k=0;bool cmatrixInitVal=false;};
+template<class T>void Mmad(LocalTensor<float>dst,LocalTensor<T>a,LocalTensor<T>b,MmadParams p){issue(M,[=]{assert(mmads<tiles.size()*10);auto t=tiles[mmads/10];unsigned k0=(mmads%10)*128;assert(p.m==128&&p.n==128&&p.k==128&&p.cmatrixInitVal==(k0==0));
+ for(unsigned m=0;m<128;++m)for(unsigned k=0;k<128;++k)assert(a.read((m/16*8+k/16)*256+(m%16)*16+k%16)==int64_t((t.m+m)*1280+k0+k+1));
+ for(unsigned n=0;n<128;++n)for(unsigned k=0;k<128;++k)assert(b.read((k/16*8+n/16)*256+(n%16)*16+k%16)==-int64_t((t.n+n)*1280+k0+k+1));
+ auto part=dot(k0,128);for(unsigned m=0;m<128;++m)for(unsigned n=0;n<128;++n){unsigned ci=(n/16)*128*16+m*16+n%16;dst.write(ci,(p.cmatrixInitVal?0:dst.read(ci))+q(t.m+m)*d(t.n+n)*part);}++mmads;});}
+struct FixpipeParamsV220{unsigned nSize=0,mSize=0,srcStride=0,dstStride=0;};
+void Fixpipe(GlobalTensor<float>dst,LocalTensor<float>src,FixpipeParamsV220 p){issue(FIX,[=]{assert(fixes<tiles.size());auto t=tiles[fixes++];assert(dst.offset==t.offset&&p.nSize==128&&p.mSize==128&&p.srcStride==128&&p.dstStride==shape.window*128);assert(!credits[dst.offset/(16384*shape.window)]);
+ for(unsigned m=0;m<128;++m)for(unsigned n=0;n<128;++n){auto value=src.read((n/16)*128*16+m*16+n%16);assert(value==q(t.m+m)*d(t.n+n)*fullDot);unsigned to=dst.offset+m*p.dstStride+n;assert(to<2*16384*shape.window);ringValues[to]=value;}});}
+template<int Mode>void CrossCoreWaitFlag(unsigned id){assert(Mode==2&&id>=4&&id<6);unsigned slot=id-4;queue[FIX].push_back({[=]{return credits[slot];},[=]{assert(credits[slot]);credits[slot]=false;}});}
+template<int Mode,int Pipe>void CrossCoreSetFlag(unsigned slot){assert(Mode==2&&Pipe==PIPE_FIX&&slot<2);issue(FIX,[=]{assert(notifies<windows.size()&&!credits[slot]);auto w=windows[notifies++];assert(w.slot==slot);
+ for(unsigned m=0;m<128;++m)for(unsigned n=0;n<w.tiles*128;++n){auto v=ringValues[slot*16384*shape.window+m*shape.window*128+n];assert(v==q(w.m+m)*d(w.n+n)*fullDot);maxima[w.m+m]=std::max(maxima[w.m+m],v);}
+ std::fill(ringValues.begin()+slot*16384*shape.window,ringValues.begin()+(slot+1)*16384*shape.window,999999999);credits[slot]=true;});}
+void drain(unsigned order){const int priorities[3][4]={{MTE2,MTE1,M,FIX},{MTE1,M,FIX,MTE2},{FIX,M,MTE1,MTE2}};
+ while(true){bool active=false,progress=false;for(int e:priorities[order]){if(queue[e].empty())continue;active=true;if(queue[e].front().ready()){auto cmd=queue[e].front();queue[e].pop_front();cmd.run();progress=true;break;}}if(!active)break;assert(progress&&"engine/event deadlock");}
+ for(auto t:tokens)assert(!t.second);assert(!credits[0]&&!credits[1]);}
+}
+// Fence is a per-generation dependency, not a simulation of SDK FetchEventID reuse.
+// Explicit producer event IDs remain bounded/checked; hardware issue queues are not modeled.
+template<AscendC::HardEvent E>void Fence(){int id=7+AscendC::fenceGeneration++;AscendC::SetFlag<E>(id);AscendC::WaitFlag<E>(id);}
+// INSERT_SOURCE
+void run(unsigned order,bool neg){negative=neg;std::vector<int64_t>final(2048,std::numeric_limits<int64_t>::min());unsigned totalMM=0,totalFix=0,totalA=0,totalB=0;
+ for(unsigned worker=0;worker<20;++worker){tiles.clear();windows.clear();unsigned sequence=0;
+  for(unsigned task=80*worker/20;task<80*(worker+1)/20;++task){unsigned mt=task/5,ns=task%5,begin=ns*12/5,end=(ns+1)*12/5;
+   for(unsigned nt=begin;nt<end;++nt){unsigned pair=(nt-begin)%shape.window;tiles.push_back({mt*128,nt*128,(sequence&1)*16384*shape.window+pair*128});if(pair+1==shape.window||nt+1==end){windows.push_back({mt*128,(nt-pair)*128,pair+1,sequence&1});++sequence;}}}
+  using namespace AscendC;l1=std::make_shared<Store>(524032,2);tokens.clear();fenceGeneration=0;for(auto&v:queue)v.clear();credits[0]=credits[1]=true;mmads=fixes=notifies=aCopies=bCopies=0;
+  ringValues.assign(2*16384*shape.window+16,999999999);maxima.assign(2048,std::numeric_limits<int64_t>::min());TPipe pipe;
+  RunC9BankedCube<half>(pipe,{1,0},{2,0},{3,0},shape,worker);drain(order);
+  assert(mmads==tiles.size()*10&&fixes==tiles.size()&&notifies==windows.size());assert(bCopies==tiles.size()*5);
+  for(unsigned i=2*16384*shape.window;i<ringValues.size();++i)assert(ringValues[i]==999999999);
+  for(unsigned i=458752/2;i<l1->v.size();++i)assert(l1->v[i]==std::numeric_limits<int64_t>::min());
+  for(unsigned m=0;m<2048;++m)final[m]=std::max(final[m],maxima[m]);totalMM+=mmads;totalFix+=fixes;totalA+=aCopies;totalB+=bCopies;
+ }
+ assert(totalMM==1920&&totalFix==192&&totalA==64&&totalB==960);int64_t score=0,golden=0;auto full=dot(0,1280);int64_t best=d(0);for(unsigned n=1;n<1536;++n)best=std::max(best,d(n));
+ for(unsigned m=0;m<2048;++m){auto ref=q(m)*best*full;assert(final[m]==ref);score+=final[m];golden+=ref;}assert(score==golden);if(neg)assert(score<0);
+}
+int main(){for(unsigned order=0;order<3;++order)for(bool neg:{false,true})run(order,neg);std::cout<<"Actual banked producer: 120 worker executions/3 deferred engine orders/2 signs, full 1920 MMAD tags per run, C/Max/Sum proxies, all input/L1/L0/GM bounds and tokens PASS\n";}
