@@ -13,8 +13,12 @@
 - 10故障控制均拒绝：多ND源stride、颜色重置、A包视图、B最后reader、B ready、A ready、L0最后reader、C最后Fix reader、MMAD→Fix ready、截断K。whole-parent inverse逐字a11e2d9/protected7逐字1734f16通过。
 - 模型明确限制：不是Ascend硬件队列、FP16精度或时序模型。数值部分是可分离整数proxy，实际源码的每个输入元素用标签逐项核对。通用Fence按每代依赖建模，不模拟SDK FetchEventID复用；最初将其误设固定7号使无限队列调度报告重复置位，已纠正模型。SDK TPipe::FetchEventID实际取eventOccupy第一个空位且不占位；不据此声称硬件事件复用已由CPU证明。显式生产者事件仍检查配额和token。另一SoC/其它动态plan未上板。
 - host guard：`python3 tools/validate_c9_banked_guard.py`，49/60反例（普通/tuning）和8/20/24/32预算/容量逐字临界通过。
-- 首份source a8c905bcb389626d4597af744b1a61f642a504ba8884b989e577877041aed1ae CANN9/dav2201编译通过，未launch。随后仅收紧PK保护为256，新source **86c85293ec13261c260b51ce7e3f402ee6a47b6527cec9f796d3bdc5f0238484**，361136B，独立冻结并编译中。必须用新source的DSO做native，禁止混用首份产物。
-- NPU精度、完整性能、正式15点：**PENDING**；没有本轮速度结论/OJ。
+- 首份source a8c905bcb389626d4597af744b1a61f642a504ba8884b989e577877041aed1ae CANN9/dav2201编译通过，未launch。随后仅收紧PK保护为256，新source **86c85293ec13261c260b51ce7e3f402ee6a47b6527cec9f796d3bdc5f0238484**，361136B，独立冻结CANN9编译通过；实际DSO9f42b673310894921ab2206750807dbf02b96e047f97361a99178670a172c692。
+- NPU一次及五报告精度全部PASS，y191.80950927734375，abs1.52587890625e-5/rel7.955179e-8，原FP64 golden191.8094940185547；全部input/y guards通过。
+- 实际msprof符号最后BANKED_C9=true，20Cube40AIV，每核MMAD [90,100,90,100,100]*4在五报告全一致，完整默认8表×5通过。
+- 五times [55.502220,55.542221,56.362255,55.642227,56.382256]us，median55.642227，相对parent55.142204慢0.906788%。不通过预定10%和全五准入，已归档，kernel恢复2073。不是大的性能提升。
+- PMU（每报告核心均值再五次median）MTE1活动25.904378→22.682528us、MAC28.281706→27.708333、MTE2 30.282717→31.205333、AIC46.013055/AIV51.629583；局部供数指标下降未改善全kernel。不能从这些重叠指标相加或声称物理bank已被证明。
+- 正式15点、全负native、同地址变化序列、另一SoC：**未执行**，性能门槛失败后停止本路线，无新OJ。不扫offset/PK/BK/flags或重采救性能。
 
 ## 固定设备验证与性能门槛
 
@@ -27,3 +31,5 @@ parent source2073/DSOca36五次[55.142204,54.922195,56.122246,55.062202,55.38221
 - 当前冻结：远端imports/c9-banked-l1-86c85293/kernel.asc；build native_oj_like/build-c9-banked-l1-86c85293；log c9-banked-l1-86c85293-build.log。
 - 旧首份单独保留imports/c9-banked-l1与build-c9-banked-l1，不能把其编译PASS冒充当前DSO。
 - 原始日志/构建/input/凭据仅私有artifacts/远端，不入Git。
+
+实现commit b8b2f53。correctness79931/profile31313均terminal0；raw完整下载artifacts/c9-banked-l1/c9-banked-l1-evidence.tgz（15798583B/179members/40CSV，source/DSO/golden绑定核对，700/600）。首次下载未终态时提前检查曾报EOF，等待原scp终态0后完整验证通过，无重传/重测。CPU测试需在实现commit上运行，当前恢复后的kernel不含这条失败分支。

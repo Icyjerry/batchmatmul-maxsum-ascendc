@@ -1364,3 +1364,10 @@ C9/C1所有handles终态/完整raw下载/2073恢复与8e9d473推送后，最后m
 ## 2026-10-15 C9双半区与两独立颜色流生产者实现
 
 从2073派生experiment/c9-banked-l1/source86c85293/361136B，仅C9FP16NT。A五K256包分别放0/262144/65536/327680/131072，B196608/393216，两multiND sourceNdStride512与dstNdStride32768元素；两独立颜色游标解决奇数五包跨tile错位。原GM/MMAD/Vector/MakePlan保持。SDKMDL半区策略仅启发，不声明9382bank收益。CPU actualproducer120workers/三延迟优先序/两sign/1920MMAD全标签/完整C-Max-Sum整数proxy/10fault通过，wholeinverse/protected7和guard49/60反例/8-32预算临界通过。模型Fence仅每代依赖，不是FetchEventID硬件复用/FP16证明。首份a8c905bc CANN9编译PASS未launch，后仅PK保护收紧256，当前86c独立冻结编译中（exec16751）。native精度/性能/正式15 PENDING。固定gate<=49.6279836且全五<54.922195，对parent55.142204；失败恢复2073，不扫offset/PK/BK/flags或重采/OJ。详见C9_BANKED_L1。目标active未完成。
+
+
+## 2026-10-15 C9双半区native终态：正确，慢0.9068%，归档
+
+b8b2f53/source86c85293/DSO9f42b673 CANN9编译PASS；9382/24AIC48AIV/caller20，同c9完整plan/原input/fullFP64golden。一次及default8表×5精度/input-yguard全PASS，y191.80950927734375/abs1.52587890625e-5，actualBANKtrue/20Cube40AIV/每核[90,100,90,100,100]*4。times[55.502220,55.542221,56.362255,55.642227,56.382256]median55.642227 vs55.142204慢0.906788%，未原10%及全五门槛，已恢复2073，不扫offset/PK/BK/flags/重采/OJ。MTE1活动25.904378→22.682528但MTE2 30.282717→31.205333，总时间不降；局部指标不可相加或当物理bank证明。负值native/变化序列/另一SoC/正式15未执行，性能失败后停止此路线。
+
+完整raw15798583B/179members/40CSV本地artifacts/c9-banked-l1/c9-banked-l1-evidence.tgz，source/DSO/golden绑定验证，700/600。correct79931/profile31313/download89627终态0，queue再次空/无job-msprof-bisheng。首次下载未终态即读tar EOF，等原scp终态后完整校验通过，无重测。正式2073/820092仍保留，无大突破/新OJ，目标未完成。详见C9_BANKED_L1。

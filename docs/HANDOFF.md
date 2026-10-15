@@ -1,3 +1,15 @@
+# 当前：C9双半区native正确但慢0.91%，归档恢复正式保留2073
+
+experiment/c9-banked-l1，kernel逐字a11e2d9/2073f48e/353255B。实现b8b2f53/source86c85293/DSO9f42b673保留。CANN9/CPU actualproducer120workers/10fault/guard49-60/inverse/protected7通过；一次+五native fullFP64/input-yguard通过，actualBANKtrue/20Cube40AIV/90或100MMAD原样。times55.502220/55.542221/56.362255/55.642227/56.382256，median55.642227比parent55.142204慢0.9068%，未预定10%和全五门槛，已恢复2073，无OJ/参数扫描/重采。MTE1活动下降未成为总收益，不据SDK半区布局宣称9382物理bank证明。详见C9_BANKED_L1。
+
+raw完整本地artifacts/c9-banked-l1/c9-banked-l1-evidence.tgz（15798583B/179members/40CSV）/summaries，source/DSO/golden绑定核对/700-600。correct79931/profile31313/download89627 terminal0，queue再次实查空/无job-msprof-bisheng。首次在scp尚运行时提前读tar出现EOF，等原scp终态0后完整通过，无重新传输/设备重测。
+
+NEXT：无可交新性能候选。避免旧C9FMatrix(.87%)、半区(-.91%)、stationaryB总GM仅1.8%、Npair共享A失败、BN256/BK64 singleC失败、MAC-first/window2失败等近邻复做。新方向先查队友DISPATCH/已有失败历史和实际PMU，必须减少真实临界路径/数据量并有不同结构依据，不能只换offset/PK/BK/flags。C5pureVector四layout均慢、C11static2.58%等见历史。正式2073/820092 Pass15/398.92us保持，目标active未完成。
+
+SSHmaster20843本turn有效，新用户授权尚未使用，已有master持续有效；下次先查实际socket/queue/ps。9382/24AIC48AIV/dev0physical14/CANN9/caller20；凭据不入Git。无活跃NPU/OJ job。
+
+## 以下为历史（以上当前为准）
+
 # 当前：C9双半区生产者已实现，CPU通过，当前精确保护版本CANN编译中
 
 experiment/c9-banked-l1，source86c85293/361136B。新C9BankedPrefetchB+RunC9BankedCube两独立颜色游标、A两multiND、L1地址重排，原GM/MMAD/Vector/MakePlan默认主体不变。CPU actualproducer120worker/3延迟次序/两sign/全部输入标签与完整C-Max-Sum整数proxy/10fault、guard49/60、wholeinverse/protected7 PASS；不是FP16/native或硬件队列证明。详见C9_BANKED_L1。原SDK首份a8c905bc CANN已PASS未launch，后仅PKguard收紧256，当前86c独立冻结编译，不能混用。
