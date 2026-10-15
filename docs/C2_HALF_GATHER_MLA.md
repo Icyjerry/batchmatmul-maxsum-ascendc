@@ -1,3 +1,15 @@
+# Native终态：四布局精度通过，完整op慢4.85%，恢复2073
+
+实现ba24cd1/source9c29cf19540bd3c0e9364e9445e8e3076aa6af7f154db5e94e0a76fc2b5399aa。CANN9/9382 actual24AIC48AIV/caller20，DSOc88f3a71c8cf43ea057f72a1d8d783fce117e8f4d1bbacbfe03d590c407847d7；真实新符号half_mla40/单AIV，无Cube。
+
+四layout各mixed-negative-mixed同context/stream/input地址完整FP64及input/yguard均精确通过。性能仅显式FP16/FF：parent2073/DSOca36五times `[2.600104,2.600104,2.060082,1.980079,2.060082]`us，中位2.060082；候选五times `[2.440098,2.640105,2.060082,2.160086,2.040082]`，中位2.160086，慢4.85437%。全部样本/default8表×5保留，不能删前两高值或称DVFS已证明。相同input/golden/plan/SoC绑定逐项一致。未预定<=1.8540738且所有五<1.980079门槛，归档并恢复完整2073，不扫初始化/stride/UB/K近邻、不重采/OJ。
+
+五次核心均值的中位：Vector .427778→.441111us、MTE2 .500556→.522222、scalar .576667→.450000，计数重叠不可相加/作单因素因果。源码移除Cast阶段没有降低完整耗时。正式C2 dtype/layout仍未知，BF16/另一SoC/正式15候选NOT RUN。保留版正式820092 Pass15/398.92us保持。
+
+原始完整包本地 `artifacts/c2-half-gather-mla/c2-half-mla-evidence.tgz`，目录700/files600；含完整父/候选五报告、四plans/四变化输入序列/全8份实际input及golden、候选source/DSOidentity/buildlog、采前gate。远端results/c2-*保留。CPU模型只对归档候选执行，恢复后应通过git show ba24cd1:kernel.asc在独立临时checkout运行，不修改模型去伪造parent通过。
+
+## 以下保留实现及采前记录
+
 # C2 half Gather + mixed FP32 products
 
 ## Hypothesis and scope

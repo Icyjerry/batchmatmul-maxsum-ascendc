@@ -1,3 +1,14 @@
+# 当前终态：新SSH恢复；C2新混合流水完成native但变慢，恢复保留版2073
+
+- experiment/c2-half-gather-mla；当前kernel逐字a11e2d9/2073f48e/353255B，正式820092 Pass15/398.92us保持，本turn无OJ，整体冲榜目标active未完成。
+- 新结构ba24cd1/source9c29cf19/DSOc88f3a71：FP16 B1M3N5K40/all4storage，half Gather+Tuple<float,half> VMLA省Cast/FP32Gather。CANN9编译PASS；CPU536+8faults/actualguard5/31和5/42/inverse/protected7通过；四layout各mixed-negative-mixed同地址native完整FP64/input/yguard精确通过。正式C2 dtype/layout仍未知，BF16明确回原。
+- 一次FF default8表×5实际half_mla40/vector1，无Cube。parent2073/ca36五[2.600104,2.600104,2.060082,1.980079,2.060082]median2.060082；新五[2.440098,2.640105,2.060082,2.160086,2.040082]median2.160086，慢4.85437%，未预定<=1.8540738且全五<1.980079。已恢复2073，不删高值/重采/初始化或stride/UB/K扫描/OJ。Vector .427778→.441111us，scalar下降未变成完整收益。详见C2_HALF_GATHER_MLA。
+- 所有raw完整下载artifacts/c2-half-gather-mla/c2-half-mla-evidence.tgz，700/600；含四完整plan/四序列/全部8份input及fullFP64/父与候选5×8表/source/DSOidentity/buildlog/采前gate。native编译82714/四correct+parent45886/candidateprofile28061/download45799均terminal0。
+- 新SSHmaster57930/pid13934曾实际有效，新授权已写privateconfig、askpass删除、scp-O；9382/24AIC48AIV/logical0→physical14/caller20。下次先核对socket/真实queue/ps，不沿用本次启动前空队列假称现在空闲。
+- NEXT：当前没有可提交新优化。先比较已下载完整PMU与保留kernel实际设备源码，寻找能减少真实临界路径的新结构；不复做C1mixed32、C2halfGather、C3flatten、C4compact、C6raw/compactNZ、C9LEFTFmatrix、C11Cᵀ、C15twoMMAD/row/collective及停测C8等已归档方向。新候选先明确shape/属性假设、实际完整plan、SDK依据和可复现gate，再写源/CPU/native；不能把历史评论耗时当本轮实测。
+
+## 以下保留历史交接（当前以上段为准）
+
 # 当前：新 SSH 已恢复，C2 half Gather/mixed FP32 原生精度通过，性能对照中
 
 experiment/c2-half-gather-mla，source9c29cf19/+68lines over retained2073；CANN9/9382/24AIC48AIV/caller20已编译，DSOc88f3a71。CPU536/all4layout+8faults、guard5/31及5/42、inverse/protected7通过。Native四layout各mixed-negative-mixed同地址三调用full FP64/output/input guards精确通过，真实plan dual16/vector1/noGM。正式C2 dtype/layout未知，勿把FP16fixture冒充隐藏配置；BF16回原。详见C2_HALF_GATHER_MLA。

@@ -1,3 +1,9 @@
+## 2026-10-15 C2 half Gather＋mixed FP32 VMLA：native正确、慢4.85%
+
+ba24cd1/source9c29cf19/DSOc88f3a71，CANN9/dav2201/9382 actual24AIC48AIV/caller20。明确FP16 B1M3N5K40四storage、无新GM；CPU536及8faults/actualguard5/31+5/42/wholeinverse/protected7通过。四layout各mixed-negative-mixed同地址native完整FP64精确/input-yguard通过。
+
+一次FF完整default8表×5：parent2073/DSOca36 `[2.600104,2.600104,2.060082,1.980079,2.060082]`median2.060082us，新actualhalf_mla40/vector1 `[2.440098,2.640105,2.060082,2.160086,2.040082]`median2.160086，慢4.85437%。未采前10%门槛1.8540738及所有五<1.980079，恢复2073，无重采/参数扫描/OJ。PMU Vector .427778→.441111/MTE2 .500556→.522222/scalar .576667→.45，重叠不相加、不将scalar减少当完整收益。候选正式15/其它layout性能/另一SoC未跑，formal属性未知；保留正式820092不变。完整raw已下载artifacts/c2-half-gather-mla，详见C2_HALF_GATHER_MLA。
+
 
 ## 2026-10-02: complete tiny K8 fold, native PENDING
 
