@@ -1,0 +1,60 @@
+{
+  "provenance": "Summary of actual CANN9 parent native_plan on Ascend910_9382, logical0/physical14,24AIC48AIV/caller20. Captured source2073/DSOca36. This is a recorded fixture, not current SDK tiler execution. Full original identity retained privately under artifacts/c9-stationary-b-audit.",
+  "build": {
+    "kernel_sha256": "2073f48e78d4fa86c409c4befc620744b2532d5f01223cf94564900f35d1ec2b"
+  },
+  "normal_plan": {
+    "hardware_aic": 24,
+    "hardware_aiv": 48,
+    "core_limit": 20,
+    "cube_blocks": 20,
+    "final_blocks": 1,
+    "system_bytes": 16777216,
+    "total_bytes": 24682496,
+    "small": 0,
+    "micro": 0,
+    "case12_packed_a": 0,
+    "tall_single": 0,
+    "tall_halves": 0,
+    "case12_zn": 0,
+    "case12_phased": 0,
+    "schedule": {
+      "b": 1,
+      "m": 2048,
+      "n": 1536,
+      "k": 1280,
+      "baseM": 128,
+      "baseN": 128,
+      "mTiles": 16,
+      "nTiles": 12,
+      "nSplit": 5,
+      "workers": 20,
+      "vectorTile": 1024,
+      "window": 3,
+      "kSplit": 1,
+      "kChunk": 256,
+      "microRows": 2048,
+      "batchGroup": 8,
+      "dual": 36,
+      "earlySum": 0,
+      "tree": 0,
+      "balance": 1
+    },
+    "cube": {
+      "usedCoreNum": 20,
+      "baseM": 128,
+      "baseN": 128,
+      "baseK": 128,
+      "stepM": 1,
+      "stepN": 1,
+      "stepKa": 10,
+      "stepKb": 2,
+      "depthA1": 10,
+      "depthB1": 4,
+      "dbL0A": 2,
+      "dbL0B": 2,
+      "dbL0C": 1,
+      "shareL1Size": 458752
+    }
+  }
+}

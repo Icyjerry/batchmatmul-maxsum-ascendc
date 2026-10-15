@@ -1,3 +1,19 @@
+# 当前：C5负结果已归档；新C9双半区/双游标结构完成实现前地址审计
+
+experiment/c9-banked-l1-audit，kernel仍逐字2073/a11e2d9/353255B，正式820092 Pass15/398.92us保持，无新OJ或C9设备代码。上一C5实现d2400ab/sourceeb1ac4bd，四layout全native正确但性能全部慢，归档b8c9c56/恢复2073，所有4父4候选×5×8报告+4变化序列raw已本地，禁止初始化/chunk/UB/stride/K/flag/行数近邻重做。C11常量metadata2.58%同样归档。
+
+新证据：实际CANN9 MDL L1Manager/CubeInBuffer把pingpong分配到0/262144两个半区（header哈希/路径见C9_BANKED_L1_AUDIT）。原C9完整A327680、B两槽327680/393216同half1。新提议A按K256包j颜色分放0,262144,65536,327680,131072；B0=196608/B1=393216，end458752与原相同，无额外GM。A通过两multi-ND ND2NZ调用（even nd3/odd nd2，srcNdStride512/srcD1280/dstNdStride32768元素）放好，原32A DMA调用→64，总A/B GM字节不变。不是旧FMatrix/N-pair/stationary-B/原FIFO前移。
+
+**关键新发现**：每Ntile5包为奇数，不能沿用global packageSequence%2；需要两独立aheadTask[c]/aheadK[c]，每路+2*256，跨tile重置c*256。两BK128 reader结束再free本路B；A换M等最后reader，新A DMA完成后才读。SDK半区策略仅设计依据，不证明9382物理bank/收益。
+
+`python3 tools/audit_c9_banked_l1.py`默认tests/cpu/c9_captured_plan.json：实际plan摘要、163840 A标签、两真实stride multi-ND、全A/B无重叠、20workers960B包/192tiles/原9-10分工、两个fault+globalparity反证PASS。只是独立地址/包顺序模型，未生产实现/硬件时序/native精度或性能。
+
+NEXT 直接按docs/C9_BANKED_L1_AUDIT实现一个默认false BANKED_C9 standaloneCube/helper透传，保留原Vector/GM/MakePlan；actualproducer延迟引擎/完整K/最后reader/跨N odd包/host容量/pins/wholeinverse模型后CANN9→一次C9 fullgolden→一次完整default五。gate仍<=49.6279836且所有五<54.922195，对正确parent55.142204；不扫offset/PK/BK/flags或重采，失败恢复2073。此结构尚无编译或运行句柄，勿误重启旧C5任务。
+
+SSHmaster38319/pid20843本turn再次实际有效，队列空；各C5/C11已终态并完整下载，无活跃OJ/NPU。下一用前再查socket/真实queue/ps。9382/24AIC48AIV/dev0physical14/CANN9/caller20，askpass删除/scp-O；凭据不入Git。目标active未完成。
+
+## 以下保留历史交接（当前以上段为准）
+
 # 当前终态：C5新纯Vector四布局全部native通过但均慢，恢复正式保留2073
 
 experiment/c5-half-vector，当前kernel逐字a11e2d9/2073f48e/353255B，正式820092 Pass15/398.92us保持，无新OJ/main/tag改写，goalactive未完成。新实现d2400ab/sourceeb1ac4bd/DSO9f340062保留；50行完整C5F16 Vector算法，CPU320+9fault/guard4/41及4/52/CANN9/fullinverse/protected7通过。
