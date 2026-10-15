@@ -8,6 +8,12 @@
 - **NEXT**：等新入口→检查真实master/queue/ps→冻结imports/c15-cube-collective-ca66a5417b3b/kernel.asc→独立build-c15-cube-collective（wrapper994e29f/原CMake，不改保护7）→绑source/DSO identity→c15.json/c15.complete_frame.json一次correctness→原c15_input_sequence mixed-negative-mixed→一次default8表×5。actual<half,true,true>/8Cube8AIV/每Cube8MMAD。CANN/native/性能/正式15全PENDING。
 - gate采前保持median<=9.8463933且全五<父最快10.540421、完整精度/全负/同地址变化/guard后才正式15；另对上一row10.260410报告，20%目标8.7523496。失败恢复2073、不扫flag/row/BK/split、不重采，不降低门槛。C3dtype/layout仍未知。详见C15_CUBE_COLLECTIVE。
 
+## 当前补充：冻结验证包可直接运行，仍未恢复SSH
+
+- 此goal turn先复查ccfaecc/源ca66a541及远端；干净重连仍exit255，仅Connection closed by UNKNOWN port65535。没有收到新入口，不把此前platform拒绝反复说成新明确诊断。远端queue/ps未知，无新活跃handle。
+- 已准备tools/native_oj_like/c15_cube_collective/run.sh（tracked）和私有artifacts/c15-cube-collective/c15-cube-collective-validation.tgz（63748B/SHA0de344140d01b8dceb4db104d75e2fded50609a3b49743a6843d403c74c3b660）。source/wrapper/harness/frame/fixture/两input及golden/序列核对，已有结果目录拒绝重启，CANN→identity→一次correctness/alternating/default五报告→打印原gate，无自动OJ。
+- Bash语法/三Python AST/九file SHA/wrapper994e29f/archive私有权限和安全路径PASS，仅静态包验证，未执行CANN/native/profile。下条新入口先真实连接/queue/SoC检查→scp-O上传/解压→bash包内run.sh /workspace/bmmms-codex；完整说明见C15_CUBE_COLLECTIVE。用户刷新入口请求仍待答，无需重复root密码。
+
 ## 以下为前序终态（当前以上段为准）
 
 # 当前：两条C15结构均完成设备验证，未达门槛，恢复正式Pass15保留版

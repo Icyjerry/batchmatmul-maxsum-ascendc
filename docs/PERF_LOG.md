@@ -1299,3 +1299,7 @@ source00c23fa0/81f49ff/CANN9编译PASS/DSO82f68853。实际FP16TT/9382/8Cube8AIV
 experiment/c15-cube-collective/sourceca66a541/356814B，从已验证8AIV按行81f49ff仅改变ready协议：原Cube完整Fix/事件退休后mode0/PIPE_FIX/flag8 collective set-wait，再mode2/flag9通知各AIV；AIV wait9后直接进入原row finalizer，省消费者开头全局barrier，末尾原AIVbarrier保持。基于实际CANN9 dav_c220 SyncAllImpl<false>和SetNextTaskStartImpl中的AIC mode0 pattern，不用字面名字推断；仍需native证明mode作用域/消息退休。源码inverse精确81f49ff，原8MMAD/Ksplit/数学/GM/guard全相同，保护7等1734f16。实际提取协议8producer+8consumer/8延迟到达顺序/4fault controls通过，guard54+65临界通过。最新模型明确检查每Cube集体消息及每AIV配对消息各消费一次，不能用它代替硬件重复输入检查。
 
 暂停/恢复后原master socket消失，CPU旧handle Unknown process id；恢复后重新CPU检查terminal0，无NPU重启。干净SSH重连platform authorization denied，已异步请求新入口，无需root密码；当前远端queue未知。CANN/native/五报告/正式15全PENDING，无新OJ。固定旧gate median<=9.8463933且全五<10.540421、全精度/负值/同地址输入切换与guard，再进正式15；同时报告对上一row10.260410对照，不将旧收益归新协议。文档C15_CUBE_COLLECTIVE，source身份忽略artifacts/c15-cube-collective/source.json，脱敏连接log私有0600。整体目标未达成。
+
+## 2026-10-15 SSH未恢复，冻结C15验证包准备完成
+
+当前ccfaecc/ca66a541不变。重连exit255，当前仅Connection closed by UNKNOWN port65535，未收到新入口；前次platform authorization denied不冒充当前更明确diagnosis。新tools/native_oj_like/c15_cube_collective/run.sh及私有63748B包0de34414准备：source/wrapper/harness/完整frame/两input和golden/序列哈希核对，已有结果拒绝重启，实际CANN成功后绑定DSO，沿用原队列完成一次correctness→alternating→default五profile并打印不变gate；不自动OJ。Bash语法/三Python AST/九hash/archive权限路径已静态验证，**未执行任何CANN或NPU**。包忽略artifacts/c15-cube-collective，脚本与说明入Git，可在新入口后直接运行。当前阻碍仍有效云平台访问授权，整体目标未达成。

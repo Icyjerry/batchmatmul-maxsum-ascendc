@@ -49,3 +49,20 @@ kernel356814B/SHA **ca66a5417b3ba41d6dd86231e4f3e36fb28dc6ca7df9feb854c1218bee87
 暂停后前台SSH master/control socket消失，现有入口干净重连返回platform authorization denied，脱敏结果已确认；原始private log留/private/tmp/bmmms-remote-access/reconnect-current.log/0600，凭据不入Git。已请求用户刷新云平台访问授权，无需重复root密码。上次实际queue为空发生在暂停前；当前远端queue状态未知，不能写成已确认无任务。
 
 CANN编译、native精度、输入切换、五报告及正式15 **PENDING**，未创建任何新OJ任务。下一新SSH到达后：先检查真实master/queue/ps，上传本候选到按SHA命名的冻结目录，只构建一次独立native_oj_like shared；写source/DSO/wrapper身份；correctness→同地址序列→一次default五报告→对照上述gate。不要把阻碍归因成源码编译错误。
+
+## 2026-10-15 离线验证包已准备
+
+再次读取当前Git状态仍ccfaecc/源ca66a541，干净重连仍失败，当前脱敏stderr为Connection closed by UNKNOWN port65535；此前一次明确platform authorization denied仍是历史证据，不能把当前模糊关闭说成新增的明确授权诊断。没有新的SSH入口或活跃远端任务handle。
+
+新增独立验证脚本`tools/native_oj_like/c15_cube_collective/run.sh`，不修改算法/保护7/现有harness实现。其冻结传输包`artifacts/c15-cube-collective/c15-cube-collective-validation.tgz` **SHA0de344140d01b8dceb4db104d75e2fded50609a3b49743a6843d403c74c3b660 /63748B**，所有目录700/文件600，不含凭据、大日志或输入原件。包不入Git；脚本和流程说明入Git。
+
+包包含原sourceca66、原wrapper994e29f、原CMake/driver/job/analyze/c15fixture、从正确parent完整summary抽取的frame，以及9文件SHA manifest。启动前核对两个已有input的实际字节SHA、两份golden SHA、原完整frame、原fixture、同地址序列准确顺序和harness/source哈希；若已有任何该候选结果目录，拒绝重启以免覆盖未知/活跃job。成功编译后才创建source/DSO/wrapper identity，按原job.py串行correctness→alternating→一次完整default五报告，保留全样本、核对8Cube8AIV/8MMAD/true符号并打印原gate结果，不自动创建OJ。
+
+新入口恢复后，先核对真实SoC/queue/ps，再用scp -O上传包、解压到固定路径：
+
+```sh
+tar -xzf c15-cube-collective-validation.tgz
+bash c15-cube-collective-validation/run.sh /workspace/bmmms-codex
+```
+
+只有脚本开始启动后产生的新handle才可作为verified wait。当前仅`bash -n`、三个嵌入Python段AST解析、9文件hash/实际wrapper身份、archive安全路径及权限检查PASS；**没有运行build.sh/编译/NPU/profile**。启动时对原server输入/完整frame依赖缺失或属性变化应停止并审阅，不静默生成替换数据或放宽检查。
