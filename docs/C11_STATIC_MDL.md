@@ -1,3 +1,13 @@
+# Native终态：完整精度通过，中位仅改善2.58%，恢复2073
+
+实现80bb3ed/source3bcc585a/DSO3c470ca010d4f7d5fcaad100915de0d0ec32b8692cc252cb1897a03dafaea8f1，wrapper994e29f。CANN9/dav2201实际编译PASS。一次正确性及五性能调用native fullFP64/Input/yguard均通过，116.72545623779297与parent逐位一致，abs7.6293945e-6/rel6.5361869e-8。
+
+五default完整8表actualSTATIC_C11=true/20Cube40AIV/MMAD[160]*16+[128]*4全部确认。TaskDuration `[74.302971,75.042999,72.642906,73.282928,74.062965]`us，中位74.062965，对parent76.023041改善2.57826%，五次均低于父最快75.783028，但未预定10%门槛68.4207369。没有重采/扫描static字段、flags、block或step，没有OJ，恢复完整2073。FP16/全负/变化输入/另一SoC/候选正式15 NOT RUN。
+
+相同input/golden/normalPlan/SoC精确绑定逐项通过。完整raw已下载artifacts/c11-static-mdl/c11-static-mdl-evidence.tgz（700/600），含两轮编译source/log/候选完整五报告及正确性/DSO身份/实际frame/input元数据/golden/采前gate；parent原完整报告保留artifacts/c11-mdl-output-audit。不是正式隐藏属性确认。原正式820092/2073 Pass15不变，整体冲榜目标未完成。
+
+## 以下保留采前实现记录
+
 # C11 MDL compile-time tiling metadata
 
 ## Hypothesis and scope

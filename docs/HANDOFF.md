@@ -1,3 +1,15 @@
+# 当前终态：C11常量metadata通过native，仅2.58%，恢复正式Pass15保留版
+
+experiment/c11-static-mdl，当前kernel逐字a11e2d9/2073/353255B；正式820092 Pass15/398.92us保持，无新OJ，goal active未完成。80bb3ed/source3bcc585a保留完整实现；CANN9编译/native一次+五fullFP64/input-yguard通过，真实STATICtrue/20AIC40AIV/MMAD[160]*16+[128]*4不变。
+
+五times[74.302971,75.042999,72.642906,73.282928,74.062965]median74.062965 vs parent76.023041，改善2.57826%但未原10%gate68.4207369，已恢复2073。无重复/static字段/flags/block/step扫描/OJ，失败结构归档。Raw全本地artifacts/c11-static-mdl/c11-static-mdl-evidence.tgz，700/600；详见C11_STATIC_MDL。编译75928首轮exit2（API修复前）、46296修正exit0、native82802和download48719均终态0。
+
+NEXT 可独立评估未测C5：用户shapeB8M16N32K128、dtype/layout未确认，先明确本地fixture并实读normalPlan/profile。原SmallVectorK256Rows刻意排除M>=16且N>=16；C5现在Cube MIX11。若实际C5 MMAD远小于跨单元交接时间，评估完整批次纯Vector直接写y是否比Cube交接更省；这是不同于已失败的C6 B13M23N73K192 Vectorpairs，不将其失败改名重做，不先凭静态FLOPS宣称提速。尚无C5候选/设备实测。其它已归档方向见前序，不复活。
+
+SSHmaster57930/pid13934本turn有效，queue在native终态后重查空且ps无job/msprof/bisheng，9382/24AIC48AIV/dev0physical14/CANN9/caller20；下次先查实际状态。askpass已删，scp-O，凭据不入Git。
+
+## 以下保留历史交接（当前以上段为准）
+
 # 当前进行：C11原MDL常量tiling配置，CPU过、设备编译中
 
 experiment/c11-static-mdl，候选3bcc585a/355430B、45增2改 kernel lines。实际CANN9 MatmulApiStaticTiling公开类型，13字段冻结为actualC11 256x128x64/step1,1,4,4/depth8,8/db2,2,1/L1393216，余字段-1回runtime，DUAL_MDL_CONFIG原值不动。非换tile/输入转置/旧full-A/N-pair/GM新通路，原MDL所有计算/事件/归约body保持。formalC11属性仍明确假设，本地BF16TT。

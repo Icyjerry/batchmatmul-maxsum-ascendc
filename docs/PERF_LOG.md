@@ -1,3 +1,9 @@
+## 2026-10-15 C11原MDL常量tiling metadata：native通过，仅2.58%
+
+80bb3ed/source3bcc585a/DSO3c470ca0/wrapper994e29f，13字段冻结原native256x128x64/step1,1,4,4/depth8,8/db2,2,1/L1393216；原DUAL config/计算/所有事件/GM不变。CPUactualguard12/62和12/73/13constants16defaults/inverse2073/protected7 PASS。初版41ddda11编译namespace/早hook错误已保留，修正后CANN9/dav2201PASS。
+
+9382/24AIC48AIV/caller20，BF16TT1/1536/2048/2048明确localfixture。一次及五native fullFP64输出/inputs/yguard PASS，116.7254562378与parent相同。ActualSTATICtrue/20AIC40AIV/每核MMAD[160]*16+[128]*4不变，全8表×5。Times[74.302971,75.042999,72.642906,73.282928,74.062965]median74.062965us，parent76.023041，改善2.57826%但未采前10%<=68.4207369。五均快于父最快也不能降低median准入；恢复2073，无重复/static字段或参数扫描/OJ。其它dtype/全负/变化输入/正式15未跑。原始全下载artifacts/c11-static-mdl，详见C11_STATIC_MDL，goal未完成。
+
 ## 2026-10-15 C2 half Gather＋mixed FP32 VMLA：native正确、慢4.85%
 
 ba24cd1/source9c29cf19/DSOc88f3a71，CANN9/dav2201/9382 actual24AIC48AIV/caller20。明确FP16 B1M3N5K40四storage、无新GM；CPU536及8faults/actualguard5/31+5/42/wholeinverse/protected7通过。四layout各mixed-negative-mixed同地址native完整FP64精确/input-yguard通过。
