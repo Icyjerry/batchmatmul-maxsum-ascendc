@@ -29,3 +29,14 @@ CANN独立编译在 `native_oj_like/build-c15-ready`，冻结source路径 import
 修复通过后，以这份**正确的修复版**作为C15性能对照，才考虑 C15_RESIDENT_INPUT_AUDIT 的batched A/完整split B常驻L1；不以原错误输出0的耗时估计加速。驻留优化预设20%完整TaskDuration中位改善门槛不变，正确性修复本身不冒充性能突破，不自动创建OJ任务。
 
 Raw私有 `artifacts/c15-producer-ready` 与remote native_oj_like/results/c15-baseline-*。正式15点/另一SoC/当前ZIP接受源绑定尚未验证。
+
+
+## 修复版 native 终态：PASS，成为有效性能对照
+
+实际CANN9编译PASS，source2073f48e/353255B，DSOca36b327c9104b3006de2bb7ec732a3b817ae8fff447c6ce2a37e2d9c5fd28e6 /wrapper994e29f。相同case/full frame和输入，一次correctness精确输出1.6493455171585083，abs/rel均0。全负storage fullFP64golden -40.06380844116211，独立native correctness PASS。五次性能调用全部精确fullgolden，inputs/yguard完整，重复调用结果逐位相同。
+
+默认全部8表×5，actual MIX11/8AIC8AIV/FP16+PACKED true完整符号。五TaskDuration `[10.540421,10.940437,11.080443,11.540462,10.760430]` μs，中位 **10.940437μs**。不是对错误原版的速度提升；原版输出0，不采性能。这证明该设备/输入的写回通知修复有效，不替代正式15点或其它SoC。
+
+五sample内各role core-mean的中位：AIC MTE2 3.659375us、MTE1 1.086945us、Cube0.748125us、Fix0.218334us，AIV wait-id0 4.678958us、Vector0.131320us、barrier wait-id14 0.697431us。PMU时间重叠，不能相加或据此保证驻留收益。
+
+下一resident split input实验以本2073f48e为parent，预设20%gate **<=8.7523496μs**；失败恢复本正确修复版，不恢复已实测错误的原ZIP。正确修复保留在独立分支，未OJ/未main。全部raw包已下载 artifacts/c15-producer-ready/c15-ready-*，完整source/DSO/输入/Plan/SoC绑定。

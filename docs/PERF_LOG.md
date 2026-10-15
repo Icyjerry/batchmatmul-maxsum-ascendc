@@ -1185,3 +1185,10 @@ CPU实际新增producer分支/helpers78batch pairs/完整K/负值/零尾/输入b
 9382/24AIC48AIV/dev0physical14/CANN9队列复核，补回C6失败raw/编译log/DSO身份且不重跑。C15实际normalPlan dual25/BM64BN64/kSplit8/kChunk1024/workers8/cube8/final1，system16777216/total16908288。完整实际FP16storage FP64golden1.6493455171585083；ZIP078635/DSO0357587a一次correctness输出0.0/rel1/exit1，actual+guard bits和precision_failure.json已保存。没有profile，不能比较无效原版的速度。
 
 实际CANN9 SyncAllImpl<true>只同步AIV，原manual_split_tt无Cube partial完成通知。仅两行修复Cube PIPE_FIX set0→AIV wait0→原barrier/finalizer，source353255B/SHA2073f48e78d4，冻结独立CANN编译中。15个task-owner DAG+无/过早通知反例、实际位置/逆补丁/保护7通过，是CPU语义非native证据。完整数学/原GM/plan/其它入口不变。C15_PRODUCER_READY详述，后续先完整精度/负值/多次调用/五报告；通过才作为resident L1的有效性能对照，20%结构优化门槛保持，无新OJ任务。
+
+
+### C15 写回通知 native PASS：建立正确的10.940437us性能对照
+
+2073f48e/353255B，DSOca36b327，同C15输入/actual完整normalPlan：混合一次精度+五性能调用精确fullFP64golden1.6493455171585083，abs/rel0，inputs/yguard完整；全负golden-40.06380844116211另一次完整native精度PASS。默认8表×5，actual8AIC8AIV/MIX11/FP16PACKED true，TaskDuration[10.540421,10.940437,11.080443,11.540462,10.760430]us，中位10.940437。原ZIP输出0，没有有效性能对照，不称性能提升。原缺Cube→AIV依赖在本机被修复结果支持，正式15/其它SoC仍未验证。
+
+核心均值五次中位AIC MTE2=3.659375/MTE1=1.086945/MAC=.748125/Fix=.218334us，AIV flag0wait4.678958/Vector.131320/barrier14wait.697431，重叠不可相加。接下来resident split input只在这份正确parent上比较，20%gate<=8.7523496us，失败恢复2073f48e。全部原始包已下载，未新OJ。
