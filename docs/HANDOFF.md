@@ -18,7 +18,7 @@
 
 ## 下一条可执行动作
 
-- 用户澄清比较最早队友版本，授权一次正式验证；唯一新任务 **6ad046feaad397b6d98aa318** 已创建，kernel2073f48e/353255B、七保护文件及dry-run一致。立即查询同ID到终态，不重复提交。本次授权已用，不沿用此前“无新任务”状态。CANN/15precision/perf PENDING，raw ignored artifacts/producer-ready-formal-20261015。
+- 用户澄清比较最早队友版本，授权一次正式验证；唯一新任务 **6ad046feaad397b6d98aa318** 已创建，kernel2073f48e/353255B、七保护文件及dry-run一致。立即查询同ID到终态，不重复提交。本次授权已用，不沿用此前“无新任务”状态。服务端ID820092/Running（无case结果），服务端源码SHA已再次核对一致。CANN/15precision/perf PENDING，raw ignored artifacts/producer-ready-formal-20261015。
 
 - 当前没有活跃NPU任务，exec79837/95735/8673均terminal0。全部C11编译/host SDK query/真实selector/correctness/profile包以及C15alternating包已下载，private artifacts目录700/files600。不要重新启动这些任务。
 - 后续应从2073出发选择有新证据且未失败的结构方向，或补本机shape/layout/dtype正确性覆盖；不复活C11 NN tiling/C15resident微调。没有达到重大性能突破；仅执行本次用户明确授权的唯一OJ验证，不额外创建任务。

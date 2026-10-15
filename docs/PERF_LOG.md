@@ -1220,3 +1220,5 @@ PMU核心均值五次中位：AIV Vector5.146000→1.953111us，但AIC MTE1 25.4
 用户澄清比较对象为最早队友版本，授权一次正式验证。当前kernel2073f48e/353255B（3ff5ff4，字节等于a11e2d9），包含较新队友整合及本机C15 producer-ready修复，不包含已撤回的C11 NN Cᵀ或其它未过gate实验。七保护文件逐字1734f16，隔离工程dry-run只上传kernel.asc且SHA一致。
 
 唯一正式任务 **6ad046feaad397b6d98aa318** 已创建。查询同ID至终态，不重复提交；当前CANN/15precision/性能结果PENDING。这不是已确认相对最早队友版的同设备总耗时收益。原始身份/results保留ignored artifacts/producer-ready-formal-20261015。
+
+服务端自有任务读取成功：ID820092，状态Running，尚无case结果；服务端保存kernel.asc SHA与冻结2073f48e一致。此前读取队友任务403不代表本次提交权限失败。未重复创建任务，继续查询6ad046feaad397b6d98aa318即可，正式成绩仍PENDING。
